@@ -302,7 +302,7 @@ const LandingPage = () => {
 
       {/* Featured Products */}
       <section id="products" className="py-16 bg-white">
-        <div className=" w-full container mx-auto px-2">
+        <div className="container w-full mx-auto px-2 max-w-screen-xl">
           <div className="text-center space-y-4 mb-12">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium mb-4">
               Produk Terlaris
