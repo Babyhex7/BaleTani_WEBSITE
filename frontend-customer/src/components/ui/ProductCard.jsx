@@ -49,10 +49,7 @@ const ProductCard = ({
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span>Stok: {product.stock}</span>
           </div>
-          <div className="flex items-center space-x-1">
-            <Star className="text-yellow-400 fill-current" size={16} />
-            <span className="text-gray-700 font-medium">4.8</span>
-          </div>
+        
         </div>
         
         <div className="space-y-2 pt-2">

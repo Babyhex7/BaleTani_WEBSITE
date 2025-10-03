@@ -200,7 +200,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen  bg-white">
       {/* Hero Section */}
       <section className="relative bg-white py-16 lg:py-18">
         <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-white to-blue-50 opacity-40"></div>
@@ -223,7 +223,7 @@ const LandingPage = () => {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
-                  size="lg" 
+                  size="small" 
                   className="bg-green-600 hover:bg-green-700 text-white"
                   onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
                 >
@@ -232,7 +232,7 @@ const LandingPage = () => {
                 </Button>
                 <Button 
                   variant="outline" 
-                  size="lg" 
+                  size="small" 
                   className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
                   onClick={() => handleWhatsAppOrder('Konsultasi Produk', 0, 'gratis')}
                 >
@@ -302,7 +302,7 @@ const LandingPage = () => {
 
       {/* Featured Products */}
       <section id="products" className="py-16 bg-white">
-        <div className="container mx-auto px-4">
+        <div className=" w-full container mx-auto px-2">
           <div className="text-center space-y-4 mb-12">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium mb-4">
               Produk Terlaris
