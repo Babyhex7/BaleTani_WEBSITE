@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { ShoppingCart, Star, MessageCircle, Heart, TrendingUp, Package, Clock, Filter, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import useAuthStore from '../store/useAuthStore';
-import Button from '../components/ui/Button';
+import useAuthStore from '../../store/store_customer/useAuthStore';
+import Button from '../../components/ui/Button';
 
 /**
  * Komponen Home untuk pengguna yang sudah login

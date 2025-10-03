@@ -1,5 +1,5 @@
 import axios from "axios";
-import useAuthStore from "../store/useAuthStore";
+import useAuthStore from "../../store/store_customer/useAuthStore";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";

@@ -2,10 +2,10 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import LandingPage from './pages/LandingPage';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import useAuthStore from './store/useAuthStore';
+import Home from './pages/customer/Home';
+import Login from './pages/customer/Login';
+import Register from './pages/customer/Register';
+import useAuthStore from './store/store_customerStore';
 
 /**
  * Komponen utama aplikasi yang mengatur routing

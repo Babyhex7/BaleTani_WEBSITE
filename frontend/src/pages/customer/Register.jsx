@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft, CheckCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import useAuthStore from '../store/useAuthStore';
-import authService from '../services/authService';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
+import useAuthStore from '../../store/store_customer/useAuthStore';
+import authService from '../../services/services_customer/authService';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
 
 const Register = () => {
   const [formData, setFormData] = useState({
