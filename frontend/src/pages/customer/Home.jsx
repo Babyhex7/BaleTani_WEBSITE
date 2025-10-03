@@ -303,12 +303,12 @@ const Home = () => {
                       <ShoppingCart className="mr-2" size={16} />
                       Tambah ke Keranjang
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="whatsapp"
                       className="w-full"
                       onClick={() => handleWhatsAppOrder(product.name, product.price, product.unit)}
                     >
-                      <MessageCircle className="mr-2" size={16} />
+                      <MessageCircle className="mr-2 h-4 w-4" />
                       Pesan via WhatsApp
                     </Button>
                   </div>

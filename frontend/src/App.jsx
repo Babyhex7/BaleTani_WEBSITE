@@ -6,6 +6,8 @@ import Home from './pages/customer/Home';
 import Login from './pages/customer/Login';
 import Register from './pages/customer/Register';
 import useAuthStore from './store/store_customer/useAuthStore';
+import ContactPage from './pages/customer/ContactPage';
+import KategoriPage from './pages/customer/KategoriPage';
 
 /**
  * Komponen utama aplikasi yang mengatur routing
@@ -25,11 +27,11 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/categories" element={<KategoriPage />} />
           {/* Placeholder routes - akan dibuat nanti */}
           <Route path="/products" element={<div className="container-custom section-padding"><h1 className="text-2xl font-bold">Halaman Produk (Coming Soon)</h1></div>} />
           <Route path="/promo" element={<div className="container-custom section-padding"><h1 className="text-2xl font-bold">Halaman Promo (Coming Soon)</h1></div>} />
-          <Route path="/categories" element={<div className="container-custom section-padding"><h1 className="text-2xl font-bold">Halaman Kategori (Coming Soon)</h1></div>} />
-          <Route path="/contact" element={<div className="container-custom section-padding"><h1 className="text-2xl font-bold">Halaman Kontak (Coming Soon)</h1></div>} />
           <Route path="/about" element={<div className="container-custom section-padding"><h1 className="text-2xl font-bold">Tentang Kami (Coming Soon)</h1></div>} />
           <Route path="/profile" element={<div className="container-custom section-padding"><h1 className="text-2xl font-bold">Profil (Coming Soon)</h1></div>} />
           <Route path="/orders" element={<div className="container-custom section-padding"><h1 className="text-2xl font-bold">Pesanan Saya (Coming Soon)</h1></div>} />

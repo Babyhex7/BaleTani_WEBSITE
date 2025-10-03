@@ -543,13 +543,15 @@ const LandingPage = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
+              variant="whatsapp"
               size="lg"
-              className="bg-white text-green-600 hover:bg-gray-100"
-              onClick={() => handleWhatsAppOrder('Konsultasi Pemesanan', 0, 'gratis')}
+              className="focus:ring-[#25D366]"
+              onClick={() => handleWhatsAppOrder('Konsultasi Produk', 0, 'gratis')}
             >
               <MessageCircle className="mr-2" size={20} />
-              Pesan via WhatsApp
+              Chat WhatsApp
             </Button>
+
             <Link to="/products">
               <Button 
                 variant="outline" 
