@@ -3,7 +3,7 @@
  * Menyediakan endpoint untuk mengakses data produk
  */
 
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const {
   getAllProducts,
@@ -11,8 +11,8 @@ const {
   getFeaturedProducts,
   getAllCategories,
   searchProducts,
-  getProductsByCategory
-} = require('../controllers/productController');
+  getProductsByCategory,
+} = require("../controllers/productController");
 
 // Routes untuk produk
 /**
@@ -20,21 +20,21 @@ const {
  * Mendapatkan semua produk dengan filter dan pagination
  * Query params: page, limit, category, search, sort, minPrice, maxPrice
  */
-router.get('/', getAllProducts);
+router.get("/", getAllProducts);
 
 /**
  * GET /api/products/featured
  * Mendapatkan produk unggulan
  * Query params: limit
  */
-router.get('/featured', getFeaturedProducts);
+router.get("/featured", getFeaturedProducts);
 
 /**
  * GET /api/products/search
  * Pencarian produk berdasarkan keyword
  * Query params: q (keyword), limit
  */
-router.get('/search', searchProducts);
+router.get("/search", searchProducts);
 
 /**
  * GET /api/products/category/:categorySlug
@@ -42,13 +42,13 @@ router.get('/search', searchProducts);
  * Params: categorySlug
  * Query params: page, limit, sort
  */
-router.get('/category/:categorySlug', getProductsByCategory);
+router.get("/category/:categorySlug", getProductsByCategory);
 
 /**
  * GET /api/products/:id
  * Mendapatkan detail produk berdasarkan ID
  * Params: id
  */
-router.get('/:id', getProductById);
+router.get("/:id", getProductById);
 
 module.exports = router;

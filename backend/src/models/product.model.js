@@ -28,7 +28,7 @@ const Product = sequelize.define(
     unit: {
       type: DataTypes.STRING(20),
       allowNull: false,
-      defaultValue: 'kg'
+      defaultValue: "kg",
     },
     stock: {
       type: DataTypes.INTEGER,

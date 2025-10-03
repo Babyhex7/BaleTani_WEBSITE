@@ -4,8 +4,8 @@
  * Peringatan: Script ini akan menghapus semua data yang ada!
  */
 
-const { sequelize } = require('../src/config/database');
-const models = require('../src/models');
+const { sequelize } = require("../src/config/database");
+const models = require("../src/models");
 
 /**
  * Fungsi untuk force sync database
@@ -13,17 +13,17 @@ const models = require('../src/models');
  */
 const forceSyncDatabase = async () => {
   try {
-    console.log('🔄 Memulai force sync database...');
-    
+    console.log("🔄 Memulai force sync database...");
+
     // Force sync akan drop semua tabel dan membuat ulang
     await sequelize.sync({ force: true });
-    
-    console.log('✅ Database berhasil di-sync dengan force!');
-    console.log('📋 Struktur tabel telah diperbarui sesuai dengan model');
-    
+
+    console.log("✅ Database berhasil di-sync dengan force!");
+    console.log("📋 Struktur tabel telah diperbarui sesuai dengan model");
+
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error saat force sync database:', error);
+    console.error("❌ Error saat force sync database:", error);
     process.exit(1);
   }
 };

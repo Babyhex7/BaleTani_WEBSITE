@@ -3,8 +3,8 @@
  * Menyediakan API endpoint untuk CRUD produk dan kategori
  */
 
-const { Product, Category } = require('../models');
-const { Op } = require('sequelize');
+const { Product, Category } = require("../models");
+const { Op } = require("sequelize");
 
 /**
  * Mendapatkan semua produk dengan filter dan pagination
@@ -24,9 +24,9 @@ const getAllProducts = async (req, res) => {
       limit = 12,
       category,
       search,
-      sort = 'newest',
+      sort = "newest",
       minPrice,
-      maxPrice
+      maxPrice,
     } = req.query;
 
     // Setup pagination
@@ -38,9 +38,9 @@ const getAllProducts = async (req, res) => {
     const includeConditions = [
       {
         model: Category,
-        as: 'category',
-        attributes: ['id', 'name', 'slug']
-      }
+        as: "category",
+        attributes: ["id", "name", "slug"],
+      },
     ];
 
     // Filter berdasarkan kategori
@@ -51,7 +51,7 @@ const getAllProducts = async (req, res) => {
     // Filter berdasarkan pencarian
     if (search) {
       whereConditions.name = {
-        [Op.like]: `%${search}%`
+        [Op.like]: `%${search}%`,
       };
     }
 
@@ -63,25 +63,25 @@ const getAllProducts = async (req, res) => {
     }
 
     // Setup sorting
-    let orderBy = [['createdAt', 'DESC']]; // default: newest
+    let orderBy = [["createdAt", "DESC"]]; // default: newest
     switch (sort) {
-      case 'name_asc':
-        orderBy = [['name', 'ASC']];
+      case "name_asc":
+        orderBy = [["name", "ASC"]];
         break;
-      case 'name_desc':
-        orderBy = [['name', 'DESC']];
+      case "name_desc":
+        orderBy = [["name", "DESC"]];
         break;
-      case 'price_asc':
-        orderBy = [['price', 'ASC']];
+      case "price_asc":
+        orderBy = [["price", "ASC"]];
         break;
-      case 'price_desc':
-        orderBy = [['price', 'DESC']];
+      case "price_desc":
+        orderBy = [["price", "DESC"]];
         break;
-      case 'newest':
-        orderBy = [['createdAt', 'DESC']];
+      case "newest":
+        orderBy = [["createdAt", "DESC"]];
         break;
       default:
-        orderBy = [['createdAt', 'DESC']];
+        orderBy = [["createdAt", "DESC"]];
     }
 
     // Query produk dengan filter dan pagination
@@ -91,7 +91,7 @@ const getAllProducts = async (req, res) => {
       offset,
       limit: pageLimit,
       order: orderBy,
-      distinct: true
+      distinct: true,
     });
 
     // Hitung total halaman
@@ -99,7 +99,7 @@ const getAllProducts = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Produk berhasil diambil',
+      message: "Produk berhasil diambil",
       data: {
         products,
         pagination: {
@@ -108,17 +108,16 @@ const getAllProducts = async (req, res) => {
           totalItems: count,
           itemsPerPage: pageLimit,
           hasNextPage: parseInt(page) < totalPages,
-          hasPrevPage: parseInt(page) > 1
-        }
-      }
+          hasPrevPage: parseInt(page) > 1,
+        },
+      },
     });
-
   } catch (error) {
-    console.error('Error mengambil produk:', error);
+    console.error("Error mengambil produk:", error);
     res.status(500).json({
       success: false,
-      message: 'Gagal mengambil produk',
-      error: error.message
+      message: "Gagal mengambil produk",
+      error: error.message,
     });
   }
 };
@@ -134,31 +133,30 @@ const getProductById = async (req, res) => {
       include: [
         {
           model: Category,
-          as: 'category',
-          attributes: ['id', 'name', 'slug', 'description']
-        }
-      ]
+          as: "category",
+          attributes: ["id", "name", "slug", "description"],
+        },
+      ],
     });
 
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Produk tidak ditemukan'
+        message: "Produk tidak ditemukan",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Detail produk berhasil diambil',
-      data: product
+      message: "Detail produk berhasil diambil",
+      data: product,
     });
-
   } catch (error) {
-    console.error('Error mengambil detail produk:', error);
+    console.error("Error mengambil detail produk:", error);
     res.status(500).json({
       success: false,
-      message: 'Gagal mengambil detail produk',
-      error: error.message
+      message: "Gagal mengambil detail produk",
+      error: error.message,
     });
   }
 };
@@ -174,34 +172,33 @@ const getFeaturedProducts = async (req, res) => {
     const products = await Product.findAll({
       where: {
         stock: { [Op.gt]: 10 }, // stok lebih dari 10
-        isActive: true
+        isActive: true,
       },
       include: [
         {
           model: Category,
-          as: 'category',
-          attributes: ['id', 'name', 'slug']
-        }
+          as: "category",
+          attributes: ["id", "name", "slug"],
+        },
       ],
       limit: parseInt(limit),
       order: [
-        ['stock', 'DESC'],
-        ['price', 'ASC']
-      ]
+        ["stock", "DESC"],
+        ["price", "ASC"],
+      ],
     });
 
     res.status(200).json({
       success: true,
-      message: 'Produk unggulan berhasil diambil',
-      data: products
+      message: "Produk unggulan berhasil diambil",
+      data: products,
     });
-
   } catch (error) {
-    console.error('Error mengambil produk unggulan:', error);
+    console.error("Error mengambil produk unggulan:", error);
     res.status(500).json({
       success: false,
-      message: 'Gagal mengambil produk unggulan',
-      error: error.message
+      message: "Gagal mengambil produk unggulan",
+      error: error.message,
     });
   }
 };
@@ -212,39 +209,38 @@ const getFeaturedProducts = async (req, res) => {
 const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.findAll({
-      attributes: ['id', 'name', 'slug', 'description'],
+      attributes: ["id", "name", "slug", "description"],
       include: [
         {
           model: Product,
-          as: 'products',
-          attributes: ['id'], // hanya ambil id untuk menghitung
+          as: "products",
+          attributes: ["id"], // hanya ambil id untuk menghitung
           where: { isActive: true },
-          required: false
-        }
-      ]
+          required: false,
+        },
+      ],
     });
 
     // Tambahkan jumlah produk per kategori
-    const categoriesWithCount = categories.map(category => ({
+    const categoriesWithCount = categories.map((category) => ({
       id: category.id,
       name: category.name,
       slug: category.slug,
       description: category.description,
-      productCount: category.products.length
+      productCount: category.products.length,
     }));
 
     res.status(200).json({
       success: true,
-      message: 'Kategori berhasil diambil',
-      data: categoriesWithCount
+      message: "Kategori berhasil diambil",
+      data: categoriesWithCount,
     });
-
   } catch (error) {
-    console.error('Error mengambil kategori:', error);
+    console.error("Error mengambil kategori:", error);
     res.status(500).json({
       success: false,
-      message: 'Gagal mengambil kategori',
-      error: error.message
+      message: "Gagal mengambil kategori",
+      error: error.message,
     });
   }
 };
@@ -259,7 +255,7 @@ const searchProducts = async (req, res) => {
     if (!keyword || keyword.trim().length < 2) {
       return res.status(400).json({
         success: false,
-        message: 'Keyword pencarian minimal 2 karakter'
+        message: "Keyword pencarian minimal 2 karakter",
       });
     }
 
@@ -267,33 +263,32 @@ const searchProducts = async (req, res) => {
       where: {
         [Op.or]: [
           { name: { [Op.like]: `%${keyword}%` } },
-          { description: { [Op.like]: `%${keyword}%` } }
+          { description: { [Op.like]: `%${keyword}%` } },
         ],
-        isActive: true
+        isActive: true,
       },
       include: [
         {
           model: Category,
-          as: 'category',
-          attributes: ['id', 'name', 'slug']
-        }
+          as: "category",
+          attributes: ["id", "name", "slug"],
+        },
       ],
       limit: parseInt(limit),
-      order: [['name', 'ASC']]
+      order: [["name", "ASC"]],
     });
 
     res.status(200).json({
       success: true,
       message: `Ditemukan ${products.length} produk untuk "${keyword}"`,
-      data: products
+      data: products,
     });
-
   } catch (error) {
-    console.error('Error pencarian produk:', error);
+    console.error("Error pencarian produk:", error);
     res.status(500).json({
       success: false,
-      message: 'Gagal melakukan pencarian',
-      error: error.message
+      message: "Gagal melakukan pencarian",
+      error: error.message,
     });
   }
 };
@@ -304,14 +299,14 @@ const searchProducts = async (req, res) => {
 const getProductsByCategory = async (req, res) => {
   try {
     const { categorySlug } = req.params;
-    const { page = 1, limit = 12, sort = 'newest' } = req.query;
+    const { page = 1, limit = 12, sort = "newest" } = req.query;
 
     // Cari kategori berdasarkan slug
     const category = await Category.findOne({ where: { slug: categorySlug } });
     if (!category) {
       return res.status(404).json({
         success: false,
-        message: 'Kategori tidak ditemukan'
+        message: "Kategori tidak ditemukan",
       });
     }
 
@@ -320,38 +315,38 @@ const getProductsByCategory = async (req, res) => {
     const pageLimit = parseInt(limit);
 
     // Setup sorting
-    let orderBy = [['createdAt', 'DESC']];
+    let orderBy = [["createdAt", "DESC"]];
     switch (sort) {
-      case 'name_asc':
-        orderBy = [['name', 'ASC']];
+      case "name_asc":
+        orderBy = [["name", "ASC"]];
         break;
-      case 'name_desc':
-        orderBy = [['name', 'DESC']];
+      case "name_desc":
+        orderBy = [["name", "DESC"]];
         break;
-      case 'price_asc':
-        orderBy = [['price', 'ASC']];
+      case "price_asc":
+        orderBy = [["price", "ASC"]];
         break;
-      case 'price_desc':
-        orderBy = [['price', 'DESC']];
+      case "price_desc":
+        orderBy = [["price", "DESC"]];
         break;
     }
 
     // Query produk dalam kategori
     const { count, rows: products } = await Product.findAndCountAll({
-      where: { 
+      where: {
         categoryId: category.id,
-        isActive: true 
+        isActive: true,
       },
       include: [
         {
           model: Category,
-          as: 'category',
-          attributes: ['id', 'name', 'slug']
-        }
+          as: "category",
+          attributes: ["id", "name", "slug"],
+        },
       ],
       offset,
       limit: pageLimit,
-      order: orderBy
+      order: orderBy,
     });
 
     const totalPages = Math.ceil(count / pageLimit);
@@ -368,17 +363,16 @@ const getProductsByCategory = async (req, res) => {
           totalItems: count,
           itemsPerPage: pageLimit,
           hasNextPage: parseInt(page) < totalPages,
-          hasPrevPage: parseInt(page) > 1
-        }
-      }
+          hasPrevPage: parseInt(page) > 1,
+        },
+      },
     });
-
   } catch (error) {
-    console.error('Error mengambil produk kategori:', error);
+    console.error("Error mengambil produk kategori:", error);
     res.status(500).json({
       success: false,
-      message: 'Gagal mengambil produk kategori',
-      error: error.message
+      message: "Gagal mengambil produk kategori",
+      error: error.message,
     });
   }
 };
@@ -389,5 +383,5 @@ module.exports = {
   getFeaturedProducts,
   getAllCategories,
   searchProducts,
-  getProductsByCategory
+  getProductsByCategory,
 };
