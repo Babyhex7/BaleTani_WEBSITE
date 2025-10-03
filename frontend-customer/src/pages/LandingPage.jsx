@@ -241,36 +241,7 @@ const LandingPage = () => {
                 </Button>
               </div>
 
-              {/* Trust indicators */}
-              <div className="grid grid-cols-3 gap-4 pt-8">
-                <div className="flex items-center space-x-3 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <Shield className="text-green-600" size={20} />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-gray-900">100% Segar</div>
-                    <div className="text-xs text-gray-600">Jaminan Kualitas</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Truck className="text-blue-600" size={20} />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-gray-900">Kirim Cepat</div>
-                    <div className="text-xs text-gray-600">Same Day</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Clock className="text-purple-600" size={20} />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-gray-900">24/7 Order</div>
-                    <div className="text-xs text-gray-600">Kapan Saja</div>
-                  </div>
-                </div>
-              </div>
+             
             </div>
 
             <div className="relative">
