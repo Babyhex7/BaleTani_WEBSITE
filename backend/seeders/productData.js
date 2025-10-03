@@ -1,0 +1,104 @@
+/**
+ * Seed data untuk produk BaleTani Fresh Market
+ * Data sesuai dengan list produk yang diminta
+ */
+
+const seedProducts = [
+  // Seafood
+  { id: 1, name: 'Udang sedang 1', categoryId: 1, price: 65000, unit: 'kg', stock: 25, isActive: true, description: 'Udang sedang segar ukuran 1 langsung dari tambak' },
+  { id: 2, name: 'Udang sedang 2', categoryId: 1, price: 70000, unit: 'kg', stock: 20, isActive: true, description: 'Udang sedang segar ukuran 2 kualitas premium' },
+  { id: 3, name: 'Udang besar', categoryId: 1, price: 85000, unit: 'kg', stock: 15, isActive: true, description: 'Udang besar segar ukuran jumbo' },
+  { id: 4, name: 'Udang kecil', categoryId: 1, price: 40000, unit: 'kg', stock: 30, isActive: true, description: 'Udang kecil segar untuk masakan rumahan' },
+  { id: 5, name: 'Cumi', categoryId: 1, price: 65000, unit: 'kg', stock: 18, isActive: true, description: 'Cumi-cumi segar langsung dari laut' },
+  { id: 6, name: 'Ikan Kembung', categoryId: 1, price: 30000, unit: 'kg', stock: 25, isActive: true, description: 'Ikan kembung segar kaya omega 3' },
+  { id: 15, name: 'Bawal', categoryId: 1, price: 35000, unit: 'kg', stock: 20, isActive: true, description: 'Ikan bawal segar daging tebal' },
+  { id: 30, name: 'Tongkol', categoryId: 1, price: 40000, unit: 'kg', stock: 22, isActive: true, description: 'Ikan tongkol segar untuk masakan tradisional' },
+  { id: 31, name: 'Cengek', categoryId: 1, price: 75000, unit: 'kg', stock: 12, isActive: true, description: 'Ikan cengek segar kualitas premium' },
+
+  // Daging & Unggas
+  { id: 7, name: 'Ayam filet', categoryId: 2, price: 43000, unit: 'kg', stock: 30, isActive: true, description: 'Daging ayam filet tanpa tulang tanpa kulit' },
+  { id: 8, name: 'Ceker Ayam', categoryId: 2, price: 15000, unit: 'kg', stock: 40, isActive: true, description: 'Ceker ayam segar untuk kolak atau sup' },
+  { id: 9, name: 'Sayap Ayam', categoryId: 2, price: 35000, unit: 'kg', stock: 35, isActive: true, description: 'Sayap ayam segar untuk dipanggang atau digoreng' },
+  { id: 10, name: 'Ayam potong (all part)', categoryId: 2, price: 35000, unit: 'kg', stock: 25, isActive: true, description: 'Ayam potong lengkap semua bagian' },
+  { id: 12, name: 'Ayam', categoryId: 2, price: 27000, unit: 'kg', stock: 28, isActive: true, description: 'Ayam utuh segar untuk berbagai masakan' },
+
+  // Telur
+  { id: 11, name: 'Telor puyuh', categoryId: 3, price: 40000, unit: 'kg', stock: 50, isActive: true, description: 'Telur puyuh segar kaya protein' },
+  { id: 53, name: 'Telur Ayam Kampung', categoryId: 3, price: 3000, unit: 'pcs', stock: 100, isActive: true, description: 'Telur ayam kampung organik per butir' },
+  { id: 54, name: 'Telur Ayam Ras', categoryId: 3, price: 29000, unit: 'kg', stock: 60, isActive: true, description: 'Telur ayam ras segar per kilogram' },
+
+  // Rempah & Bumbu
+  { id: 13, name: 'Sereh', categoryId: 4, price: 12000, unit: 'kg', stock: 45, isActive: true, description: 'Serai segar untuk bumbu masakan' },
+  { id: 14, name: 'Jahe', categoryId: 4, price: 32000, unit: 'kg', stock: 35, isActive: true, description: 'Jahe segar kualitas terbaik' },
+  { id: 16, name: 'Cikur', categoryId: 4, price: 50000, unit: 'kg', stock: 20, isActive: true, description: 'Kencur segar untuk jamu dan bumbu' },
+  { id: 17, name: 'Lengkuas', categoryId: 4, price: 20000, unit: 'kg', stock: 30, isActive: true, description: 'Lengkuas segar untuk masakan tradisional' },
+  { id: 18, name: 'Koneng', categoryId: 4, price: 18000, unit: 'kg', stock: 25, isActive: true, description: 'Kunyit segar untuk bumbu dan jamu' },
+  { id: 20, name: 'Salam', categoryId: 4, price: 500, unit: 'iket', stock: 100, isActive: true, description: 'Daun salam segar per ikat' },
+  { id: 21, name: 'Daun jeruk', categoryId: 4, price: 2000, unit: 'pak', stock: 80, isActive: true, description: 'Daun jeruk segar per pak' },
+  { id: 32, name: 'Bawang putih', categoryId: 4, price: 40000, unit: 'kg', stock: 40, isActive: true, description: 'Bawang putih segar kualitas super' },
+  { id: 33, name: 'Cabe Kriting', categoryId: 4, price: 72000, unit: 'kg', stock: 15, isActive: true, description: 'Cabai keriting segar pedas mantap' },
+
+  // Sayuran
+  { id: 19, name: 'Tomat', categoryId: 5, price: 10000, unit: 'kg', stock: 50, isActive: true, description: 'Tomat segar matang pohon' },
+  { id: 22, name: 'Kentang', categoryId: 5, price: 18000, unit: 'kg', stock: 45, isActive: true, description: 'Kentang segar kualitas pilihan' },
+  { id: 34, name: 'Suraung', categoryId: 5, price: 15000, unit: 'iket', stock: 30, isActive: true, description: 'Daun surawung segar per ikat' },
+  { id: 35, name: 'Sledri', categoryId: 5, price: 20000, unit: 'kg', stock: 25, isActive: true, description: 'Seledri segar untuk masakan' },
+  { id: 36, name: 'Wortel', categoryId: 5, price: 14000, unit: 'kg', stock: 40, isActive: true, description: 'Wortel segar kaya vitamin A' },
+  { id: 37, name: 'Daun bawang', categoryId: 5, price: 12000, unit: 'kg', stock: 35, isActive: true, description: 'Daun bawang segar untuk taburan' },
+  { id: 44, name: 'Kentang Lokal Dieng', categoryId: 5, price: 17000, unit: 'kg', stock: 30, isActive: true, description: 'Kentang lokal Dieng kualitas premium' },
+  { id: 46, name: 'Kol/Kubis', categoryId: 5, price: 7000, unit: 'kg', stock: 35, isActive: true, description: 'Kubis segar untuk sayur dan lalapan' },
+
+  // Buah-buahan
+  { id: 23, name: 'Pete', categoryId: 6, price: 30000, unit: 'iket', stock: 20, isActive: true, description: 'Petai segar per ikat' },
+  { id: 24, name: 'Apel', categoryId: 6, price: 30000, unit: 'kg', stock: 40, isActive: true, description: 'Apel segar manis dan renyah' },
+  { id: 25, name: 'Lemon premium', categoryId: 6, price: 32000, unit: 'kg', stock: 25, isActive: true, description: 'Lemon premium kualitas import' },
+  { id: 26, name: 'Lemon biasa', categoryId: 6, price: 20000, unit: 'kg', stock: 30, isActive: true, description: 'Lemon lokal segar asam segar' },
+  { id: 27, name: 'Salak', categoryId: 6, price: 10000, unit: 'kg', stock: 35, isActive: true, description: 'Salak segar manis legit' },
+  { id: 28, name: 'Mangis', categoryId: 6, price: 17000, unit: 'kg', stock: 25, isActive: true, description: 'Manggis segar ratu buah' },
+  { id: 29, name: 'Nanas', categoryId: 6, price: 12000, unit: 'pcs', stock: 20, isActive: true, description: 'Nanas segar manis per buah' },
+  { id: 40, name: 'Jeruk 1 Kg', categoryId: 6, price: 24000, unit: 'kg', stock: 30, isActive: true, description: 'Jeruk segar manis per kilogram' },
+  { id: 51, name: 'Pisang 1 Kg', categoryId: 6, price: 24000, unit: 'kg', stock: 40, isActive: true, description: 'Pisang segar matang per kilogram' },
+
+  // Biji-bijian & Kacang
+  { id: 38, name: 'Jagung Manis', categoryId: 7, price: 10000, unit: 'kg', stock: 35, isActive: true, description: 'Jagung manis segar per kilogram' },
+  { id: 39, name: 'Jagung Pipilan', categoryId: 7, price: 12000, unit: 'kg', stock: 40, isActive: true, description: 'Jagung pipil kering per kilogram' },
+  { id: 41, name: 'Kacang Hijau', categoryId: 7, price: 24000, unit: 'kg', stock: 30, isActive: true, description: 'Kacang hijau kualitas super' },
+  { id: 42, name: 'Kacang Kedelai', categoryId: 7, price: 14000, unit: 'kg', stock: 35, isActive: true, description: 'Kacang kedelai untuk tempe tahu' },
+  { id: 43, name: 'Kacang Tanah', categoryId: 7, price: 28000, unit: 'kg', stock: 25, isActive: true, description: 'Kacang tanah segar untuk gorengan' },
+
+  // Umbi-umbian
+  { id: 45, name: 'Ketela Pohon', categoryId: 8, price: 5000, unit: 'pcs', stock: 50, isActive: true, description: 'Singkong segar per buah' },
+
+  // Makanan Instan & Olahan
+  { id: 47, name: 'Mie Instan', categoryId: 9, price: 3000, unit: 'pcs', stock: 100, isActive: true, description: 'Mie instan per bungkus' },
+  { id: 52, name: 'Susu Kental Manis', categoryId: 9, price: 12000, unit: 'pcs', stock: 60, isActive: true, description: 'Susu kental manis per kaleng' },
+  { id: 55, name: 'Tempe 1 Kg', categoryId: 9, price: 12000, unit: 'kg', stock: 40, isActive: true, description: 'Tempe segar per kilogram' },
+  { id: 56, name: 'Tahu Mentah 1 Kg', categoryId: 9, price: 8000, unit: 'kg', stock: 50, isActive: true, description: 'Tahu putih segar per kilogram' },
+
+  // Minyak & Bahan Masak
+  { id: 48, name: 'Minyak Goreng (Curah)', categoryId: 10, price: 18000, unit: 'kg', stock: 45, isActive: true, description: 'Minyak goreng curah per kilogram' },
+  { id: 49, name: 'Minyak Goreng (Kemasan)', categoryId: 10, price: 20000, unit: 'kg', stock: 40, isActive: true, description: 'Minyak goreng kemasan branded' },
+  { id: 57, name: 'Tepung Terigu Cakra Kembar', categoryId: 10, price: 13000, unit: 'kg', stock: 35, isActive: true, description: 'Tepung terigu protein sedang' },
+
+  // Gas & BBM
+  { id: 50, name: 'LPG 3KG', categoryId: 11, price: 22000, unit: 'pcs', stock: 25, isActive: true, description: 'Tabung gas LPG 3 kilogram' }
+];
+
+const seedCategories = [
+  { id: 1, name: 'Seafood', description: 'Ikan dan hasil laut segar', slug: 'seafood' },
+  { id: 2, name: 'Daging & Unggas', description: 'Daging segar dan unggas', slug: 'daging-unggas' },
+  { id: 3, name: 'Telur', description: 'Telur segar berbagai jenis', slug: 'telur' },
+  { id: 4, name: 'Rempah & Bumbu', description: 'Rempah dan bumbu dapur', slug: 'rempah-bumbu' },
+  { id: 5, name: 'Sayuran', description: 'Sayuran segar organik', slug: 'sayuran' },
+  { id: 6, name: 'Buah-buahan', description: 'Buah segar pilihan', slug: 'buah' },
+  { id: 7, name: 'Biji-bijian & Kacang', description: 'Biji-bijian dan kacang-kacangan', slug: 'biji-kacang' },
+  { id: 8, name: 'Umbi-umbian', description: 'Umbi-umbian segar', slug: 'umbi' },
+  { id: 9, name: 'Makanan Olahan', description: 'Makanan siap saji dan olahan', slug: 'olahan' },
+  { id: 10, name: 'Minyak & Bahan Masak', description: 'Minyak dan bahan masakan', slug: 'minyak-bahan' },
+  { id: 11, name: 'Gas & BBM', description: 'Gas dan bahan bakar', slug: 'gas-bbm' }
+];
+
+module.exports = {
+  seedProducts,
+  seedCategories
+};

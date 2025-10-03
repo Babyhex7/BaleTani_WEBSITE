@@ -21,14 +21,23 @@ const Product = sequelize.define(
     description: {
       type: DataTypes.TEXT,
     },
-    basePrice: {
+    price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
-      field: "base_price",
+    },
+    unit: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      defaultValue: 'kg'
     },
     stock: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+      field: "is_active",
     },
     imageUrl: {
       type: DataTypes.STRING(255),

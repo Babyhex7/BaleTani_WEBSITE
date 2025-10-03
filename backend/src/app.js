@@ -6,6 +6,8 @@ require("dotenv").config();
 
 const errorHandler = require("./middlewares/error.middleware");
 const authRoutes = require("./routes/auth.routes");
+const productRoutes = require("./routes/products");
+const categoryRoutes = require("./routes/categories");
 
 const app = express();
 
@@ -43,6 +45,8 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/categories", categoryRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

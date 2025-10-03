@@ -16,6 +16,11 @@ const Category = sequelize.define(
     description: {
       type: DataTypes.TEXT,
     },
+    slug: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      unique: true,
+    },
   },
   {
     tableName: "categories",
