@@ -1,8 +1,9 @@
-import { ArrowRight, ShoppingCart, Star, MessageCircle, Truck, Shield, Clock } from 'lucide-react';
+import { ArrowRight, MessageCircle, Truck, Shield, Clock, Users, Award, CheckCircle, Leaf, Heart, Zap, Star } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import useAuthStore from '../store/useAuthStore';
 import Button from '../components/ui/Button';
+import ProductCard from '../components/ui/ProductCard';
 
 /**
  * Komponen Landing Page untuk BaleTani Fresh Market
@@ -92,7 +93,37 @@ const LandingPage = () => {
     }
   ];
 
-  // Data testimoni pelanggan
+  // Data statistik dan pencapaian
+  const achievements = [
+    { number: '500+', label: 'Produk Segar', icon: Leaf },
+    { number: '10,000+', label: 'Pelanggan Puas', icon: Users },
+    { number: '24/7', label: 'Layanan', icon: Clock },
+    { number: '100%', label: 'Terpercaya', icon: Award }
+  ];
+
+  // Data keunggulan BaleTani
+  const benefits = [
+    {
+      icon: Shield,
+      title: 'Jaminan Kesegaran',
+      description: 'Produk segar langsung dari kebun dengan standar kualitas premium dan jaminan uang kembali'
+    },
+    {
+      icon: Truck,
+      title: 'Pengiriman Express',
+      description: 'Pengiriman cepat dan aman dalam 24 jam dengan sistem cold chain untuk menjaga kesegaran'
+    },
+    {
+      icon: Heart,
+      title: 'Ramah Lingkungan',
+      description: 'Mendukung petani lokal dan praktik pertanian berkelanjutan untuk masa depan yang lebih hijau'
+    },
+    {
+      icon: Zap,
+      title: 'Pesan Instan',
+      description: 'Pemesanan mudah via WhatsApp 24/7 dengan respon cepat dan pelayanan yang ramah'
+    }
+  ];
   const testimonials = [
     {
       id: 1,
@@ -171,25 +202,29 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="hero-gradient section-padding">
-        <div className="container-custom">
+      <section className="relative bg-white py-16 lg:py-18">
+        <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-white to-blue-50 opacity-40"></div>
+        <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
-              <div className="space-y-4">
+              <div className="space-y-6">
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium">
+                  Segar Langsung dari Kebun
+                </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
                   Belanja Segar & Hemat,{' '}
-                  <span className="text-gradient">Langsung dari Kebun</span>
+                  <span className="text-green-600">Langsung dari Kebun</span>
                 </h1>
-                <p className="text-xl text-gray-600 leading-relaxed">
-                  Pilih produk terbaik, pesan instan via WhatsApp. 
-                  Dari kebun ke Balé, dari Balé ke rumahmu.
+                <p className="text-lg text-gray-600 leading-relaxed">
+                  Nikmati produk segar berkualitas premium dengan pengiriman cepat. 
+                  Pesan mudah via WhatsApp, dari kebun ke meja makan Anda.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   size="lg" 
-                  className="text-lg px-8"
+                  className="bg-green-600 hover:bg-green-700 text-white"
                   onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
                 >
                   Belanja Sekarang
@@ -198,142 +233,135 @@ const LandingPage = () => {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="text-lg px-8"
+                  className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
                   onClick={() => handleWhatsAppOrder('Konsultasi Produk', 0, 'gratis')}
                 >
                   <MessageCircle className="mr-2" size={20} />
-                  Hubungi WhatsApp
+                  Chat WhatsApp
                 </Button>
               </div>
 
               {/* Trust indicators */}
-              <div className="flex flex-wrap gap-8 pt-8 border-t border-gray-200">
-                <div className="flex items-center space-x-2">
-                  <Shield className="text-primary-500" size={20} />
-                  <span className="text-sm font-medium text-gray-700">100% Segar</span>
+              <div className="grid grid-cols-3 gap-4 pt-8">
+                <div className="flex items-center space-x-3 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <Shield className="text-green-600" size={20} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-900">100% Segar</div>
+                    <div className="text-xs text-gray-600">Jaminan Kualitas</div>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Truck className="text-primary-500" size={20} />
-                  <span className="text-sm font-medium text-gray-700">Pengiriman Cepat</span>
+                <div className="flex items-center space-x-3 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Truck className="text-blue-600" size={20} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-900">Kirim Cepat</div>
+                    <div className="text-xs text-gray-600">Same Day</div>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Clock className="text-primary-500" size={20} />
-                  <span className="text-sm font-medium text-gray-700">Order 24/7</span>
+                <div className="flex items-center space-x-3 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Clock className="text-purple-600" size={20} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-900">24/7 Order</div>
+                    <div className="text-xs text-gray-600">Kapan Saja</div>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="relative">
               <div className="relative z-10">
-                <img 
-                  src="/api/placeholder/600/500" 
-                  alt="Fresh Market Products" 
-                  className="rounded-2xl shadow-2xl w-full h-auto animate-float"
-                />
+                <div className="bg-white p-6 rounded-2xl shadow-lg">
+                  <img 
+                    src="/api/placeholder/600/500" 
+                    alt="Fresh Market Products" 
+                    className="rounded-xl w-full h-auto"
+                  />
+                </div>
               </div>
-              <div className="absolute -top-6 -right-6 w-32 h-32 bg-secondary-400 rounded-full opacity-20 animate-pulse-slow"></div>
-              <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-accent-500 rounded-full opacity-20 animate-pulse-slow"></div>
+              {/* Decorative elements */}
+              <div className="absolute -top-4 -right-4 w-16 h-16 bg-green-200 rounded-full opacity-60"></div>
+              <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-blue-200 rounded-full opacity-60"></div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Promo Section */}
-      <section className="bg-gradient-to-r from-accent-500 to-accent-600 text-white py-12">
-        <div className="container-custom">
+      {/* Statistics Section */}
+      <section className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {achievements.map((achievement, index) => {
+              const IconComponent = achievement.icon;
+              return (
+                <div key={index} className="text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <IconComponent className="text-green-600" size={24} />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900 mb-1">{achievement.number}</div>
+                  <div className="text-gray-600 text-sm font-medium">{achievement.label}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Special Offer Banner */}
+      <section className="py-8 bg-green-600">
+        <div className="container mx-auto px-4">
           <div className="text-center space-y-4">
-            <h2 className="text-2xl md:text-3xl font-bold">🔥 Promo Hari Ini!</h2>
-            <p className="text-xl">Dapatkan produk segar terbaik dengan harga spesial</p>
-            <Link to="/products">
-              <Button variant="secondary" size="lg" className="mt-4">
-                Lihat Semua Produk
-              </Button>
-            </Link>
+            <h2 className="text-2xl md:text-3xl font-bold text-white">Promo Spesial Hari Ini!</h2>
+            <p className="text-lg text-green-100">Diskon hingga 25% untuk pembelian pertama</p>
+            <Button 
+              variant="secondary" 
+              size="md"
+              className="bg-white text-green-600 hover:bg-gray-100"
+              onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
+            >
+              Belanja Sekarang
+            </Button>
           </div>
         </div>
       </section>
 
       {/* Featured Products */}
-      <section id="products" className="section-padding bg-gray-50">
-        <div className="container-custom">
+      <section id="products" className="py-16 bg-white">
+        <div className="container mx-auto px-4">
           <div className="text-center space-y-4 mb-12">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium mb-4">
+              Produk Terlaris
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
               Produk Unggulan Hari Ini
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Pilihan terbaik produk segar dengan kualitas premium dan harga terjangkau
+              Pilihan terbaik produk segar dengan kualitas premium dan harga terjangkau untuk keluarga Indonesia
             </p>
           </div>
 
-          <div className="product-grid mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {featuredProducts.map((product) => (
-              <div key={product.id} className="card card-hover group">
-                <div className="relative overflow-hidden rounded-t-xl">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  {product.discount > 0 && (
-                    <div className="promo-badge">
-                      -{product.discount}%
-                    </div>
-                  )}
-                  <div className="absolute top-2 left-2 bg-primary-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                    {product.category}
-                  </div>
-                </div>
-                
-                <div className="p-6 space-y-4">
-                  <div>
-                    <h3 className="font-semibold text-lg text-gray-900 mb-2">{product.name}</h3>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl font-bold text-primary-500">
-                        {formatPrice(product.price)}
-                      </span>
-                      <span className="text-sm text-gray-500">/{product.unit}</span>
-                      {product.originalPrice > product.price && (
-                        <span className="text-sm text-gray-500 line-through">
-                          {formatPrice(product.originalPrice)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>Stok: {product.stock} tersedia</span>
-                    <div className="flex items-center space-x-1">
-                      <Star className="text-yellow-400 fill-current" size={16} />
-                      <span>4.8</span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Button 
-                      variant="accent" 
-                      className="w-full"
-                      onClick={() => handleWhatsAppOrder(product.name, product.price, product.unit)}
-                    >
-                      <MessageCircle className="mr-2" size={16} />
-                      Pesan via WhatsApp
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => handleAddToCart(product)}
-                    >
-                      <ShoppingCart className="mr-2" size={16} />
-                      Tambah ke Keranjang
-                    </Button>
-                  </div>
-                </div>
-              </div>
+              <ProductCard
+                key={product.id}
+                product={product}
+                onWhatsAppOrder={handleWhatsAppOrder}
+                onAddToCart={handleAddToCart}
+                formatPrice={formatPrice}
+              />
             ))}
           </div>
 
           <div className="text-center">
             <Link to="/products">
-              <Button variant="primary" size="lg">
+              <Button 
+                size="lg"
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
                 Lihat Semua Produk
                 <ArrowRight className="ml-2" size={20} />
               </Button>
@@ -342,15 +370,44 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="section-padding">
-        <div className="container-custom">
+      {/* Benefits Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
           <div className="text-center space-y-4 mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-              Kategori Produk
+              Mengapa Pilih BaleTani?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Temukan berbagai macam produk segar berkualitas dalam setiap kategori
+              Kami berkomitmen memberikan pengalaman belanja terbaik dengan jaminan kualitas dan layanan premium
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {benefits.map((benefit, index) => {
+              const IconComponent = benefit.icon;
+              return (
+                <div key={index} className="p-6 bg-white rounded-xl border border-gray-100 hover:border-green-200 hover:shadow-lg transition-all duration-300 group">
+                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-200 transition-colors duration-300">
+                    <IconComponent className="text-green-600" size={24} />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3">{benefit.title}</h3>
+                  <p className="text-gray-600 leading-relaxed text-sm">{benefit.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Categories Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+              Kategori Produk Pilihan
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Jelajahi koleksi lengkap produk segar berkualitas premium dari berbagai kategori terbaik
             </p>
           </div>
 
@@ -359,22 +416,22 @@ const LandingPage = () => {
               <Link 
                 key={category.name} 
                 to={category.href}
-                className="card card-hover group"
+                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-200"
               >
-                <div className="relative overflow-hidden rounded-t-xl">
+                <div className="relative overflow-hidden">
                   <img 
                     src={category.image} 
                     alt={category.name}
                     className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <h3 className="font-semibold text-lg">{category.name}</h3>
-                    <p className="text-sm opacity-90">{category.itemCount} produk</p>
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
+                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+                    <span className="text-xs font-semibold text-gray-800">{category.itemCount} produk</span>
                   </div>
                 </div>
-                <div className="p-4">
-                  <p className="text-gray-600 text-sm">{category.description}</p>
+                <div className="p-5">
+                  <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-green-600 transition-colors duration-300">{category.name}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{category.description}</p>
                 </div>
               </Link>
             ))}
@@ -383,36 +440,41 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="section-padding bg-gray-50">
-        <div className="container-custom">
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
           <div className="text-center space-y-4 mb-12">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-4">
+              Kata Mereka
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-              Testimoni Pelanggan
+              Testimoni Pelanggan Setia
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Apa kata pelanggan setia BaleTani tentang produk dan layanan kami
+              Ribuan pelanggan telah merasakan pengalaman berbelanja terbaik bersama BaleTani
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="card">
-                <div className="p-6 space-y-4">
-                  <div className="flex items-center space-x-1">
+              <div key={testimonial.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-1 mb-3">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="text-yellow-400 fill-current" size={16} />
+                      <Star key={i} className="text-yellow-400 fill-current" size={18} />
                     ))}
                   </div>
-                  <p className="text-gray-700 italic">"{testimonial.comment}"</p>
-                  <div className="flex items-center space-x-3">
+                  <blockquote className="text-gray-700 leading-relaxed">
+                    "{testimonial.comment}"
+                  </blockquote>
+                  <div className="flex items-center space-x-3 pt-3 border-t border-gray-100">
                     <img 
                       src={testimonial.image} 
                       alt={testimonial.name}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
                     />
                     <div>
-                      <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
-                      <p className="text-sm text-gray-600">{testimonial.location}</p>
+                      <h4 className="font-bold text-gray-900">{testimonial.name}</h4>
+                      <p className="text-gray-600 text-sm">{testimonial.location}</p>
                     </div>
                   </div>
                 </div>
@@ -423,13 +485,16 @@ const LandingPage = () => {
       </section>
 
       {/* About Section */}
-      <section className="section-padding">
-        <div className="container-custom">
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <div className="space-y-4">
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium">
+                  Tentang Kami
+                </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                  Tentang BaleTani Fresh Market
+                  BaleTani Fresh Market
                 </h2>
                 <p className="text-lg text-gray-600 leading-relaxed">
                   Kami berkomitmen menyediakan produk segar berkualitas tinggi langsung dari kebun ke rumah Anda. 
@@ -439,79 +504,87 @@ const LandingPage = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-xs">✓</span>
+                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg shadow-sm">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="text-green-600" size={20} />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Produk Segar Berkualitas</h3>
-                    <p className="text-gray-600">Langsung dari kebun pilihan dengan standar kualitas tinggi</p>
+                    <h3 className="font-bold text-gray-900 mb-1">Produk Segar Berkualitas</h3>
+                    <p className="text-gray-600 text-sm">Langsung dari kebun pilihan dengan standar kualitas tinggi dan proses seleksi ketat</p>
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-xs">✓</span>
+                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg shadow-sm">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="text-blue-600" size={20} />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Pengiriman Cepat & Aman</h3>
-                    <p className="text-gray-600">Sistem pengiriman terpercaya untuk menjaga kesegaran produk</p>
+                    <h3 className="font-bold text-gray-900 mb-1">Pengiriman Cepat & Aman</h3>
+                    <p className="text-gray-600 text-sm">Sistem pengiriman terpercaya dengan cold chain untuk menjaga kesegaran produk</p>
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-xs">✓</span>
+                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg shadow-sm">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="text-purple-600" size={20} />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Harga Terjangkau</h3>
-                    <p className="text-gray-600">Harga bersahabat tanpa mengurangi kualitas produk</p>
+                    <h3 className="font-bold text-gray-900 mb-1">Harga Terjangkau</h3>
+                    <p className="text-gray-600 text-sm">Harga bersahabat langsung dari petani tanpa mengurangi kualitas produk</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-primary-50 p-6 rounded-xl">
-                <p className="text-primary-700 font-semibold text-lg italic text-center">
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl border border-green-200">
+                <p className="text-green-800 font-bold text-lg text-center leading-relaxed">
                   "Dari kebun ke Balé, dari Balé ke rumahmu"
                 </p>
               </div>
             </div>
 
             <div className="relative">
-              <img 
-                src="/api/placeholder/500/400" 
-                alt="About BaleTani" 
-                className="rounded-2xl shadow-xl w-full h-auto"
-              />
+              <div className="bg-white p-4 rounded-2xl shadow-lg">
+                <img 
+                  src="/api/placeholder/500/400" 
+                  alt="About BaleTani" 
+                  className="rounded-xl w-full h-auto"
+                />
+              </div>
+              <div className="absolute -top-4 -right-4 w-12 h-12 bg-green-200 rounded-full opacity-60"></div>
+              <div className="absolute -bottom-4 -left-4 w-10 h-10 bg-blue-200 rounded-full opacity-60"></div>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-primary-500 to-primary-600 text-white section-padding">
-        <div className="container-custom text-center space-y-8">
+      <section className="py-16 bg-green-600">
+        <div className="container mx-auto px-4 text-center space-y-6">
           <div className="space-y-4">
-            <h2 className="text-3xl md:text-4xl font-bold">
+            <h2 className="text-3xl md:text-4xl font-bold text-white">
               Siap Belanja Produk Segar Hari Ini?
             </h2>
-            <p className="text-xl opacity-90 max-w-2xl mx-auto">
-              Jangan tunggu lagi! Pesan sekarang dan nikmati kesegaran langsung dari kebun
+            <p className="text-lg text-green-100 max-w-2xl mx-auto leading-relaxed">
+              Bergabunglah dengan ribuan pelanggan yang telah merasakan pengalaman berbelanja terbaik. 
+              Pesan sekarang dan nikmati kesegaran langsung dari kebun!
             </p>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              variant="secondary"
               size="lg"
-              className="text-lg px-8"
+              className="bg-white text-green-600 hover:bg-gray-100"
               onClick={() => handleWhatsAppOrder('Konsultasi Pemesanan', 0, 'gratis')}
             >
               <MessageCircle className="mr-2" size={20} />
               Pesan via WhatsApp
             </Button>
             <Link to="/products">
-              <Button variant="outline" size="lg" className="text-lg px-8 border-white text-white hover:bg-white hover:text-primary-500">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="border-white text-white hover:bg-white hover:text-green-600"
+              >
                 Lihat Katalog Produk
                 <ArrowRight className="ml-2" size={20} />
               </Button>
