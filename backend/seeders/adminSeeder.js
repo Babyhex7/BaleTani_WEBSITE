@@ -15,31 +15,31 @@ const seedAdminData = async () => {
 
     const users = [
       {
-        full_name: "Ahmad Admin",
+        fullName: "Ahmad Admin",
         email: "admin@baletani.com",
         password: await bcrypt.hash("admin123", 12),
         role: "admin",
       },
       {
-        full_name: "Siti Staff",
+        fullName: "Siti Staff",
         email: "staff@baletani.com",
         password: await bcrypt.hash("staff123", 12),
         role: "staff",
       },
       {
-        full_name: "Budi Customer",
+        fullName: "Budi Customer",
         email: "customer@baletani.com",
         password: await bcrypt.hash("customer123", 12),
         role: "customer",
       },
       {
-        full_name: "Rina Farmer",
+        fullName: "Rina Farmer",
         email: "rina@customer.com",
         password: await bcrypt.hash("customer123", 12),
         role: "customer",
       },
       {
-        full_name: "Joko Petani",
+        fullName: "Joko Petani",
         email: "joko@customer.com",
         password: await bcrypt.hash("customer123", 12),
         role: "customer",
