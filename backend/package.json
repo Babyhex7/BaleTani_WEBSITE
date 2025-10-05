@@ -8,6 +8,7 @@
     "dev": "nodemon src/server.js",
     "seed": "node seeders/index.js",
     "seed:dev": "nodemon seeders/index.js",
+    "seed:admin": "node seeders/adminSeeder.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["baletani", "fresh-market", "api", "nodejs"],

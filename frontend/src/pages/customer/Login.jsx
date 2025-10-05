@@ -64,17 +64,19 @@ const Login = () => {
     try {
       const response = await authService.login(formData);
       
-      if (response.success) {
-        login(response.data.user, response.data.token);
-        toast.success('Login berhasil!');
-        
-        // Redirect based on user role
-        if (response.data.user.role === 'admin' || response.data.user.role === 'staff') {
-          window.location.href = 'http://localhost:5174'; // Admin dashboard
+      // authService.login sudah return format yang benar
+      login(response.user, response.token);
+      toast.success(response.message || 'Login berhasil!');
+      
+      // Redirect berdasarkan role user dengan delay singkat untuk UX
+      setTimeout(() => {
+        if (response.user.role === 'admin' || response.user.role === 'staff') {
+          navigate('/admin/dashboard');
         } else {
-          navigate('/');
+          navigate('/home');
         }
-      }
+      }, 500);
+      
     } catch (error) {
       console.error('Login error:', error);
       toast.error(error.message || 'Login gagal. Silakan coba lagi.');

@@ -21,9 +21,10 @@ const Product = sequelize.define(
     description: {
       type: DataTypes.TEXT,
     },
-    price: {
+    basePrice: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
+      field: "base_price",
     },
     unit: {
       type: DataTypes.STRING(20),

@@ -54,6 +54,34 @@ const useAuthStore = create(
         return roles.includes(user?.role);
       },
 
+      // Check if user is admin or staff
+      isAdmin: () => {
+        const { user } = get();
+        return user?.role === "admin";
+      },
+
+      isStaff: () => {
+        const { user } = get();
+        return user?.role === "staff";
+      },
+
+      isCustomer: () => {
+        const { user } = get();
+        return user?.role === "customer";
+      },
+
+      // Check if user can access admin area
+      canAccessAdmin: () => {
+        const { user } = get();
+        return user?.role === "admin" || user?.role === "staff";
+      },
+
+      // Get user display name
+      getDisplayName: () => {
+        const { user } = get();
+        return user?.full_name || user?.email || "User";
+      },
+
       // Update user profile
       updateProfile: (updatedUser) => {
         set((state) => ({

@@ -8,6 +8,7 @@ const errorHandler = require("./middlewares/error.middleware");
 const authRoutes = require("./routes/auth.routes");
 const productRoutes = require("./routes/products");
 const categoryRoutes = require("./routes/categories");
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

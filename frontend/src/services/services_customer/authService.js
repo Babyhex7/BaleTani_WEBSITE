@@ -11,11 +11,29 @@ const authService = {
     }
   },
 
-  // Login user
+  // Login user (mendukung semua role: customer, admin, staff)
   login: async (credentials) => {
     try {
       const response = await apiClient.post("/auth/login", credentials);
-      return response.data;
+
+      // Pastikan response memiliki user data dengan role
+      if (response.data && response.data.user && response.data.token) {
+        const { user, token } = response.data;
+
+        // Validasi role yang valid
+        const validRoles = ["customer", "admin", "staff"];
+        if (!validRoles.includes(user.role)) {
+          throw new Error("Role pengguna tidak valid");
+        }
+
+        return {
+          user,
+          token,
+          message: response.data.message || "Login berhasil",
+        };
+      } else {
+        throw new Error("Response login tidak valid");
+      }
     } catch (error) {
       throw error.response?.data || error;
     }
@@ -31,10 +49,58 @@ const authService = {
     }
   },
 
-  // Logout (client-side only)
+  // Refresh token
+  refreshToken: async () => {
+    try {
+      const response = await apiClient.post("/auth/refresh");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Change password
+  changePassword: async (passwordData) => {
+    try {
+      const response = await apiClient.patch(
+        "/auth/change-password",
+        passwordData
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Logout (client-side only, bisa diperluas untuk server-side logout)
   logout: () => {
-    // This could be extended to call a logout endpoint if needed
+    // Bisa ditambahkan call ke endpoint logout jika diperlukan
     return Promise.resolve();
+  },
+
+  // Verify user role (helper function)
+  verifyRole: (user, requiredRole) => {
+    if (!user || !user.role) return false;
+
+    // Admin bisa akses semua area kecuali yang spesifik customer
+    if (user.role === "admin" && requiredRole !== "customer") {
+      return true;
+    }
+
+    // Staff bisa akses area admin tertentu
+    if (
+      user.role === "staff" &&
+      (requiredRole === "admin" || requiredRole === "staff")
+    ) {
+      return true;
+    }
+
+    // Customer hanya bisa akses area customer
+    if (user.role === "customer" && requiredRole === "customer") {
+      return true;
+    }
+
+    return user.role === requiredRole;
   },
 };
 
