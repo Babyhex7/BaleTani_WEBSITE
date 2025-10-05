@@ -1,10 +1,35 @@
 import apiClient from "./apiClient";
 
+// Helper untuk normalisasi bentuk response API agar fleksibel
+// Backend saat ini mengembalikan: { success, message, data: { user, token } }
+// Tapi kita buat robust jika nanti diubah jadi { user, token }
+const extractAuthPayload = (raw) => {
+  if (!raw) return {};
+  // Coba bentuk baru lebih datar
+  if (raw.user && raw.token) {
+    return { user: raw.user, token: raw.token, message: raw.message };
+  }
+  // Bentuk saat ini (dengan nesting data)
+  if (raw.data && raw.data.user && raw.data.token) {
+    return {
+      user: raw.data.user,
+      token: raw.data.token,
+      message: raw.message,
+    };
+  }
+  return {};
+};
+
+const validRoles = ["customer", "admin", "staff"];
+
 const authService = {
   // Register new user
   register: async (userData) => {
     try {
       const response = await apiClient.post("/auth/register", userData);
+      const payload = extractAuthPayload(response.data);
+      if (payload.user && payload.token) return payload;
+      // Fallback: mungkin hanya mengembalikan data user di dalam data
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -15,25 +40,21 @@ const authService = {
   login: async (credentials) => {
     try {
       const response = await apiClient.post("/auth/login", credentials);
+      const payload = extractAuthPayload(response.data);
 
-      // Pastikan response memiliki user data dengan role
-      if (response.data && response.data.user && response.data.token) {
-        const { user, token } = response.data;
-
-        // Validasi role yang valid
-        const validRoles = ["customer", "admin", "staff"];
-        if (!validRoles.includes(user.role)) {
-          throw new Error("Role pengguna tidak valid");
-        }
-
-        return {
-          user,
-          token,
-          message: response.data.message || "Login berhasil",
-        };
-      } else {
+      if (!payload.user || !payload.token) {
         throw new Error("Response login tidak valid");
       }
+
+      if (!validRoles.includes(payload.user.role)) {
+        throw new Error("Role pengguna tidak valid");
+      }
+
+      return {
+        user: payload.user,
+        token: payload.token,
+        message: payload.message || "Login berhasil",
+      };
     } catch (error) {
       throw error.response?.data || error;
     }
@@ -43,13 +64,16 @@ const authService = {
   getProfile: async () => {
     try {
       const response = await apiClient.get("/auth/profile");
-      return response.data;
+      // Backend: { success, data: { user } }
+      const user = response.data?.user || response.data?.data?.user;
+      if (!user) return response.data;
+      return { user };
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  // Refresh token
+  // Refresh token (jika nanti ditambahkan di backend)
   refreshToken: async () => {
     try {
       const response = await apiClient.post("/auth/refresh");
@@ -72,34 +96,20 @@ const authService = {
     }
   },
 
-  // Logout (client-side only, bisa diperluas untuk server-side logout)
-  logout: () => {
-    // Bisa ditambahkan call ke endpoint logout jika diperlukan
-    return Promise.resolve();
-  },
+  // Logout (client-side only)
+  logout: () => Promise.resolve(),
 
   // Verify user role (helper function)
   verifyRole: (user, requiredRole) => {
     if (!user || !user.role) return false;
 
-    // Admin bisa akses semua area kecuali yang spesifik customer
-    if (user.role === "admin" && requiredRole !== "customer") {
-      return true;
-    }
-
-    // Staff bisa akses area admin tertentu
+    if (user.role === "admin" && requiredRole !== "customer") return true;
     if (
       user.role === "staff" &&
       (requiredRole === "admin" || requiredRole === "staff")
-    ) {
+    )
       return true;
-    }
-
-    // Customer hanya bisa akses area customer
-    if (user.role === "customer" && requiredRole === "customer") {
-      return true;
-    }
-
+    if (user.role === "customer" && requiredRole === "customer") return true;
     return user.role === requiredRole;
   },
 };
