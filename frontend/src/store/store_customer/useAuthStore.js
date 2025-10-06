@@ -79,8 +79,7 @@ const useAuthStore = create(
       // Get user display name
       getDisplayName: () => {
         const { user } = get();
-        // Backend mengirim 'fullName'; seeder pakai kolom DB 'full_name' yang di-map ke 'fullName'
-        return user?.fullName || user?.full_name || user?.email || "User";
+        return user?.full_name || user?.email || "User";
       },
 
       // Update user profile

@@ -41,7 +41,6 @@ const Order = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    // nanti buat langsung direct ke WA aja
     payment_method: {
       type: DataTypes.STRING(50),
       allowNull: true,
