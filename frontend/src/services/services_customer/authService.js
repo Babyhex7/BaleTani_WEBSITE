@@ -16,9 +16,15 @@ const authService = {
     try {
       const response = await apiClient.post("/auth/login", credentials);
 
-      // Pastikan response memiliki user data dengan role
-      if (response.data && response.data.user && response.data.token) {
-        const { user, token } = response.data;
+      // Debug: log raw response structure
+      if (import.meta.env.VITE_DEBUG_AUTH === 'true') {
+        console.log('[DEBUG] Raw login response:', response.data);
+      }
+
+      // Backend returns: { success: true, message: '...', data: { user: {...}, token: '...' } }
+      // So we need to access response.data.data.user and response.data.data.token
+      if (response.data && response.data.success && response.data.data && response.data.data.user && response.data.data.token) {
+        const { user, token } = response.data.data;
 
         // Validasi role yang valid
         const validRoles = ["customer", "admin", "staff"];
@@ -32,6 +38,7 @@ const authService = {
           message: response.data.message || "Login berhasil",
         };
       } else {
+        console.error('Invalid response structure:', response.data);
         throw new Error("Response login tidak valid");
       }
     } catch (error) {

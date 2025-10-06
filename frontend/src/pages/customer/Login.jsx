@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -18,6 +18,20 @@ const Login = () => {
 
   const navigate = useNavigate();
   const { login, setLoading } = useAuthStore();
+
+  // Debug initial mount state
+  useEffect(() => {
+    if (import.meta.env.VITE_DEBUG_AUTH === 'true') {
+      // Lazy import to avoid circular
+      import('../../utils/debugLogger').then(({ debugLog }) => {
+        debugLog('LOGIN', 'Mount Login component', {
+          formData,
+          location: window.location.pathname,
+        });
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -63,6 +77,10 @@ const Login = () => {
 
     try {
       const response = await authService.login(formData);
+      if (import.meta.env.VITE_DEBUG_AUTH === 'true') {
+        const { debugLog } = await import('../../utils/debugLogger');
+        debugLog('LOGIN', 'Login success raw response', response);
+      }
       
       // authService.login sudah return format yang benar
       login(response.user, response.token);
@@ -79,6 +97,10 @@ const Login = () => {
       
     } catch (error) {
       console.error('Login error:', error);
+      if (import.meta.env.VITE_DEBUG_AUTH === 'true') {
+        const { debugLog } = await import('../../utils/debugLogger');
+        debugLog('LOGIN', 'Login failed', { error });
+      }
       toast.error(error.message || 'Login gagal. Silakan coba lagi.');
       
       // Handle specific errors

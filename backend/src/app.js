@@ -26,17 +26,34 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// CORS configuration
+// CORS configuration - Allow multiple development ports
 const corsOptions = {
-  origin: [
-    process.env.FRONTEND_CUSTOMER_URL,
-    process.env.FRONTEND_ADMIN_URL,
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://localhost:5174",
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // List of allowed origins
+    const allowedOrigins = [
+      process.env.FRONTEND_CUSTOMER_URL,
+      process.env.FRONTEND_ADMIN_URL,
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:5175", // Additional fallback ports
+      "http://localhost:5176",
+    ];
+    
+    // Check if origin is allowed or if it's a localhost with different port
+    if (allowedOrigins.includes(origin) || origin.match(/^http:\/\/localhost:\d+$/)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 };
 app.use(cors(corsOptions));
 

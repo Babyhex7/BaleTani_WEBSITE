@@ -11,7 +11,7 @@ import apiClient from "../services_customer/apiClient";
 export const getProducts = async (params = {}) => {
   try {
     const queryString = new URLSearchParams(params).toString();
-    const response = await apiClient.get(`/admin/products?${queryString}`);
+    const response = await apiClient.get(`/admin/inventory/products?${queryString}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal mengambil data produk" };
@@ -21,7 +21,7 @@ export const getProducts = async (params = {}) => {
 // Mendapatkan detail produk
 export const getProductById = async (id) => {
   try {
-    const response = await apiClient.get(`/admin/products/${id}`);
+    const response = await apiClient.get(`/admin/inventory/products/${id}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal mengambil detail produk" };
@@ -31,7 +31,7 @@ export const getProductById = async (id) => {
 // Membuat produk baru
 export const createProduct = async (productData) => {
   try {
-    const response = await apiClient.post("/admin/products", productData);
+    const response = await apiClient.post("/admin/inventory/products", productData);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal membuat produk baru" };
@@ -41,7 +41,7 @@ export const createProduct = async (productData) => {
 // Memperbarui produk
 export const updateProduct = async (id, productData) => {
   try {
-    const response = await apiClient.put(`/admin/products/${id}`, productData);
+    const response = await apiClient.put(`/admin/inventory/products/${id}`, productData);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal memperbarui produk" };
@@ -51,7 +51,7 @@ export const updateProduct = async (id, productData) => {
 // Menghapus produk
 export const deleteProduct = async (id) => {
   try {
-    const response = await apiClient.delete(`/admin/products/${id}`);
+    const response = await apiClient.delete(`/admin/inventory/products/${id}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal menghapus produk" };
@@ -63,7 +63,7 @@ export const deleteProduct = async (id) => {
 // Mendapatkan daftar kategori
 export const getCategories = async () => {
   try {
-    const response = await apiClient.get("/admin/categories");
+    const response = await apiClient.get("/admin/inventory/categories");
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal mengambil data kategori" };

@@ -14,10 +14,21 @@ const getProducts = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     const search = req.query.search || "";
-    const categoryId = req.query.category_id || "";
+    // Accept both category_id & categoryId from client
+    const categoryFilter = req.query.category_id || req.query.categoryId || "";
     const status = req.query.status || "";
-    const sortBy = req.query.sortBy || "name";
-    const sortOrder = req.query.sortOrder || "ASC";
+    const rawSort = req.query.sortBy || "name";
+    const sortOrder = (req.query.sortOrder || "ASC").toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
+    // Map incoming sort field (snake_case from frontend) to model attribute names
+    const sortFieldMap = {
+      name: 'name',
+      base_price: 'basePrice',
+      stock: 'stock',
+      updated_at: 'updatedAt',
+      category_name: 'category_name' // special handling
+    };
+    const mappedSort = sortFieldMap[rawSort] || 'name';
 
     // Build where clause
     const whereClause = {};
@@ -29,8 +40,9 @@ const getProducts = async (req, res, next) => {
       ];
     }
 
-    if (categoryId) {
-      whereClause.category_id = categoryId;
+    if (categoryFilter) {
+      // Use model attribute name (categoryId) not DB column alias
+      whereClause.categoryId = categoryFilter;
     }
 
     // Filter berdasarkan status stok
@@ -43,6 +55,14 @@ const getProducts = async (req, res, next) => {
     }
 
     // Get products with pagination
+    const order = [];
+    if (mappedSort === 'category_name') {
+      // Sort by category name
+      order.push([{ model: Category, as: 'category' }, 'name', sortOrder]);
+    } else {
+      order.push([mappedSort, sortOrder]);
+    }
+
     const { count, rows: products } = await Product.findAndCountAll({
       where: whereClause,
       include: [
@@ -52,7 +72,7 @@ const getProducts = async (req, res, next) => {
           attributes: ["id", "name"],
         },
       ],
-      order: [[sortBy, sortOrder.toUpperCase()]],
+      order,
       limit,
       offset,
     });
@@ -62,13 +82,13 @@ const getProducts = async (req, res, next) => {
       id: product.id,
       name: product.name,
       description: product.description,
-      base_price: parseFloat(product.base_price),
+      base_price: parseFloat(product.basePrice),
       stock: product.stock,
-      image_url: product.image_url,
-      category_id: product.category_id,
+      image_url: product.imageUrl,
+      category_id: product.categoryId,
       category_name: product.category?.name || "Uncategorized",
-      created_at: product.created_at,
-      updated_at: product.updated_at,
+      created_at: product.createdAt,
+      updated_at: product.updatedAt,
     }));
 
     res.json({
@@ -114,13 +134,13 @@ const getProductById = async (req, res, next) => {
       id: product.id,
       name: product.name,
       description: product.description,
-      base_price: parseFloat(product.base_price),
+      base_price: parseFloat(product.basePrice),
       stock: product.stock,
-      image_url: product.image_url,
-      category_id: product.category_id,
+      image_url: product.imageUrl,
+      category_id: product.categoryId,
       category_name: product.category?.name || "Uncategorized",
-      created_at: product.created_at,
-      updated_at: product.updated_at,
+      created_at: product.createdAt,
+      updated_at: product.updatedAt,
     };
 
     res.json({
@@ -145,8 +165,7 @@ const createProduct = async (req, res, next) => {
       });
     }
 
-    const { name, description, base_price, stock, category_id, image_url } =
-      req.body;
+    const { name, description, base_price, stock, category_id, image_url } = req.body;
 
     // Validasi kategori exists
     if (category_id) {
@@ -163,10 +182,10 @@ const createProduct = async (req, res, next) => {
     const product = await Product.create({
       name,
       description,
-      base_price,
+      basePrice: base_price,
       stock: stock || 0,
-      category_id,
-      image_url,
+      categoryId: category_id,
+      imageUrl: image_url,
     });
 
     // Get product with category info
@@ -184,13 +203,13 @@ const createProduct = async (req, res, next) => {
       id: productWithCategory.id,
       name: productWithCategory.name,
       description: productWithCategory.description,
-      base_price: parseFloat(productWithCategory.base_price),
+      base_price: parseFloat(productWithCategory.basePrice),
       stock: productWithCategory.stock,
-      image_url: productWithCategory.image_url,
-      category_id: productWithCategory.category_id,
+      image_url: productWithCategory.imageUrl,
+      category_id: productWithCategory.categoryId,
       category_name: productWithCategory.category?.name || "Uncategorized",
-      created_at: productWithCategory.created_at,
-      updated_at: productWithCategory.updated_at,
+      created_at: productWithCategory.createdAt,
+      updated_at: productWithCategory.updatedAt,
     };
 
     res.status(201).json({
@@ -216,8 +235,7 @@ const updateProduct = async (req, res, next) => {
     }
 
     const { id } = req.params;
-    const { name, description, base_price, stock, category_id, image_url } =
-      req.body;
+    const { name, description, base_price, stock, category_id, image_url } = req.body;
 
     const product = await Product.findByPk(id);
     if (!product) {
@@ -228,7 +246,7 @@ const updateProduct = async (req, res, next) => {
     }
 
     // Validasi kategori exists jika diubah
-    if (category_id && category_id !== product.category_id) {
+    if (category_id && category_id !== product.categoryId) {
       const category = await Category.findByPk(category_id);
       if (!category) {
         return res.status(400).json({
@@ -241,12 +259,11 @@ const updateProduct = async (req, res, next) => {
     // Update product
     await product.update({
       name: name || product.name,
-      description:
-        description !== undefined ? description : product.description,
-      base_price: base_price || product.base_price,
+      description: description !== undefined ? description : product.description,
+      basePrice: base_price !== undefined ? base_price : product.basePrice,
       stock: stock !== undefined ? stock : product.stock,
-      category_id: category_id || product.category_id,
-      image_url: image_url !== undefined ? image_url : product.image_url,
+      categoryId: category_id || product.categoryId,
+      imageUrl: image_url !== undefined ? image_url : product.imageUrl,
     });
 
     // Get updated product with category info
@@ -264,13 +281,13 @@ const updateProduct = async (req, res, next) => {
       id: updatedProduct.id,
       name: updatedProduct.name,
       description: updatedProduct.description,
-      base_price: parseFloat(updatedProduct.base_price),
+      base_price: parseFloat(updatedProduct.basePrice),
       stock: updatedProduct.stock,
-      image_url: updatedProduct.image_url,
-      category_id: updatedProduct.category_id,
+      image_url: updatedProduct.imageUrl,
+      category_id: updatedProduct.categoryId,
       category_name: updatedProduct.category?.name || "Uncategorized",
-      created_at: updatedProduct.created_at,
-      updated_at: updatedProduct.updated_at,
+      created_at: updatedProduct.createdAt,
+      updated_at: updatedProduct.updatedAt,
     };
 
     res.json({

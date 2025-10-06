@@ -33,7 +33,7 @@ const ProtectedRoute = ({
   }
 
   // Jika ada required role, cek apakah user memiliki role tersebut
-  if (requiredRole && user?.role !== requiredRole) {
+  if (requiredRole && !hasRequiredRole(user?.role, requiredRole)) {
     // Jika user adalah admin/staff tapi mencoba akses customer area
     if ((user?.role === 'admin' || user?.role === 'staff') && requiredRole === 'customer') {
       return <Navigate to="/admin/dashboard" replace />;
@@ -63,6 +63,19 @@ const ProtectedRoute = ({
     }
 
     return <Navigate to="/unauthorized" replace />;
+  }
+
+  // Helper function to check role permissions
+  function hasRequiredRole(userRole, requiredRole) {
+    if (!userRole || !requiredRole) return false;
+    
+    // If required role is admin, allow both admin and staff
+    if (requiredRole === 'admin') {
+      return userRole === 'admin' || userRole === 'staff';
+    }
+    
+    // Otherwise, exact match
+    return userRole === requiredRole;
   }
 
   return children;

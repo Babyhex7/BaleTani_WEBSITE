@@ -16,7 +16,11 @@ router.use("/dashboard", dashboardRoutes);
 // User management routes
 router.use("/users", userRoutes);
 
-// Inventory management routes
+// Inventory management routes (products dan categories)
+router.use("/products", inventoryRoutes);
 router.use("/inventory", inventoryRoutes);
+
+// Shortcut routes for better API structure
+router.use("/orders", require("./dashboard")); // For recent orders endpoint
 
 module.exports = router;

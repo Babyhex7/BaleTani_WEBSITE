@@ -17,31 +17,31 @@ const seedAdminData = async () => {
       {
         fullName: "Ahmad Admin",
         email: "admin@baletani.com",
-        password: await bcrypt.hash("admin123", 12),
+        password: "admin123", // Let model handle hashing
         role: "admin",
       },
       {
         fullName: "Siti Staff",
         email: "staff@baletani.com",
-        password: await bcrypt.hash("staff123", 12),
+        password: "staff123", // Let model handle hashing
         role: "staff",
       },
       {
         fullName: "Budi Customer",
         email: "customer@baletani.com",
-        password: await bcrypt.hash("customer123", 12),
+        password: "customer123", // Let model handle hashing
         role: "customer",
       },
       {
         fullName: "Rina Farmer",
         email: "rina@customer.com",
-        password: await bcrypt.hash("customer123", 12),
+        password: "customer123", // Let model handle hashing
         role: "customer",
       },
       {
         fullName: "Joko Petani",
         email: "joko@customer.com",
-        password: await bcrypt.hash("customer123", 12),
+        password: "customer123", // Let model handle hashing
         role: "customer",
       },
     ];

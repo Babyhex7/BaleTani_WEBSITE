@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import AdminLayout from '../../components/layout_admin/AdminLayout';
 import Table from '../../components/ui_admin/Table';
 import SearchFilter from '../../components/ui_admin/SearchFilter';
@@ -6,6 +6,28 @@ import Pagination from '../../components/ui_admin/Pagination';
 import ModalAdmin, { ConfirmModal } from '../../components/ui_admin/ModalAdmin';
 import { LoadingSpinner, Alert, Badge, EmptyState } from '../../components/ui_admin/CommonComponents';
 import { getProducts, getCategories, createProduct, updateProduct, deleteProduct } from '../../services/services_admin/inventoryService';
+
+// Lightweight debug panel (auto tree-shaken out in production builds when condition unused)
+const DebugPanel = ({ data }) => {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+      <div className="flex items-center justify-between">
+        <h4 className="font-medium text-blue-900 text-sm">Debug Info</h4>
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          className="text-xs px-2 py-1 rounded border border-blue-300 text-blue-700 hover:bg-blue-100"
+        >{open ? 'Hide' : 'Show'}</button>
+      </div>
+      {open && (
+        <pre className="text-[10px] leading-snug text-blue-800 mt-2 overflow-x-auto max-h-48">
+          {JSON.stringify(data, null, 2)}
+        </pre>
+      )}
+    </div>
+  );
+};
 
 /**
  * Halaman Inventory Management - Kelola Produk dan Stok
@@ -100,75 +122,89 @@ const InventoryManagement = () => {
     { id: 4, name: 'Alat Pertanian' }
   ];
 
-  useEffect(() => {
-    loadData();
-  }, [currentPage, itemsPerPage, searchValue, selectedCategory, selectedStatus, sortField, sortDirection]);
+  // Define callback functions first
+  const loadCategories = useCallback(async () => {
+    try {
+      console.log('🔄 Loading categories...');
+      const response = await getCategories();
+      console.log('✅ Categories response:', response);
+      
+      if (response.success && response.data) {
+        setCategories(response.data.categories || []);
+        console.log(`📂 Loaded ${response.data.categories?.length || 0} categories`);
+      } else {
+        throw new Error('Invalid categories response');
+      }
+    } catch (err) {
+      console.error('❌ Error loading categories:', err);
+      // Fallback to mock categories if API fails
+      setCategories(mockCategories);
+    }
+  }, []);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Simulasi loading
-      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log('🔄 Loading inventory data...');
 
-      // Filter dan search logic untuk mock data
-      let filteredProducts = [...mockProducts];
+      // Prepare API parameters
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchValue,
+        category_id: selectedCategory,
+        status: selectedStatus,
+        sortBy: sortField,
+        sortOrder: sortDirection
+      };
 
-      if (searchValue) {
-        filteredProducts = filteredProducts.filter(product =>
-          product.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-          product.description.toLowerCase().includes(searchValue.toLowerCase())
-        );
+      console.log('📡 API params:', params);
+
+      // Load products from API
+      const response = await getProducts(params);
+      
+      console.log('✅ Products response:', response);
+      
+      if (response.success && response.data) {
+        const normalized = (response.data.products || []).map(p => ({
+          ...p,
+            base_price: (p.base_price === null || p.base_price === undefined || isNaN(p.base_price)) ? 0 : Number(p.base_price),
+            stock: (p.stock === null || p.stock === undefined || isNaN(p.stock)) ? 0 : Number(p.stock),
+            category_name: p.category_name || p.category?.name || 'Tidak Ada',
+            updated_at: p.updated_at || p.updatedAt || p.created_at || p.createdAt || new Date().toISOString()
+        }));
+  setProducts(normalized);
+  console.log('🧪 Normalized products sample:', normalized.slice(0,3));
+        setTotalItems(response.data.pagination?.totalItems || 0);
+        console.log(`📦 Loaded ${response.data.products?.length || 0} products`);
+      } else {
+        throw new Error('Invalid response structure');
       }
-
-      if (selectedCategory) {
-        filteredProducts = filteredProducts.filter(product => 
-          product.category_id.toString() === selectedCategory
-        );
-      }
-
-      if (selectedStatus) {
-        if (selectedStatus === 'low_stock') {
-          filteredProducts = filteredProducts.filter(product => product.stock <= 10);
-        } else if (selectedStatus === 'out_of_stock') {
-          filteredProducts = filteredProducts.filter(product => product.stock === 0);
-        } else if (selectedStatus === 'in_stock') {
-          filteredProducts = filteredProducts.filter(product => product.stock > 10);
-        }
-      }
-
-      // Sorting
-      filteredProducts.sort((a, b) => {
-        let aValue = a[sortField];
-        let bValue = b[sortField];
-        
-        if (typeof aValue === 'string') {
-          aValue = aValue.toLowerCase();
-          bValue = bValue.toLowerCase();
-        }
-        
-        if (sortDirection === 'asc') {
-          return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-        } else {
-          return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-        }
-      });
-
-      // Pagination
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-
-      setProducts(paginatedProducts);
-      setTotalItems(filteredProducts.length);
-      setCategories(mockCategories);
 
     } catch (err) {
+      console.error('❌ Error loading products:', err);
       setError(err.message || 'Gagal memuat data produk');
+      // Fallback to empty state rather than crash
+      setProducts([]);
+      setTotalItems(0);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, itemsPerPage, searchValue, selectedCategory, selectedStatus, sortField, sortDirection]);
+
+  // Load categories only once on mount
+  useEffect(() => {
+    console.log('🎯 InventoryManagement - component mounted, loading categories');
+    loadCategories();
+  }, [loadCategories]);
+
+  // Load data when dependencies change
+  useEffect(() => {
+    console.log('🎯 InventoryManagement - useEffect dependencies changed');
+    loadData();
+  }, [loadData]);
 
   // Handler functions
   const handleSort = (field) => {
@@ -236,7 +272,16 @@ const InventoryManagement = () => {
       key: 'base_price',
       label: 'Harga',
       sortable: true,
-      render: (value) => `Rp ${value.toLocaleString('id-ID')}`
+      render: (value) => {
+        if (value === null || value === undefined || isNaN(value)) {
+          return 'Rp -';
+        }
+        try {
+          return `Rp ${Number(value).toLocaleString('id-ID')}`;
+        } catch (e) {
+          return 'Rp -';
+        }
+      }
     },
     {
       key: 'stock',
@@ -263,7 +308,12 @@ const InventoryManagement = () => {
     {
       key: 'updated_at',
       label: 'Terakhir Update',
-      render: (value) => new Date(value).toLocaleDateString('id-ID')
+      render: (value) => {
+        if (!value) return '-';
+        const dateObj = new Date(value);
+        if (isNaN(dateObj.getTime())) return '-';
+        return dateObj.toLocaleDateString('id-ID');
+      }
     }
   ];
 
@@ -307,9 +357,43 @@ const InventoryManagement = () => {
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
+  console.log('🎯 InventoryManagement render state:', { 
+    isLoading, 
+    error, 
+    productsCount: products.length, 
+    categoriesCount: categories.length,
+    totalItems 
+  });
+
+  if (isLoading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <LoadingSpinner />
+          <span className="ml-3 text-gray-600">Memuat data inventory...</span>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
+        {/* Debug Info (development only) */}
+        {import.meta.env.MODE !== 'production' && import.meta.env.VITE_DEBUG_AUTH === 'true' && (
+          <DebugPanel
+            data={{
+              isLoading,
+              error,
+              productsCount: products.length,
+              categoriesCount: categories.length,
+              totalItems,
+              currentPage,
+              totalPages: Math.ceil(totalItems / itemsPerPage)
+            }}
+          />
+        )}
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>

@@ -20,7 +20,7 @@ export const getDashboardStats = async () => {
 // Mendapatkan pesanan terbaru
 export const getRecentOrders = async (limit = 5) => {
   try {
-    const response = await apiClient.get(`/admin/orders/recent?limit=${limit}`);
+    const response = await apiClient.get(`/admin/dashboard/recent-orders?limit=${limit}`);
     return response.data;
   } catch (error) {
     throw (
@@ -33,7 +33,7 @@ export const getRecentOrders = async (limit = 5) => {
 export const getLowStockProducts = async (limit = 10) => {
   try {
     const response = await apiClient.get(
-      `/admin/products/low-stock?limit=${limit}`
+      `/admin/dashboard/low-stock?limit=${limit}`
     );
     return response.data;
   } catch (error) {

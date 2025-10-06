@@ -90,13 +90,17 @@ const AdminDashboard = () => {
       setIsLoading(true);
       setError(null);
 
-      // Simulasi loading (akan diganti dengan API calls yang sesungguhnya)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Load data in parallel for better performance
+      const [statsResponse, ordersResponse, lowStockResponse] = await Promise.all([
+        getDashboardStats(),
+        getRecentOrders(5),
+        getLowStockProducts(10)
+      ]);
 
-      // Untuk sementara gunakan mock data
-      setStats(mockStats);
-      setRecentOrders(mockRecentOrders);
-      setLowStockProducts(mockLowStockProducts);
+      // Set real data from API
+      setStats(statsResponse.data);
+      setRecentOrders(ordersResponse.data.orders || []);
+      setLowStockProducts(lowStockResponse.data.products || []);
 
       /* 
       // Implementasi sesungguhnya ketika backend sudah ready:

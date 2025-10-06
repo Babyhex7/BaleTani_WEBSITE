@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { debugLog, diffStates } from "../../utils/debugLogger";
 
 const useAuthStore = create(
   persist(
@@ -12,15 +13,28 @@ const useAuthStore = create(
       error: null,
 
       // Actions
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setUser: (user) => {
+        debugLog('AUTH', 'setUser called', { user });
+        set({ user, isAuthenticated: !!user });
+      },
 
-      setToken: (token) => set({ token }),
+      setToken: (token) => {
+        debugLog('AUTH', 'setToken called', { hasToken: !!token });
+        set({ token });
+      },
 
-      setLoading: (isLoading) => set({ isLoading }),
+      setLoading: (isLoading) => {
+        debugLog('AUTH', 'setLoading', { isLoading });
+        set({ isLoading });
+      },
 
-      setError: (error) => set({ error }),
+      setError: (error) => {
+        debugLog('AUTH', 'setError', { error });
+        set({ error });
+      },
 
       login: (userData, token) => {
+        debugLog('AUTH', 'login()', { userData, hasToken: !!token });
         set({
           user: userData,
           token,
@@ -30,13 +44,13 @@ const useAuthStore = create(
       },
 
       logout: () => {
+        debugLog('AUTH', 'logout()');
         set({
           user: null,
           token: null,
           isAuthenticated: false,
           error: null,
         });
-        // Clear token from localStorage
         localStorage.removeItem("baletani-auth-storage");
       },
 
@@ -84,6 +98,7 @@ const useAuthStore = create(
 
       // Update user profile
       updateProfile: (updatedUser) => {
+        debugLog('AUTH', 'updateProfile()', { updatedUser });
         set((state) => ({
           user: { ...state.user, ...updatedUser },
         }));
@@ -99,5 +114,12 @@ const useAuthStore = create(
     }
   )
 );
+
+// Subscribe untuk diff logging (hanya aktif jika debug)
+let prevState;
+useAuthStore.subscribe((next) => {
+  if (prevState) diffStates(prevState, next);
+  prevState = next;
+});
 
 export default useAuthStore;

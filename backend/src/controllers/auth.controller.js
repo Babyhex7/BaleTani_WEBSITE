@@ -68,6 +68,7 @@ const login = async (req, res, next) => {
     // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Login validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: "Validation errors",
@@ -76,24 +77,31 @@ const login = async (req, res, next) => {
     }
 
     const { email, password } = req.body;
+    console.log(`🔐 Login attempt for: ${email}`);
 
     // Find user by email
     const user = await User.findOne({ where: { email } });
     if (!user) {
+      console.log(`❌ User not found: ${email}`);
       return res.status(401).json({
         success: false,
         message: "Invalid email or password",
       });
     }
 
+    console.log(`✅ User found: ${user.email} (${user.role})`);
+
     // Check password
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
+      console.log(`❌ Invalid password for: ${email}`);
       return res.status(401).json({
         success: false,
         message: "Invalid email or password",
       });
     }
+
+    console.log(`✅ Login successful for: ${email}`);
 
     // Generate token
     const token = generateToken(user.id);

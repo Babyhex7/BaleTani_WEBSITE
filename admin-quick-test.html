@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BaleTani Admin Login Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .section { margin: 15px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 8px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .info { color: blue; }
+        .link { color: #007bff; text-decoration: underline; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BaleTani Admin Quick Test</h1>
+        
+        <div class="section">
+            <h3>1. Login Test</h3>
+            <button onclick="testLogin()">Login as Admin</button>
+            <button onclick="clearStorage()">Clear Storage</button>
+            <div id="loginStatus"></div>
+        </div>
+
+        <div class="section">
+            <h3>2. Frontend Links</h3>
+            <div>
+                <span class="link" onclick="openPage('http://localhost:5174/login')">→ Login Page</span><br>
+                <span class="link" onclick="openPage('http://localhost:5174/admin/dashboard')">→ Admin Dashboard</span><br>
+                <span class="link" onclick="openPage('http://localhost:5174/admin/inventory')">→ Admin Inventory</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>3. API Test</h3>
+            <button onclick="testInventoryAPI()">Test Inventory API</button>
+            <div id="apiResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>4. Debug Info</h3>
+            <button onclick="checkLocalStorage()">Check LocalStorage</button>
+            <div id="debugInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let token = null;
+
+        function openPage(url) {
+            window.open(url, '_blank');
+        }
+
+        async function testLogin() {
+            const statusDiv = document.getElementById('loginStatus');
+            statusDiv.innerHTML = '<div class="info">Testing login...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@baletani.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Login response:', data);
+                
+                if (data.success && data.data) {
+                    token = data.data.token;
+                    
+                    // Simulate what frontend auth store does
+                    const authData = {
+                        user: data.data.user,
+                        token: data.data.token,
+                        isAuthenticated: true
+                    };
+                    localStorage.setItem('baletani-auth-storage', JSON.stringify(authData));
+                    
+                    statusDiv.innerHTML = `
+                        <div class="success">✅ Login berhasil!</div>
+                        <div>User: ${data.data.user.fullName} (${data.data.user.role})</div>
+                        <div>Token: ${token.substring(0, 20)}...</div>
+                    `;
+                } else {
+                    statusDiv.innerHTML = `<div class="error">❌ Login gagal: ${data.message}</div>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function testInventoryAPI() {
+            const resultDiv = document.getElementById('apiResult');
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="error">❌ Please login first!</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="info">Testing inventory API...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/inventory/products`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await response.json();
+                console.log('Inventory API response:', data);
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ API berhasil!</div>
+                        <div>Total products: ${data.data.products.length}</div>
+                        <div>Total items: ${data.data.pagination.totalItems}</div>
+                        <details>
+                            <summary>Raw Response</summary>
+                            <pre style="font-size: 12px; background: #f5f5f5; padding: 10px; overflow-x: auto;">
+                                ${JSON.stringify(data, null, 2)}
+                            </pre>
+                        </details>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ API Error: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Network Error: ${error.message}</div>`;
+            }
+        }
+
+        function checkLocalStorage() {
+            const debugDiv = document.getElementById('debugInfo');
+            const authData = localStorage.getItem('baletani-auth-storage');
+            
+            debugDiv.innerHTML = `
+                <div><strong>LocalStorage Auth Data:</strong></div>
+                <pre style="font-size: 12px; background: #f5f5f5; padding: 10px; overflow-x: auto;">
+                    ${authData || 'No auth data found'}
+                </pre>
+                <div><strong>Current Token:</strong> ${token ? token.substring(0, 30) + '...' : 'None'}</div>
+            `;
+        }
+
+        function clearStorage() {
+            localStorage.removeItem('baletani-auth-storage');
+            token = null;
+            document.getElementById('loginStatus').innerHTML = '<div class="info">Storage cleared</div>';
+        }
+    </script>
+</body>
+</html>
