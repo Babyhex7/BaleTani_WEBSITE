@@ -1,4 +1,8 @@
 import apiClient from "../services_customer/apiClient";
+import { mockAdminServices } from "../../utils/mockAdminData";
+
+// Demo mode - set to true to use mock data
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true' || true;
 
 /**
  * Service untuk API Inventory Management
@@ -9,6 +13,10 @@ import apiClient from "../services_customer/apiClient";
 
 // Mendapatkan daftar produk dengan pagination dan filter
 export const getProducts = async (params = {}) => {
+  if (DEMO_MODE) {
+    return await mockAdminServices.getInventoryData(params);
+  }
+  
   try {
     const queryString = new URLSearchParams(params).toString();
     const response = await apiClient.get(`/admin/inventory/products?${queryString}`);
@@ -20,6 +28,10 @@ export const getProducts = async (params = {}) => {
 
 // Mendapatkan detail produk
 export const getProductById = async (id) => {
+  if (DEMO_MODE) {
+    return await mockAdminServices.getProductById(parseInt(id));
+  }
+  
   try {
     const response = await apiClient.get(`/admin/inventory/products/${id}`);
     return response.data;
@@ -30,6 +42,10 @@ export const getProductById = async (id) => {
 
 // Membuat produk baru
 export const createProduct = async (productData) => {
+  if (DEMO_MODE) {
+    return await mockAdminServices.createProduct(productData);
+  }
+  
   try {
     const response = await apiClient.post("/admin/inventory/products", productData);
     return response.data;
@@ -40,6 +56,10 @@ export const createProduct = async (productData) => {
 
 // Memperbarui produk
 export const updateProduct = async (id, productData) => {
+  if (DEMO_MODE) {
+    return await mockAdminServices.updateProduct(parseInt(id), productData);
+  }
+  
   try {
     const response = await apiClient.put(`/admin/inventory/products/${id}`, productData);
     return response.data;
@@ -50,6 +70,10 @@ export const updateProduct = async (id, productData) => {
 
 // Menghapus produk
 export const deleteProduct = async (id) => {
+  if (DEMO_MODE) {
+    return await mockAdminServices.deleteProduct(parseInt(id));
+  }
+  
   try {
     const response = await apiClient.delete(`/admin/inventory/products/${id}`);
     return response.data;
@@ -107,6 +131,10 @@ export const deleteCategory = async (id) => {
 
 // Update stok produk
 export const updateProductStock = async (id, stockData) => {
+  if (DEMO_MODE) {
+    return await mockAdminServices.updateInventoryStock(id, stockData.stock);
+  }
+  
   try {
     const response = await apiClient.patch(
       `/admin/products/${id}/stock`,

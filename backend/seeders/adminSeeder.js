@@ -62,11 +62,11 @@ const seedAdminData = async () => {
     console.log("\nCreating categories...");
 
     const categories = [
-      { name: "Benih", description: "Benih tanaman berkualitas tinggi" },
-      { name: "Pupuk", description: "Pupuk organik dan anorganik" },
-      { name: "Pestisida", description: "Pestisida dan herbisida" },
-      { name: "Alat Pertanian", description: "Peralatan dan mesin pertanian" },
-      { name: "Irigasi", description: "Sistem irigasi dan penyiraman" },
+      { name: "Benih", description: "Benih tanaman berkualitas tinggi", slug: "benih" },
+      { name: "Pupuk", description: "Pupuk organik dan anorganik", slug: "pupuk" },
+      { name: "Pestisida", description: "Pestisida dan herbisida", slug: "pestisida" },
+      { name: "Alat Pertanian", description: "Peralatan dan mesin pertanian", slug: "alat-pertanian" },
+      { name: "Irigasi", description: "Sistem irigasi dan penyiraman", slug: "irigasi" },
     ];
 
     const createdCategories = [];

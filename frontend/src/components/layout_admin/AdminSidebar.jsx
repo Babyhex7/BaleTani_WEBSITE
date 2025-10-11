@@ -84,8 +84,13 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between h-16 px-6 bg-green-600 text-white">
-            <div className="flex items-center">
-              <span className="text-xl font-bold">🌾 BaleTani</span>
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/BaleTani_Logo.png" 
+                alt="BaleTani" 
+                className="w-8 h-8 object-contain rounded-lg" 
+              />
+              <span className="text-xl font-bold">BaleTani</span>
             </div>
             <button
               onClick={() => setIsOpen(false)}

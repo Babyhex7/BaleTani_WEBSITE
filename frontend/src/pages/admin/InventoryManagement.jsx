@@ -60,66 +60,67 @@ const InventoryManagement = () => {
   const mockProducts = [
     {
       id: 1,
-      name: 'Benih Padi Unggul IR64',
+      name: 'Bayam Segar Organik',
       category_id: 1,
-      category_name: 'Benih',
-      base_price: 15000,
+      category_name: 'Sayuran',
+      base_price: 8000,
       stock: 150,
-      description: 'Benih padi varietas unggul dengan hasil panen tinggi',
+      description: 'Bayam segar organik langsung dari kebun, kaya akan zat besi',
       created_at: '2025-01-01',
       updated_at: '2025-01-05'
     },
     {
       id: 2,
-      name: 'Pupuk NPK 16-16-16',
-      category_id: 2,
-      category_name: 'Pupuk',
-      base_price: 85000,
+      name: 'Tomat Cherry Premium',
+      category_id: 1,
+      category_name: 'Sayuran',
+      base_price: 25000,
       stock: 75,
-      description: 'Pupuk majemuk untuk pertumbuhan optimal tanaman',
+      description: 'Tomat cherry premium dengan rasa manis dan segar',
       created_at: '2025-01-02',
       updated_at: '2025-01-05'
     },
     {
       id: 3,
-      name: 'Pestisida Organik Neem',
-      category_id: 3,
-      category_name: 'Pestisida',
-      base_price: 125000,
+      name: 'Apel Fuji Import',
+      category_id: 2,
+      category_name: 'Buah-buahan',
+      base_price: 45000,
       stock: 25,
-      description: 'Pestisida alami dari ekstrak neem untuk pengendalian hama',
+      description: 'Apel Fuji import berkualitas tinggi dengan rasa manis dan renyah',
       created_at: '2025-01-03',
       updated_at: '2025-01-05'
     },
     {
       id: 4,
-      name: 'Alat Semprot Manual',
-      category_id: 4,
-      category_name: 'Alat Pertanian',
-      base_price: 350000,
+      name: 'Daging Sapi Premium',
+      category_id: 3,
+      category_name: 'Daging & Unggas',
+      base_price: 120000,
       stock: 12,
-      description: 'Alat semprot manual berkualitas tinggi untuk aplikasi pestisida',
+      description: 'Daging sapi premium segar, pilihan terbaik untuk keluarga',
       created_at: '2025-01-04',
       updated_at: '2025-01-05'
     },
     {
       id: 5,
-      name: 'Benih Jagung Hibrida',
-      category_id: 1,
-      category_name: 'Benih',
-      base_price: 45000,
+      name: 'Ikan Salmon Segar',
+      category_id: 4,
+      category_name: 'Seafood',
+      base_price: 180000,
       stock: 5, // Low stock
-      description: 'Benih jagung hibrida dengan produktivitas tinggi',
+      description: 'Ikan salmon segar berkualitas tinggi, kaya omega-3',
       created_at: '2025-01-05',
       updated_at: '2025-01-05'
     }
   ];
 
   const mockCategories = [
-    { id: 1, name: 'Benih' },
-    { id: 2, name: 'Pupuk' },
-    { id: 3, name: 'Pestisida' },
-    { id: 4, name: 'Alat Pertanian' }
+    { id: 1, name: 'Sayuran' },
+    { id: 2, name: 'Buah-buahan' },
+    { id: 3, name: 'Daging & Unggas' },
+    { id: 4, name: 'Seafood' },
+    { id: 5, name: 'Susu & Telur' }
   ];
 
   // Define callback functions first
@@ -505,8 +506,10 @@ const ProductModal = ({ isOpen, onClose, product, categories, isEdit, onSave }) 
     category_id: '',
     base_price: '',
     stock: '',
-    description: ''
+    description: '',
+    image: null
   });
+  const [imagePreview, setImagePreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -516,16 +519,20 @@ const ProductModal = ({ isOpen, onClose, product, categories, isEdit, onSave }) 
         category_id: product.category_id?.toString() || '',
         base_price: product.base_price?.toString() || '',
         stock: product.stock?.toString() || '',
-        description: product.description || ''
+        description: product.description || '',
+        image: null
       });
+      setImagePreview(product.image_url || null);
     } else {
       setFormData({
         name: '',
         category_id: '',
         base_price: '',
         stock: '',
-        description: ''
+        description: '',
+        image: null
       });
+      setImagePreview(null);
     }
   }, [product, isEdit, isOpen]);
 
@@ -558,6 +565,43 @@ const ProductModal = ({ isOpen, onClose, product, categories, isEdit, onSave }) 
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size should be less than 5MB');
+        return;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        image: file
+      }));
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      image: null
+    }));
+    setImagePreview(null);
   };
 
   return (
@@ -601,6 +645,74 @@ const ProductModal = ({ isOpen, onClose, product, categories, isEdit, onSave }) 
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Image Upload */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Gambar Produk
+          </label>
+          
+          {!imagePreview ? (
+            <div className="border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 transition-colors duration-200">
+              <label className="cursor-pointer block">
+                <div className="flex flex-col items-center justify-center py-8 px-6">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-medium text-gray-700 mb-1">Upload gambar produk</p>
+                  <p className="text-xs text-gray-500 text-center">
+                    Klik untuk memilih file atau drag & drop<br />
+                    PNG, JPG, JPEG maksimal 5MB
+                  </p>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          ) : (
+            <div className="relative inline-block">
+              <div className="group relative">
+                <img 
+                  src={imagePreview} 
+                  alt="Preview produk" 
+                  className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                  <div className="flex space-x-2">
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors duration-200"
+                      title="Hapus gambar"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                    <label className="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center cursor-pointer transition-colors duration-200" title="Ganti gambar">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2 text-center">Hover untuk edit gambar</p>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-4">

@@ -135,8 +135,12 @@ const Login = () => {
 
         {/* Logo and title */}
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mb-4">
-            <span className="text-white font-bold text-2xl">B</span>
+          <div className="mx-auto w-16 h-16 flex items-center justify-center mb-4">
+            <img 
+              src="/BaleTani_Logo.png" 
+              alt="BaleTani" 
+              className="w-16 h-16 object-contain rounded-xl" 
+            />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Masuk ke BaleTani

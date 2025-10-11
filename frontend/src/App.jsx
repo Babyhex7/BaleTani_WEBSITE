@@ -1,10 +1,18 @@
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import DemoBanner from './components/ui/DemoBanner';
 import LandingPage from './pages/customer/LandingPage';
 import Home from './pages/customer/Home';
 import Login from './pages/customer/Login';
 import Register from './pages/customer/Register';
+import Products from './pages/customer/Products';
+import ProductsSimple from './pages/customer/ProductsSimple';
+import ProductDetail from './pages/customer/ProductDetail';
+import Promo from './pages/customer/Promo';
+import Categories from './pages/customer/Categories';
+import Contact from './pages/customer/Contact';
+import Profile from './pages/customer/Profile';
 import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRoute';
 
 // Admin Pages
@@ -59,9 +67,15 @@ function App() {
       <Route path="/products" element={
         <ProtectedRoute requiredRole="customer">
           <CustomerLayout>
-            <div className="container-custom section-padding">
-              <h1 className="text-2xl font-bold">Halaman Produk (Coming Soon)</h1>
-            </div>
+            <ProductsSimple />
+          </CustomerLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/products/:id" element={
+        <ProtectedRoute requiredRole="customer">
+          <CustomerLayout>
+            <ProductDetail />
           </CustomerLayout>
         </ProtectedRoute>
       } />
@@ -69,9 +83,7 @@ function App() {
       <Route path="/promo" element={
         <ProtectedRoute requiredRole="customer">
           <CustomerLayout>
-            <div className="container-custom section-padding">
-              <h1 className="text-2xl font-bold">Halaman Promo (Coming Soon)</h1>
-            </div>
+            <Promo />
           </CustomerLayout>
         </ProtectedRoute>
       } />
@@ -79,9 +91,7 @@ function App() {
       <Route path="/categories" element={
         <ProtectedRoute requiredRole="customer">
           <CustomerLayout>
-            <div className="container-custom section-padding">
-              <h1 className="text-2xl font-bold">Halaman Kategori (Coming Soon)</h1>
-            </div>
+            <Categories />
           </CustomerLayout>
         </ProtectedRoute>
       } />
@@ -89,9 +99,7 @@ function App() {
       <Route path="/contact" element={
         <ProtectedRoute requiredRole="customer">
           <CustomerLayout>
-            <div className="container-custom section-padding">
-              <h1 className="text-2xl font-bold">Halaman Kontak (Coming Soon)</h1>
-            </div>
+            <Contact />
           </CustomerLayout>
         </ProtectedRoute>
       } />
@@ -109,9 +117,7 @@ function App() {
       <Route path="/profile" element={
         <ProtectedRoute requiredRole="customer">
           <CustomerLayout>
-            <div className="container-custom section-padding">
-              <h1 className="text-2xl font-bold">Profil (Coming Soon)</h1>
-            </div>
+            <Profile />
           </CustomerLayout>
         </ProtectedRoute>
       } />
@@ -229,6 +235,7 @@ function App() {
 const CustomerLayout = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
+      <DemoBanner />
       <Navbar />
       <main className="flex-1">
         {children}

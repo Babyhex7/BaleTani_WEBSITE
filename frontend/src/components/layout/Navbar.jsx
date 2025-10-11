@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, ShoppingCart, User, LogOut } from 'lucide-react';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import Button from '../ui/Button';
+import logoImage from '/BaleTani_Logo.png';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -39,9 +40,14 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">B</span>
+            <Link to="/" className="flex items-center space-x-3">
+              {/* Logo Image */}
+              <div className="w-10 h-10 flex items-center justify-center">
+                <img 
+                  src={logoImage}
+                  alt="BaleTani" 
+                  className="w-10 h-10 object-contain rounded-lg" 
+                />
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-lg text-gray-900">BaleTani</span>

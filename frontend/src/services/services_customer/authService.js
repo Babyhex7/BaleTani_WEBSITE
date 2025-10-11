@@ -1,8 +1,16 @@
 import apiClient from "./apiClient";
+import { mockAuth } from "../../utils/mockData";
+
+// Demo mode - set to true to use mock data instead of real API
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true' || true; // Default true for now
 
 const authService = {
   // Register new user
   register: async (userData) => {
+    if (DEMO_MODE) {
+      return await mockAuth.register(userData);
+    }
+    
     try {
       const response = await apiClient.post("/auth/register", userData);
       return response.data;
@@ -13,6 +21,10 @@ const authService = {
 
   // Login user (mendukung semua role: customer, admin, staff)
   login: async (credentials) => {
+    if (DEMO_MODE) {
+      return await mockAuth.login(credentials);
+    }
+    
     try {
       const response = await apiClient.post("/auth/login", credentials);
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layout_admin/AdminLayout';
 import StatCard from '../../components/ui_admin/StatCard';
 import Table from '../../components/ui_admin/Table';
@@ -10,7 +11,8 @@ import { getDashboardStats, getRecentOrders, getLowStockProducts } from '../../s
  * Menampilkan overview performa toko dan data penting
  */
 const AdminDashboard = () => {
-  const [stats, setStats] = useState(null);
+  const navigate = useNavigate();
+  const [stats, setStats] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
   const [lowStockProducts, setLowStockProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -186,6 +188,25 @@ const AdminDashboard = () => {
     }
   ];
 
+  // Quick action handlers
+  const handleTambahProduk = () => {
+    navigate('/admin/inventory');
+  };
+
+  const handleKelolaUser = () => {
+    navigate('/admin/users');
+  };
+
+  const handleLihatLaporan = () => {
+    // For now, show alert since reports page doesn't exist yet
+    alert('Fitur laporan akan segera tersedia!');
+  };
+
+  const handlePengaturan = () => {
+    // For now, show alert since settings page doesn't exist yet
+    alert('Fitur pengaturan akan segera tersedia!');
+  };
+
   if (isLoading) {
     return (
       <AdminLayout>
@@ -289,28 +310,40 @@ const AdminDashboard = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Aksi Cepat</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <button 
+              onClick={handleTambahProduk}
+              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors group"
+            >
               <div className="text-center">
-                <div className="text-2xl mb-2">📦</div>
-                <div className="text-sm font-medium text-gray-900">Tambah Produk</div>
+                <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📦</div>
+                <div className="text-sm font-medium text-gray-900 group-hover:text-green-700">Tambah Produk</div>
               </div>
             </button>
-            <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <button 
+              onClick={handleKelolaUser}
+              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors group"
+            >
               <div className="text-center">
-                <div className="text-2xl mb-2">👥</div>
-                <div className="text-sm font-medium text-gray-900">Kelola User</div>
+                <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">👥</div>
+                <div className="text-sm font-medium text-gray-900 group-hover:text-blue-700">Kelola User</div>
               </div>
             </button>
-            <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <button 
+              onClick={handleLihatLaporan}
+              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors group"
+            >
               <div className="text-center">
-                <div className="text-2xl mb-2">📊</div>
-                <div className="text-sm font-medium text-gray-900">Lihat Laporan</div>
+                <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📊</div>
+                <div className="text-sm font-medium text-gray-900 group-hover:text-purple-700">Lihat Laporan</div>
               </div>
             </button>
-            <button className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <button 
+              onClick={handlePengaturan}
+              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-orange-50 hover:border-orange-300 transition-colors group"
+            >
               <div className="text-center">
-                <div className="text-2xl mb-2">⚙️</div>
-                <div className="text-sm font-medium text-gray-900">Pengaturan</div>
+                <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">⚙️</div>
+                <div className="text-sm font-medium text-gray-900 group-hover:text-orange-700">Pengaturan</div>
               </div>
             </button>
           </div>
