@@ -59,6 +59,7 @@ const registerCustomer = async (req, res) => {
           phone_number: customer.phone_number,
           full_name: customer.full_name,
           address: customer.address,
+          role: 'customer', // Add role for frontend authorization
         },
         token,
       },
@@ -130,6 +131,7 @@ const loginCustomer = async (req, res) => {
           phone_number: customer.phone_number,
           full_name: customer.full_name,
           address: customer.address,
+          role: 'customer', // Add role for frontend authorization
         },
         token,
       },
@@ -165,7 +167,14 @@ const getCustomerProfile = async (req, res) => {
     res.json({
       success: true,
       data: {
-        customer,
+        customer: {
+          id: customer.id,
+          phone_number: customer.phone_number,
+          full_name: customer.full_name,
+          address: customer.address,
+          created_at: customer.created_at,
+          role: 'customer', // Add role for frontend authorization
+        },
       },
     });
   } catch (error) {

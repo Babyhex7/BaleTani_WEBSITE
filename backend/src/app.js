@@ -35,7 +35,7 @@ const corsOptions = {
     if (!origin) return callback(null, true);
 
     // Development mode: Allow all localhost and local network IPs
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== "production") {
       // Allow localhost with any port
       if (origin.match(/^http:\/\/localhost:\d+$/)) {
         return callback(null, true);
@@ -45,7 +45,11 @@ const corsOptions = {
         return callback(null, true);
       }
       // Allow local network IPs (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
-      if (origin.match(/^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+):\d+$/)) {
+      if (
+        origin.match(
+          /^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+):\d+$/
+        )
+      ) {
         return callback(null, true);
       }
     }
@@ -59,20 +63,25 @@ const corsOptions = {
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log('❌ CORS blocked origin:', origin);
+      console.log("❌ CORS blocked origin:", origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Accept",
+  ],
   exposedHeaders: ["Content-Range", "X-Content-Range"],
   preflightContinue: false,
 };
 
 // Enable CORS pre-flight for all routes
-app.options('*', cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(cors(corsOptions));
 
 // Body parsing middleware
