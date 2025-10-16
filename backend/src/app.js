@@ -4,6 +4,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
+// Updated CORS configuration
 const errorHandler = require("./middlewares/error.middleware");
 const authRoutes = require("./routes/auth.routes"); // Admin auth
 const customerAuthRoutes = require("./routes/customerAuth.routes"); // Customer auth
@@ -27,38 +28,51 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// CORS configuration - Allow multiple development ports
+// CORS configuration - Allow multiple development origins (localhost and local IPs)
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
-    // List of allowed origins
+    // Development mode: Allow all localhost and local network IPs
+    if (process.env.NODE_ENV !== 'production') {
+      // Allow localhost with any port
+      if (origin.match(/^http:\/\/localhost:\d+$/)) {
+        return callback(null, true);
+      }
+      // Allow 127.0.0.1 with any port
+      if (origin.match(/^http:\/\/127\.0\.0\.1:\d+$/)) {
+        return callback(null, true);
+      }
+      // Allow local network IPs (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
+      if (origin.match(/^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+):\d+$/)) {
+        return callback(null, true);
+      }
+    }
+
+    // Production mode: Only allow specific origins
     const allowedOrigins = [
       process.env.FRONTEND_CUSTOMER_URL,
       process.env.FRONTEND_ADMIN_URL,
-      "http://localhost:3000",
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost:5175", // Additional fallback ports
-      "http://localhost:5176",
-    ];
+    ].filter(Boolean);
 
-    // Check if origin is allowed or if it's a localhost with different port
-    if (
-      allowedOrigins.includes(origin) ||
-      origin.match(/^http:\/\/localhost:\d+$/)
-    ) {
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log('❌ CORS blocked origin:', origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
   optionsSuccessStatus: 200,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  exposedHeaders: ["Content-Range", "X-Content-Range"],
+  preflightContinue: false,
 };
+
+// Enable CORS pre-flight for all routes
+app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
 
 // Body parsing middleware
@@ -79,6 +93,12 @@ app.get("/api/health", (req, res) => {
     message: "BaleTani Fresh Market API is running!",
     timestamp: new Date().toISOString(),
   });
+});
+
+// Catch browser extension logs (to prevent CORS errors)
+app.post("/api/log", (req, res) => {
+  // Silently ignore browser extension logs
+  res.status(204).send();
 });
 
 // 404 handler
