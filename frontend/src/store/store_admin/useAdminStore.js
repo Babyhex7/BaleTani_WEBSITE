@@ -45,21 +45,35 @@ const useAdminStore = create(
       userError: null,
 
       // Admin Auth Actions
-      login: (admin, token) =>
+      login: (admin, token) => {
+        console.log("[AdminStore] Login:", { admin, hasToken: !!token });
         set({
           admin,
           token,
           isAuthenticated: true,
-        }),
+        });
+      },
 
-      logout: () =>
+      logout: () => {
+        console.log("[AdminStore] Logout");
         set({
           admin: null,
           token: null,
           isAuthenticated: false,
-        }),
+        });
+        // Clear admin storage dari localStorage
+        localStorage.removeItem("baletani-admin-storage");
+      },
 
       setLoading: (isLoading) => set({ isLoading }),
+
+      // Update admin info without re-login
+      updateAdmin: (adminData) => {
+        console.log("[AdminStore] Update admin:", adminData);
+        set((state) => ({
+          admin: { ...state.admin, ...adminData },
+        }));
+      },
 
       // Actions untuk Dashboard
       setDashboardData: (data) =>

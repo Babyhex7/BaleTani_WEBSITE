@@ -1,4 +1,4 @@
-import apiClient from "../services_customer/apiClient";
+import adminApiClient from "./adminApiClient";
 
 /**
  * Service untuk API User Management
@@ -9,7 +9,7 @@ import apiClient from "../services_customer/apiClient";
 export const getUsers = async (params = {}) => {
   try {
     const queryString = new URLSearchParams(params).toString();
-    const response = await apiClient.get(`/admin/users?${queryString}`);
+    const response = await adminApiClient.get(`/admin/users?${queryString}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal mengambil data pengguna" };
@@ -19,7 +19,7 @@ export const getUsers = async (params = {}) => {
 // Mendapatkan detail user
 export const getUserById = async (id) => {
   try {
-    const response = await apiClient.get(`/admin/users/${id}`);
+    const response = await adminApiClient.get(`/admin/users/${id}`);
     return response.data;
   } catch (error) {
     throw (
@@ -31,7 +31,7 @@ export const getUserById = async (id) => {
 // Membuat user baru
 export const createUser = async (userData) => {
   try {
-    const response = await apiClient.post("/admin/users", userData);
+    const response = await adminApiClient.post("/admin/users", userData);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal membuat pengguna baru" };
@@ -41,7 +41,7 @@ export const createUser = async (userData) => {
 // Memperbarui user
 export const updateUser = async (id, userData) => {
   try {
-    const response = await apiClient.put(`/admin/users/${id}`, userData);
+    const response = await adminApiClient.put(`/admin/users/${id}`, userData);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal memperbarui pengguna" };
@@ -51,7 +51,7 @@ export const updateUser = async (id, userData) => {
 // Menghapus user
 export const deleteUser = async (id) => {
   try {
-    const response = await apiClient.delete(`/admin/users/${id}`);
+    const response = await adminApiClient.delete(`/admin/users/${id}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal menghapus pengguna" };
@@ -61,7 +61,9 @@ export const deleteUser = async (id) => {
 // Update role user
 export const updateUserRole = async (id, role) => {
   try {
-    const response = await apiClient.patch(`/admin/users/${id}/role`, { role });
+    const response = await adminApiClient.patch(`/admin/users/${id}/role`, {
+      role,
+    });
     return response.data;
   } catch (error) {
     throw (
@@ -73,7 +75,7 @@ export const updateUserRole = async (id, role) => {
 // Reset password user
 export const resetUserPassword = async (id, newPassword) => {
   try {
-    const response = await apiClient.patch(
+    const response = await adminApiClient.patch(
       `/admin/users/${id}/reset-password`,
       { password: newPassword }
     );
@@ -88,7 +90,7 @@ export const resetUserPassword = async (id, newPassword) => {
 // Mendapatkan statistik users
 export const getUserStats = async () => {
   try {
-    const response = await apiClient.get("/admin/users/stats");
+    const response = await adminApiClient.get("/admin/users/stats");
     return response.data;
   } catch (error) {
     throw (

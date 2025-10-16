@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, Phone } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import apiClient from '../../services/services_customer/apiClient';
+import adminAuthService from '../../services/services_admin/adminAuthService';
 import useAdminStore from '../../store/store_admin/useAdminStore';
 
 const AdminLogin = () => {
@@ -63,30 +63,26 @@ const AdminLogin = () => {
         password: formData.password
       };
       
-      const response = await apiClient.post('/admin/auth/login', loginData);
+      // Gunakan adminAuthService, bukan apiClient biasa
+      const response = await adminAuthService.login(loginData);
       
-      if (response.data.success) {
-        const { user, token } = response.data.data;
-        
-        // Normalize role to simple string for easier checking
-        const normalizedUser = {
-          ...user,
-          role: user.role?.role_name || user.role || 'admin'
-        };
-        
-        // Save to admin store (bukan localStorage langsung)
-        login(normalizedUser, token);
-        
-        toast.success('Login berhasil!');
-        navigate('/admin/dashboard');
-      }
+      // response sudah berisi { admin, token, message }
+      console.log('[AdminLogin] Login response:', response);
+      
+      // Save ke admin store
+      login(response.admin, response.token);
+      
+      toast.success(response.message || 'Login berhasil!');
+      
+      // Redirect ke admin dashboard
+      navigate('/admin/dashboard', { replace: true });
     } catch (error) {
-      console.error('Admin login error:', error);
-      toast.error(error.response?.data?.message || 'Login gagal. Silakan coba lagi.');
+      console.error('[AdminLogin] Login error:', error);
+      toast.error(error.message || 'Login gagal. Silakan coba lagi.');
       
-      if (error.response?.data?.errors) {
+      if (error.errors) {
         const fieldErrors = {};
-        error.response.data.errors.forEach(err => {
+        error.errors.forEach(err => {
           if (err.path) {
             fieldErrors[err.path] = err.msg;
           }

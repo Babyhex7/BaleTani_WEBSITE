@@ -14,27 +14,27 @@ const useAuthStore = create(
 
       // Actions
       setUser: (user) => {
-        debugLog('AUTH', 'setUser called', { user });
+        debugLog("AUTH", "setUser called", { user });
         set({ user, isAuthenticated: !!user });
       },
 
       setToken: (token) => {
-        debugLog('AUTH', 'setToken called', { hasToken: !!token });
+        debugLog("AUTH", "setToken called", { hasToken: !!token });
         set({ token });
       },
 
       setLoading: (isLoading) => {
-        debugLog('AUTH', 'setLoading', { isLoading });
+        debugLog("AUTH", "setLoading", { isLoading });
         set({ isLoading });
       },
 
       setError: (error) => {
-        debugLog('AUTH', 'setError', { error });
+        debugLog("AUTH", "setError", { error });
         set({ error });
       },
 
       login: (userData, token) => {
-        debugLog('AUTH', 'login()', { userData, hasToken: !!token });
+        debugLog("AUTH", "Customer login()", { userData, hasToken: !!token });
         set({
           user: userData,
           token,
@@ -44,14 +44,15 @@ const useAuthStore = create(
       },
 
       logout: () => {
-        debugLog('AUTH', 'logout()');
+        debugLog("AUTH", "Customer logout()");
         set({
           user: null,
           token: null,
           isAuthenticated: false,
           error: null,
         });
-        localStorage.removeItem("baletani-auth-storage");
+        // Clear ONLY customer storage
+        localStorage.removeItem("baletani-customer-storage");
       },
 
       clearError: () => set({ error: null }),
@@ -98,14 +99,14 @@ const useAuthStore = create(
 
       // Update user profile
       updateProfile: (updatedUser) => {
-        debugLog('AUTH', 'updateProfile()', { updatedUser });
+        debugLog("AUTH", "updateProfile()", { updatedUser });
         set((state) => ({
           user: { ...state.user, ...updatedUser },
         }));
       },
     }),
     {
-      name: "baletani-auth-storage",
+      name: "baletani-customer-storage", // HARUS BEDA dengan admin!
       partialize: (state) => ({
         user: state.user,
         token: state.token,

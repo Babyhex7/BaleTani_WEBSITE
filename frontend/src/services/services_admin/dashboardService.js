@@ -1,4 +1,4 @@
-import apiClient from "../services_customer/apiClient";
+import adminApiClient from "./adminApiClient";
 
 /**
  * Service untuk API Dashboard Admin
@@ -8,7 +8,7 @@ import apiClient from "../services_customer/apiClient";
 // Mendapatkan statistik dashboard
 export const getDashboardStats = async () => {
   try {
-    const response = await apiClient.get("/admin/dashboard/stats");
+    const response = await adminApiClient.get("/admin/dashboard/stats");
     return response.data;
   } catch (error) {
     throw (
@@ -20,7 +20,9 @@ export const getDashboardStats = async () => {
 // Mendapatkan pesanan terbaru
 export const getRecentOrders = async (limit = 5) => {
   try {
-    const response = await apiClient.get(`/admin/dashboard/recent-orders?limit=${limit}`);
+    const response = await adminApiClient.get(
+      `/admin/dashboard/recent-orders?limit=${limit}`
+    );
     return response.data;
   } catch (error) {
     throw (
@@ -32,7 +34,7 @@ export const getRecentOrders = async (limit = 5) => {
 // Mendapatkan produk dengan stok menipis
 export const getLowStockProducts = async (limit = 10) => {
   try {
-    const response = await apiClient.get(
+    const response = await adminApiClient.get(
       `/admin/dashboard/low-stock?limit=${limit}`
     );
     return response.data;
@@ -46,7 +48,7 @@ export const getLowStockProducts = async (limit = 10) => {
 // Mendapatkan notifikasi admin
 export const getAdminNotifications = async () => {
   try {
-    const response = await apiClient.get("/admin/notifications");
+    const response = await adminApiClient.get("/admin/notifications");
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal mengambil notifikasi" };
@@ -56,7 +58,7 @@ export const getAdminNotifications = async () => {
 // Menandai notifikasi sebagai dibaca
 export const markNotificationAsRead = async (notificationId) => {
   try {
-    const response = await apiClient.patch(
+    const response = await adminApiClient.patch(
       `/admin/notifications/${notificationId}/read`
     );
     return response.data;
