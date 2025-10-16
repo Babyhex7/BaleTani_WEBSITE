@@ -5,7 +5,8 @@ const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
 const errorHandler = require("./middlewares/error.middleware");
-const authRoutes = require("./routes/auth.routes");
+const authRoutes = require("./routes/auth.routes"); // Admin auth
+const customerAuthRoutes = require("./routes/customerAuth.routes"); // Customer auth
 const productRoutes = require("./routes/products");
 const categoryRoutes = require("./routes/categories");
 const adminRoutes = require("./routes/admin");
@@ -31,7 +32,7 @@ const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
+
     // List of allowed origins
     const allowedOrigins = [
       process.env.FRONTEND_CUSTOMER_URL,
@@ -42,18 +43,21 @@ const corsOptions = {
       "http://localhost:5175", // Additional fallback ports
       "http://localhost:5176",
     ];
-    
+
     // Check if origin is allowed or if it's a localhost with different port
-    if (allowedOrigins.includes(origin) || origin.match(/^http:\/\/localhost:\d+$/)) {
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.match(/^http:\/\/localhost:\d+$/)
+    ) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
   optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 };
 app.use(cors(corsOptions));
 
@@ -62,7 +66,8 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Routes
-app.use("/api/auth", authRoutes);
+app.use("/api/admin/auth", authRoutes); // Admin auth: /api/admin/auth/login
+app.use("/api/customer/auth", customerAuthRoutes); // Customer auth: /api/customer/auth/login & /api/customer/auth/register
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/admin", adminRoutes);

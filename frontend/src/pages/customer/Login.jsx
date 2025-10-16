@@ -9,7 +9,7 @@ import Input from '../../components/ui/Input';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: '',
+    phoneNumber: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -51,10 +51,10 @@ const Login = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.email) {
-      newErrors.email = 'Email wajib diisi';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Format email tidak valid';
+    if (!formData.phoneNumber) {
+      newErrors.phoneNumber = 'Nomor telepon wajib diisi';
+    } else if (!/^(08|628|\+628)[0-9]{8,12}$/.test(formData.phoneNumber.replace(/\s/g, ''))) {
+      newErrors.phoneNumber = 'Format nomor telepon tidak valid (08xx atau 628xx)';
     }
 
     if (!formData.password) {
@@ -76,23 +76,25 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await authService.login(formData);
+      // Transform data to match backend API
+      const loginData = {
+        phone_number: formData.phoneNumber,
+        password: formData.password
+      };
+      
+      const response = await authService.login(loginData);
       if (import.meta.env.VITE_DEBUG_AUTH === 'true') {
         const { debugLog } = await import('../../utils/debugLogger');
         debugLog('LOGIN', 'Login success raw response', response);
       }
       
       // authService.login sudah return format yang benar
-      login(response.user, response.token);
+      login(response.customer, response.token);
       toast.success(response.message || 'Login berhasil!');
       
-      // Redirect berdasarkan role user dengan delay singkat untuk UX
+      // Navigate to customer home
       setTimeout(() => {
-        if (response.user.role === 'admin' || response.user.role === 'staff') {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/home');
-        }
+        navigate('/home');
       }, 500);
       
     } catch (error) {
@@ -150,17 +152,17 @@ const Login = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow-xl rounded-xl sm:px-10 border border-gray-100">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Email field */}
+            {/* Phone Number field */}
             <Input
-              label="Email"
-              type="email"
-              name="email"
-              value={formData.email}
+              label="Nomor Telepon"
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
               onChange={handleInputChange}
-              error={errors.email}
+              error={errors.phoneNumber}
               required
-              autoComplete="email"
-              placeholder="Masukkan email Anda"
+              autoComplete="tel"
+              placeholder="08xxxxxxxxxx atau 628xxxxxxxxxx"
             />
 
             {/* Password field */}

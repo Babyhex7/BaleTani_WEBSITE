@@ -2,8 +2,8 @@ const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 const bcrypt = require("bcryptjs");
 
-const User = sequelize.define(
-  "User",
+const Customer = sequelize.define(
+  "Customer",
   {
     id: {
       type: DataTypes.UUID,
@@ -19,13 +19,13 @@ const User = sequelize.define(
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    role_id: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
     password_hash: {
       type: DataTypes.STRING(255),
       allowNull: false,
+    },
+    address: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
     is_active: {
       type: DataTypes.BOOLEAN,
@@ -52,29 +52,35 @@ const User = sequelize.define(
     },
   },
   {
-    tableName: "users",
+    tableName: "customers",
     timestamps: false, // We handle timestamps manually
     paranoid: false, // We handle soft deletes manually
     underscored: true,
     hooks: {
-      beforeCreate: async (user) => {
-        if (user.password_hash) {
+      beforeCreate: async (customer) => {
+        if (customer.password_hash) {
           const salt = await bcrypt.genSalt(10);
-          user.password_hash = await bcrypt.hash(user.password_hash, salt);
+          customer.password_hash = await bcrypt.hash(
+            customer.password_hash,
+            salt
+          );
         }
         // Normalize phone number
-        if (user.phone_number) {
-          user.phone_number = normalizePhoneNumber(user.phone_number);
+        if (customer.phone_number) {
+          customer.phone_number = normalizePhoneNumber(customer.phone_number);
         }
       },
-      beforeUpdate: async (user) => {
-        if (user.changed("password_hash")) {
+      beforeUpdate: async (customer) => {
+        if (customer.changed("password_hash")) {
           const salt = await bcrypt.genSalt(10);
-          user.password_hash = await bcrypt.hash(user.password_hash, salt);
+          customer.password_hash = await bcrypt.hash(
+            customer.password_hash,
+            salt
+          );
         }
         // Normalize phone number
-        if (user.changed("phone_number")) {
-          user.phone_number = normalizePhoneNumber(user.phone_number);
+        if (customer.changed("phone_number")) {
+          customer.phone_number = normalizePhoneNumber(customer.phone_number);
         }
       },
     },
@@ -102,8 +108,8 @@ function normalizePhoneNumber(phoneNumber) {
 }
 
 // Instance method to check password
-User.prototype.comparePassword = async function (candidatePassword) {
+Customer.prototype.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password_hash);
 };
 
-module.exports = User;
+module.exports = Customer;

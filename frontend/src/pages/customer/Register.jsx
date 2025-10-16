@@ -10,7 +10,7 @@ import Input from '../../components/ui/Input';
 const Register = () => {
   const [formData, setFormData] = useState({
     fullName: '',
-    email: '',
+    phoneNumber: '',
     password: '',
     confirmPassword: ''
   });
@@ -46,10 +46,10 @@ const Register = () => {
       newErrors.fullName = 'Nama lengkap minimal 2 karakter';
     }
 
-    if (!formData.email) {
-      newErrors.email = 'Email wajib diisi';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Format email tidak valid';
+    if (!formData.phoneNumber) {
+      newErrors.phoneNumber = 'Nomor telepon wajib diisi';
+    } else if (!/^(08|628|\+628)[0-9]{8,12}$/.test(formData.phoneNumber.replace(/\s/g, ''))) {
+      newErrors.phoneNumber = 'Format nomor telepon tidak valid (08xx atau 628xx)';
     }
 
     if (!formData.password) {
@@ -104,10 +104,18 @@ const Register = () => {
 
     try {
       const { confirmPassword, ...registerData } = formData;
-      const response = await authService.register(registerData);
+      
+      // Transform data to match backend API
+      const apiData = {
+        phone_number: registerData.phoneNumber,
+        full_name: registerData.fullName,
+        password: registerData.password
+      };
+      
+      const response = await authService.register(apiData);
       
       if (response.success) {
-        login(response.data.user, response.data.token);
+        login(response.data.customer, response.data.token);
         toast.success('Registrasi berhasil! Selamat datang di BaleTani!');
         navigate('/');
       }
@@ -175,17 +183,17 @@ const Register = () => {
               placeholder="Masukkan nama lengkap Anda"
             />
 
-            {/* Email field */}
+            {/* Phone Number field */}
             <Input
-              label="Email"
-              type="email"
-              name="email"
-              value={formData.email}
+              label="Nomor Telepon"
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
               onChange={handleInputChange}
-              error={errors.email}
+              error={errors.phoneNumber}
               required
-              autoComplete="email"
-              placeholder="Masukkan email Anda"
+              autoComplete="tel"
+              placeholder="08xxxxxxxxxx atau 628xxxxxxxxxx"
             />
 
             {/* Password field */}

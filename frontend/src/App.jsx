@@ -8,6 +8,7 @@ import Register from './pages/customer/Register';
 import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRoute';
 
 // Admin Pages
+import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import InventoryManagement from './pages/admin/InventoryManagement';
 import UserManagement from './pages/admin/UserManagement';
@@ -21,6 +22,9 @@ function App() {
     <Routes>
       {/* Root redirect berdasarkan role */}
       <Route path="/" element={<RoleBasedRedirect />} />
+
+      {/* Admin Login (public) */}
+      <Route path="/admin/login" element={<AdminLogin />} />
 
       {/* Public routes (tidak perlu login) */}
       <Route path="/landing" element={

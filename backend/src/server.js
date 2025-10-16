@@ -8,11 +8,18 @@ const startServer = async () => {
     // Test database connection
     await testConnection();
 
+    // Disable foreign key checks for sync
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 0;");
+
     // Sync database models
     await sequelize.sync({
-      force: false, // Set to true only for development when you want to recreate tables
-      alter: false, // Set to true to automatically update table structure
+      force: true, // TEMPORARY: Recreate tables for new schema
+      alter: false,
     });
+
+    // Re-enable foreign key checks
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 1;");
+
     console.log("✅ Database models synchronized successfully.");
 
     // Start server

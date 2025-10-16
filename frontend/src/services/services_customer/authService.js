@@ -1,10 +1,13 @@
 import apiClient from "./apiClient";
 
 const authService = {
-  // Register new user
+  // Register new customer
   register: async (userData) => {
     try {
-      const response = await apiClient.post("/auth/register", userData);
+      const response = await apiClient.post(
+        "/customer/auth/register",
+        userData
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -14,31 +17,33 @@ const authService = {
   // Login user (mendukung semua role: customer, admin, staff)
   login: async (credentials) => {
     try {
-      const response = await apiClient.post("/auth/login", credentials);
+      const response = await apiClient.post(
+        "/customer/auth/login",
+        credentials
+      );
 
       // Debug: log raw response structure
-      if (import.meta.env.VITE_DEBUG_AUTH === 'true') {
-        console.log('[DEBUG] Raw login response:', response.data);
+      if (import.meta.env.VITE_DEBUG_AUTH === "true") {
+        console.log("[DEBUG] Raw login response:", response.data);
       }
 
-      // Backend returns: { success: true, message: '...', data: { user: {...}, token: '...' } }
-      // So we need to access response.data.data.user and response.data.data.token
-      if (response.data && response.data.success && response.data.data && response.data.data.user && response.data.data.token) {
-        const { user, token } = response.data.data;
-
-        // Validasi role yang valid
-        const validRoles = ["customer", "admin", "staff"];
-        if (!validRoles.includes(user.role)) {
-          throw new Error("Role pengguna tidak valid");
-        }
+      // Backend returns: { success: true, message: '...', data: { customer: {...}, token: '...' } }
+      if (
+        response.data &&
+        response.data.success &&
+        response.data.data &&
+        response.data.data.customer &&
+        response.data.data.token
+      ) {
+        const { customer, token } = response.data.data;
 
         return {
-          user,
+          customer,
           token,
           message: response.data.message || "Login berhasil",
         };
       } else {
-        console.error('Invalid response structure:', response.data);
+        console.error("Invalid response structure:", response.data);
         throw new Error("Response login tidak valid");
       }
     } catch (error) {
