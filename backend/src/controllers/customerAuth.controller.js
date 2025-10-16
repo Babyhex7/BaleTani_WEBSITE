@@ -1,6 +1,29 @@
 const jwt = require("jsonwebtoken");
 const { Customer } = require("../models");
 
+// Utility function to normalize phone number to +62 format
+const normalizePhoneNumber = (phone) => {
+  if (!phone) return phone;
+
+  // Remove all spaces and dashes
+  let normalized = phone.replace(/[\s-]/g, "");
+
+  // If starts with 0, replace with +62
+  if (normalized.startsWith("0")) {
+    normalized = "+62" + normalized.substring(1);
+  }
+  // If starts with 62, add +
+  else if (normalized.startsWith("62") && !normalized.startsWith("+62")) {
+    normalized = "+" + normalized;
+  }
+  // If doesn't start with +62, assume it needs +62
+  else if (!normalized.startsWith("+62")) {
+    normalized = "+62" + normalized;
+  }
+
+  return normalized;
+};
+
 // Register Customer
 const registerCustomer = async (req, res) => {
   try {
@@ -14,10 +37,13 @@ const registerCustomer = async (req, res) => {
       });
     }
 
+    // Normalize phone number
+    const normalizedPhone = normalizePhoneNumber(phone_number);
+
     // Check if customer already exists
     const existingCustomer = await Customer.findOne({
       where: {
-        phone_number,
+        phone_number: normalizedPhone,
         deleted_at: null,
       },
     });
@@ -29,9 +55,9 @@ const registerCustomer = async (req, res) => {
       });
     }
 
-    // Create new customer
+    // Create new customer with normalized phone number
     const customer = await Customer.create({
-      phone_number,
+      phone_number: normalizedPhone,
       full_name,
       password_hash: password, // Will be hashed by the hook
       address: address || null,
@@ -86,10 +112,13 @@ const loginCustomer = async (req, res) => {
       });
     }
 
-    // Find customer
+    // Normalize phone number
+    const normalizedPhone = normalizePhoneNumber(phone_number);
+
+    // Find customer with normalized phone number
     const customer = await Customer.findOne({
       where: {
-        phone_number,
+        phone_number: normalizedPhone,
         deleted_at: null,
         is_active: true,
       },

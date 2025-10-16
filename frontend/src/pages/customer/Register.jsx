@@ -48,8 +48,12 @@ const Register = () => {
 
     if (!formData.phoneNumber) {
       newErrors.phoneNumber = 'Nomor telepon wajib diisi';
-    } else if (!/^(08|628|\+628)[0-9]{8,12}$/.test(formData.phoneNumber.replace(/\s/g, ''))) {
-      newErrors.phoneNumber = 'Format nomor telepon tidak valid (08xx atau 628xx)';
+    } else {
+      // More flexible validation - accept 08xx, 62xxx, +62xxx
+      const cleaned = formData.phoneNumber.replace(/[\s-]/g, '');
+      if (!/^(0|62|\+62)[0-9]{9,13}$/.test(cleaned)) {
+        newErrors.phoneNumber = 'Format nomor telepon tidak valid (08xx, 62xxx, atau +62xxx)';
+      }
     }
 
     if (!formData.password) {
@@ -92,6 +96,27 @@ const Register = () => {
 
   const passwordStrength = getPasswordStrength(formData.password);
 
+  // Normalize phone number to +62 format
+  const normalizePhoneNumber = (phone) => {
+    // Remove all spaces and dashes
+    let normalized = phone.replace(/[\s-]/g, '');
+    
+    // If starts with 0, replace with +62
+    if (normalized.startsWith('0')) {
+      normalized = '+62' + normalized.substring(1);
+    }
+    // If starts with 62, add +
+    else if (normalized.startsWith('62') && !normalized.startsWith('+62')) {
+      normalized = '+' + normalized;
+    }
+    // If doesn't start with +62, assume it needs +62
+    else if (!normalized.startsWith('+62')) {
+      normalized = '+62' + normalized;
+    }
+    
+    return normalized;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -105,9 +130,12 @@ const Register = () => {
     try {
       const { confirmPassword, ...registerData } = formData;
       
+      // Normalize phone number before sending to backend
+      const normalizedPhone = normalizePhoneNumber(registerData.phoneNumber);
+      
       // Transform data to match backend API
       const apiData = {
-        phone_number: registerData.phoneNumber,
+        phone_number: normalizedPhone,
         full_name: registerData.fullName,
         password: registerData.password
       };
@@ -115,16 +143,14 @@ const Register = () => {
       const response = await authService.register(apiData);
       
       if (response.success) {
-        // Don't auto-login, redirect to login page
-        toast.success('Registrasi berhasil! Silakan login untuk melanjutkan.');
-        setTimeout(() => {
-          navigate('/login', { 
-            state: { 
-              registered: true,
-              phoneNumber: registerData.phoneNumber 
-            } 
-          });
-        }, 1500);
+        // Don't show toast here, let Login page handle it
+        // Redirect to login page with normalized phone number
+        navigate('/login', { 
+          state: { 
+            registered: true,
+            phoneNumber: normalizedPhone
+          } 
+        });
       }
     } catch (error) {
       console.error('Registration error:', error);
@@ -200,7 +226,7 @@ const Register = () => {
               error={errors.phoneNumber}
               required
               autoComplete="tel"
-              placeholder="08xxxxxxxxxx atau 628xxxxxxxxxx"
+              placeholder="08xx, 62xx, atau +62xx"
             />
 
             {/* Password field */}

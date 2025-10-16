@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import useAuthStore from '../../store/store_customer/useAuthStore';
+import useAdminStore from '../../store/store_admin/useAdminStore';
 
 /**
  * Header/Navbar Admin yang menampilkan breadcrumb dan info user
@@ -8,7 +8,7 @@ import useAuthStore from '../../store/store_customer/useAuthStore';
  */
 const AdminHeader = ({ sidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
-  const { user } = useAuthStore();
+  const { admin } = useAdminStore();
 
   // Mapping path ke breadcrumb
   const getBreadcrumb = () => {
@@ -73,12 +73,14 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }) => {
           <div className="flex items-center">
             <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
               <span className="text-green-600 font-semibold text-sm">
-                {user?.full_name?.charAt(0)?.toUpperCase() || 'A'}
+                {admin?.full_name?.charAt(0)?.toUpperCase() || 'A'}
               </span>
             </div>
             <div className="ml-2 hidden sm:block">
-              <p className="text-sm font-medium text-gray-900">{user?.full_name || 'Admin'}</p>
-              <p className="text-xs text-gray-500 capitalize">{user?.role || 'admin'}</p>
+              <p className="text-sm font-medium text-gray-900">{admin?.full_name || 'Admin'}</p>
+              <p className="text-xs text-gray-500 capitalize">
+                {typeof admin?.role === 'string' ? admin?.role : admin?.role?.role_name || 'admin'}
+              </p>
             </div>
           </div>
         </div>

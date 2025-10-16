@@ -59,8 +59,12 @@ const Login = () => {
 
     if (!formData.phoneNumber) {
       newErrors.phoneNumber = 'Nomor telepon wajib diisi';
-    } else if (!/^(08|628|\+628)[0-9]{8,12}$/.test(formData.phoneNumber.replace(/\s/g, ''))) {
-      newErrors.phoneNumber = 'Format nomor telepon tidak valid (08xx atau 628xx)';
+    } else {
+      // More flexible validation - accept 08xx, 62xxx, +62xxx
+      const cleaned = formData.phoneNumber.replace(/[\s-]/g, '');
+      if (!/^(0|62|\+62)[0-9]{9,13}$/.test(cleaned)) {
+        newErrors.phoneNumber = 'Format nomor telepon tidak valid (08xx, 62xxx, atau +62xxx)';
+      }
     }
 
     if (!formData.password) {
@@ -69,6 +73,27 @@ const Login = () => {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  // Normalize phone number to +62 format
+  const normalizePhoneNumber = (phone) => {
+    // Remove all spaces and dashes
+    let normalized = phone.replace(/[\s-]/g, '');
+    
+    // If starts with 0, replace with +62
+    if (normalized.startsWith('0')) {
+      normalized = '+62' + normalized.substring(1);
+    }
+    // If starts with 62, add +
+    else if (normalized.startsWith('62') && !normalized.startsWith('+62')) {
+      normalized = '+' + normalized;
+    }
+    // If doesn't start with +62, assume it needs +62
+    else if (!normalized.startsWith('+62')) {
+      normalized = '+62' + normalized;
+    }
+    
+    return normalized;
   };
 
   const handleSubmit = async (e) => {
@@ -82,9 +107,12 @@ const Login = () => {
     setLoading(true);
 
     try {
+      // Normalize phone number before sending to backend
+      const normalizedPhone = normalizePhoneNumber(formData.phoneNumber);
+      
       // Transform data to match backend API
       const loginData = {
-        phone_number: formData.phoneNumber,
+        phone_number: normalizedPhone,
         password: formData.password
       };
       
@@ -168,7 +196,7 @@ const Login = () => {
               error={errors.phoneNumber}
               required
               autoComplete="tel"
-              placeholder="08xxxxxxxxxx atau 628xxxxxxxxxx"
+              placeholder="08xx, 62xx, atau +62xx"
             />
 
             {/* Password field */}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import useAuthStore from '../../store/store_customer/useAuthStore';
+import useAdminStore from '../../store/store_admin/useAdminStore';
 
 /**
  * Sidebar Admin dengan navigasi menu yang responsive
@@ -9,7 +9,7 @@ import useAuthStore from '../../store/store_customer/useAuthStore';
 const AdminSidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { admin, logout } = useAdminStore();
 
   // Menu navigasi admin
   const menuItems = [
@@ -64,7 +64,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/admin/login');
   };
 
   return (
@@ -102,12 +102,14 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
             <div className="flex items-center">
               <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                 <span className="text-green-600 font-semibold">
-                  {user?.full_name?.charAt(0)?.toUpperCase() || 'A'}
+                  {admin?.full_name?.charAt(0)?.toUpperCase() || 'A'}
                 </span>
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">{user?.full_name || 'Admin'}</p>
-                <p className="text-xs text-gray-500 capitalize">{user?.role || 'admin'}</p>
+                <p className="text-sm font-medium text-gray-900">{admin?.full_name || 'Admin'}</p>
+                <p className="text-xs text-gray-500 capitalize">
+                  {typeof admin?.role === 'string' ? admin?.role : admin?.role?.role_name || 'admin'}
+                </p>
               </div>
             </div>
           </div>

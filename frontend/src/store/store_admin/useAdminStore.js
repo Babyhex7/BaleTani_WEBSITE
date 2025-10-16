@@ -8,6 +8,12 @@ import { persist } from "zustand/middleware";
 const useAdminStore = create(
   persist(
     (set, get) => ({
+      // Admin Auth State
+      admin: null,
+      token: null,
+      isAuthenticated: false,
+      isLoading: false,
+
       // State untuk dashboard
       dashboardStats: null,
       recentOrders: [],
@@ -37,6 +43,23 @@ const useAdminStore = create(
       dashboardError: null,
       inventoryError: null,
       userError: null,
+
+      // Admin Auth Actions
+      login: (admin, token) =>
+        set({
+          admin,
+          token,
+          isAuthenticated: true,
+        }),
+
+      logout: () =>
+        set({
+          admin: null,
+          token: null,
+          isAuthenticated: false,
+        }),
+
+      setLoading: (isLoading) => set({ isLoading }),
 
       // Actions untuk Dashboard
       setDashboardData: (data) =>
@@ -121,6 +144,10 @@ const useAdminStore = create(
       // Reset store
       resetAdminStore: () =>
         set({
+          admin: null,
+          token: null,
+          isAuthenticated: false,
+          isLoading: false,
           dashboardStats: null,
           recentOrders: [],
           lowStockProducts: [],
@@ -145,8 +172,11 @@ const useAdminStore = create(
     }),
     {
       name: "baletani-admin-storage",
-      // Hanya persist data penting, tidak persist loading/error states
+      // Persist admin auth dan data penting
       partialize: (state) => ({
+        admin: state.admin,
+        token: state.token,
+        isAuthenticated: state.isAuthenticated,
         dashboardStats: state.dashboardStats,
         categories: state.categories,
         userStats: state.userStats,
