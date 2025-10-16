@@ -1,27 +1,26 @@
 const jwt = require("jsonwebtoken");
 const { Customer } = require("../models");
 
-// Utility function to normalize phone number to +62 format
+// Utility function to normalize phone number to 62 format (consistent with model)
 const normalizePhoneNumber = (phone) => {
   if (!phone) return phone;
 
-  // Remove all spaces and dashes
-  let normalized = phone.replace(/[\s-]/g, "");
+  // Remove all non-digit characters
+  let cleaned = phone.replace(/\D/g, "");
 
-  // If starts with 0, replace with +62
-  if (normalized.startsWith("0")) {
-    normalized = "+62" + normalized.substring(1);
-  }
-  // If starts with 62, add +
-  else if (normalized.startsWith("62") && !normalized.startsWith("+62")) {
-    normalized = "+" + normalized;
-  }
-  // If doesn't start with +62, assume it needs +62
-  else if (!normalized.startsWith("+62")) {
-    normalized = "+62" + normalized;
+  // Handle different formats
+  if (cleaned.startsWith("0")) {
+    // Convert 08xx to 628xx
+    cleaned = "62" + cleaned.substring(1);
+  } else if (cleaned.startsWith("8")) {
+    // Convert 8xx to 628xx
+    cleaned = "62" + cleaned;
+  } else if (!cleaned.startsWith("62")) {
+    // Add 62 if not present
+    cleaned = "62" + cleaned;
   }
 
-  return normalized;
+  return cleaned;
 };
 
 // Register Customer
