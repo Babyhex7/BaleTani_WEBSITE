@@ -2,8 +2,8 @@ const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 const bcrypt = require("bcryptjs");
 
-const User = sequelize.define(
-  "User",
+const Admin = sequelize.define(
+  "Admin",
   {
     id: {
       type: DataTypes.UUID,
@@ -52,29 +52,29 @@ const User = sequelize.define(
     },
   },
   {
-    tableName: "users",
-    timestamps: false, // We handle timestamps manually
-    paranoid: false, // We handle soft deletes manually
+    tableName: "users", // Still use users table
+    timestamps: false,
+    paranoid: false,
     underscored: true,
     hooks: {
-      beforeCreate: async (user) => {
-        if (user.password_hash) {
+      beforeCreate: async (admin) => {
+        if (admin.password_hash) {
           const salt = await bcrypt.genSalt(10);
-          user.password_hash = await bcrypt.hash(user.password_hash, salt);
+          admin.password_hash = await bcrypt.hash(admin.password_hash, salt);
         }
         // Normalize phone number
-        if (user.phone_number) {
-          user.phone_number = normalizePhoneNumber(user.phone_number);
+        if (admin.phone_number) {
+          admin.phone_number = normalizePhoneNumber(admin.phone_number);
         }
       },
-      beforeUpdate: async (user) => {
-        if (user.changed("password_hash")) {
+      beforeUpdate: async (admin) => {
+        if (admin.changed("password_hash")) {
           const salt = await bcrypt.genSalt(10);
-          user.password_hash = await bcrypt.hash(user.password_hash, salt);
+          admin.password_hash = await bcrypt.hash(admin.password_hash, salt);
         }
         // Normalize phone number
-        if (user.changed("phone_number")) {
-          user.phone_number = normalizePhoneNumber(user.phone_number);
+        if (admin.changed("phone_number")) {
+          admin.phone_number = normalizePhoneNumber(admin.phone_number);
         }
       },
     },
@@ -102,8 +102,8 @@ function normalizePhoneNumber(phoneNumber) {
 }
 
 // Instance method to check password
-User.prototype.comparePassword = async function (candidatePassword) {
+Admin.prototype.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password_hash);
 };
 
-module.exports = User;
+module.exports = Admin;

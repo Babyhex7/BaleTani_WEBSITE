@@ -1,4 +1,4 @@
-const User = require("./user.model");
+const Admin = require("./admin.model");
 const Role = require("./role.model");
 const Customer = require("./customer.model");
 const Category = require("./category.model");
@@ -6,13 +6,13 @@ const Product = require("./product.model");
 // const Order = require("./order.model"); // Temporarily disabled
 
 // Define associations
-// Role and User relationship
-Role.hasMany(User, {
+// Role and Admin relationship
+Role.hasMany(Admin, {
   foreignKey: "role_id",
-  as: "users",
+  as: "admins",
 });
 
-User.belongsTo(Role, {
+Admin.belongsTo(Role, {
   foreignKey: "role_id",
   as: "role",
 });
@@ -29,7 +29,7 @@ Category.hasMany(Product, {
 });
 
 module.exports = {
-  User,
+  Admin,
   Role,
   Customer,
   Category,

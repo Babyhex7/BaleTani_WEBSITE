@@ -1,11 +1,11 @@
-const { User } = require("../models");
+const { Admin } = require("../models");
 const { validationResult } = require("express-validator");
 const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
 
 /**
  * Admin User Management Controller
- * CRUD operations untuk mengelola users dengan RBAC
+ * CRUD operations untuk mengelola admin users dengan RBAC
  */
 
 // Get all users with pagination and filters
@@ -34,7 +34,7 @@ const getUsers = async (req, res, next) => {
     }
 
     // Get users with pagination
-    const { count, rows: users } = await User.findAndCountAll({
+    const { count, rows: users } = await Admin.findAndCountAll({
       where: whereClause,
       attributes: { exclude: ["password"] },
       order: [[sortBy, sortOrder.toUpperCase()]],
@@ -74,7 +74,7 @@ const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const user = await User.findByPk(id, {
+    const user = await Admin.findByPk(id, {
       attributes: { exclude: ["password"] },
     });
 
@@ -110,7 +110,7 @@ const createUser = async (req, res, next) => {
     const { full_name, email, password, role = "customer" } = req.body;
 
     // Check if user already exists
-    const existingUser = await User.findOne({ where: { email } });
+    const existingUser = await Admin.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -128,7 +128,7 @@ const createUser = async (req, res, next) => {
     }
 
     // Create new user
-    const user = await User.create({
+    const user = await Admin.create({
       full_name,
       email,
       password,
@@ -163,7 +163,7 @@ const updateUser = async (req, res, next) => {
     const { id } = req.params;
     const { full_name, email, password, role } = req.body;
 
-    const user = await User.findByPk(id);
+    const user = await Admin.findByPk(id);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -173,7 +173,7 @@ const updateUser = async (req, res, next) => {
 
     // Check if email is already taken by another user
     if (email && email !== user.email) {
-      const existingUser = await User.findOne({
+      const existingUser = await Admin.findOne({
         where: {
           email,
           id: { [Op.ne]: id },
@@ -237,7 +237,7 @@ const deleteUser = async (req, res, next) => {
       });
     }
 
-    const user = await User.findByPk(id);
+    const user = await Admin.findByPk(id);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -270,7 +270,7 @@ const updateUserRole = async (req, res, next) => {
       });
     }
 
-    const user = await User.findByPk(id);
+    const user = await Admin.findByPk(id);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -313,7 +313,7 @@ const resetUserPassword = async (req, res, next) => {
       });
     }
 
-    const user = await User.findByPk(id);
+    const user = await Admin.findByPk(id);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -338,9 +338,9 @@ const resetUserPassword = async (req, res, next) => {
 const getUserStats = async (req, res, next) => {
   try {
     const [totalAdmins, totalStaff, totalCustomers] = await Promise.all([
-      User.count({ where: { role: "admin" } }),
-      User.count({ where: { role: "staff" } }),
-      User.count({ where: { role: "customer" } }),
+      Admin.count({ where: { role: "admin" } }),
+      Admin.count({ where: { role: "staff" } }),
+      Admin.count({ where: { role: "customer" } }),
     ]);
 
     res.json({

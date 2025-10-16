@@ -13,7 +13,7 @@ const startServer = async () => {
 
     // Sync database models
     await sequelize.sync({
-      force: true, // TEMPORARY: Recreate tables for new schema
+      force: false, // Don't drop tables - preserve existing data
       alter: false,
     });
 

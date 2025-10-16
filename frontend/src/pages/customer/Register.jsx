@@ -20,7 +20,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { login, setLoading } = useAuthStore();
+  const { setLoading } = useAuthStore();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -115,9 +115,16 @@ const Register = () => {
       const response = await authService.register(apiData);
       
       if (response.success) {
-        login(response.data.customer, response.data.token);
-        toast.success('Registrasi berhasil! Selamat datang di BaleTani!');
-        navigate('/');
+        // Don't auto-login, redirect to login page
+        toast.success('Registrasi berhasil! Silakan login untuk melanjutkan.');
+        setTimeout(() => {
+          navigate('/login', { 
+            state: { 
+              registered: true,
+              phoneNumber: registerData.phoneNumber 
+            } 
+          });
+        }, 1500);
       }
     } catch (error) {
       console.error('Registration error:', error);

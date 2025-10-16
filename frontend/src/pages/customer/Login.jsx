@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import useAuthStore from '../../store/store_customer/useAuthStore';
@@ -8,8 +8,9 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
 const Login = () => {
+  const location = useLocation();
   const [formData, setFormData] = useState({
-    phoneNumber: '',
+    phoneNumber: location.state?.phoneNumber || '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -19,14 +20,19 @@ const Login = () => {
   const navigate = useNavigate();
   const { login, setLoading } = useAuthStore();
 
-  // Debug initial mount state
+  // Show success message if coming from registration
   useEffect(() => {
+    if (location.state?.registered) {
+      toast.success('Registrasi berhasil! Silakan login dengan akun Anda.');
+    }
+    
     if (import.meta.env.VITE_DEBUG_AUTH === 'true') {
       // Lazy import to avoid circular
       import('../../utils/debugLogger').then(({ debugLog }) => {
         debugLog('LOGIN', 'Mount Login component', {
           formData,
           location: window.location.pathname,
+          fromRegistration: location.state?.registered || false,
         });
       });
     }

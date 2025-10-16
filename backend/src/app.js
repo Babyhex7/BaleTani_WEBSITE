@@ -6,7 +6,7 @@ require("dotenv").config();
 
 // Updated CORS configuration
 const errorHandler = require("./middlewares/error.middleware");
-const authRoutes = require("./routes/auth.routes"); // Admin auth
+const adminAuthRoutes = require("./routes/adminAuth.routes"); // Admin auth
 const customerAuthRoutes = require("./routes/customerAuth.routes"); // Customer auth
 const productRoutes = require("./routes/products");
 const categoryRoutes = require("./routes/categories");
@@ -89,7 +89,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Routes
-app.use("/api/admin/auth", authRoutes); // Admin auth: /api/admin/auth/login
+app.use("/api/admin/auth", adminAuthRoutes); // Admin auth: /api/admin/auth/login
 app.use("/api/customer/auth", customerAuthRoutes); // Customer auth: /api/customer/auth/login & /api/customer/auth/register
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);

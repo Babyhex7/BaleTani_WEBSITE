@@ -4,6 +4,19 @@ import { Navigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import { Alert } from '../ui_admin/CommonComponents';
 
+// Helper function to check role permissions
+function hasRequiredRole(userRole, requiredRole) {
+  if (!userRole || !requiredRole) return false;
+  
+  // If required role is admin, allow both admin and staff
+  if (requiredRole === 'admin') {
+    return userRole === 'admin' || userRole === 'staff';
+  }
+  
+  // Otherwise, exact match
+  return userRole === requiredRole;
+}
+
 /**
  * Komponen untuk melindungi route berdasarkan role (RBAC)
  * Mengecek apakah user sudah login dan memiliki role yang sesuai
@@ -17,8 +30,19 @@ const ProtectedRoute = ({
   const { isAuthenticated, user } = useAuthStore();
   const location = useLocation();
 
+  // Debug logging
+  console.log('[ProtectedRoute] Check:', {
+    isAuthenticated,
+    user,
+    userRole: user?.role,
+    requiredRole,
+    requireAuth,
+    path: location.pathname
+  });
+
   // Jika butuh authentication tapi user belum login
   if (requireAuth && !isAuthenticated) {
+    console.log('[ProtectedRoute] Not authenticated, redirecting to:', redirectTo);
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
@@ -63,19 +87,6 @@ const ProtectedRoute = ({
     }
 
     return <Navigate to="/unauthorized" replace />;
-  }
-
-  // Helper function to check role permissions
-  function hasRequiredRole(userRole, requiredRole) {
-    if (!userRole || !requiredRole) return false;
-    
-    // If required role is admin, allow both admin and staff
-    if (requiredRole === 'admin') {
-      return userRole === 'admin' || userRole === 'staff';
-    }
-    
-    // Otherwise, exact match
-    return userRole === requiredRole;
   }
 
   return children;
