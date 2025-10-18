@@ -1,33 +1,27 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-const Category = sequelize.define(
-  "Category",
+const ProductImage = sequelize.define(
+  "ProductImage",
   {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    category_name: {
-      type: DataTypes.STRING(100),
+    product_id: {
+      type: DataTypes.UUID,
       allowNull: false,
-      unique: true,
     },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+    image_url: {
+      type: DataTypes.STRING(500),
+      allowNull: false,
     },
-    is_active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+    display_order: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-      allowNull: false,
-    },
-    updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
       allowNull: false,
@@ -43,11 +37,11 @@ const Category = sequelize.define(
     },
   },
   {
-    tableName: "product_categories",
+    tableName: "product_images",
     timestamps: false,
     paranoid: false,
     underscored: true,
   }
 );
 
-module.exports = Category;
+module.exports = ProductImage;

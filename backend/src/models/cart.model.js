@@ -1,49 +1,25 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-const Product = sequelize.define(
-  "Product",
+const Cart = sequelize.define(
+  "Cart",
   {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    name: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    product_type: {
-      type: DataTypes.ENUM("online", "offline"),
-      allowNull: false,
-    },
-    category_id: {
+    customer_id: {
       type: DataTypes.UUID,
-      allowNull: true,
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    selling_price: {
-      type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
     },
-    unit: {
-      type: DataTypes.STRING(20),
+    product_id: {
+      type: DataTypes.UUID,
       allowNull: false,
     },
-    shelf_life_days: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    total_stock: {
+    quantity: {
       type: DataTypes.DECIMAL(10, 2),
-      defaultValue: 0,
-    },
-    is_active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      allowNull: false,
     },
     created_at: {
       type: DataTypes.DATE,
@@ -66,11 +42,11 @@ const Product = sequelize.define(
     },
   },
   {
-    tableName: "products",
+    tableName: "carts",
     timestamps: false,
     paranoid: false,
     underscored: true,
   }
 );
 
-module.exports = Product;
+module.exports = Cart;

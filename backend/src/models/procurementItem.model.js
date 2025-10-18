@@ -1,56 +1,43 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-const Product = sequelize.define(
-  "Product",
+const ProcurementItem = sequelize.define(
+  "ProcurementItem",
   {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    name: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    product_type: {
-      type: DataTypes.ENUM("online", "offline"),
-      allowNull: false,
-    },
-    category_id: {
+    procurement_id: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: false,
     },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+    product_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
     },
-    selling_price: {
-      type: DataTypes.DECIMAL(12, 2),
+    quantity: {
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     unit: {
       type: DataTypes.STRING(20),
       allowNull: false,
     },
-    shelf_life_days: {
-      type: DataTypes.INTEGER,
+    purchase_price_per_unit: {
+      type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
     },
-    total_stock: {
-      type: DataTypes.DECIMAL(10, 2),
-      defaultValue: 0,
+    subtotal: {
+      type: DataTypes.DECIMAL(15, 2),
+      allowNull: false,
     },
-    is_active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+    expiry_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
     },
     created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-      allowNull: false,
-    },
-    updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
       allowNull: false,
@@ -66,11 +53,11 @@ const Product = sequelize.define(
     },
   },
   {
-    tableName: "products",
+    tableName: "procurement_items",
     timestamps: false,
     paranoid: false,
     underscored: true,
   }
 );
 
-module.exports = Product;
+module.exports = ProcurementItem;

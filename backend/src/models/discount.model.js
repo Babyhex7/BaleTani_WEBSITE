@@ -1,45 +1,33 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-const Product = sequelize.define(
-  "Product",
+const Discount = sequelize.define(
+  "Discount",
   {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    name: {
-      type: DataTypes.TEXT,
+    discount_name: {
+      type: DataTypes.STRING(100),
       allowNull: false,
     },
-    product_type: {
-      type: DataTypes.ENUM("online", "offline"),
+    discount_type: {
+      type: DataTypes.ENUM("percentage", "fixed_amount"),
       allowNull: false,
     },
-    category_id: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    selling_price: {
-      type: DataTypes.DECIMAL(12, 2),
-      allowNull: false,
-    },
-    unit: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-    },
-    shelf_life_days: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    total_stock: {
+    value: {
       type: DataTypes.DECIMAL(10, 2),
-      defaultValue: 0,
+      allowNull: false,
+    },
+    start_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    end_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
     },
     is_active: {
       type: DataTypes.BOOLEAN,
@@ -66,11 +54,11 @@ const Product = sequelize.define(
     },
   },
   {
-    tableName: "products",
+    tableName: "discounts",
     timestamps: false,
     paranoid: false,
     underscored: true,
   }
 );
 
-module.exports = Product;
+module.exports = Discount;

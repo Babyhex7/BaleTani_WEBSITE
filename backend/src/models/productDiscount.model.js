@@ -1,33 +1,23 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-const Category = sequelize.define(
-  "Category",
+const ProductDiscount = sequelize.define(
+  "ProductDiscount",
   {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    category_name: {
-      type: DataTypes.STRING(100),
+    product_id: {
+      type: DataTypes.UUID,
       allowNull: false,
-      unique: true,
     },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    is_active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+    discount_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
     },
     created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-      allowNull: false,
-    },
-    updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
       allowNull: false,
@@ -43,11 +33,11 @@ const Category = sequelize.define(
     },
   },
   {
-    tableName: "product_categories",
+    tableName: "product_discounts",
     timestamps: false,
     paranoid: false,
     underscored: true,
   }
 );
 
-module.exports = Category;
+module.exports = ProductDiscount;

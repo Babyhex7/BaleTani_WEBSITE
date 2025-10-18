@@ -1,6 +1,5 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
-const bcrypt = require("bcryptjs");
 
 const Customer = sequelize.define(
   "Customer",
@@ -19,17 +18,9 @@ const Customer = sequelize.define(
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    password_hash: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
     address: {
       type: DataTypes.TEXT,
       allowNull: true,
-    },
-    is_active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
     },
     created_at: {
       type: DataTypes.DATE,
@@ -58,26 +49,12 @@ const Customer = sequelize.define(
     underscored: true,
     hooks: {
       beforeCreate: async (customer) => {
-        if (customer.password_hash) {
-          const salt = await bcrypt.genSalt(10);
-          customer.password_hash = await bcrypt.hash(
-            customer.password_hash,
-            salt
-          );
-        }
         // Normalize phone number
         if (customer.phone_number) {
           customer.phone_number = normalizePhoneNumber(customer.phone_number);
         }
       },
       beforeUpdate: async (customer) => {
-        if (customer.changed("password_hash")) {
-          const salt = await bcrypt.genSalt(10);
-          customer.password_hash = await bcrypt.hash(
-            customer.password_hash,
-            salt
-          );
-        }
         // Normalize phone number
         if (customer.changed("phone_number")) {
           customer.phone_number = normalizePhoneNumber(customer.phone_number);
@@ -106,10 +83,5 @@ function normalizePhoneNumber(phoneNumber) {
 
   return cleaned;
 }
-
-// Instance method to check password
-Customer.prototype.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password_hash);
-};
 
 module.exports = Customer;
