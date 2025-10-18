@@ -14,7 +14,12 @@ const StockMovement = sequelize.define(
       allowNull: false,
     },
     movement_type: {
-      type: DataTypes.ENUM("procurement_in", "sale_out", "adjustment", "expired"),
+      type: DataTypes.ENUM(
+        "procurement_in",
+        "sale_out",
+        "adjustment",
+        "expired"
+      ),
       allowNull: false,
     },
     quantity_change: {

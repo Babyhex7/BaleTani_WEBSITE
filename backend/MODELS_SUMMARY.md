@@ -3,12 +3,14 @@
 ## ✅ Model yang Sudah Diupdate
 
 ### 1. **role.model.js** ✓
+
 - Tabel: `roles`
 - Primary Key: UUID
 - Fitur: Soft delete (deleted_at, deleted_by)
 - Relasi: One-to-Many dengan users
 
 ### 2. **admin.model.js (users table)** ✓
+
 - Tabel: `users`
 - Primary Key: UUID
 - Fields: phone_number, full_name, role_id, password_hash, is_active
@@ -16,6 +18,7 @@
 - Relasi: BelongsTo Role
 
 ### 3. **customer.model.js** ✓
+
 - Tabel: `customers`
 - Primary Key: UUID
 - Fields: phone_number, full_name, address
@@ -23,15 +26,17 @@
 - Fitur: Phone normalization, soft delete
 
 ### 4. **category.model.js** ✓
+
 - Tabel: `product_categories`
 - Primary Key: UUID (diubah dari INTEGER)
 - Fields: category_name, description, is_active
 - **Perubahan**: UUID primary key, tambah is_active dan soft delete
 
 ### 5. **product.model.js** ✓
+
 - Tabel: `products`
 - Primary Key: UUID (diubah dari INTEGER)
-- **Fields Baru**: 
+- **Fields Baru**:
   - product_type (ENUM: online, offline)
   - shelf_life_days
   - total_stock (DECIMAL 10,2)
@@ -39,6 +44,7 @@
 - Fitur: Soft delete
 
 ### 6. **order.model.js** ✓
+
 - Tabel: `orders`
 - Primary Key: UUID
 - **Fields Lengkap**:
@@ -56,18 +62,21 @@
 ## ✅ Model Baru yang Dibuat
 
 ### 7. **productImage.model.js** ✓
+
 - Tabel: `product_images`
 - Primary Key: UUID
 - Fields: product_id, image_url, display_order
 - Relasi: BelongsTo Product
 
 ### 8. **discount.model.js** ✓
+
 - Tabel: `discounts`
 - Primary Key: UUID
 - Fields: discount_name, discount_type (percentage/fixed_amount), value, start_date, end_date, is_active
 - Fitur: Soft delete
 
 ### 9. **productDiscount.model.js** ✓
+
 - Tabel: `product_discounts`
 - Primary Key: UUID
 - **Junction Table** untuk Many-to-Many: Products ↔ Discounts
@@ -75,9 +84,10 @@
 - Fitur: Soft delete
 
 ### 10. **procurement.model.js** ✓
+
 - Tabel: `procurements`
 - Primary Key: UUID
-- Fields: 
+- Fields:
   - procurement_number, supplier_name, procurement_date
   - total_amount, status (pending/approved/rejected), notes
   - created_by, approved_by, approved_at
@@ -85,6 +95,7 @@
 - Fitur: Approval workflow, soft delete
 
 ### 11. **procurementItem.model.js** ✓
+
 - Tabel: `procurement_items`
 - Primary Key: UUID
 - Fields: procurement_id, product_id, quantity, unit, purchase_price_per_unit, subtotal, expiry_date
@@ -92,6 +103,7 @@
 - Fitur: Soft delete
 
 ### 12. **cart.model.js** ✓
+
 - Tabel: `carts`
 - Primary Key: UUID
 - Fields: customer_id, product_id, quantity
@@ -99,6 +111,7 @@
 - Fitur: Soft delete
 
 ### 13. **orderItem.model.js** ✓
+
 - Tabel: `order_items`
 - Primary Key: UUID
 - Fields: order_id, product_id, quantity, unit, price_per_unit, discount_per_unit, subtotal
@@ -106,12 +119,14 @@
 - Fitur: Soft delete
 
 ### 14. **softDeleteLog.model.js** ✓
+
 - Tabel: `soft_delete_logs`
 - Primary Key: UUID
 - Fields: table_name, record_id, deleted_by, deleted_reason, deleted_at
 - **Audit Trail** untuk semua soft delete
 
 ### 15. **stockMovement.model.js** ✓
+
 - Tabel: `stock_movements_reporting`
 - Primary Key: UUID
 - Fields:
@@ -125,6 +140,7 @@
 ## 🔗 Relasi Database (index.js) ✓
 
 ### One-to-Many (1:N)
+
 - ✅ Role → Users (Admin)
 - ✅ Category → Products
 - ✅ Product → ProductImages
@@ -140,18 +156,21 @@
 - ✅ User → SoftDeleteLogs (deleted_by)
 
 ### Many-to-Many (M:N)
+
 - ✅ Product ↔ Discount (via ProductDiscount)
 - ✅ Customer ↔ Product (via Cart)
 
 ## 🎯 Konsistensi Skema
 
 ### ✅ Semua tabel utama memiliki:
+
 - `id` UUID sebagai Primary Key
 - `created_at` TIMESTAMP
 - `deleted_at` TIMESTAMP (soft delete)
 - `deleted_by` UUID FK → users.id
 
 ### ✅ ENUM Types:
+
 - **product_type**: online, offline
 - **discount_type**: percentage, fixed_amount
 - **payment_method**: cash, transfer, qris
