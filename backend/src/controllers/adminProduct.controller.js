@@ -1,0 +1,585 @@
+const { Op } = require("sequelize");
+const {
+  Product,
+  Category,
+  ProductImage,
+  Discount,
+  ProductDiscount,
+  SoftDeleteLog,
+  ProcurementItem,
+  OrderItem,
+} = require("../models");
+
+/**
+ * GET /admin/products
+ * Get all products with filtering, search, and pagination
+ */
+const getAll = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      product_type = "",
+      category_id = "",
+      is_active = "",
+      stock_below = "",
+      sort_by = "created_at",
+      sort_order = "DESC",
+    } = req.query;
+
+    // Build where clause
+    const whereClause = {
+      deleted_at: null, // Only get non-deleted products
+    };
+
+    // Search by name or description
+    if (search) {
+      whereClause[Op.or] = [
+        { name: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    // Filter by product type
+    if (product_type) {
+      whereClause.product_type = product_type;
+    }
+
+    // Filter by category
+    if (category_id) {
+      whereClause.category_id = category_id;
+    }
+
+    // Filter by active status
+    if (is_active !== "") {
+      whereClause.is_active = is_active === "true";
+    }
+
+    // Filter by stock below threshold
+    if (stock_below) {
+      whereClause.total_stock = {
+        [Op.lt]: parseFloat(stock_below),
+      };
+    }
+
+    // Calculate offset
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    // Get products with relations
+    const { count, rows: products } = await Product.findAndCountAll({
+      where: whereClause,
+      include: [
+        {
+          model: Category,
+          as: "category",
+          attributes: ["id", "category_name", "is_active"],
+        },
+        {
+          model: ProductImage,
+          as: "images",
+          where: { deleted_at: null },
+          required: false,
+          attributes: ["id", "image_url", "display_order"],
+          order: [["display_order", "ASC"]],
+        },
+        {
+          model: Discount,
+          as: "discounts",
+          through: {
+            where: { deleted_at: null },
+            attributes: [],
+          },
+          where: {
+            deleted_at: null,
+            is_active: true,
+            start_date: { [Op.lte]: new Date() },
+            end_date: { [Op.gte]: new Date() },
+          },
+          required: false,
+          attributes: ["id", "discount_name", "discount_type", "value"],
+        },
+      ],
+      limit: parseInt(limit),
+      offset: offset,
+      order: [[sort_by, sort_order.toUpperCase()]],
+      distinct: true,
+    });
+
+    // Format response
+    const formattedProducts = products.map((product) => {
+      const productData = product.toJSON();
+
+      // Calculate active discount if any
+      let finalPrice = parseFloat(productData.selling_price);
+      let activeDiscount = null;
+
+      if (productData.discounts && productData.discounts.length > 0) {
+        const discount = productData.discounts[0]; // Take first active discount
+        activeDiscount = {
+          id: discount.id,
+          name: discount.discount_name,
+          type: discount.discount_type,
+          value: parseFloat(discount.value),
+        };
+
+        if (discount.discount_type === "percentage") {
+          finalPrice =
+            finalPrice - (finalPrice * parseFloat(discount.value)) / 100;
+        } else {
+          finalPrice = finalPrice - parseFloat(discount.value);
+        }
+      }
+
+      return {
+        ...productData,
+        selling_price: parseFloat(productData.selling_price),
+        total_stock: parseFloat(productData.total_stock),
+        final_price: parseFloat(finalPrice.toFixed(2)),
+        active_discount: activeDiscount,
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Data produk berhasil diambil",
+      data: {
+        products: formattedProducts,
+        pagination: {
+          total: count,
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total_pages: Math.ceil(count / parseInt(limit)),
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Get all products error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat mengambil data produk",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * GET /admin/products/:id
+ * Get product detail with full relations and history
+ */
+const getById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findOne({
+      where: {
+        id: id,
+        deleted_at: null,
+      },
+      include: [
+        {
+          model: Category,
+          as: "category",
+          attributes: ["id", "category_name", "description", "is_active"],
+        },
+        {
+          model: ProductImage,
+          as: "images",
+          where: { deleted_at: null },
+          required: false,
+          attributes: ["id", "image_url", "display_order", "created_at"],
+          order: [["display_order", "ASC"]],
+        },
+        {
+          model: Discount,
+          as: "discounts",
+          through: {
+            where: { deleted_at: null },
+            attributes: ["created_at"],
+          },
+          where: { deleted_at: null },
+          required: false,
+          attributes: [
+            "id",
+            "discount_name",
+            "discount_type",
+            "value",
+            "start_date",
+            "end_date",
+            "is_active",
+          ],
+        },
+        {
+          model: ProcurementItem,
+          as: "procurementItems",
+          where: { deleted_at: null },
+          required: false,
+          limit: 10,
+          order: [["created_at", "DESC"]],
+          attributes: [
+            "id",
+            "procurement_id",
+            "quantity",
+            "unit",
+            "purchase_price_per_unit",
+            "subtotal",
+            "expiry_date",
+            "created_at",
+          ],
+        },
+        {
+          model: OrderItem,
+          as: "orderItems",
+          where: { deleted_at: null },
+          required: false,
+          limit: 10,
+          order: [["created_at", "DESC"]],
+          attributes: [
+            "id",
+            "order_id",
+            "quantity",
+            "unit",
+            "price_per_unit",
+            "discount_per_unit",
+            "subtotal",
+            "created_at",
+          ],
+        },
+      ],
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Produk tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Detail produk berhasil diambil",
+      data: product,
+    });
+  } catch (error) {
+    console.error("Get product by id error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat mengambil detail produk",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * POST /admin/products
+ * Create new product
+ */
+const create = async (req, res) => {
+  try {
+    const {
+      name,
+      product_type,
+      category_id,
+      description,
+      selling_price,
+      unit,
+      shelf_life_days,
+      is_active = true,
+    } = req.body;
+
+    // Validation
+    if (!name || !product_type || !selling_price || !unit || !shelf_life_days) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Data tidak lengkap. Field name, product_type, selling_price, unit, dan shelf_life_days wajib diisi",
+      });
+    }
+
+    // Validate product_type
+    if (!["online", "offline"].includes(product_type)) {
+      return res.status(400).json({
+        success: false,
+        message: "Product type harus 'online' atau 'offline'",
+      });
+    }
+
+    // Validate category if provided
+    if (category_id) {
+      const category = await Category.findOne({
+        where: { id: category_id, deleted_at: null },
+      });
+
+      if (!category) {
+        return res.status(404).json({
+          success: false,
+          message: "Kategori tidak ditemukan",
+        });
+      }
+    }
+
+    // Create product
+    const product = await Product.create({
+      name,
+      product_type,
+      category_id: category_id || null,
+      description: description || null,
+      selling_price: parseFloat(selling_price),
+      unit,
+      shelf_life_days: parseInt(shelf_life_days),
+      total_stock: 0, // Initial stock is 0
+      is_active: is_active === true || is_active === "true",
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+
+    // Fetch created product with relations
+    const createdProduct = await Product.findOne({
+      where: { id: product.id },
+      include: [
+        {
+          model: Category,
+          as: "category",
+          attributes: ["id", "category_name"],
+        },
+      ],
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Produk berhasil ditambahkan",
+      data: createdProduct,
+    });
+  } catch (error) {
+    console.error("Create product error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat menambahkan produk",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * PUT /admin/products/:id
+ * Update product
+ */
+const update = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      name,
+      product_type,
+      category_id,
+      description,
+      selling_price,
+      unit,
+      shelf_life_days,
+      is_active,
+    } = req.body;
+
+    // Find product
+    const product = await Product.findOne({
+      where: { id: id, deleted_at: null },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Produk tidak ditemukan",
+      });
+    }
+
+    // Validate product_type if provided
+    if (product_type && !["online", "offline"].includes(product_type)) {
+      return res.status(400).json({
+        success: false,
+        message: "Product type harus 'online' atau 'offline'",
+      });
+    }
+
+    // Validate category if provided
+    if (category_id) {
+      const category = await Category.findOne({
+        where: { id: category_id, deleted_at: null },
+      });
+
+      if (!category) {
+        return res.status(404).json({
+          success: false,
+          message: "Kategori tidak ditemukan",
+        });
+      }
+    }
+
+    // Update product
+    await product.update({
+      name: name || product.name,
+      product_type: product_type || product.product_type,
+      category_id:
+        category_id !== undefined ? category_id : product.category_id,
+      description:
+        description !== undefined ? description : product.description,
+      selling_price: selling_price
+        ? parseFloat(selling_price)
+        : product.selling_price,
+      unit: unit || product.unit,
+      shelf_life_days: shelf_life_days
+        ? parseInt(shelf_life_days)
+        : product.shelf_life_days,
+      is_active: is_active !== undefined ? is_active : product.is_active,
+      updated_at: new Date(),
+    });
+
+    // Fetch updated product with relations
+    const updatedProduct = await Product.findOne({
+      where: { id: product.id },
+      include: [
+        {
+          model: Category,
+          as: "category",
+          attributes: ["id", "category_name"],
+        },
+        {
+          model: ProductImage,
+          as: "images",
+          where: { deleted_at: null },
+          required: false,
+          attributes: ["id", "image_url", "display_order"],
+        },
+      ],
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Produk berhasil diperbarui",
+      data: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Update product error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat memperbarui produk",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * DELETE /admin/products/:id
+ * Soft delete product
+ */
+const softDelete = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason = "" } = req.body;
+    const adminId = req.user.id;
+
+    // Find product
+    const product = await Product.findOne({
+      where: { id: id, deleted_at: null },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Produk tidak ditemukan",
+      });
+    }
+
+    // Soft delete product
+    await product.update({
+      deleted_at: new Date(),
+      deleted_by: adminId,
+      updated_at: new Date(),
+    });
+
+    // Log to soft_delete_logs
+    await SoftDeleteLog.create({
+      table_name: "products",
+      record_id: product.id,
+      deleted_by: adminId,
+      deleted_reason: reason,
+      deleted_at: new Date(),
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Produk berhasil dihapus",
+      data: {
+        id: product.id,
+        name: product.name,
+        deleted_at: product.deleted_at,
+      },
+    });
+  } catch (error) {
+    console.error("Soft delete product error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat menghapus produk",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * POST /admin/products/:id/restore
+ * Restore soft deleted product
+ */
+const restore = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find soft deleted product
+    const product = await Product.findOne({
+      where: {
+        id: id,
+        deleted_at: { [Op.ne]: null },
+      },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Produk yang dihapus tidak ditemukan",
+      });
+    }
+
+    // Restore product
+    await product.update({
+      deleted_at: null,
+      deleted_by: null,
+      updated_at: new Date(),
+    });
+
+    // Delete log from soft_delete_logs
+    await SoftDeleteLog.destroy({
+      where: {
+        table_name: "products",
+        record_id: product.id,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Produk berhasil dipulihkan",
+      data: product,
+    });
+  } catch (error) {
+    console.error("Restore product error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat memulihkan produk",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  getAll,
+  getById,
+  create,
+  update,
+  softDelete,
+  restore,
+};
