@@ -33,10 +33,10 @@ import StockOverview from './pages/admin/StockOverview';
 function App() {
   return (
     <Routes>
-      {/* Root redirect to admin dashboard */}
-      <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+      {/* Root redirect to landing page */}
+      <Route path="/" element={<Navigate to="/landing" replace />} />
 
-      {/* Public routes */}
+      {/* Public routes - Landing Page */}
       <Route path="/landing" element={
         <CustomerLayout>
           <LandingPage />
