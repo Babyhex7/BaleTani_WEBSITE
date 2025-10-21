@@ -136,7 +136,8 @@ function App() {
       <Route path="/admin/customers" element={<CustomerManagement />} />
 
       {/* Coming soon admin routes */}
-      <Route path="/admin/stock-overview" element={
+      <Route path="/admin/stock-overview" element={<StockOverview />} />
+      <Route path="/admin/stock-overview-placeholder" element={
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">� Stock Overview</h1>
@@ -148,7 +149,8 @@ function App() {
         </div>
       } />
 
-      <Route path="/admin/discounts" element={
+      <Route path="/admin/discounts" element={<DiscountManagement />} />
+      <Route path="/admin/discounts-placeholder" element={
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">🏷️ Discount Management</h1>
