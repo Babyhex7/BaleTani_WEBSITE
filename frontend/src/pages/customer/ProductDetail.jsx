@@ -81,7 +81,7 @@ const ProductDetail = () => {
       verified: true
     },
     rating: 4.8,
-    reviews: 45,
+    reviewCount: 45,
     sold: 150,
     description: `Bayam organik segar langsung dari kebun yang dirawat dengan penuh perhatian tanpa menggunakan pestisida kimia. Dipetik pagi hari untuk menjaga kesegaran dan kandungan nutrisinya.
 
@@ -370,7 +370,7 @@ Terima kasih! 🙏`;
                   <span className="text-sm font-medium">{product.rating}</span>
                 </div>
                 <span className="text-sm text-gray-600">
-                  ({product.reviews} ulasan)
+                  ({product.reviewCount} ulasan)
                 </span>
                 <span className="text-sm text-gray-600">
                   {product.sold} terjual
@@ -536,7 +536,7 @@ Terima kasih! 🙏`;
                 { id: 'description', label: 'Deskripsi' },
                 { id: 'specifications', label: 'Spesifikasi' },
                 { id: 'nutrition', label: 'Informasi Gizi' },
-                { id: 'reviews', label: `Ulasan (${product.reviews})` }
+                { id: 'reviews', label: `Ulasan (${product.reviewCount})` }
               ].map((tab) => (
                 <button
                   key={tab.id}

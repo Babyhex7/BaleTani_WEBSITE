@@ -3,7 +3,7 @@ import {
   ChartBarIcon,
   CurrencyDollarIcon,
   ShoppingCartIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   CalendarIcon,
   ArrowDownTrayIcon,
 } from '@heroicons/react/24/outline';
@@ -128,7 +128,7 @@ const SalesReport = () => {
                   {formatCurrency(salesData.summary.totalRevenue)}
                 </p>
                 <div className="flex items-center gap-1 mt-2">
-                  <TrendingUpIcon className="w-4 h-4 text-green-600" />
+                  <ArrowTrendingUpIcon className="w-4 h-4 text-green-600" />
                   <span className="text-xs text-green-600 font-medium">+15% vs last month</span>
                 </div>
               </div>
@@ -144,7 +144,7 @@ const SalesReport = () => {
                 <p className="text-sm font-medium text-gray-600">Total Orders</p>
                 <p className="text-2xl font-bold text-gray-900 mt-2">{salesData.summary.totalOrders}</p>
                 <div className="flex items-center gap-1 mt-2">
-                  <TrendingUpIcon className="w-4 h-4 text-blue-600" />
+                  <ArrowTrendingUpIcon className="w-4 h-4 text-blue-600" />
                   <span className="text-xs text-blue-600 font-medium">+8% vs last month</span>
                 </div>
               </div>
@@ -162,7 +162,7 @@ const SalesReport = () => {
                   {formatCurrency(salesData.summary.avgOrderValue)}
                 </p>
                 <div className="flex items-center gap-1 mt-2">
-                  <TrendingUpIcon className="w-4 h-4 text-purple-600" />
+                  <ArrowTrendingUpIcon className="w-4 h-4 text-purple-600" />
                   <span className="text-xs text-purple-600 font-medium">+5% vs last month</span>
                 </div>
               </div>
@@ -178,7 +178,7 @@ const SalesReport = () => {
                 <p className="text-sm font-medium text-gray-600">Products Sold</p>
                 <p className="text-2xl font-bold text-gray-900 mt-2">{salesData.summary.totalProducts}</p>
                 <div className="flex items-center gap-1 mt-2">
-                  <TrendingUpIcon className="w-4 h-4 text-yellow-600" />
+                  <ArrowTrendingUpIcon className="w-4 h-4 text-yellow-600" />
                   <span className="text-xs text-yellow-600 font-medium">+12% vs last month</span>
                 </div>
               </div>
