@@ -19,7 +19,7 @@ import { formatCurrency, formatDateTime, mockProducts, mockProcurements } from '
 
 /**
  * AdminDashboard - Halaman dashboard utama admin
- * Menampilkan statistik, grafik, notifikasi, dan akses cepat
+ * Menampilkan statis  tik, grafik, notifikasi, dan akses cepat
  */
 const AdminDashboard = () => {
   const navigate = useNavigate();

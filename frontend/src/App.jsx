@@ -25,6 +25,16 @@ import OrderManagement from './pages/admin/OrderManagement';
 import CustomerManagement from './pages/admin/CustomerManagement';
 import DiscountManagement from './pages/admin/DiscountManagement';
 import StockOverview from './pages/admin/StockOverview';
+import ProcurementApproval from './pages/admin/ProcurementApproval';
+import SalesReport from './pages/admin/SalesReport';
+import ProcurementReport from './pages/admin/ProcurementReport';
+import InventoryReport from './pages/admin/InventoryReport';
+import FinanceSummary from './pages/admin/FinanceSummary';
+import UsersRolesManagement from './pages/admin/UsersRolesManagement';
+import SystemLogsPage from './pages/admin/SystemLogsPage';
+import SystemPreferences from './pages/admin/SystemPreferences';
+import MyProfile from './pages/admin/MyProfile';
+import ChangePassword from './pages/admin/ChangePassword';
 
 /**
  * Komponen utama aplikasi yang mengatur routing
@@ -127,6 +137,7 @@ function App() {
       <Route path="/admin/inventory" element={<InventoryManagement />} />
       <Route path="/admin/products" element={<ProductManagement />} />
       <Route path="/admin/procurement" element={<ProcurementManagement />} />
+      <Route path="/admin/procurement/approvals" element={<ProcurementApproval />} />
       <Route path="/admin/categories" element={<CategoryManagement />} />
       <Route path="/admin/users" element={<UserManagement />} />
       <Route path="/admin/orders" element={<OrderManagement />} />
@@ -134,6 +145,23 @@ function App() {
       <Route path="/admin/orders/offline" element={<OrderManagement />} />
       <Route path="/admin/orders/b2b" element={<OrderManagement />} />
       <Route path="/admin/customers" element={<CustomerManagement />} />
+      <Route path="/admin/stock-overview" element={<StockOverview />} />
+      <Route path="/admin/discounts" element={<DiscountManagement />} />
+
+      {/* Reports & Insights */}
+      <Route path="/admin/reports/sales" element={<SalesReport />} />
+      <Route path="/admin/reports/procurement" element={<ProcurementReport />} />
+      <Route path="/admin/reports/inventory" element={<InventoryReport />} />
+      <Route path="/admin/reports/finance" element={<FinanceSummary />} />
+
+      {/* System Settings */}
+      <Route path="/admin/settings/users" element={<UsersRolesManagement />} />
+      <Route path="/admin/settings/logs" element={<SystemLogsPage />} />
+      <Route path="/admin/settings/preferences" element={<SystemPreferences />} />
+
+      {/* Profile */}
+      <Route path="/admin/profile" element={<MyProfile />} />
+      <Route path="/admin/profile/change-password" element={<ChangePassword />} />
 
       {/* Coming soon admin routes */}
       <Route path="/admin/stock-overview" element={<StockOverview />} />

@@ -7,11 +7,13 @@ import {
   MagnifyingGlassIcon,
   CalendarIcon,
   XMarkIcon,
+  CheckCircleIcon,
+  XCircleIcon,
 } from '@heroicons/react/24/outline';
 import AdminLayout from '../../components/layout_admin/AdminLayout';
 import { Badge } from '../../components/ui_admin/CommonComponents';
 import Pagination from '../../components/ui_admin/Pagination';
-import { formatCurrency, formatDate } from '../../utils/mockProductData';
+import { formatCurrency, formatDate, mockProducts } from '../../utils/mockProductData';
 
 /**
  * DiscountManagement - Halaman manajemen diskon produk
@@ -69,7 +71,11 @@ const DiscountManagement = () => {
     start_date: '',
     end_date: '',
     is_active: true,
+    products: [], // Array of selected product IDs
   });
+
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [productSearchTerm, setProductSearchTerm] = useState('');
 
   // Calculate stats
   const stats = {
@@ -106,7 +112,10 @@ const DiscountManagement = () => {
       start_date: '',
       end_date: '',
       is_active: true,
+      products: [],
     });
+    setSelectedProducts([]);
+    setProductSearchTerm('');
     setShowModal(true);
   };
 
@@ -120,7 +129,10 @@ const DiscountManagement = () => {
       start_date: discount.start_date,
       end_date: discount.end_date,
       is_active: discount.is_active,
+      products: discount.products || [],
     });
+    setSelectedProducts(discount.products || []);
+    setProductSearchTerm('');
     setShowModal(true);
   };
 
@@ -139,22 +151,54 @@ const DiscountManagement = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    const discountData = {
+      ...formData,
+      products: selectedProducts,
+      products_count: selectedProducts.length,
+    };
+
     if (modalMode === 'add') {
       const newDiscount = {
         id: discounts.length + 1,
-        ...formData,
-        products_count: 0,
+        ...discountData,
         created_at: new Date().toISOString().replace('T', ' ').substring(0, 19),
       };
       setDiscounts([...discounts, newDiscount]);
     } else if (modalMode === 'edit') {
       setDiscounts(discounts.map(d =>
-        d.id === selectedDiscount.id ? { ...d, ...formData } : d
+        d.id === selectedDiscount.id ? { ...d, ...discountData } : d
       ));
     }
     
     setShowModal(false);
   };
+
+  // Product selector handlers
+  const toggleProductSelection = (productId) => {
+    setSelectedProducts(prev => {
+      if (prev.includes(productId)) {
+        return prev.filter(id => id !== productId);
+      } else {
+        return [...prev, productId];
+      }
+    });
+  };
+
+  const selectAllProducts = () => {
+    const activeProductIds = mockProducts
+      .filter(p => p.status === 'active')
+      .map(p => p.product_id);
+    setSelectedProducts(activeProductIds);
+  };
+
+  const clearAllProducts = () => {
+    setSelectedProducts([]);
+  };
+
+  // Filter products for selector
+  const filteredProducts = mockProducts
+    .filter(p => p.status === 'active')
+    .filter(p => p.product_name.toLowerCase().includes(productSearchTerm.toLowerCase()));
 
   const getTypeBadge = (type) => {
     return type === 'percentage'
@@ -433,6 +477,82 @@ const DiscountManagement = () => {
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         />
                       </div>
+                    </div>
+
+                    {/* Product Selector */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Pilih Produk ({selectedProducts.length} dipilih)
+                        </label>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={selectAllProducts}
+                            className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200"
+                          >
+                            <CheckCircleIcon className="w-4 h-4 inline mr-1" />
+                            Pilih Semua
+                          </button>
+                          <button
+                            type="button"
+                            onClick={clearAllProducts}
+                            className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
+                          >
+                            <XCircleIcon className="w-4 h-4 inline mr-1" />
+                            Hapus Semua
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Product Search */}
+                      <div className="relative mb-2">
+                        <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder="Cari produk..."
+                          value={productSearchTerm}
+                          onChange={(e) => setProductSearchTerm(e.target.value)}
+                          className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        />
+                      </div>
+
+                      {/* Product List */}
+                      <div className="border border-gray-300 rounded-lg max-h-64 overflow-y-auto">
+                        {filteredProducts.length === 0 ? (
+                          <div className="p-4 text-center text-sm text-gray-500">
+                            Tidak ada produk ditemukan
+                          </div>
+                        ) : (
+                          filteredProducts.map((product) => (
+                            <label
+                              key={product.product_id}
+                              className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedProducts.includes(product.product_id)}
+                                onChange={() => toggleProductSelection(product.product_id)}
+                                className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                              />
+                              <img
+                                src={product.product_image}
+                                alt={product.product_name}
+                                className="w-10 h-10 object-cover rounded"
+                              />
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-900">{product.product_name}</p>
+                                <p className="text-xs text-gray-500">
+                                  {formatCurrency(product.price)} • Stok: {product.stock_quantity}
+                                </p>
+                              </div>
+                            </label>
+                          ))
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Pilih produk yang akan mendapatkan diskon ini
+                      </p>
                     </div>
 
                     <div className="flex items-center gap-2">
