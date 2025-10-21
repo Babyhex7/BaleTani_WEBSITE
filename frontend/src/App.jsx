@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import DemoBanner from './components/ui/DemoBanner';
@@ -13,7 +13,6 @@ import Promo from './pages/customer/Promo';
 import Categories from './pages/customer/Categories';
 import Contact from './pages/customer/Contact';
 import Profile from './pages/customer/Profile';
-import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRoute';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -22,207 +21,167 @@ import UserManagement from './pages/admin/UserManagement';
 import ProductManagement from './pages/admin/ProductManagement';
 import ProcurementManagement from './pages/admin/ProcurementManagement';
 import CategoryManagement from './pages/admin/CategoryManagement';
+import OrderManagement from './pages/admin/OrderManagement';
+import CustomerManagement from './pages/admin/CustomerManagement';
+import DiscountManagement from './pages/admin/DiscountManagement';
+import StockOverview from './pages/admin/StockOverview';
 
 /**
  * Komponen utama aplikasi yang mengatur routing
- * Mendukung RBAC untuk customer dan admin area
+ * DUMMY UI BRANCH - No authentication required
  */
 function App() {
   return (
     <Routes>
-      {/* Root redirect berdasarkan role */}
-      <Route path="/" element={<RoleBasedRedirect />} />
+      {/* Root redirect to admin dashboard */}
+      <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
 
-      {/* Public routes (tidak perlu login) */}
+      {/* Public routes */}
       <Route path="/landing" element={
-        <ProtectedRoute requireAuth={false}>
-          <CustomerLayout>
-            <LandingPage />
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <LandingPage />
+        </CustomerLayout>
       } />
       
       <Route path="/login" element={
-        <ProtectedRoute requireAuth={false}>
-          <CustomerLayout>
-            <Login />
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <Login />
+        </CustomerLayout>
       } />
       
       <Route path="/register" element={
-        <ProtectedRoute requireAuth={false}>
-          <CustomerLayout>
-            <Register />
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <Register />
+        </CustomerLayout>
       } />
 
-      {/* Customer routes (hanya untuk customer) */}
+      {/* Customer routes */}
       <Route path="/home" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <Home />
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <Home />
+        </CustomerLayout>
       } />
 
       <Route path="/products" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <ProductsSimple />
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <ProductsSimple />
+        </CustomerLayout>
       } />
 
       <Route path="/products/:id" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <ProductDetail />
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <ProductDetail />
+        </CustomerLayout>
       } />
 
       <Route path="/promo" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <Promo />
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <Promo />
+        </CustomerLayout>
       } />
 
       <Route path="/categories" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <Categories />
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <Categories />
+        </CustomerLayout>
       } />
 
       <Route path="/contact" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <Contact />
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <Contact />
+        </CustomerLayout>
       } />
 
       <Route path="/about" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <div className="container-custom section-padding">
-              <h1 className="text-2xl font-bold">Tentang Kami (Coming Soon)</h1>
-            </div>
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <div className="container-custom section-padding">
+            <h1 className="text-2xl font-bold">Tentang Kami (Coming Soon)</h1>
+          </div>
+        </CustomerLayout>
       } />
 
       <Route path="/profile" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <Profile />
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <Profile />
+        </CustomerLayout>
       } />
 
       <Route path="/orders" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <div className="container-custom section-padding">
-              <h1 className="text-2xl font-bold">Pesanan Saya (Coming Soon)</h1>
-            </div>
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <div className="container-custom section-padding">
+            <h1 className="text-2xl font-bold">Pesanan Saya (Coming Soon)</h1>
+          </div>
+        </CustomerLayout>
       } />
 
       <Route path="/cart" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <div className="container-custom section-padding">
-              <h1 className="text-2xl font-bold">Keranjang (Coming Soon)</h1>
-            </div>
-          </CustomerLayout>
-        </ProtectedRoute>
+        <CustomerLayout>
+          <div className="container-custom section-padding">
+            <h1 className="text-2xl font-bold">Keranjang (Coming Soon)</h1>
+          </div>
+        </CustomerLayout>
       } />
 
-      {/* Admin routes (untuk admin dan staff) */}
-      <Route path="/admin/dashboard" element={
-        <ProtectedRoute requireAdmin={true}>
-          <AdminDashboard />
-        </ProtectedRoute>
-      } />
-
-      <Route path="/admin/inventory" element={
-        <ProtectedRoute requireAdmin={true}>
-          <InventoryManagement />
-        </ProtectedRoute>
-      } />
-
-      <Route path="/admin/products" element={
-        <ProtectedRoute requireAdmin={true}>
-          <ProductManagement />
-        </ProtectedRoute>
-      } />
-
-      <Route path="/admin/procurement" element={
-        <ProtectedRoute requireAdmin={true}>
-          <ProcurementManagement />
-        </ProtectedRoute>
-      } />
-
-      <Route path="/admin/categories" element={
-        <ProtectedRoute requireAdmin={true}>
-          <CategoryManagement />
-        </ProtectedRoute>
-      } />
-
-      <Route path="/admin/users" element={
-        <ProtectedRoute requireAdmin={true}>
-          <UserManagement />
-        </ProtectedRoute>
-      } />
+      {/* Admin routes - NO AUTHENTICATION (Dummy UI Branch) */}
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/inventory" element={<InventoryManagement />} />
+      <Route path="/admin/products" element={<ProductManagement />} />
+      <Route path="/admin/procurement" element={<ProcurementManagement />} />
+      <Route path="/admin/categories" element={<CategoryManagement />} />
+      <Route path="/admin/users" element={<UserManagement />} />
+      <Route path="/admin/orders" element={<OrderManagement />} />
+      <Route path="/admin/orders/online" element={<OrderManagement />} />
+      <Route path="/admin/orders/offline" element={<OrderManagement />} />
+      <Route path="/admin/orders/b2b" element={<OrderManagement />} />
+      <Route path="/admin/customers" element={<CustomerManagement />} />
 
       {/* Coming soon admin routes */}
-      <Route path="/admin/orders" element={
-        <ProtectedRoute requireAdmin={true}>
-          <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">🛒 Order Management</h1>
-              <p className="text-gray-600">Fitur ini akan segera hadir!</p>
-              <a href="/admin/dashboard" className="mt-4 inline-block text-green-600 hover:text-green-700">
-                ← Kembali ke Dashboard
-              </a>
-            </div>
+      <Route path="/admin/stock-overview" element={
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">� Stock Overview</h1>
+            <p className="text-gray-600">Fitur ini akan segera hadir!</p>
+            <a href="/admin/dashboard" className="mt-4 inline-block text-green-600 hover:text-green-700">
+              ← Kembali ke Dashboard
+            </a>
           </div>
-        </ProtectedRoute>
+        </div>
+      } />
+
+      <Route path="/admin/discounts" element={
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">🏷️ Discount Management</h1>
+            <p className="text-gray-600">Fitur ini akan segera hadir!</p>
+            <a href="/admin/dashboard" className="mt-4 inline-block text-green-600 hover:text-green-700">
+              ← Kembali ke Dashboard
+            </a>
+          </div>
+        </div>
       } />
 
       <Route path="/admin/accounting" element={
-        <ProtectedRoute requireAdmin={true}>
-          <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">💰 Akuntansi</h1>
-              <p className="text-gray-600">Fitur ini akan segera hadir!</p>
-              <a href="/admin/dashboard" className="mt-4 inline-block text-green-600 hover:text-green-700">
-                ← Kembali ke Dashboard
-              </a>
-            </div>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">💰 Akuntansi</h1>
+            <p className="text-gray-600">Fitur ini akan segera hadir!</p>
+            <a href="/admin/dashboard" className="mt-4 inline-block text-green-600 hover:text-green-700">
+              ← Kembali ke Dashboard
+            </a>
           </div>
-        </ProtectedRoute>
+        </div>
       } />
 
       <Route path="/admin/reports" element={
-        <ProtectedRoute requireAdmin={true}>
-          <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">📋 Reports</h1>
-              <p className="text-gray-600">Fitur ini akan segera hadir!</p>
-              <a href="/admin/dashboard" className="mt-4 inline-block text-green-600 hover:text-green-700">
-                ← Kembali ke Dashboard
-              </a>
-            </div>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">📋 Reports</h1>
+            <p className="text-gray-600">Fitur ini akan segera hadir!</p>
+            <a href="/admin/dashboard" className="mt-4 inline-block text-green-600 hover:text-green-700">
+              ← Kembali ke Dashboard
+            </a>
           </div>
-        </ProtectedRoute>
+        </div>
       } />
 
       {/* Unauthorized page */}

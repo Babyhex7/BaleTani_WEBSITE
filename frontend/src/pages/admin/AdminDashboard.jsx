@@ -16,7 +16,6 @@ import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layout_admin/AdminLayout';
 import { Badge } from '../../components/ui_admin/CommonComponents';
 import { formatCurrency, formatDateTime, mockProducts, mockProcurements } from '../../utils/mockProductData';
-import useAdminStore from '../../store/store_admin/useAdminStore';
 
 /**
  * AdminDashboard - Halaman dashboard utama admin
@@ -24,7 +23,6 @@ import useAdminStore from '../../store/store_admin/useAdminStore';
  */
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { admin } = useAdminStore();
   const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
@@ -140,7 +138,7 @@ const AdminDashboard = () => {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
             <p className="text-gray-600 mt-1">
-              Selamat datang kembali, <span className="font-semibold">{admin?.full_name || 'Admin'}</span>!
+              Selamat datang kembali, <span className="font-semibold">Super Admin</span>!
             </p>
           </div>
           <div className="text-right">

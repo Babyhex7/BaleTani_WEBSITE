@@ -27,11 +27,9 @@ import {
   PlusCircleIcon,
   ListBulletIcon,
 } from '@heroicons/react/24/outline';
-import useAdminStore from '../../store/store_admin/useAdminStore';
 
 const AdminSidebarModern = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
-  const { admin, logout, hasPermission } = useAdminStore();
   const [openMenus, setOpenMenus] = useState({
     'Products & Inventory': true, // Open by default
   });
@@ -44,8 +42,7 @@ const AdminSidebarModern = ({ isOpen, setIsOpen }) => {
   };
 
   const handleLogout = () => {
-    logout();
-    navigate('/admin/login');
+    navigate('/login');
   };
 
   // Menu structure with permissions
@@ -129,12 +126,8 @@ const AdminSidebarModern = ({ isOpen, setIsOpen }) => {
     },
   ];
 
-  // Filter menu based on permissions (super_admin sees all)
-  const filteredMenu = menuItems.filter((item) => {
-    if (!item.permission) return true;
-    if (admin?.role?.role_name === 'super_admin') return true;
-    return hasPermission && hasPermission(item.permission);
-  });
+  // No permission filtering for dummy UI branch - show all menus
+  const filteredMenu = menuItems;
 
   return (
     <>
@@ -148,11 +141,11 @@ const AdminSidebarModern = ({ isOpen, setIsOpen }) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-30 h-screen bg-white border-r border-gray-200 transition-transform duration-300 ${
+        className={`fixed top-0 left-0 z-30 h-screen bg-white border-r border-gray-200 shadow-lg transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 w-64`}
+        } lg:translate-x-0 lg:static w-64 flex-shrink-0`}
       >
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col overflow-hidden">
           {/* Logo */}
           <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700">
             <h1 className="text-2xl font-bold text-white">BaléTani</h1>
@@ -163,14 +156,14 @@ const AdminSidebarModern = ({ isOpen, setIsOpen }) => {
           <div className="p-4 bg-gradient-to-br from-green-50 to-white border-b border-gray-200">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                {admin?.full_name?.charAt(0).toUpperCase() || 'A'}
+                A
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 truncate">
-                  {admin?.full_name || 'Admin'}
+                  Super Admin
                 </p>
-                <p className="text-xs text-gray-500 truncate capitalize">
-                  {admin?.role?.role_name?.replace(/_/g, ' ') || 'Admin'}
+                <p className="text-xs text-gray-500 truncate">
+                  Demo Account
                 </p>
               </div>
             </div>
