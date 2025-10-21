@@ -3,11 +3,25 @@ import { persist } from "zustand/middleware";
 
 /**
  * Store untuk Admin Management
- * Mengelola state global untuk admin functionality
+ * Mengelola state global untuk admin functionality dan authentication
  */
 const useAdminStore = create(
   persist(
     (set, get) => ({
+      // ============ AUTH STATE ============
+      admin: {
+        id: "admin-001",
+        full_name: "Super Admin",
+        phone_number: "081234567890",
+        role: {
+          id: "role-001",
+          role_name: "super_admin",
+          description: "Full system access",
+        },
+      },
+      isAuthenticated: true, // Set true untuk testing
+      token: "dummy-token-for-testing",
+
       // State untuk dashboard
       dashboardStats: null,
       recentOrders: [],
@@ -37,6 +51,64 @@ const useAdminStore = create(
       dashboardError: null,
       inventoryError: null,
       userError: null,
+
+      // ============ AUTH ACTIONS ============
+      setAdmin: (adminData, token) =>
+        set({
+          admin: adminData,
+          isAuthenticated: true,
+          token: token,
+        }),
+
+      logout: () =>
+        set({
+          admin: null,
+          isAuthenticated: false,
+          token: null,
+        }),
+
+      updateAdmin: (adminData) =>
+        set({
+          admin: adminData,
+        }),
+
+      // Check if admin has permission
+      hasPermission: (permission) => {
+        const { admin } = get();
+        if (!admin || !admin.role) return false;
+
+        // Super Admin has all permissions
+        if (admin.role.role_name === "super_admin") return true;
+
+        // Define permissions per role
+        const rolePermissions = {
+          super_inventory_admin: [
+            "products",
+            "procurement",
+            "inventory",
+            "approval",
+          ],
+          super_whatsapp_admin: [
+            "orders",
+            "orders_online",
+            "customers",
+            "whatsapp",
+          ],
+          super_cashier: ["orders", "transactions", "customers"],
+          inventory_admin: ["procurement", "inventory"],
+          whatsapp_admin: ["orders_online", "customers"],
+          cashier: ["transactions"],
+          finance_admin: ["reports", "finance"],
+        };
+
+        const userPermissions = rolePermissions[admin.role.role_name] || [];
+        return userPermissions.includes(permission);
+      },
+
+      getRole: () => {
+        const { admin } = get();
+        return admin?.role?.role_name || null;
+      },
 
       // Actions untuk Dashboard
       setDashboardData: (data) =>

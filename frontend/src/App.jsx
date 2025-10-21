@@ -19,6 +19,9 @@ import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRo
 import AdminDashboard from './pages/admin/AdminDashboard';
 import InventoryManagement from './pages/admin/InventoryManagement';
 import UserManagement from './pages/admin/UserManagement';
+import ProductManagement from './pages/admin/ProductManagement';
+import ProcurementManagement from './pages/admin/ProcurementManagement';
+import CategoryManagement from './pages/admin/CategoryManagement';
 
 /**
  * Komponen utama aplikasi yang mengatur routing
@@ -144,26 +147,44 @@ function App() {
 
       {/* Admin routes (untuk admin dan staff) */}
       <Route path="/admin/dashboard" element={
-        <ProtectedRoute requiredRole="admin">
+        <ProtectedRoute requireAdmin={true}>
           <AdminDashboard />
         </ProtectedRoute>
       } />
 
       <Route path="/admin/inventory" element={
-        <ProtectedRoute requiredRole="admin">
+        <ProtectedRoute requireAdmin={true}>
           <InventoryManagement />
         </ProtectedRoute>
       } />
 
+      <Route path="/admin/products" element={
+        <ProtectedRoute requireAdmin={true}>
+          <ProductManagement />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/admin/procurement" element={
+        <ProtectedRoute requireAdmin={true}>
+          <ProcurementManagement />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/admin/categories" element={
+        <ProtectedRoute requireAdmin={true}>
+          <CategoryManagement />
+        </ProtectedRoute>
+      } />
+
       <Route path="/admin/users" element={
-        <ProtectedRoute requiredRole="admin">
+        <ProtectedRoute requireAdmin={true}>
           <UserManagement />
         </ProtectedRoute>
       } />
 
       {/* Coming soon admin routes */}
       <Route path="/admin/orders" element={
-        <ProtectedRoute requiredRole="admin">
+        <ProtectedRoute requireAdmin={true}>
           <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="text-center">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">🛒 Order Management</h1>
@@ -177,7 +198,7 @@ function App() {
       } />
 
       <Route path="/admin/accounting" element={
-        <ProtectedRoute requiredRole="admin">
+        <ProtectedRoute requireAdmin={true}>
           <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="text-center">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">💰 Akuntansi</h1>
@@ -191,7 +212,7 @@ function App() {
       } />
 
       <Route path="/admin/reports" element={
-        <ProtectedRoute requiredRole="admin">
+        <ProtectedRoute requireAdmin={true}>
           <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="text-center">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">📋 Reports</h1>

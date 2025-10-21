@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AdminSidebar from './AdminSidebar';
+import AdminSidebarModern from './AdminSidebarModern';
 import AdminHeader from './AdminHeader';
 
 /**
@@ -12,7 +12,7 @@ const AdminLayout = ({ children }) => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <AdminSidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+      <AdminSidebarModern isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
       
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">

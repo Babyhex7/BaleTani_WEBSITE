@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-// Corrected relative paths
+// Import admin store for admin routes
+import useAdminStore from '../../store/store_admin/useAdminStore';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import { Alert } from '../ui_admin/CommonComponents';
 
@@ -12,11 +13,51 @@ const ProtectedRoute = ({
   children, 
   requiredRole = null, 
   requireAuth = true,
+  requireAdmin = false, // NEW: For admin routes
+  requiredPermission = null, // NEW: For permission-based access
   redirectTo = '/login' 
 }) => {
-  const { isAuthenticated, user } = useAuthStore();
   const location = useLocation();
+  
+  // Use different store based on route type
+  const adminStore = useAdminStore();
+  const customerStore = useAuthStore();
+  
+  // Determine which store to use
+  const isAdminRoute = requireAdmin || location.pathname.startsWith('/admin');
+  const { isAuthenticated, user, admin, hasPermission } = isAdminRoute 
+    ? { isAuthenticated: adminStore.isAuthenticated, user: null, admin: adminStore.admin, hasPermission: adminStore.hasPermission }
+    : { isAuthenticated: customerStore.isAuthenticated, user: customerStore.user, admin: null, hasPermission: null };
 
+  // ========== ADMIN ROUTES ==========
+  if (requireAdmin || isAdminRoute) {
+    // Check if admin is authenticated
+    if (!isAuthenticated || !admin) {
+      console.log('❌ Admin not authenticated, redirecting to login...');
+      return <Navigate to="/admin/login" state={{ from: location }} replace />;
+    }
+    
+    // Check specific permission if required
+    if (requiredPermission && !hasPermission(requiredPermission)) {
+      console.log('❌ No permission:', requiredPermission);
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <div className="max-w-md w-full">
+            <Alert
+              type="error"
+              title="Akses Ditolak"
+              message="Anda tidak memiliki izin untuk mengakses halaman ini."
+            />
+          </div>
+        </div>
+      );
+    }
+    
+    // Admin authenticated and has permission
+    return children;
+  }
+
+  // ========== CUSTOMER ROUTES ==========
   // Jika butuh authentication tapi user belum login
   if (requireAuth && !isAuthenticated) {
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
