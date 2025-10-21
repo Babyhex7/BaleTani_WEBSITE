@@ -16,7 +16,7 @@ const Profile = () => {
     gender: 'male',
     address: 'Jl. Mawar No. 123, Jakarta Selatan 12560',
     joinDate: '2024-01-15',
-    avatar: '/api/placeholder/150/150',
+    avatar: 'https://placehold.co/150x150',
     isVerified: true
   });
 
@@ -345,12 +345,7 @@ const Profile = () => {
                 <p className="text-gray-600 mb-2">{userProfile.bio}</p>
                 <p className="text-sm text-gray-500">Bergabung {new Date(userProfile.joinDate).toLocaleDateString('id-ID')}</p>
               </div>
-              <button
-                onClick={() => setIsEditingProfile(true)}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors"
-              >
-                ✏️ Edit
-              </button>
+              
             </div>
           </div>
 
@@ -369,13 +364,13 @@ const Profile = () => {
         {/* Profile Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-bold text-gray-800">👤 Informasi Profile</h3>
+            <h3 className="text-2xl font-bold text-gray-800">Informasi Profile</h3>
             {!isEditingProfile ? (
               <button
                 onClick={() => setIsEditingProfile(true)}
                 className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
               >
-                ✏️ Edit Profile
+                Edit Profile
               </button>
             ) : (
               <div className="space-x-2">
@@ -388,7 +383,7 @@ const Profile = () => {
                       : 'bg-green-500 hover:bg-green-600'
                   } text-white`}
                 >
-                  {saveStatus === 'saving' ? '💾 Menyimpan...' : '💾 Simpan'}
+                  {saveStatus === 'saving' ? 'Menyimpan...' : 'Simpan'}
                 </button>
                 <button
                   onClick={() => {
@@ -397,7 +392,7 @@ const Profile = () => {
                   }}
                   className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
                 >
-                  ❌ Batal
+                  Batal
                 </button>
               </div>
             )}
@@ -519,7 +514,7 @@ const Profile = () => {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h3 className="text-2xl font-bold text-gray-800">📦 Riwayat Pesanan</h3>
+          <h3 className="text-2xl font-bold text-gray-800">Riwayat Pesanan</h3>
           <div className="text-sm text-gray-500">
             {orderHistory?.length || 0} pesanan total
           </div>
@@ -587,11 +582,11 @@ const Profile = () => {
   if (activeSection === 'preferences') {
     return (
       <div className="space-y-8">
-        <h3 className="text-2xl font-bold text-gray-800">⚙️ Pengaturan Preferensi</h3>
+        <h3 className="text-2xl font-bold text-gray-800">Pengaturan Preferensi</h3>
 
         {/* Notification Preferences */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h4 className="text-xl font-bold text-gray-800 mb-6">🔔 Notifikasi</h4>
+          <h4 className="text-xl font-bold text-gray-800 mb-6">Notifikasi</h4>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <div>
@@ -654,7 +649,7 @@ const Profile = () => {
 
         {/* Delivery Preferences */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h4 className="text-xl font-bold text-gray-800 mb-6">🚚 Pengiriman</h4>
+          <h4 className="text-xl font-bold text-gray-800 mb-6">Pengiriman</h4>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Waktu Pengiriman Preferensi
@@ -674,7 +669,7 @@ const Profile = () => {
 
         {/* Category Preferences */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h4 className="text-xl font-bold text-gray-800 mb-6">❤️ Kategori Favorit</h4>
+          <h4 className="text-xl font-bold text-gray-800 mb-6">Kategori Favorit</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { id: 'sayuran', name: 'Sayuran', icon: '🥬' },
@@ -717,7 +712,7 @@ const Profile = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-gray-800 mb-4">
-            👤 Profile Saya
+            Profile Saya
           </h1>
           <p className="text-xl text-gray-600">
             Kelola informasi profile dan preferensi Anda
