@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { mockProducts, mockCategories } from '../../utils/mockData';
 
 const ProductsSimple = () => {
+  const navigate = useNavigate();
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  const isAuthenticated = () => {
+    // Sesuaikan key dengan implementasi autentikasi project Anda (contoh: 'authToken' atau 'user')
+    return Boolean(localStorage.getItem('authToken') || localStorage.getItem('user'));
+  };
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -24,8 +32,6 @@ const ProductsSimple = () => {
           price: 8000,
           unit: "ikat",
           category: "sayuran",
-          seller: "Pak Budi",
-          location: "Bogor",
           stock: 50,
           rating: 4.8,
           reviews: 45,
@@ -39,8 +45,6 @@ const ProductsSimple = () => {
           price: 15000,
           unit: "kg",
           category: "sayuran",
-          seller: "Bu Sari",
-          location: "Cianjur",
           stock: 30,
           rating: 4.9,
           reviews: 67,
@@ -54,8 +58,6 @@ const ProductsSimple = () => {
           price: 25000,
           unit: "kg",
           category: "buah-buahan",
-          seller: "Toko Segar",
-          location: "Bandung",
           stock: 20,
           rating: 4.7,
           reviews: 89,
@@ -69,8 +71,6 @@ const ProductsSimple = () => {
           price: 120000,
           unit: "kg",
           category: "daging",
-          seller: "Pak Joko",
-          location: "Jakarta",
           stock: 15,
           rating: 4.9,
           reviews: 124,
@@ -84,8 +84,6 @@ const ProductsSimple = () => {
           price: 180000,
           unit: "kg",
           category: "seafood",
-          seller: "Ocean Fresh",
-          location: "Surabaya",
           stock: 8,
           rating: 4.8,
           reviews: 76,
@@ -147,6 +145,11 @@ const ProductsSimple = () => {
 
   // Add to cart functionality
   const handleAddToCart = (product) => {
+    if (!isAuthenticated()) {
+      setShowLoginPrompt(true);
+      return;
+    }
+
     setCart(prev => ({
       ...prev,
       [product.id]: (prev[product.id] || 0) + 1
@@ -155,15 +158,20 @@ const ProductsSimple = () => {
     // Show success notification
     alert(`${product.name} ditambahkan ke keranjang!`);
   };
+ 
+   // Toggle wishlist
+   const handleToggleWishlist = (productId) => {
+     if (!isAuthenticated()) {
+       setShowLoginPrompt(true);
+       return;
+     }
 
-  // Toggle wishlist
-  const handleToggleWishlist = (productId) => {
-    if (wishlist.includes(productId)) {
-      setWishlist(wishlist.filter(id => id !== productId));
-    } else {
-      setWishlist([...wishlist, productId]);
-    }
-  };
+     if (wishlist.includes(productId)) {
+       setWishlist(wishlist.filter(id => id !== productId));
+     } else {
+       setWishlist([...wishlist, productId]);
+     }
+   };
 
   if (loading) {
     return (
@@ -202,7 +210,6 @@ const ProductsSimple = () => {
             <div className="flex justify-center space-x-4">
               {Object.keys(cart).length > 0 && (
                 <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2 flex items-center space-x-2">
-                  <span>🛒</span>
                   <span className="text-green-700 font-medium">
                     {Object.values(cart).reduce((sum, qty) => sum + qty, 0)} item di keranjang
                   </span>
@@ -210,7 +217,6 @@ const ProductsSimple = () => {
               )}
               {wishlist.length > 0 && (
                 <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2 flex items-center space-x-2">
-                  <span>❤️</span>
                   <span className="text-red-700 font-medium">
                     {wishlist.length} item di wishlist
                   </span>
@@ -317,38 +323,37 @@ const ProductsSimple = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
               {filteredProducts.map(product => (
-              <div key={product.id} className="group bg-white rounded-2xl shadow-sm hover:shadow-2xl overflow-hidden transition-all duration-500 transform hover:-translate-y-2">
-                {/* Product Image */}
-                <div className="relative overflow-hidden">
-                  <img 
-                    src={product.image || 'https://placehold.co/300x200'} 
-                    alt={String(product.name || 'Product')}
-                    className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  {(product.discount || 0) > 0 && (
-                    <div className="absolute top-4 left-4">
-                      <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                        -{String(product.discount || 0)}%
-                      </span>
-                    </div>
-                  )}
-                  <div className="absolute top-4 right-4">
-                    <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-600 hover:text-red-500 hover:bg-white transition-all duration-200 shadow-lg">
-                      <span className="text-lg">🤍</span>
-                    </button>
-                  </div>
-                </div>
+              <div
+                key={product.id}
+                className="group bg-white rounded-2xl shadow-sm hover:shadow-2xl overflow-hidden transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
+              >
+                 {/* Product Image */}
+                 <div className="relative overflow-hidden">
+                   <img 
+                     src={product.image || 'https://placehold.co/300x200'} 
+                     alt={String(product.name || 'Product')}
+                     className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+                   />
+                   {(product.discount || 0) > 0 && (
+                     <div className="absolute top-4 left-4">
+                       <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                         -{String(product.discount || 0)}%
+                       </span>
+                     </div>
+                   )}
+                   
+                 </div>
 
-                {/* Product Info */}
-                <div className="p-6">
-                  <div className="mb-3">
-                    <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-green-600 transition-colors">
-                      {String(product.name || '')}
-                    </h3>
-                    <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed">
-                      {String(product.description || '')}
-                    </p>
-                  </div>
+                 {/* Product Info */}
+                 <div className="p-6 flex-1 flex flex-col">
+                   <div className="mb-3">
+                     <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-green-600 transition-colors">
+                       {String(product.name || '')}
+                     </h3>
+                     <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed">
+                       {String(product.description || '')}
+                     </p>
+                   </div>
                   
                   {/* Price */}
                   <div className="flex items-baseline justify-between mb-4">
@@ -357,18 +362,6 @@ const ProductsSimple = () => {
                         Rp {(product.price || 0).toLocaleString('id-ID')}
                       </span>
                       <span className="text-sm text-gray-500">/{String(product.unit || '')}</span>
-                    </div>
-                  </div>
-                  
-                  {/* Seller Info */}
-                  <div className="flex items-center justify-between text-sm mb-4 py-3 px-4 bg-gray-50 rounded-xl">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-gray-400">👨‍🌾</span>
-                      <span className="font-medium text-gray-700">{String(product.seller || '')}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-gray-400">📍</span>
-                      <span className="text-gray-600">{String(product.location || '')}</span>
                     </div>
                   </div>
                   
@@ -391,31 +384,31 @@ const ProductsSimple = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex space-x-3">
-                    <button 
-                      onClick={() => handleAddToCart(product)}
-                      className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                    >
-                      <span className="flex items-center justify-center space-x-2">
-                        <span>🛒</span>
-                        <span className="text-sm">
-                          {cart[product.id] ? `Di Keranjang (${cart[product.id]})` : 'Tambah Keranjang'}
-                        </span>
-                      </span>
-                    </button>
-                    
-                    <button 
-                      onClick={() => handleToggleWishlist(product.id)}
-                      className={`px-4 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl ${
-                        wishlist.includes(product.id)
-                          ? 'bg-red-500 hover:bg-red-600 text-white'
-                          : 'bg-white hover:bg-red-50 text-gray-600 hover:text-red-500 border border-gray-200 hover:border-red-300'
-                      }`}
-                    >
-                      <span className="text-lg">{wishlist.includes(product.id) ? '❤️' : '♡'}</span>
-                    </button>
-                  </div>
-                </div>
+                  <div className="flex space-x-3 mt-auto">
+                     <button 
+                       onClick={() => handleAddToCart(product)}
+                       className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                     >
+                       <span className="flex items-center justify-center space-x-2">
+                         <span>🛒</span>
+                         <span className="text-sm">
+                           {cart[product.id] ? `Di Keranjang (${cart[product.id]})` : 'Tambah Keranjang'}
+                         </span>
+                       </span>
+                     </button>
+                     
+                     <button 
+                       onClick={() => handleToggleWishlist(product.id)}
+                       className={`px-4 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl ${
+                         wishlist.includes(product.id)
+                           ? 'bg-red-500 hover:bg-red-600 text-white'
+                           : 'bg-white hover:bg-red-50 text-gray-600 hover:text-red-500 border border-gray-200 hover:border-red-300'
+                       }`}
+                     >
+                       <span className="text-lg">{wishlist.includes(product.id) ? '❤️' : '♡'}</span>
+                     </button>
+                   </div>
+                 </div>
                 </div>
               ))}
             </div>
@@ -438,21 +431,34 @@ const ProductsSimple = () => {
         </div>
       )}
 
-      {/* Floating Cart Button */}
-      {Object.keys(cart).length > 0 && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-full shadow-2xl hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-3">
-            <span className="text-2xl">🛒</span>
-            <div className="flex flex-col items-start">
-              <span className="text-sm">Keranjang</span>
-              <span className="text-xs opacity-90">
-                {Object.values(cart).reduce((sum, qty) => sum + qty, 0)} item
-              </span>
+      {/* Login Prompt Modal */}
+      {showLoginPrompt && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Anda perlu login
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Silakan login untuk menambahkan produk ke keranjang atau wishlist.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={() => {
+                  setShowLoginPrompt(false);
+                  navigate('/login');
+                }}
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300"
+              >
+                Masuk
+              </button>
+              <button
+                onClick={() => setShowLoginPrompt(false)}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-lg transition-all duration-300"
+              >
+                Nanti saja
+              </button>
             </div>
-            <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-              {Object.keys(cart).length}
-            </div>
-          </button>
+          </div>
         </div>
       )}
     </div>

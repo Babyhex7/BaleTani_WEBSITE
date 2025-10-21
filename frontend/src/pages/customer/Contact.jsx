@@ -110,21 +110,21 @@ const Contact = () => {
       name: 'Pak Budi Santoso',
       role: 'Founder & CEO',
       description: 'Ex-petani yang berpengalaman 20+ tahun',
-      image: '/api/placeholder/150/150',
+      image: 'https://placehold.co/150x150',
       contact: 'budi@baletani.com'
     },
     {
       name: 'Bu Sari Indah',
       role: 'Quality Control Manager',
       description: 'Ahli nutrisi dan food safety',
-      image: '/api/placeholder/150/150',
+      image: 'https://placehold.co/150x150',
       contact: 'sari@baletani.com'
     },
     {
       name: 'Mas Joko',
       role: 'Customer Happiness',
       description: 'Siap membantu 24/7',
-      image: '/api/placeholder/150/150',
+      image: 'https://placehold.co/150x150',
       contact: 'joko@baletani.com'
     }
   ];
@@ -135,7 +135,7 @@ const Contact = () => {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-gray-800 mb-4">
-            📞 Hubungi Kami
+            Hubungi Kami
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
             Punya pertanyaan atau butuh bantuan? Tim BaleTani siap membantu Anda 24/7. 
@@ -191,7 +191,7 @@ const Contact = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           {/* Contact Form */}
           <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h3 className="text-2xl font-bold text-gray-800 mb-6">✉️ Kirim Pesan</h3>
+            <h3 className="text-2xl font-bold text-gray-800 mb-6">Kirim Pesan</h3>
             
             {submitStatus === 'success' && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
@@ -300,7 +300,6 @@ const Contact = () => {
                   </span>
                 ) : (
                   <span className="flex items-center justify-center space-x-2">
-                    <span>✉️</span>
                     <span>Kirim Pesan</span>
                   </span>
                 )}
@@ -312,7 +311,7 @@ const Contact = () => {
           <div className="space-y-8">
             {/* Operational Hours */}
             <div className="bg-white rounded-2xl shadow-xl p-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6">🕒 Jam Operasional</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6">Jam Operasional</h3>
               <div className="space-y-4">
                 {operationalHours.map((schedule, index) => (
                   <div
@@ -337,21 +336,27 @@ const Contact = () => {
               
               <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-700">
-                  💡 <strong>Tips:</strong> Untuk mendapatkan produk paling segar, 
+                <strong>Tips:</strong> Untuk mendapatkan produk paling segar, 
                   datang di pagi hari (06:00-09:00) saat fresh stock baru tiba!
                 </p>
               </div>
             </div>
 
             {/* Location Map Placeholder */}
+            {/* Location Map Placeholder */}
             <div className="bg-white rounded-2xl shadow-xl p-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6">📍 Lokasi Kami</h3>
-              <div className="bg-gray-200 rounded-lg h-64 flex items-center justify-center mb-4">
-                <div className="text-center text-gray-500">
-                  <div className="text-4xl mb-2">🗺️</div>
-                  <p className="font-medium">Interactive Map</p>
-                  <p className="text-sm">Google Maps Integration</p>
-                </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6">Lokasi Kami</h3>
+              <div className="bg-gray-200 rounded-lg h-64 mb-4 overflow-hidden">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d832.6109943437089!2d107.72516776753591!3d-6.939781297538308!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68c323777ca3a1%3A0x355eff6734ed9167!2sUniversitas%20Pendidikan%20Indonesia%20(UPI)%20Kampus%20Cibiru!5e0!3m2!1sid!2sid!4v1761056157649!5m2!1sid!2sid"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="rounded-lg"
+                ></iframe>
               </div>
               <div className="space-y-2 text-gray-600">
                 <p className="flex items-center space-x-2">
@@ -373,7 +378,7 @@ const Contact = () => {
 
         {/* FAQ Section */}
         <div className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">❓ Frequently Asked Questions</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Frequently Asked Questions</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {faqs.map((faq, index) => (
               <div key={index} className="bg-white rounded-2xl shadow-lg p-6">
@@ -384,9 +389,9 @@ const Contact = () => {
           </div>
         </div>
 
-        {/* Team Section */}
+        {/* Team Section
         <div className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">👥 Tim Kami</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Tim Kami</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {teamMembers.map((member, index) => (
               <div key={index} className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:-translate-y-2 transition-all duration-300">
@@ -407,11 +412,11 @@ const Contact = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* CTA Section */}
         <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl p-8 text-white text-center">
-          <h3 className="text-3xl font-bold mb-4">🚀 Siap Bergabung dengan BaleTani?</h3>
+          <h3 className="text-3xl font-bold mb-4">Siap Bergabung dengan BaleTani?</h3>
           <p className="text-lg mb-6">
             Dapatkan produk segar berkualitas tinggi dengan pelayanan terbaik. 
             Hubungi kami sekarang dan rasakan perbedaannya!
