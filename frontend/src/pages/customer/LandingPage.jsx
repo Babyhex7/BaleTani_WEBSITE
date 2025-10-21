@@ -20,7 +20,7 @@ const LandingPage = () => {
       name: 'Udang Sedang Fresh',
       price: 65000,
       originalPrice: 70000,
-      image: '/api/placeholder/300/300',
+      image: 'https://placehold.co/300x300',
       category: 'Seafood',
       stock: 50,
       discount: 7,
@@ -31,7 +31,7 @@ const LandingPage = () => {
       name: 'Ayam Filet Premium',
       price: 43000,
       originalPrice: 48000,
-      image: '/api/placeholder/300/300',
+      image: 'https://placehold.co/300x300',
       category: 'Daging & Unggas',
       stock: 30,
       discount: 10,
@@ -42,7 +42,7 @@ const LandingPage = () => {
       name: 'Apel Segar',
       price: 30000,
       originalPrice: 35000,
-      image: '/api/placeholder/300/300',
+      image: 'https://placehold.co/300x300',
       category: 'Buah',
       stock: 25,
       discount: 14,
@@ -53,7 +53,7 @@ const LandingPage = () => {
       name: 'Tomat Segar',
       price: 10000,
       originalPrice: 12000,
-      image: '/api/placeholder/300/300',
+      image: 'https://placehold.co/300x300',
       category: 'Sayuran',
       stock: 40,
       discount: 17,
@@ -66,28 +66,28 @@ const LandingPage = () => {
     {
       name: 'Sayuran Segar',
       description: 'Sayuran organik langsung dari kebun',
-      image: '/api/placeholder/250/200',
+      image: 'https://placehold.co/250x200',
       itemCount: 15,
       href: '/products?category=sayuran'
     },
     {
       name: 'Buah-buahan',
       description: 'Buah segar dan manis pilihan terbaik',
-      image: '/api/placeholder/250/200',
+      image: 'https://placehold.co/250x200',
       itemCount: 8,
       href: '/products?category=buah'
     },
     {
       name: 'Daging & Unggas',
       description: 'Daging dan unggas segar berkualitas premium',
-      image: '/api/placeholder/250/200',
+      image: 'https://placehold.co/250x200',
       itemCount: 6,
       href: '/products?category=daging'
     },
     {
       name: 'Seafood',
       description: 'Ikan dan seafood langsung dari laut',
-      image: '/api/placeholder/250/200',
+      image: 'https://placehold.co/250x200',
       itemCount: 5,
       href: '/products?category=seafood'
     }
@@ -131,7 +131,7 @@ const LandingPage = () => {
       location: 'Jakarta',
       rating: 5,
       comment: 'Produknya selalu segar dan berkualitas! Pengiriman juga cepat. Recommended banget!',
-      image: '/api/placeholder/60/60'
+      image: 'https://placehold.co/60x60'
     },
     {
       id: 2,
@@ -139,7 +139,7 @@ const LandingPage = () => {
       location: 'Bogor',
       rating: 5,
       comment: 'Harga terjangkau dan produknya fresh. Sudah berlangganan di BaleTani lebih dari 6 bulan.',
-      image: '/api/placeholder/60/60'
+      image: 'https://placehold.co/60x60'
     },
     {
       id: 3,
@@ -147,7 +147,7 @@ const LandingPage = () => {
       location: 'Depok',
       rating: 5,
       comment: 'Paket sayur mingguannya sangat membantu untuk kebutuhan rumah tangga. Terima kasih BaleTani!',
-      image: '/api/placeholder/60/60'
+      image: 'https://placehold.co/60x60'
     }
   ];
 
@@ -248,7 +248,7 @@ const LandingPage = () => {
               <div className="relative z-10">
                 <div className="bg-white p-6 rounded-2xl shadow-lg">
                   <img 
-                    src="/api/placeholder/600/500" 
+                    src="https://placehold.co/600x500" 
                     alt="Fresh Market Products" 
                     className="rounded-xl w-full h-auto"
                   />
@@ -516,7 +516,7 @@ const LandingPage = () => {
             <div className="relative">
               <div className="bg-white p-4 rounded-2xl shadow-lg">
                 <img 
-                  src="/api/placeholder/500/400" 
+                  src="https://placehold.co/500x400" 
                   alt="About BaleTani" 
                   className="rounded-xl w-full h-auto"
                 />
@@ -544,6 +544,7 @@ const LandingPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
+              variant="outline"
               className="bg-white text-green-600 hover:bg-gray-100"
               onClick={() => handleWhatsAppOrder('Konsultasi Pemesanan', 0, 'gratis')}
             >
@@ -554,7 +555,7 @@ const LandingPage = () => {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="border-white text-white hover:bg-white hover:text-green-600"
+                className="border-white text-white hover:bg-green-600 hover:text-green-600"
               >
                 Lihat Katalog Produk
                 <ArrowRight className="ml-2" size={20} />

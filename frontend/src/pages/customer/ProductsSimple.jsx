@@ -30,7 +30,7 @@ const ProductsSimple = () => {
           rating: 4.8,
           reviews: 45,
           discount: 20,
-          image: "/api/placeholder/300/200"
+          image: "https://placehold.co/300x200"
         },
         {
           id: 2,
@@ -45,7 +45,7 @@ const ProductsSimple = () => {
           rating: 4.9,
           reviews: 67,
           discount: 17,
-          image: "/api/placeholder/300/200"
+          image: "https://placehold.co/300x200"
         },
         {
           id: 3,
@@ -60,7 +60,7 @@ const ProductsSimple = () => {
           rating: 4.7,
           reviews: 89,
           discount: 15,
-          image: "/api/placeholder/300/200"
+          image: "https://placehold.co/300x200"
         },
         {
           id: 4,
@@ -75,7 +75,7 @@ const ProductsSimple = () => {
           rating: 4.9,
           reviews: 124,
           discount: 10,
-          image: "/api/placeholder/300/200"
+          image: "https://placehold.co/300x200"
         },
         {
           id: 5,
@@ -90,7 +90,7 @@ const ProductsSimple = () => {
           rating: 4.8,
           reviews: 76,
           discount: 25,
-          image: "/api/placeholder/300/200"
+          image: "https://placehold.co/300x200"
         }
       ];
       
@@ -321,7 +321,7 @@ const ProductsSimple = () => {
                 {/* Product Image */}
                 <div className="relative overflow-hidden">
                   <img 
-                    src={product.image || '/api/placeholder/300/200'} 
+                    src={product.image || 'https://placehold.co/300x200'} 
                     alt={String(product.name || 'Product')}
                     className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
                   />
