@@ -20,6 +20,7 @@ import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
 import productService from '../../services/services_customer/productService';
 import ProductCard from '../../components/ui/ProductCard';
+import { mockProducts } from '../../utils/mockData';
 
 /**
  * Halaman Detail Produk - Menampilkan informasi lengkap produk dengan WhatsApp integration
@@ -42,14 +43,47 @@ const ProductDetail = () => {
     const loadProduct = async () => {
       try {
         setLoading(true);
-        const response = await productService.getById(id);
-        if (response.data) {
-          setProduct(response.data);
+        
+        // Coba ambil dari mockProducts dulu berdasarkan ID
+        const productId = parseInt(id);
+        const mockProduct = mockProducts.find(p => p.id === productId);
+        
+        if (mockProduct) {
+          // Convert category object to string if needed
+          const categoryName = typeof mockProduct.category === 'object' 
+            ? mockProduct.category.name 
+            : mockProduct.category;
+            
+          setProduct({
+            ...mockProduct,
+            category: categoryName,
+            images: mockProduct.image ? [mockProduct.image] : ['/api/placeholder/600/600'],
+            reviewCount: mockProduct.reviews?.length || 0,
+            sold: 150,
+            seller: {
+              name: mockProduct.seller || 'Toko BaleTani',
+              location: mockProduct.location || 'Indonesia',
+              phone: '6285885725027',
+              rating: 4.8,
+              totalProducts: 25,
+              joinDate: '2022',
+              verified: true
+            }
+          });
+        } else {
+          // Jika tidak ada di mock, coba dari API
+          const response = await productService.getById(id);
+          if (response.data) {
+            setProduct(response.data);
+          } else {
+            toast.error('Produk tidak ditemukan');
+            navigate('/products');
+          }
         }
       } catch (error) {
         console.error('Error loading product:', error);
-        // Fallback to mock data if API fails
-        toast.info('Menggunakan data demo');
+        toast.error('Gagal memuat produk');
+        navigate('/products');
       } finally {
         setLoading(false);
       }

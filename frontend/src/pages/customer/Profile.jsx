@@ -184,15 +184,6 @@ const Profile = () => {
     }
   });
 
-  // Preferences data
-  const [preferences, setPreferences] = useState({
-    emailNotifications: true,
-    smsNotifications: false,
-    promotionalEmails: true,
-    deliveryTime: 'morning',
-    favoriteCategories: ['sayuran', 'buah-buahan']
-  });
-
   // User stats data
   const userStats = {
     totalOrders: 24,
@@ -252,13 +243,6 @@ const Profile = () => {
         ...prev[category],
         [key]: !prev[category][key]
       }
-    }));
-  };
-
-  const handlePreferenceChange = (key) => {
-    setPreferences(prev => ({
-      ...prev,
-      [key]: !prev[key]
     }));
   };
 
@@ -539,134 +523,6 @@ const Profile = () => {
       </div>
     );
   }
-
-  if (activeSection === 'preferences') {
-    return (
-      <div className="space-y-8">
-        <h3 className="text-2xl font-bold text-gray-800">Pengaturan Preferensi</h3>
-
-        {/* Notification Preferences */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h4 className="text-xl font-bold text-gray-800 mb-6">Notifikasi</h4>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="font-medium text-gray-800">Email Notifications</div>
-                <div className="text-sm text-gray-600">Terima notifikasi via email</div>
-              </div>
-              <button
-                onClick={() => handlePreferenceChange('emailNotifications')}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  preferences.emailNotifications ? 'bg-green-500' : 'bg-gray-300'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    preferences.emailNotifications ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="font-medium text-gray-800">SMS Notifications</div>
-                <div className="text-sm text-gray-600">Terima notifikasi via SMS</div>
-              </div>
-              <button
-                onClick={() => handlePreferenceChange('smsNotifications')}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  preferences.smsNotifications ? 'bg-green-500' : 'bg-gray-300'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    preferences.smsNotifications ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="font-medium text-gray-800">Promotional Emails</div>
-                <div className="text-sm text-gray-600">Terima email promo dan penawaran khusus</div>
-              </div>
-              <button
-                onClick={() => handlePreferenceChange('promotionalEmails')}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  preferences.promotionalEmails ? 'bg-green-500' : 'bg-gray-300'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    preferences.promotionalEmails ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Delivery Preferences */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h4 className="text-xl font-bold text-gray-800 mb-6">Pengiriman</h4>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Waktu Pengiriman Preferensi
-            </label>
-            <select
-              value={preferences.deliveryTime}
-              onChange={(e) => setPreferences(prev => ({ ...prev, deliveryTime: e.target.value }))}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            >
-              <option value="morning">Pagi (06:00 - 12:00)</option>
-              <option value="afternoon">Siang (12:00 - 18:00)</option>
-              <option value="evening">Sore (18:00 - 21:00)</option>
-              <option value="anytime">Kapan Saja</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Category Preferences */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h4 className="text-xl font-bold text-gray-800 mb-6">Kategori Favorit</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { id: 'sayuran', name: 'Sayuran' },
-              { id: 'buah-buahan', name: 'Buah-buahan' },
-              { id: 'daging', name: 'Daging' },
-              { id: 'seafood', name: 'Seafood' },
-              { id: 'dairy', name: 'Dairy' },
-              { id: 'rempah', name: 'Rempah' },
-              { id: 'beras', name: 'Beras' },
-              { id: 'frozen', name: 'Frozen' }
-            ].map(category => (
-              <div
-                key={category.id}
-                onClick={() => {
-                  const newFavorites = preferences.favoriteCategories.includes(category.id)
-                    ? preferences.favoriteCategories.filter(id => id !== category.id)
-                    : [...preferences.favoriteCategories, category.id];
-                  setPreferences(prev => ({ ...prev, favoriteCategories: newFavorites }));
-                }}
-                className={`cursor-pointer p-4 rounded-xl border-2 transition-all duration-300 text-center ${
-                  preferences.favoriteCategories.includes(category.id)
-                    ? 'border-green-500 bg-green-50 text-green-700 shadow-md'
-                    : 'border-gray-200 hover:border-green-300 hover:bg-green-50'
-                }`}
-              >
-                <div className="text-sm font-medium">{category.name}</div>
-                {preferences.favoriteCategories.includes(category.id) && (
-                  <CheckCircleIcon className="w-5 h-5 text-green-600 mx-auto mt-2" />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
   };
 
   return (
@@ -705,17 +561,6 @@ const Profile = () => {
           >
             <ShoppingBagIcon className="w-5 h-5" />
             Pesanan
-          </button>
-          <button
-            onClick={() => setActiveSection('preferences')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-              activeSection === 'preferences'
-                ? 'bg-green-600 text-white shadow-lg'
-                : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-600'
-            }`}
-          >
-            <Cog6ToothIcon className="w-5 h-5" />
-            Preferensi
           </button>
         </div>
 
