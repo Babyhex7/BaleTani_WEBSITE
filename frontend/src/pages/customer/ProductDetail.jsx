@@ -9,6 +9,7 @@ import {
   MapPin, 
   Clock, 
   Shield, 
+  ShieldCheck,
   Truck,
   Plus,
   Minus,
@@ -20,6 +21,7 @@ import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
 import productService from '../../services/services_customer/productService';
 import ProductCard from '../../components/ui/ProductCard';
+import Button from '../../components/ui/Button';
 import { mockProducts } from '../../utils/mockData';
 
 /**
@@ -36,7 +38,6 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState('description');
 
   // Load product data
   useEffect(() => {
@@ -385,15 +386,12 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
                   -{productDiscount}%
                 </div>
               )}
-              <div className="absolute top-4 right-4 flex space-x-2">
+              <div className="absolute top-4 right-4">
                 <button
                   onClick={handleShare}
                   className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
                 >
                   <Share2 size={18} className="text-gray-600" />
-                </button>
-                <button className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors">
-                  <Heart size={18} className="text-gray-600" />
                 </button>
               </div>
             </div>
@@ -423,32 +421,7 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{safeProduct.name}</h1>
-              
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="flex items-center space-x-1">
-                  <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        size={16}
-                        className={`${
-                          i < Math.floor(safeProduct.rating) 
-                            ? 'text-yellow-400 fill-current' 
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm font-medium">{safeProduct.rating}</span>
-                </div>
-                <span className="text-sm text-gray-600">
-                  ({safeProduct.reviewCount} ulasan)
-                </span>
-                <span className="text-sm text-gray-600">
-                  {safeProduct.sold} terjual
-                </span>
-              </div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">{safeProduct.name}</h1>
 
               <div className="flex items-baseline space-x-3 mb-4">
                 <span className="text-3xl font-bold text-green-600">
@@ -470,43 +443,6 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
                 <p className="text-green-700 text-sm mt-1">
                   Produk segar dengan garansi uang kembali jika tidak sesuai kualitas
                 </p>
-              </div>
-            </div>
-
-            {/* Seller Info */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-green-600 font-bold text-lg">
-                      {safeProduct.seller?.name?.charAt(0) || 'B'}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <h3 className="font-bold text-gray-900">{safeProduct.seller?.name || 'BaleTani'}</h3>
-                      {safeProduct.seller?.verified && (
-                        <div className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <ShieldCheck size={12} />
-                          Terverifikasi
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-1 text-sm text-gray-600 mt-1">
-                      <MapPin size={14} />
-                      <span>{safeProduct.seller?.location || 'Bogor, Jawa Barat'}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right text-sm">
-                  <div className="flex items-center gap-1 text-yellow-600 justify-end">
-                    <Star size={14} fill="currentColor" />
-                    <span className="font-semibold">{safeProduct.seller?.rating || 4.8}</span>
-                  </div>
-                  <div className="text-gray-600 text-xs mt-1">
-                    {safeProduct.seller?.totalProducts || 25} produk
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -578,13 +514,6 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
                       <Plus size={20} />
                       Tambah ke Keranjang
                     </button>
-                    <button
-                      onClick={handleWhatsAppOrder}
-                      className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
-                    >
-                      <MessageCircle size={20} />
-                      Chat WhatsApp
-                    </button>
                   </div>
                 </div>
               </div>
@@ -609,116 +538,13 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
           </div>
         </div>
 
-        {/* Product Details Tabs */}
-        <div className="bg-white rounded-xl shadow-sm mb-12">
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6">
-              {[
-                { id: 'description', label: 'Deskripsi' },
-                { id: 'specifications', label: 'Spesifikasi' },
-                { id: 'nutrition', label: 'Informasi Gizi' },
-                { id: 'reviews', label: `Ulasan (${safeProduct.reviewCount})` }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-2 font-medium text-sm border-b-2 transition-colors ${
-                    activeTab === tab.id
-                      ? 'border-green-600 text-green-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          <div className="p-6">
-            {activeTab === 'description' && (
-              <div className="prose max-w-none">
-                <div className="whitespace-pre-line text-gray-700 leading-relaxed">
-                  {safeProduct.description}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'specifications' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(safeProduct.specifications).map(([key, value]) => (
-                  <div key={key} className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="font-medium text-gray-900">{key}</span>
-                    <span className="text-gray-600">{value}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {activeTab === 'nutrition' && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {Object.entries(safeProduct.nutritionFacts).map(([key, value]) => (
-                  <div key={key} className="bg-gray-50 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-green-600 mb-1">{value}</div>
-                    <div className="text-sm text-gray-600">{key}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {activeTab === 'reviews' && (
-              <div className="space-y-6">
-                {safeProduct.reviews.map((review) => (
-                  <div key={review.id} className="border-b border-gray-100 pb-6 last:border-b-0">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                        <span className="text-gray-600 font-medium text-sm">
-                          {review.user.charAt(0)}
-                        </span>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <h4 className="font-medium text-gray-900">{review.user}</h4>
-                            <div className="flex items-center space-x-2">
-                              <div className="flex items-center">
-                                {[...Array(5)].map((_, i) => (
-                                  <Star
-                                    key={i}
-                                    size={14}
-                                    className={`${
-                                      i < review.rating 
-                                        ? 'text-yellow-400 fill-current' 
-                                        : 'text-gray-300'
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                              <span className="text-sm text-gray-500">{review.date}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-gray-700 mb-3">{review.comment}</p>
-                        {review.images.length > 0 && (
-                          <div className="flex space-x-2 mb-3">
-                            {review.images.map((image, index) => (
-                              <img
-                                key={index}
-                                src={image}
-                                alt={`Review ${index + 1}`}
-                                className="w-16 h-16 rounded-lg object-cover"
-                              />
-                            ))}
-                          </div>
-                        )}
-                        <button className="text-sm text-gray-500 hover:text-green-600">
-                          👍 Membantu ({review.helpful})
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* Product Description */}
+        <div className="bg-white rounded-xl shadow-sm mb-12 p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Deskripsi Produk</h2>
+          <div className="prose max-w-none">
+            <div className="text-gray-700 leading-relaxed text-justify">
+              {safeProduct.description}
+            </div>
           </div>
         </div>
 

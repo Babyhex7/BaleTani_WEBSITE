@@ -6,7 +6,9 @@ import {
   ShoppingCartIcon,
   HeartIcon,
   Squares2X2Icon,
-  ShoppingBagIcon
+  ShoppingBagIcon,
+  SparklesIcon,
+  CubeIcon
 } from '@heroicons/react/24/outline';
 import { 
   ShoppingCartIcon as ShoppingCartSolid,
@@ -299,17 +301,17 @@ const ProductsSimple = () => {
                     onChange={(e) => handleCategoryFilter(e.target.value)}
                     className="block w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white shadow-sm text-base font-medium appearance-none cursor-pointer"
                   >
-                    <option value="all">📦 Semua Kategori</option>
+                    <option value="all">◆ Semua Kategori</option>
                     {categories.map(category => {
-                      const icons = {
-                        leaf: '🌿',
-                        apple: '🍎',
-                        meat: '🥩',
-                        fish: '🐟'
+                      const iconLabels = {
+                        leaf: '❯',
+                        apple: '❯',
+                        meat: '❯',
+                        fish: '❯'
                       };
                       return (
                         <option key={category.id} value={category.value}>
-                          {icons[category.icon]} {category.name}
+                          {iconLabels[category.icon]} {category.name}
                         </option>
                       );
                     })}

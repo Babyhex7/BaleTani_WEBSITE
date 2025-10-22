@@ -70,14 +70,10 @@ const ProductCard = ({ product }) => {
             )}
           </div>
 
-          {/* Stock Badge */}
-          {isOutOfStock ? (
+          {/* Stock Badge - Only show if out of stock */}
+          {isOutOfStock && (
             <div className="absolute top-3 right-3 bg-gray-800 text-white px-2 py-1 rounded-md text-xs font-medium">
               Habis
-            </div>
-          ) : product.stock < 10 && (
-            <div className="absolute top-3 right-3 bg-orange-500 text-white px-2 py-1 rounded-md text-xs font-medium">
-              Stok: {product.stock}
             </div>
           )}
 

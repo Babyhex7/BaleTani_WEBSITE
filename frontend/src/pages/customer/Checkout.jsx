@@ -29,6 +29,7 @@ const Checkout = () => {
   const [pickupMethod, setPickupMethod] = useState('pickup'); // 'pickup' atau 'delivery'
   const [deliveryType, setDeliveryType] = useState('instant'); // 'instant', 'sameday', 'nextday'
   const [paymentMethod, setPaymentMethod] = useState('qris'); // 'qris', 'transfer', 'cash'
+  const [selectedBank, setSelectedBank] = useState(''); // untuk pilihan bank saat transfer
   const [deliveryAddress, setDeliveryAddress] = useState('');
 
   if (!user) {
@@ -433,13 +434,46 @@ const Checkout = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900">Transfer Bank</h3>
-                        <p className="text-sm text-gray-600">BCA, BNI, Mandiri</p>
+                        <p className="text-sm text-gray-600">Pilih bank tujuan</p>
                       </div>
                     </div>
                     {paymentMethod === 'transfer' && (
                       <CheckCircle2 size={20} className="text-green-600" />
                     )}
                   </div>
+                  {paymentMethod === 'transfer' && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Pilih Bank Tujuan Transfer
+                      </label>
+                      <select
+                        value={selectedBank}
+                        onChange={(e) => setSelectedBank(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      >
+                        <option value="">-- Pilih Bank --</option>
+                        <option value="bca">BCA - Bank Central Asia</option>
+                        <option value="bni">BNI - Bank Negara Indonesia</option>
+                        <option value="mandiri">Bank Mandiri</option>
+                        <option value="bri">BRI - Bank Rakyat Indonesia</option>
+                        <option value="cimb">CIMB Niaga</option>
+                        <option value="permata">Bank Permata</option>
+                      </select>
+                      {selectedBank && (
+                        <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                          <p className="text-sm font-medium text-blue-900">
+                            {selectedBank === 'bca' && 'BCA - 1234567890 a.n. BaleTani'}
+                            {selectedBank === 'bni' && 'BNI - 0987654321 a.n. BaleTani'}
+                            {selectedBank === 'mandiri' && 'Mandiri - 1122334455 a.n. BaleTani'}
+                            {selectedBank === 'bri' && 'BRI - 5544332211 a.n. BaleTani'}
+                            {selectedBank === 'cimb' && 'CIMB Niaga - 6677889900 a.n. BaleTani'}
+                            {selectedBank === 'permata' && 'Permata - 9988776655 a.n. BaleTani'}
+                          </p>
+                          <p className="text-xs text-blue-700 mt-1">Silakan transfer ke rekening di atas</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </button>
 
                 {/* Tunai */}

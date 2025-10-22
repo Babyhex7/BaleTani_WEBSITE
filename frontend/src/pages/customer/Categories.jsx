@@ -20,6 +20,7 @@ const Categories = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('default'); // default, price-low, price-high, name
+  const [filteredCategories, setFilteredCategories] = useState([]);
 
   // Categories data  
   const categories = [
@@ -307,6 +308,28 @@ const Categories = () => {
       : products.filter(p => p.category === cat.id).length
   }));
 
+  // Filter categories based on search term and selected category
+  useEffect(() => {
+    let filtered = updatedCategories;
+    
+    // Filter by search term
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(category =>
+        category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        category.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // Filter by selected category (exclude "all")
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(category => 
+        category.id === selectedCategory || category.id === 'all'
+      );
+    }
+    
+    setFilteredCategories(filtered);
+  }, [searchTerm, selectedCategory, products]);
+
   // Filter products by category, search, and sort
   useEffect(() => {
     let filtered = products;
@@ -396,170 +419,135 @@ const Categories = () => {
       <div className="container mx-auto px-4 py-12">
         {/* Search and Filter Section */}
         <div className="mb-8 space-y-4">
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+          {/* Search Bar and Category Filter */}
+          <div className="flex flex-col md:flex-row gap-4 max-w-4xl mx-auto">
+            {/* Search Input */}
+            <div className="flex-1">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Cari kategori..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="block w-full pl-12 pr-12 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white shadow-sm text-base"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    <XMarkIcon className="h-5 w-5" />
+                  </button>
+                )}
               </div>
-              <input
-                type="text"
-                placeholder="Cari produk, penjual, atau lokasi..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-12 pr-12 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white shadow-sm text-base"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
+            </div>
+
+            {/* Category Quick Filter Dropdown */}
+            <div className="md:w-64">
+              <div className="relative">
+                <FunnelIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => handleCategoryChange(e.target.value)}
+                  className="block w-full pl-12 pr-10 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white shadow-sm text-base font-medium appearance-none cursor-pointer"
                 >
-                  <XMarkIcon className="h-5 w-5" />
-                </button>
-              )}
+                  <option value="all">Semua Kategori</option>
+                  {categories.slice(1).map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Filter and Sort Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200">
-            <div className="flex items-center gap-2 text-gray-700">
-              <Squares2X2Icon className="w-5 h-5 text-green-600" />
-              <span className="font-medium">
-                {filteredProducts.length} dari {products.length} produk
-              </span>
-              {selectedCategory !== 'all' && (
-                <span className="ml-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                  {updatedCategories.find(c => c.id === selectedCategory)?.name}
+          {/* Filter Info Badge */}
+          {(searchTerm || selectedCategory !== 'all') && (
+            <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center justify-between max-w-4xl mx-auto">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Squares2X2Icon className="w-5 h-5 text-green-600" />
+                <span className="text-green-800 font-medium">
+                  {searchTerm && `Pencarian: "${searchTerm}"`}
+                  {searchTerm && selectedCategory !== 'all' && ' • '}
+                  {selectedCategory !== 'all' && `Filter: ${categories.find(c => c.id === selectedCategory)?.name}`}
                 </span>
-              )}
-              {searchTerm && (
-                <span className="ml-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                  Pencarian: "{searchTerm}"
-                </span>
-              )}
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <FunnelIcon className="w-5 h-5 text-gray-500" />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-sm font-medium"
+              </div>
+              <button
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedCategory('all');
+                }}
+                className="text-green-600 hover:text-green-700 font-medium text-sm whitespace-nowrap"
               >
-                <option value="default">Urutkan: Default</option>
-                <option value="name">Nama (A-Z)</option>
-                <option value="price-low">Harga Terendah</option>
-                <option value="price-high">Harga Tertinggi</option>
-                <option value="rating">Rating Tertinggi</option>
-              </select>
+                Reset Filter
+              </button>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Category Grid */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Pilih Kategori</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {updatedCategories.map((category) => (
-              <Link
-                key={category.id}
-                to={category.id === 'all' ? '/products' : `/products?category=${category.id}`}
-                onClick={() => handleCategoryChange(category.id)}
-                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-200"
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
-                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-                    <span className="text-xs font-semibold text-gray-800">{category.products} produk</span>
-                  </div>
-                </div>
-                <div className="p-5">
-                  <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-green-600 transition-colors duration-300">
-                    {category.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{category.description}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Products Section */}
-        {(selectedCategory !== 'all' || searchTerm || sortBy !== 'default') && filteredProducts.length > 0 && (
-          <div className="mb-8">
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-start gap-3">
-              <ShoppingBagIcon className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="text-green-800 font-medium">
-                  {selectedCategory !== 'all' && (
-                    <span>Kategori: <span className="font-bold">{updatedCategories.find(c => c.id === selectedCategory)?.name}</span></span>
-                  )}
-                  {searchTerm && (
-                    <span className="ml-2">• Pencarian: <span className="font-bold">"{searchTerm}"</span></span>
-                  )}
-                  {sortBy !== 'default' && (
-                    <span className="ml-2">• Diurutkan berdasarkan: <span className="font-bold capitalize">{sortBy.replace('-', ' ')}</span></span>
-                  )}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Products Grid */}
-        <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {selectedCategory === 'all' ? 'Semua Produk' : updatedCategories.find(c => c.id === selectedCategory)?.name}
-            </h2>
-            <p className="text-gray-600">
-              {filteredProducts.length} produk ditemukan
-            </p>
+            <h2 className="text-2xl font-bold text-gray-900">Pilih Kategori</h2>
+            <span className="text-gray-600 font-medium">
+              {filteredCategories.length} kategori
+            </span>
           </div>
 
-          {filteredProducts.length === 0 ? (
+          {filteredCategories.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
               <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                {searchTerm ? (
-                  <MagnifyingGlassIcon className="w-12 h-12 text-gray-400" />
-                ) : (
-                  <ShoppingBagIcon className="w-12 h-12 text-gray-400" />
-                )}
+                <MagnifyingGlassIcon className="w-12 h-12 text-gray-400" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                {searchTerm ? 'Produk tidak ditemukan' : 'Belum ada produk'}
+                Kategori tidak ditemukan
               </h3>
               <p className="text-gray-600 mb-6">
-                {searchTerm 
-                  ? `Tidak ada produk yang cocok dengan "${searchTerm}"`
-                  : 'Produk untuk kategori ini akan segera hadir'
-                }
+                Tidak ada kategori yang cocok dengan "{searchTerm}"
               </p>
-              {(searchTerm || selectedCategory !== 'all' || sortBy !== 'default') && (
-                <button
-                  onClick={() => {
-                    setSearchTerm('');
-                    setSelectedCategory('all');
-                    setSortBy('default');
-                  }}
-                  className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
-                >
-                  Reset Filter
-                </button>
-              )}
+              <button
+                onClick={() => setSearchTerm('')}
+                className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
+              >
+                Reset Pencarian
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                />
+              {filteredCategories.map((category) => (
+                <Link
+                  key={category.id}
+                  to={category.id === 'all' ? '/products' : `/products?category=${category.id}`}
+                  onClick={() => handleCategoryChange(category.id)}
+                  className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-200"
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+                      <span className="text-xs font-semibold text-gray-800">{category.products} produk</span>
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-green-600 transition-colors duration-300">
+                      {category.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{category.description}</p>
+                  </div>
+                </Link>
               ))}
             </div>
           )}
