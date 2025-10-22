@@ -54,12 +54,4 @@ const roleMiddleware = (roles) => {
   };
 };
 
-// Legacy middleware untuk backward compatibility
-const authMiddleware = authenticateAdmin;
-
-module.exports = {
-  authMiddleware, // Legacy support
-  authenticateAdmin,
-  authenticateCustomer,
-  roleMiddleware,
-};
+module.exports = { authMiddleware, roleMiddleware };
