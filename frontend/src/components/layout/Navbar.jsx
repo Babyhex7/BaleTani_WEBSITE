@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, ShoppingCart, User, LogOut } from 'lucide-react';
 import useAuthStore from '../../store/store_customer/useAuthStore';
+import useCartStore from '../../store/store_customer/useCartStore';
 import Button from '../ui/Button';
 import logoImage from '/BaleTani_Logo.png';
 
@@ -11,6 +12,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   
   const { user, isAuthenticated, logout } = useAuthStore();
+  const itemCount = useCartStore((state) => state.getItemCount());
 
   const handleLogout = () => {
     logout();
@@ -72,13 +74,17 @@ const Navbar = () => {
 
           {/* Desktop Auth & Cart */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Cart */}
-            <button className="relative p-2 text-gray-600 hover:text-primary-500 transition-colors">
-              <ShoppingCart size={24} />
-              <span className="absolute -top-1 -right-1 bg-accent-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                0
-              </span>
-            </button>
+            {/* Cart - Only show when logged in */}
+            {isAuthenticated && (
+              <Link to="/cart" className="relative p-2 text-gray-600 hover:text-primary-500 transition-colors">
+                <ShoppingCart size={24} />
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                    {itemCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* User Menu */}
             {isAuthenticated ? (
@@ -102,11 +108,11 @@ const Navbar = () => {
                       Profil Saya
                     </Link>
                     <Link
-                      to="/orders"
+                      to="/cart"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
-                      Pesanan Saya
+                      Keranjang Belanja
                     </Link>
                     <hr className="my-1" />
                     <button

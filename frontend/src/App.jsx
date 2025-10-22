@@ -9,6 +9,7 @@ import Register from './pages/customer/Register';
 import Products from './pages/customer/Products';
 import ProductsSimple from './pages/customer/ProductsSimple';
 import ProductDetail from './pages/customer/ProductDetail';
+import Cart from './pages/customer/Cart';
 import Promo from './pages/customer/Promo';
 import Categories from './pages/customer/Categories';
 import Contact from './pages/customer/Contact';
@@ -81,6 +82,12 @@ function App() {
       <Route path="/products/:id" element={
         <CustomerLayout>
           <ProductDetail />
+        </CustomerLayout>
+      } />
+
+      <Route path="/cart" element={
+        <CustomerLayout>
+          <Cart />
         </CustomerLayout>
       } />
 

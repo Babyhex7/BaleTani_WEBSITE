@@ -440,9 +440,6 @@ const Categories = () => {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  onWhatsAppOrder={handleWhatsAppOrder}
-                  onAddToCart={handleAddToCart}
-                  formatPrice={formatPrice}
                 />
               ))}
             </div>

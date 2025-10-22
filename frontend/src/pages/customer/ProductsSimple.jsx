@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mockProducts, mockCategories } from '../../utils/mockData';
+import ProductCard from '../../components/ui/ProductCard';
 
 const ProductsSimple = () => {
   const navigate = useNavigate();
@@ -321,95 +322,9 @@ const ProductsSimple = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredProducts.map(product => (
-              <div
-                key={product.id}
-                className="group bg-white rounded-2xl shadow-sm hover:shadow-2xl overflow-hidden transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
-              >
-                 {/* Product Image */}
-                 <div className="relative overflow-hidden">
-                   <img 
-                     src={product.image || 'https://placehold.co/300x200'} 
-                     alt={String(product.name || 'Product')}
-                     className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
-                   />
-                   {(product.discount || 0) > 0 && (
-                     <div className="absolute top-4 left-4">
-                       <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                         -{String(product.discount || 0)}%
-                       </span>
-                     </div>
-                   )}
-                   
-                 </div>
-
-                 {/* Product Info */}
-                 <div className="p-6 flex-1 flex flex-col">
-                   <div className="mb-3">
-                     <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-green-600 transition-colors">
-                       {String(product.name || '')}
-                     </h3>
-                     <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed">
-                       {String(product.description || '')}
-                     </p>
-                   </div>
-                  
-                  {/* Price */}
-                  <div className="flex items-baseline justify-between mb-4">
-                    <div className="flex items-baseline space-x-1">
-                      <span className="text-2xl font-bold text-green-600">
-                        Rp {(product.price || 0).toLocaleString('id-ID')}
-                      </span>
-                      <span className="text-sm text-gray-500">/{String(product.unit || '')}</span>
-                    </div>
-                  </div>
-                  
-                  {/* Rating & Stock */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-1">
-                      <div className="flex items-center space-x-1 bg-yellow-50 px-2 py-1 rounded-lg">
-                        <span className="text-yellow-500">⭐</span>
-                        <span className="text-sm font-medium text-yellow-700">
-                          {String(product.rating || 0)}
-                        </span>
-                        <span className="text-xs text-gray-500">({String(product.reviews || 0)})</span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs text-gray-500 bg-green-50 px-2 py-1 rounded-lg">
-                        Stok: {String(product.stock || 0)} {String(product.unit || '')}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex space-x-3 mt-auto">
-                     <button 
-                       onClick={() => handleAddToCart(product)}
-                       className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                     >
-                       <span className="flex items-center justify-center space-x-2">
-                         <span>🛒</span>
-                         <span className="text-sm">
-                           {cart[product.id] ? `Di Keranjang (${cart[product.id]})` : 'Tambah Keranjang'}
-                         </span>
-                       </span>
-                     </button>
-                     
-                     <button 
-                       onClick={() => handleToggleWishlist(product.id)}
-                       className={`px-4 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl ${
-                         wishlist.includes(product.id)
-                           ? 'bg-red-500 hover:bg-red-600 text-white'
-                           : 'bg-white hover:bg-red-50 text-gray-600 hover:text-red-500 border border-gray-200 hover:border-red-300'
-                       }`}
-                     >
-                       <span className="text-lg">{wishlist.includes(product.id) ? '❤️' : '♡'}</span>
-                     </button>
-                   </div>
-                 </div>
-                </div>
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           )}

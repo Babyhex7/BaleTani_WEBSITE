@@ -12,12 +12,14 @@ import {
   Truck,
   Plus,
   Minus,
-  ShoppingCart
+  ShoppingCart,
+  Tag
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import useAuthStore from '../../store/store_customer/useAuthStore';
-import Button from '../../components/ui/Button';
+import useCartStore from '../../store/store_customer/useCartStore';
 import productService from '../../services/services_customer/productService';
+import ProductCard from '../../components/ui/ProductCard';
 
 /**
  * Halaman Detail Produk - Menampilkan informasi lengkap produk dengan WhatsApp integration
@@ -27,6 +29,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
+  const { addItem } = useCartStore();
   
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -223,39 +226,40 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
 
   const handleWhatsAppOrder = () => {
     if (!isAuthenticated) {
-      toast.error('Silakan login terlebih dahulu untuk memesan produk');
+      toast.error('Silakan login terlebih dahulu');
       navigate('/login');
       return;
     }
 
-    const totalPrice = product.price * quantity;
-    const message = `Halo ${product.seller.name}! 🌾
+    const displayPrice = product.promoPrice || product.price;
+    const totalPrice = displayPrice * quantity;
+    const message = `Halo BaleTani! Saya ingin memesan:\n\n📦 ${product.name}\n💰 Rp ${displayPrice.toLocaleString('id-ID')}/${product.unit}\n📊 Jumlah: ${quantity} ${product.unit}\n💵 Total: Rp ${totalPrice.toLocaleString('id-ID')}\n\nTerima kasih!`;
 
-Saya tertarik untuk memesan:
-📦 ${product.name}
-💰 ${formatPrice(product.price)}/${product.unit}
-📊 Jumlah: ${quantity} ${product.unit}
-💵 Total: ${formatPrice(totalPrice)}
-📍 Lokasi: ${product.seller.location}
-
-Apakah stok masih tersedia? Mohon info untuk proses pemesanan selanjutnya. 
-
-Terima kasih! 🙏`;
-
-    const whatsappUrl = `https://wa.me/${product.seller.phone}?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/6285885725027?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
-    
     toast.success('Mengarahkan ke WhatsApp...');
   };
 
   const handleAddToCart = () => {
     if (!isAuthenticated) {
-      toast.error('Silakan login terlebih dahulu untuk menambah ke keranjang');
+      toast.error('Silakan login terlebih dahulu');
       navigate('/login');
       return;
     }
     
+    addItem(product, quantity);
     toast.success(`${quantity} ${product.unit} ${product.name} ditambahkan ke keranjang`);
+  };
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      toast.error('Silakan login terlebih dahulu');
+      navigate('/login');
+      return;
+    }
+    
+    addItem(product, quantity);
+    navigate('/cart');
   };
 
   const handleShare = () => {
@@ -405,56 +409,44 @@ Terima kasih! 🙏`;
             </div>
 
             {/* Seller Info */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                     <span className="text-green-600 font-bold text-lg">
-                      {product.seller.name.charAt(0)}
+                      {product.seller?.name?.charAt(0) || 'B'}
                     </span>
                   </div>
                   <div>
                     <div className="flex items-center space-x-2">
-                      <h3 className="font-bold text-gray-900">{product.seller.name}</h3>
-                      {product.seller.verified && (
-                        <div className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                          ✓ Terverifikasi
+                      <h3 className="font-bold text-gray-900">{product.seller?.name || 'BaleTani'}</h3>
+                      {product.seller?.verified && (
+                        <div className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <ShieldCheck size={12} />
+                          Terverifikasi
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center space-x-1 text-sm text-gray-600">
+                    <div className="flex items-center space-x-1 text-sm text-gray-600 mt-1">
                       <MapPin size={14} />
-                      <span>{product.seller.location}</span>
+                      <span>{product.seller?.location || 'Bogor, Jawa Barat'}</span>
                     </div>
                   </div>
                 </div>
-                <div className="text-right text-sm text-gray-600">
-                  <div>Rating: {product.seller.rating}</div>
-                  <div>{product.seller.totalProducts} produk</div>
+                <div className="text-right text-sm">
+                  <div className="flex items-center gap-1 text-yellow-600 justify-end">
+                    <Star size={14} fill="currentColor" />
+                    <span className="font-semibold">{product.seller?.rating || 4.8}</span>
+                  </div>
+                  <div className="text-gray-600 text-xs mt-1">
+                    {product.seller?.totalProducts || 25} produk
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex space-x-3">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                >
-                  Lihat Toko
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleWhatsAppOrder}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                >
-                  <MessageCircle size={16} className="mr-1" />
-                  Chat Penjual
-                </Button>
               </div>
             </div>
 
             {/* Quantity & Actions */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -468,10 +460,19 @@ Terima kasih! 🙏`;
                       >
                         <Minus size={16} />
                       </button>
-                      <span className="px-4 py-2 font-medium">{quantity}</span>
+                      <input
+                        type="number"
+                        value={quantity}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value) || 1;
+                          setQuantity(Math.max(1, Math.min(product.stock, val)));
+                        }}
+                        className="w-16 px-4 py-2 text-center font-medium focus:outline-none"
+                      />
                       <button
                         onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                        className="p-2 hover:bg-gray-100 transition-colors"
+                        disabled={quantity >= product.stock}
+                        className="p-2 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Plus size={16} />
                       </button>
@@ -485,29 +486,40 @@ Terima kasih! 🙏`;
                 <div className="border-t pt-4">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-lg font-medium text-gray-900">Total:</span>
-                    <span className="text-2xl font-bold text-green-600">
-                      {formatPrice(product.price * quantity)}
-                    </span>
+                    <div className="text-right">
+                      <span className="text-2xl font-bold text-green-600">
+                        Rp {((product.promoPrice || product.price) * quantity).toLocaleString('id-ID')}
+                      </span>
+                      {product.promoPrice && product.promoPrice < product.price && (
+                        <div className="text-sm text-gray-400 line-through">
+                          Rp {(product.price * quantity).toLocaleString('id-ID')}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="space-y-3">
-                    <Button
-                      onClick={handleWhatsAppOrder}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white"
-                      size="lg"
+                    <button
+                      onClick={handleBuyNow}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
                     >
-                      <MessageCircle size={20} className="mr-2" />
-                      Pesan via WhatsApp
-                    </Button>
-                    <Button
+                      <ShoppingCart size={20} />
+                      Beli Sekarang
+                    </button>
+                    <button
                       onClick={handleAddToCart}
-                      variant="outline"
-                      className="w-full border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                      size="lg"
+                      className="w-full border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
                     >
-                      <ShoppingCart size={20} className="mr-2" />
+                      <Plus size={20} />
                       Tambah ke Keranjang
-                    </Button>
+                    </button>
+                    <button
+                      onClick={handleWhatsAppOrder}
+                      className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                    >
+                      <MessageCircle size={20} />
+                      Chat WhatsApp
+                    </button>
                   </div>
                 </div>
               </div>
@@ -646,50 +658,16 @@ Terima kasih! 🙏`;
         </div>
 
         {/* Related Products */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Produk Serupa</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {product.relatedProducts.map((relatedProduct) => (
-              <Link
-                key={relatedProduct.id}
-                to={`/products/${relatedProduct.id}`}
-                className="group bg-gray-50 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <div className="relative">
-                  <img
-                    src={relatedProduct.image}
-                    alt={relatedProduct.name}
-                    className="w-full h-32 object-cover group-hover:scale-105 transition-transform"
-                  />
-                  {relatedProduct.discount > 0 && (
-                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">
-                      -{relatedProduct.discount}%
-                    </div>
-                  )}
-                </div>
-                <div className="p-3">
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 group-hover:text-green-600">
-                    {relatedProduct.name}
-                  </h3>
-                  <div className="flex items-center space-x-1 mb-2">
-                    <Star size={12} className="text-yellow-400 fill-current" />
-                    <span className="text-xs text-gray-600">{relatedProduct.rating}</span>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-sm font-bold text-green-600">
-                      {formatPrice(relatedProduct.price)}
-                    </div>
-                    {relatedProduct.originalPrice > relatedProduct.price && (
-                      <div className="text-xs text-gray-500 line-through">
-                        {formatPrice(relatedProduct.originalPrice)}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            ))}
+        {product.relatedProducts && product.relatedProducts.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Produk Serupa</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {product.relatedProducts.map((relatedProduct) => (
+                <ProductCard key={relatedProduct.id} product={relatedProduct} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
