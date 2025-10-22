@@ -2,6 +2,8 @@ const express = require("express");
 const dashboardRoutes = require("./dashboard");
 const userRoutes = require("./users");
 const inventoryRoutes = require("./inventory");
+const orderRoutes = require("./orders");
+const procurementRoutes = require("./procurements");
 
 const router = express.Router();
 
@@ -20,7 +22,10 @@ router.use("/users", userRoutes);
 router.use("/products", inventoryRoutes);
 router.use("/inventory", inventoryRoutes);
 
-// Shortcut routes for better API structure
-router.use("/orders", require("./dashboard")); // For recent orders endpoint
+// Order management routes
+router.use("/orders", orderRoutes);
+
+// Procurement management routes
+router.use("/procurements", procurementRoutes);
 
 module.exports = router;
