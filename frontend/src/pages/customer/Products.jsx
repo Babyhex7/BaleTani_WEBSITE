@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, Grid, List, ArrowRight, MessageCircle, Heart, Star, MapPin } from 'lucide-react';
+import { MagnifyingGlassIcon, FunnelIcon, Squares2X2Icon, ListBulletIcon, ChevronDownIcon, ChatBubbleLeftIcon, ShoppingCartIcon, HeartIcon, MapPinIcon, StarIcon } from '@heroicons/react/24/outline';
+import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import { useSearchParams, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import useAuthStore from '../../store/store_customer/useAuthStore';
@@ -8,8 +9,7 @@ import ProductCard from '../../components/ui/ProductCard';
 import productService from '../../services/services_customer/productService';
 
 /**
- * Halaman Produk - Menampilkan catalog lengkap dengan filter dan search
- * Fitur: Filter kategori, pencarian, sorting, grid/list view, WhatsApp integration
+ * Halaman Produk - Modern & Clean Design
  */
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -325,24 +325,10 @@ const Products = () => {
   /**
    * Handle WhatsApp order
    */
-  const handleWhatsAppOrder = (product) => {
-    if (!isAuthenticated) {
-      toast.error('Silakan login terlebih dahulu untuk memesan produk');
-      return;
-    }
-
-    const message = `Halo ${product.seller}! 🌾
-
-Saya tertarik dengan produk:
-📦 ${product.name}
-💰 ${formatPrice(product.price)}/${product.unit}
-📍 ${product.location}
-
-Apakah masih tersedia? Terima kasih!`;
-
+  const handleWhatsAppOrder = (productName, price, unit) => {
+    const message = `Halo, saya tertarik dengan produk:\n\n${productName}\nHarga: ${formatPrice(price)}/${unit}\n\nMohon informasi lebih lanjut.`;
     const whatsappUrl = `https://wa.me/6285885725027?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
-    
     toast.success('Mengarahkan ke WhatsApp...');
   };
 
@@ -350,212 +336,200 @@ Apakah masih tersedia? Terima kasih!`;
    * Handle add to cart (placeholder)
    */
   const handleAddToCart = (product) => {
-    if (!isAuthenticated) {
-      toast.error('Silakan login terlebih dahulu untuk menambah ke keranjang');
-      return;
-    }
-    
     toast.success(`${product.name} ditambahkan ke keranjang`);
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
-      <section className="bg-white shadow-sm border-b">
+      <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center space-y-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-              Katalog Produk BaleTani
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Temukan produk segar berkualitas premium langsung dari petani lokal terpercaya
-            </p>
-          </div>
-
-          {/* Search Bar */}
-          <div className="mt-8 max-w-2xl mx-auto">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Cari produk, penjual, atau lokasi..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-            </div>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Semua Produk</h1>
+          <p className="text-gray-600">Temukan produk segar berkualitas premium untuk kebutuhan Anda</p>
         </div>
-      </section>
+      </div>
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
-          <aside className="lg:w-1/4">
-            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-gray-900">Filter Produk</h2>
+          <aside className="lg:w-64 flex-shrink-0">
+            <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-4">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center">
+                <FunnelIcon className="w-5 h-5 mr-2" />
+                Filter
+              </h3>
+
+              {/* Categories */}
+              <div className="space-y-3 mb-6">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">Kategori</h4>
                 <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="lg:hidden p-2 text-gray-500 hover:text-gray-700"
+                  onClick={() => setSelectedCategory('all')}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                    selectedCategory === 'all'
+                      ? 'bg-green-50 text-green-700 font-medium'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
                 >
-                  <Filter size={20} />
+                  Semua Kategori
                 </button>
+                {categoryOptions.slice(1).map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                      selectedCategory === cat.id
+                        ? 'bg-green-50 text-green-700 font-medium'
+                        : 'text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span>{cat.name}</span>
+                      <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
+                        {cat.count}
+                      </span>
+                    </div>
+                  </button>
+                ))}
               </div>
 
-              <div className={`space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-                {/* Categories */}
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">Kategori</h3>
-                  <div className="space-y-2">
-                    {categoryOptions.map((category) => (
-                      <button
-                        key={category.id}
-                        onClick={() => setSelectedCategory(category.id)}
-                        className={`w-full text-left px-3 py-2 rounded-lg transition-colors duration-200 ${
-                          selectedCategory === category.id
-                            ? 'bg-green-100 text-green-800 font-medium'
-                            : 'text-gray-600 hover:bg-gray-100'
-                        }`}
-                      >
-                        <div className="flex justify-between items-center">
-                          <span>{category.name}</span>
-                          <span className="text-sm bg-gray-200 px-2 py-1 rounded-full">
-                            {category.count}
-                          </span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+              {/* Sort */}
+              <div className="space-y-3 border-t border-gray-200 pt-6">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">Urutkan</h4>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-                {/* Price Range */}
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">Rentang Harga</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="number"
-                        placeholder="Min"
-                        value={priceRange[0]}
-                        onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                      />
-                      <span className="text-gray-500">-</span>
-                      <input
-                        type="number"
-                        placeholder="Max"
-                        value={priceRange[1]}
-                        onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 100000])}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                      />
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quick Filters */}
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">Filter Cepat</h3>
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => setPriceRange([0, 20000])}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
-                    >
-                      Di bawah Rp 20.000
-                    </button>
-                    <button
-                      onClick={() => setPriceRange([20000, 50000])}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
-                    >
-                      Rp 20.000 - Rp 50.000
-                    </button>
-                    <button
-                      onClick={() => setPriceRange([50000, 100000])}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
-                    >
-                      Di atas Rp 50.000
-                    </button>
-                  </div>
-                </div>
+              {/* Price Range Quick Filters */}
+              <div className="space-y-3 border-t border-gray-200 pt-6">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">Rentang Harga</h4>
+                <button
+                  onClick={() => setPriceRange([0, 20000])}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg"
+                >
+                  Di bawah Rp 20.000
+                </button>
+                <button
+                  onClick={() => setPriceRange([20000, 50000])}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg"
+                >
+                  Rp 20.000 - Rp 50.000
+                </button>
+                <button
+                  onClick={() => setPriceRange([50000, 1000000])}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg"
+                >
+                  Di atas Rp 50.000
+                </button>
               </div>
             </div>
           </aside>
 
           {/* Main Content */}
-          <main className="lg:w-3/4">
-            {/* Controls Bar */}
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div className="text-sm text-gray-600">
-                  Menampilkan {products.length} produk
-                  {searchQuery && <span> untuk "{searchQuery}"</span>}
-                </div>
-                
-                <div className="flex items-center gap-4">
-                  {/* Sort */}
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500"
-                  >
-                    {sortOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-
-                  {/* View Mode */}
-                  <div className="flex rounded-lg border border-gray-300 overflow-hidden">
-                    <button
-                      onClick={() => setViewMode('grid')}
-                      className={`p-2 ${viewMode === 'grid' ? 'bg-green-600 text-white' : 'bg-white text-gray-600'}`}
-                    >
-                      <Grid size={18} />
-                    </button>
-                    <button
-                      onClick={() => setViewMode('list')}
-                      className={`p-2 ${viewMode === 'list' ? 'bg-green-600 text-white' : 'bg-white text-gray-600'}`}
-                    >
-                      <List size={18} />
-                    </button>
+          <main className="flex-1">
+            {/* Search & View Toggle */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+              <div className="flex flex-col sm:flex-row gap-4 items-center">
+                {/* Search */}
+                <div className="flex-1 w-full">
+                  <div className="relative">
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Cari produk..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
                   </div>
                 </div>
+
+                {/* View Mode Toggle */}
+                <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2 rounded transition-colors ${
+                      viewMode === 'grid'
+                        ? 'bg-white text-green-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <Squares2X2Icon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded transition-colors ${
+                      viewMode === 'list'
+                        ? 'bg-white text-green-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <ListBulletIcon className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
+
+              {/* Active Filters */}
+              {(selectedCategory !== 'all' || searchQuery) && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {selectedCategory !== 'all' && (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm">
+                      {categoryOptions.find(c => c.id === selectedCategory)?.name}
+                      <button
+                        onClick={() => setSelectedCategory('all')}
+                        className="hover:text-green-900 ml-1"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
+                  {searchQuery && (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm">
+                      "{searchQuery}"
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="hover:text-green-900 ml-1"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Products Grid/List */}
+            {/* Products Count */}
+            <div className="mb-6">
+              <p className="text-gray-600">
+                Menampilkan <span className="font-semibold text-gray-900">{products.length}</span> produk
+              </p>
+            </div>
+
+            {/* Products Grid */}
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-xl shadow-sm p-4 animate-pulse">
-                    <div className="bg-gray-300 rounded-lg h-48 mb-4"></div>
-                    <div className="space-y-2">
-                      <div className="bg-gray-300 h-4 rounded w-3/4"></div>
-                      <div className="bg-gray-300 h-4 rounded w-1/2"></div>
-                      <div className="bg-gray-300 h-8 rounded w-full"></div>
-                    </div>
-                  </div>
-                ))}
+              <div className="flex items-center justify-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
               </div>
             ) : !products || products.length === 0 ? (
-              /* No Products Found */
-              <div className="text-center py-16">
-                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="text-gray-400" size={32} />
+              <div className="text-center py-20">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MagnifyingGlassIcon className="w-8 h-8 text-gray-400" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Produk Tidak Ditemukan</h3>
-                <p className="text-gray-600 mb-6">
-                  Tidak ada produk yang sesuai dengan kriteria pencarian Anda.
-                </p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Produk tidak ditemukan</h3>
+                <p className="text-gray-600 mb-6">Coba ubah filter atau kata kunci pencarian</p>
                 <Button
                   onClick={() => {
                     setSearchQuery('');
                     setSelectedCategory('all');
-                    setPriceRange([0, 100000]);
+                    setPriceRange([0, 1000000]);
                   }}
                   className="bg-green-600 hover:bg-green-700 text-white"
                 >
@@ -563,210 +537,20 @@ Apakah masih tersedia? Terima kasih!`;
                 </Button>
               </div>
             ) : (
-              /* Products Grid */
               <div className={`grid gap-6 ${
-                viewMode === 'grid' 
-                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                viewMode === 'grid'
+                  ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
                   : 'grid-cols-1'
               }`}>
-                {(products || []).map((product) => (
-                  viewMode === 'grid' ? (
-                    <div key={product.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
-                      <div className="relative overflow-hidden">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        {product.discount > 0 && (
-                          <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-lg text-sm font-semibold">
-                            -{product.discount}%
-                          </div>
-                        )}
-                        <button className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors">
-                          <Heart size={16} className="text-gray-600" />
-                        </button>
-                      </div>
-                      
-                      <div className="p-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1">
-                            <h3 className="font-bold text-gray-900 mb-1 group-hover:text-green-600 transition-colors">
-                              {product.name}
-                            </h3>
-                            <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
-                              <MapPin size={14} />
-                              <span>{product.seller} • {product.location}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center space-x-1 mb-3">
-                          <div className="flex items-center">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                size={14}
-                                className={`${
-                                  i < Math.floor(product.rating) 
-                                    ? 'text-yellow-400 fill-current' 
-                                    : 'text-gray-300'
-                                }`}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-sm text-gray-600">
-                            {product.rating} ({product.reviews})
-                          </span>
-                        </div>
-
-                        <div className="space-y-2 mb-4">
-                          <div className="flex items-baseline space-x-2">
-                            <span className="text-lg font-bold text-green-600">
-                              {formatPrice(product.price)}
-                            </span>
-                            <span className="text-sm text-gray-500">/{product.unit}</span>
-                          </div>
-                          {product.originalPrice > product.price && (
-                            <div className="text-sm text-gray-500 line-through">
-                              {formatPrice(product.originalPrice)}
-                            </div>
-                          )}
-                          <div className="text-sm text-gray-600">
-                            Stok: {product.stock} {product.unit}
-                          </div>
-                        </div>
-
-                        <div className="flex space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleAddToCart(product)}
-                            className="flex-1 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                          >
-                            Keranjang
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => handleWhatsAppOrder(product)}
-                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            <MessageCircle size={16} className="mr-1" />
-                            WhatsApp
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    /* List View */
-                    <div key={product.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                      <div className="flex flex-col md:flex-row">
-                        <div className="md:w-1/4 relative">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-full h-48 md:h-full object-cover"
-                          />
-                          {product.discount > 0 && (
-                            <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-lg text-sm font-semibold">
-                              -{product.discount}%
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div className="md:w-3/4 p-6">
-                          <div className="flex flex-col md:flex-row md:items-start md:justify-between">
-                            <div className="flex-1">
-                              <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-green-600 transition-colors">
-                                {product.name}
-                              </h3>
-                              
-                              <div className="flex items-center space-x-2 text-sm text-gray-600 mb-3">
-                                <MapPin size={14} />
-                                <span>{product.seller} • {product.location}</span>
-                              </div>
-
-                              <div className="flex items-center space-x-1 mb-3">
-                                <div className="flex items-center">
-                                  {[...Array(5)].map((_, i) => (
-                                    <Star
-                                      key={i}
-                                      size={14}
-                                      className={`${
-                                        i < Math.floor(product.rating) 
-                                          ? 'text-yellow-400 fill-current' 
-                                          : 'text-gray-300'
-                                      }`}
-                                    />
-                                  ))}
-                                </div>
-                                <span className="text-sm text-gray-600">
-                                  {product.rating} ({product.reviews} ulasan)
-                                </span>
-                              </div>
-
-                              <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                                {product.description}
-                              </p>
-                            </div>
-
-                            <div className="md:text-right md:ml-6">
-                              <div className="space-y-2 mb-4">
-                                <div className="flex md:justify-end items-baseline space-x-2">
-                                  <span className="text-2xl font-bold text-green-600">
-                                    {formatPrice(product.price)}
-                                  </span>
-                                  <span className="text-sm text-gray-500">/{product.unit}</span>
-                                </div>
-                                {product.originalPrice > product.price && (
-                                  <div className="text-sm text-gray-500 line-through">
-                                    {formatPrice(product.originalPrice)}
-                                  </div>
-                                )}
-                                <div className="text-sm text-gray-600">
-                                  Stok: {product.stock} {product.unit}
-                                </div>
-                              </div>
-
-                              <div className="flex md:justify-end space-x-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleAddToCart(product)}
-                                  className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                                >
-                                  Keranjang
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleWhatsAppOrder(product)}
-                                  className="bg-green-600 hover:bg-green-700 text-white"
-                                >
-                                  <MessageCircle size={16} className="mr-1" />
-                                  WhatsApp
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )
+                {products.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onWhatsAppOrder={handleWhatsAppOrder}
+                    onAddToCart={handleAddToCart}
+                    formatPrice={formatPrice}
+                  />
                 ))}
-              </div>
-            )}
-
-            {/* Load More Button */}
-            {products.length > 0 && products.length >= 9 && (
-              <div className="text-center mt-12">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                >
-                  Muat Lebih Banyak
-                  <ArrowRight className="ml-2" size={20} />
-                </Button>
               </div>
             )}
           </main>

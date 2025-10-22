@@ -27,10 +27,9 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { name: 'Beranda', href: '/', current: true },
     { name: 'Produk', href: '/products', current: false },
-    { name: 'Promo', href: '/promo', current: false },
     { name: 'Kategori', href: '/categories', current: false },
+    { name: 'Promo', href: '/promo', current: false },
     { name: 'Kontak', href: '/contact', current: false },
   ];
 

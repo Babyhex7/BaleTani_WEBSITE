@@ -91,7 +91,7 @@ const Login = () => {
         if (response.user.role === 'admin' || response.user.role === 'staff') {
           navigate('/admin/dashboard');
         } else {
-          navigate('/home');
+          navigate('/products');
         }
       }, 500);
       

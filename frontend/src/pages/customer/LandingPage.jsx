@@ -1,4 +1,5 @@
-import { ArrowRight, MessageCircle, Truck, Shield, Clock, Users, Award, CheckCircle, Leaf, Heart, Zap, Star } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, MessageCircle, Truck, Shield, Clock, Users, Award, CheckCircle, Leaf, Heart, Zap, Star, ChevronDown, Package, ThumbsUp } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import useAuthStore from '../../store/store_customer/useAuthStore';
@@ -12,6 +13,40 @@ import ProductCard from '../../components/ui/ProductCard';
 const LandingPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
+  const [openFaq, setOpenFaq] = useState(null);
+
+  // Toggle FAQ
+  const toggleFaq = (index) => {
+    setOpenFaq(openFaq === index ? null : index);
+  };
+
+  // FAQ Data
+  const faqs = [
+    {
+      question: 'Bagaimana cara memesan produk di BaleTani?',
+      answer: 'Anda dapat memesan melalui website kami dengan memilih produk, menambahkan ke keranjang, dan checkout. Atau hubungi kami langsung via WhatsApp untuk pemesanan cepat.'
+    },
+    {
+      question: 'Berapa lama waktu pengiriman?',
+      answer: 'Pengiriman dilakukan dalam 24 jam untuk area Jabodetabek. Untuk area luar kota, waktu pengiriman 2-3 hari kerja dengan sistem cold chain untuk menjaga kesegaran.'
+    },
+    {
+      question: 'Apakah produk dijamin segar?',
+      answer: 'Ya, semua produk kami dijamin segar karena langsung dari petani lokal. Jika ada produk yang tidak sesuai standar, kami berikan garansi uang kembali 100%.'
+    },
+    {
+      question: 'Apakah ada minimum order?',
+      answer: 'Tidak ada minimum order. Anda dapat membeli produk sesuai kebutuhan, mulai dari 1 kg atau bahkan satuan untuk beberapa produk tertentu.'
+    },
+    {
+      question: 'Bagaimana sistem pembayaran?',
+      answer: 'Kami menerima pembayaran via transfer bank, e-wallet (OVO, GoPay, Dana), dan COD untuk area tertentu. Pembayaran aman dan terpercaya.'
+    },
+    {
+      question: 'Apakah bisa berlangganan?',
+      answer: 'Tentu! Kami menyediakan paket berlangganan mingguan atau bulanan dengan harga spesial. Hubungi tim kami untuk informasi lebih lanjut.'
+    }
+  ];
 
   // Data produk unggulan untuk ditampilkan di landing page
   const featuredProducts = [
@@ -263,14 +298,14 @@ const LandingPage = () => {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-white border-y border-gray-100">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {achievements.map((achievement, index) => {
               const IconComponent = achievement.icon;
               return (
-                <div key={index} className="text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <div key={index} className="text-center p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-300">
+                  <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3">
                     <IconComponent className="text-green-600" size={24} />
                   </div>
                   <div className="text-2xl font-bold text-gray-900 mb-1">{achievement.number}</div>
@@ -283,11 +318,14 @@ const LandingPage = () => {
       </section>
 
       {/* Special Offer Banner */}
-      <section className="py-8 bg-green-600">
+      <section className="py-8 bg-gradient-to-r from-green-600 to-green-700">
         <div className="container mx-auto px-4">
           <div className="text-center space-y-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-white">Promo Spesial Hari Ini!</h2>
-            <p className="text-lg text-green-100">Diskon hingga 25% untuk pembelian pertama</p>
+            <div className="flex items-center justify-center gap-2">
+              <Package className="text-white" size={28} />
+              <h2 className="text-2xl md:text-3xl font-bold text-white">Promo Spesial Hari Ini!</h2>
+            </div>
+            <p className="text-lg text-green-50">Diskon hingga 25% untuk pembelian pertama</p>
             <Button 
               variant="secondary" 
               size="md"
@@ -342,7 +380,7 @@ const LandingPage = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center space-y-4 mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
@@ -357,8 +395,8 @@ const LandingPage = () => {
             {benefits.map((benefit, index) => {
               const IconComponent = benefit.icon;
               return (
-                <div key={index} className="p-6 bg-white rounded-xl border border-gray-100 hover:border-green-200 hover:shadow-lg transition-all duration-300 group">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-200 transition-colors duration-300">
+                <div key={index} className="p-6 bg-white rounded-xl border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-300 group">
+                  <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-100 transition-colors duration-300">
                     <IconComponent className="text-green-600" size={24} />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3">{benefit.title}</h3>
@@ -371,7 +409,7 @@ const LandingPage = () => {
       </section>
 
       {/* Categories Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center space-y-4 mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
@@ -387,17 +425,20 @@ const LandingPage = () => {
               <Link 
                 key={category.name} 
                 to={category.href}
-                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-200"
+                className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-300"
               >
                 <div className="relative overflow-hidden">
                   <img 
                     src={category.image} 
                     alt={category.name}
                     className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/250x200/e5e7eb/6b7280?text=' + encodeURIComponent(category.name);
+                    }}
                   />
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
-                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-                    <span className="text-xs font-semibold text-gray-800">{category.itemCount} produk</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                  <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 shadow-sm">
+                    <span className="text-xs font-semibold text-gray-700">{category.itemCount} produk</span>
                   </div>
                 </div>
                 <div className="p-5">
@@ -411,11 +452,12 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center space-y-4 mb-12">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-4">
-              Kata Mereka
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 text-green-700 text-sm font-medium mb-4">
+              <ThumbsUp size={16} />
+              <span>Kata Mereka</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
               Testimoni Pelanggan Setia
@@ -427,7 +469,7 @@ const LandingPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+              <div key={testimonial.id} className="bg-white p-6 rounded-xl border border-gray-200 hover:border-green-200 hover:shadow-md transition-all duration-300">
                 <div className="space-y-4">
                   <div className="flex items-center space-x-1 mb-3">
                     {[...Array(testimonial.rating)].map((_, i) => (
@@ -442,6 +484,9 @@ const LandingPage = () => {
                       src={testimonial.image} 
                       alt={testimonial.name}
                       className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/60x60/e5e7eb/6b7280?text=' + testimonial.name.charAt(0);
+                      }}
                     />
                     <div>
                       <h4 className="font-bold text-gray-900">{testimonial.name}</h4>
@@ -456,13 +501,14 @@ const LandingPage = () => {
       </section>
 
       {/* About Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <div className="space-y-4">
-                <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium">
-                  Tentang Kami
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 text-green-700 text-sm font-medium">
+                  <Leaf size={16} />
+                  <span>Tentang Kami</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
                   BaleTani Fresh Market
@@ -475,8 +521,8 @@ const LandingPage = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg shadow-sm">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <CheckCircle className="text-green-600" size={20} />
                   </div>
                   <div>
@@ -485,9 +531,9 @@ const LandingPage = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg shadow-sm">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="text-blue-600" size={20} />
+                <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="text-green-600" size={20} />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-1">Pengiriman Cepat & Aman</h3>
@@ -495,9 +541,9 @@ const LandingPage = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg shadow-sm">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="text-purple-600" size={20} />
+                <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="text-green-600" size={20} />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-1">Harga Terjangkau</h3>
@@ -506,7 +552,7 @@ const LandingPage = () => {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl border border-green-200">
+              <div className="bg-green-50 p-6 rounded-xl border border-green-200">
                 <p className="text-green-800 font-bold text-lg text-center leading-relaxed">
                   "Dari kebun ke Balé, dari Balé ke rumahmu"
                 </p>
@@ -514,16 +560,63 @@ const LandingPage = () => {
             </div>
 
             <div className="relative">
-              <div className="bg-white p-4 rounded-2xl shadow-lg">
+              <div className="bg-white p-4 rounded-2xl shadow-md border border-gray-200">
                 <img 
-                  src="https://placehold.co/500x400" 
+                  src="https://via.placeholder.com/500x400/e5e7eb/6b7280?text=BaleTani+Fresh+Market" 
                   alt="About BaleTani" 
                   className="rounded-xl w-full h-auto"
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/500x400/e5e7eb/6b7280?text=BaleTani';
+                  }}
                 />
               </div>
-              <div className="absolute -top-4 -right-4 w-12 h-12 bg-green-200 rounded-full opacity-60"></div>
-              <div className="absolute -bottom-4 -left-4 w-10 h-10 bg-blue-200 rounded-full opacity-60"></div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+              Pertanyaan yang Sering Diajukan
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Temukan jawaban untuk pertanyaan umum seputar BaleTani Fresh Market
+            </p>
+          </div>
+
+          <div className="max-w-3xl mx-auto space-y-4">
+            {faqs.map((faq, index) => (
+              <div 
+                key={index}
+                className="bg-white rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md"
+              >
+                <button
+                  onClick={() => toggleFaq(index)}
+                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                >
+                  <span className="font-semibold text-gray-900 pr-4">{faq.question}</span>
+                  <ChevronDown 
+                    className={`w-5 h-5 text-green-600 flex-shrink-0 transition-transform duration-300 ${
+                      openFaq === index ? 'transform rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                <div
+                  className={`transition-all duration-300 ease-in-out ${
+                    openFaq === index 
+                      ? 'max-h-96 opacity-100' 
+                      : 'max-h-0 opacity-0 overflow-hidden'
+                  }`}
+                >
+                  <div className="px-6 pb-4 text-gray-600 leading-relaxed">
+                    {faq.answer}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
