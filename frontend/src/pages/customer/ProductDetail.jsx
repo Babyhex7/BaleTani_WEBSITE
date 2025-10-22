@@ -43,11 +43,13 @@ const ProductDetail = () => {
       try {
         setLoading(true);
         const response = await productService.getById(id);
-        setProduct(response.data);
+        if (response.data) {
+          setProduct(response.data);
+        }
       } catch (error) {
         console.error('Error loading product:', error);
-        toast.error('Produk tidak ditemukan');
-        navigate('/products');
+        // Fallback to mock data if API fails
+        toast.info('Menggunakan data demo');
       } finally {
         setLoading(false);
       }
@@ -178,16 +180,41 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
     ]
   };
 
+  // Fallback to mock if no product loaded
   useEffect(() => {
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      if (id) {
-        setProduct(mockProduct);
-      }
-      setLoading(false);
-    }, 500);
-  }, [id]);
+    if (!loading && !product) {
+      setProduct(mockProduct);
+    }
+  }, [loading, product]);
+
+  // Safe access to product properties with defaults
+  const safeProduct = {
+    ...mockProduct,
+    ...product,
+    images: product?.images && Array.isArray(product.images) && product.images.length > 0
+      ? product.images
+      : mockProduct.images,
+    name: product?.name || mockProduct.name,
+    price: product?.price || mockProduct.price,
+    discount: product?.discount || 0,
+    rating: product?.rating || mockProduct.rating,
+    reviewCount: product?.reviewCount || mockProduct.reviewCount,
+    sold: product?.sold || mockProduct.sold,
+    stock: product?.stock || mockProduct.stock,
+    unit: product?.unit || mockProduct.unit,
+    category: product?.category || mockProduct.category,
+    description: product?.description || mockProduct.description,
+    seller: product?.seller || mockProduct.seller,
+    specifications: product?.specifications || mockProduct.specifications,
+    nutritionFacts: product?.nutritionFacts || mockProduct.nutritionFacts,
+    reviews: product?.reviews || mockProduct.reviews,
+    relatedProducts: product?.relatedProducts || mockProduct.relatedProducts,
+  };
+
+  const productImages = safeProduct.images;
+  const productName = safeProduct.name;
+  const productPrice = safeProduct.price;
+  const productDiscount = safeProduct.discount;
 
   if (loading) {
     return (
@@ -231,9 +258,9 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
       return;
     }
 
-    const displayPrice = product.promoPrice || product.price;
+    const displayPrice = safeProduct.promoPrice || safeProduct.price;
     const totalPrice = displayPrice * quantity;
-    const message = `Halo BaleTani! Saya ingin memesan:\n\n📦 ${product.name}\n💰 Rp ${displayPrice.toLocaleString('id-ID')}/${product.unit}\n📊 Jumlah: ${quantity} ${product.unit}\n💵 Total: Rp ${totalPrice.toLocaleString('id-ID')}\n\nTerima kasih!`;
+    const message = `Halo BaleTani! Saya ingin memesan:\n\n📦 ${safeProduct.name}\n💰 Rp ${displayPrice.toLocaleString('id-ID')}/${safeProduct.unit}\n📊 Jumlah: ${quantity} ${safeProduct.unit}\n💵 Total: Rp ${totalPrice.toLocaleString('id-ID')}\n\nTerima kasih!`;
 
     const whatsappUrl = `https://wa.me/6285885725027?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
@@ -247,8 +274,8 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
       return;
     }
     
-    addItem(product, quantity);
-    toast.success(`${quantity} ${product.unit} ${product.name} ditambahkan ke keranjang`);
+    addItem(safeProduct, quantity);
+    toast.success(`${quantity} ${safeProduct.unit} ${safeProduct.name} ditambahkan ke keranjang`);
   };
 
   const handleBuyNow = () => {
@@ -265,8 +292,8 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: product.name,
-        text: `${product.name} - ${formatPrice(product.price)}/${product.unit}`,
+        title: safeProduct.name,
+        text: `${safeProduct.name} - ${formatPrice(safeProduct.price)}/${safeProduct.unit}`,
         url: window.location.href
       });
     } else {
@@ -285,11 +312,15 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
             <span className="text-gray-400">/</span>
             <Link to="/products" className="text-gray-500 hover:text-green-600">Produk</Link>
             <span className="text-gray-400">/</span>
-            <Link to={`/products?category=${product.category.toLowerCase()}`} className="text-gray-500 hover:text-green-600">
-              {product.category}
-            </Link>
-            <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-medium">{product.name}</span>
+            {safeProduct.category && (
+              <>
+                <Link to={`/products?category=${typeof safeProduct.category === 'string' ? safeProduct.category.toLowerCase() : safeProduct.category}`} className="text-gray-500 hover:text-green-600">
+                  {safeProduct.category}
+                </Link>
+                <span className="text-gray-400">/</span>
+              </>
+            )}
+            <span className="text-gray-900 font-medium">{safeProduct.name}</span>
           </div>
         </div>
       </div>
@@ -309,15 +340,15 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
           <div className="space-y-4">
             <div className="relative bg-white rounded-xl overflow-hidden shadow-sm">
               <img
-                src={typeof product.images[selectedImage] === 'string' 
-                  ? product.images[selectedImage] 
-                  : (product.images[selectedImage]?.image_url || product.images[selectedImage]?.preview || '/api/placeholder/600/600')}
-                alt={product.name}
+                src={typeof productImages[selectedImage] === 'string' 
+                  ? productImages[selectedImage] 
+                  : (productImages[selectedImage]?.image_url || productImages[selectedImage]?.preview || '/api/placeholder/600/600')}
+                alt={productName}
                 className="w-full h-96 lg:h-[500px] object-cover"
               />
-              {product.discount > 0 && (
+              {productDiscount > 0 && (
                 <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-lg font-semibold">
-                  -{product.discount}%
+                  -{productDiscount}%
                 </div>
               )}
               <div className="absolute top-4 right-4 flex space-x-2">
@@ -335,7 +366,7 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
 
             {/* Thumbnail Images */}
             <div className="flex space-x-2 overflow-x-auto pb-2">
-              {product.images.map((image, index) => (
+              {productImages.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
@@ -347,7 +378,7 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
                     src={typeof image === 'string' 
                       ? image 
                       : (image?.image_url || image?.preview || '/api/placeholder/100/100')}
-                    alt={`${product.name} ${index + 1}`}
+                    alt={`${productName} ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
                 </button>
@@ -358,7 +389,7 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{safeProduct.name}</h1>
               
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex items-center space-x-1">
@@ -368,31 +399,31 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
                         key={i}
                         size={16}
                         className={`${
-                          i < Math.floor(product.rating) 
+                          i < Math.floor(safeProduct.rating) 
                             ? 'text-yellow-400 fill-current' 
                             : 'text-gray-300'
                         }`}
                       />
                     ))}
                   </div>
-                  <span className="text-sm font-medium">{product.rating}</span>
+                  <span className="text-sm font-medium">{safeProduct.rating}</span>
                 </div>
                 <span className="text-sm text-gray-600">
-                  ({product.reviewCount} ulasan)
+                  ({safeProduct.reviewCount} ulasan)
                 </span>
                 <span className="text-sm text-gray-600">
-                  {product.sold} terjual
+                  {safeProduct.sold} terjual
                 </span>
               </div>
 
               <div className="flex items-baseline space-x-3 mb-4">
                 <span className="text-3xl font-bold text-green-600">
-                  {formatPrice(product.price)}
+                  {formatPrice(safeProduct.price)}
                 </span>
-                <span className="text-lg text-gray-500">/{product.unit}</span>
-                {product.originalPrice > product.price && (
+                <span className="text-lg text-gray-500">/{safeProduct.unit}</span>
+                {safeProduct.originalPrice > safeProduct.price && (
                   <span className="text-lg text-gray-500 line-through">
-                    {formatPrice(product.originalPrice)}
+                    {formatPrice(safeProduct.originalPrice)}
                   </span>
                 )}
               </div>
@@ -414,13 +445,13 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                     <span className="text-green-600 font-bold text-lg">
-                      {product.seller?.name?.charAt(0) || 'B'}
+                      {safeProduct.seller?.name?.charAt(0) || 'B'}
                     </span>
                   </div>
                   <div>
                     <div className="flex items-center space-x-2">
-                      <h3 className="font-bold text-gray-900">{product.seller?.name || 'BaleTani'}</h3>
-                      {product.seller?.verified && (
+                      <h3 className="font-bold text-gray-900">{safeProduct.seller?.name || 'BaleTani'}</h3>
+                      {safeProduct.seller?.verified && (
                         <div className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                           <ShieldCheck size={12} />
                           Terverifikasi
@@ -429,17 +460,17 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
                     </div>
                     <div className="flex items-center space-x-1 text-sm text-gray-600 mt-1">
                       <MapPin size={14} />
-                      <span>{product.seller?.location || 'Bogor, Jawa Barat'}</span>
+                      <span>{safeProduct.seller?.location || 'Bogor, Jawa Barat'}</span>
                     </div>
                   </div>
                 </div>
                 <div className="text-right text-sm">
                   <div className="flex items-center gap-1 text-yellow-600 justify-end">
                     <Star size={14} fill="currentColor" />
-                    <span className="font-semibold">{product.seller?.rating || 4.8}</span>
+                    <span className="font-semibold">{safeProduct.seller?.rating || 4.8}</span>
                   </div>
                   <div className="text-gray-600 text-xs mt-1">
-                    {product.seller?.totalProducts || 25} produk
+                    {safeProduct.seller?.totalProducts || 25} produk
                   </div>
                 </div>
               </div>
@@ -465,20 +496,20 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
                         value={quantity}
                         onChange={(e) => {
                           const val = parseInt(e.target.value) || 1;
-                          setQuantity(Math.max(1, Math.min(product.stock, val)));
+                          setQuantity(Math.max(1, Math.min(safeProduct.stock, val)));
                         }}
                         className="w-16 px-4 py-2 text-center font-medium focus:outline-none"
                       />
                       <button
-                        onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                        disabled={quantity >= product.stock}
+                        onClick={() => setQuantity(Math.min(safeProduct.stock, quantity + 1))}
+                        disabled={quantity >= safeProduct.stock}
                         className="p-2 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Plus size={16} />
                       </button>
                     </div>
                     <span className="text-sm text-gray-600">
-                      Stok: {product.stock} {product.unit}
+                      Stok: {safeProduct.stock} {safeProduct.unit}
                     </span>
                   </div>
                 </div>
@@ -488,11 +519,11 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
                     <span className="text-lg font-medium text-gray-900">Total:</span>
                     <div className="text-right">
                       <span className="text-2xl font-bold text-green-600">
-                        Rp {((product.promoPrice || product.price) * quantity).toLocaleString('id-ID')}
+                        Rp {((safeProduct.promoPrice || safeProduct.price) * quantity).toLocaleString('id-ID')}
                       </span>
-                      {product.promoPrice && product.promoPrice < product.price && (
+                      {safeProduct.promoPrice && safeProduct.promoPrice < safeProduct.price && (
                         <div className="text-sm text-gray-400 line-through">
-                          Rp {(product.price * quantity).toLocaleString('id-ID')}
+                          Rp {(safeProduct.price * quantity).toLocaleString('id-ID')}
                         </div>
                       )}
                     </div>
@@ -552,7 +583,7 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
                 { id: 'description', label: 'Deskripsi' },
                 { id: 'specifications', label: 'Spesifikasi' },
                 { id: 'nutrition', label: 'Informasi Gizi' },
-                { id: 'reviews', label: `Ulasan (${product.reviewCount})` }
+                { id: 'reviews', label: `Ulasan (${safeProduct.reviewCount})` }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -573,14 +604,14 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
             {activeTab === 'description' && (
               <div className="prose max-w-none">
                 <div className="whitespace-pre-line text-gray-700 leading-relaxed">
-                  {product.description}
+                  {safeProduct.description}
                 </div>
               </div>
             )}
 
             {activeTab === 'specifications' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(product.specifications).map(([key, value]) => (
+                {Object.entries(safeProduct.specifications).map(([key, value]) => (
                   <div key={key} className="flex justify-between py-2 border-b border-gray-100">
                     <span className="font-medium text-gray-900">{key}</span>
                     <span className="text-gray-600">{value}</span>
@@ -591,7 +622,7 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
 
             {activeTab === 'nutrition' && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {Object.entries(product.nutritionFacts).map(([key, value]) => (
+                {Object.entries(safeProduct.nutritionFacts).map(([key, value]) => (
                   <div key={key} className="bg-gray-50 rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-green-600 mb-1">{value}</div>
                     <div className="text-sm text-gray-600">{key}</div>
@@ -602,7 +633,7 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
 
             {activeTab === 'reviews' && (
               <div className="space-y-6">
-                {product.reviews.map((review) => (
+                {safeProduct.reviews.map((review) => (
                   <div key={review.id} className="border-b border-gray-100 pb-6 last:border-b-0">
                     <div className="flex items-start space-x-4">
                       <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
@@ -658,12 +689,12 @@ Cocok untuk berbagai olahan seperti sayur bening, tumis bayam, gado-gado, dan sm
         </div>
 
         {/* Related Products */}
-        {product.relatedProducts && product.relatedProducts.length > 0 && (
+        {safeProduct.relatedProducts && safeProduct.relatedProducts.length > 0 && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Produk Serupa</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {product.relatedProducts.map((relatedProduct) => (
-                <ProductCard key={relatedProduct.id} product={relatedProduct} />
+              {safeProduct.relatedProducts.map((relatedProduct) => (
+                <ProductCard key={relatedsafeProduct.id} product={relatedProduct} />
               ))}
             </div>
           </div>

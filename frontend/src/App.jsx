@@ -10,6 +10,7 @@ import Products from './pages/customer/Products';
 import ProductsSimple from './pages/customer/ProductsSimple';
 import ProductDetail from './pages/customer/ProductDetail';
 import Cart from './pages/customer/Cart';
+import Checkout from './pages/customer/Checkout';
 import Promo from './pages/customer/Promo';
 import Categories from './pages/customer/Categories';
 import Contact from './pages/customer/Contact';
@@ -88,6 +89,12 @@ function App() {
       <Route path="/cart" element={
         <CustomerLayout>
           <Cart />
+        </CustomerLayout>
+      } />
+
+      <Route path="/checkout" element={
+        <CustomerLayout>
+          <Checkout />
         </CustomerLayout>
       } />
 

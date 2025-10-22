@@ -1,4 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import {
+  UserCircleIcon,
+  ShoppingBagIcon,
+  TicketIcon,
+  Cog6ToothIcon,
+  QuestionMarkCircleIcon,
+  CameraIcon,
+  CheckCircleIcon,
+  CalendarIcon,
+  TruckIcon,
+  ShoppingCartIcon,
+  EnvelopeIcon,
+  PhoneIcon,
+  MapPinIcon,
+  BellIcon,
+  DevicePhoneMobileIcon,
+  ClockIcon
+} from '@heroicons/react/24/outline';
+import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 
 const Profile = () => {
   const [activeSection, setActiveSection] = useState('main');
@@ -73,34 +92,6 @@ const Profile = () => {
     }
   ];
 
-  // Mock favorites
-  const favoriteProducts = [
-    {
-      id: 1,
-      name: 'Bayam Organik',
-      price: 8000,
-      image: '/api/placeholder/120/120',
-      rating: 4.8,
-      seller: 'Pak Budi Farm'
-    },
-    {
-      id: 2,
-      name: 'Salmon Norway',
-      price: 180000,
-      image: '/api/placeholder/120/120', 
-      rating: 4.9,
-      seller: 'Ocean Fresh'
-    },
-    {
-      id: 3,
-      name: 'Apel Fuji',
-      price: 25000,
-      image: '/api/placeholder/120/120',
-      rating: 4.7,
-      seller: 'Fresh Fruit Co'
-    }
-  ];
-
   // Mock order history with tracking
   const orderHistory = [
     {
@@ -115,7 +106,6 @@ const Profile = () => {
       trackingNumber: 'BT24100801',
       deliveryDate: '2024-10-09',
       courier: 'GoSend',
-      rating: 5,
       canReview: false,
       trackingSteps: [
         { status: 'ordered', time: '2024-10-08 09:00', desc: 'Pesanan dikonfirmasi' },
@@ -136,7 +126,6 @@ const Profile = () => {
       trackingNumber: 'BT24100501',
       deliveryDate: '2024-10-06',
       courier: 'AnterAja',
-      rating: 4,
       canReview: false
     },
     {
@@ -150,7 +139,6 @@ const Profile = () => {
       trackingNumber: 'BT24101001',
       estimatedDelivery: '2024-10-12',
       courier: 'JNT Express',
-      rating: null,
       canReview: false,
       trackingSteps: [
         { status: 'ordered', time: '2024-10-10 10:30', desc: 'Pesanan dikonfirmasi' },
@@ -169,7 +157,6 @@ const Profile = () => {
       trackingNumber: 'BT24100901',
       estimatedDelivery: '2024-10-11',
       courier: 'Kurir Toko',
-      rating: null,
       canReview: false,
       trackingSteps: [
         { status: 'ordered', time: '2024-10-09 14:15', desc: 'Pesanan diterima' },
@@ -209,19 +196,16 @@ const Profile = () => {
   // User stats data
   const userStats = {
     totalOrders: 24,
-    totalSpent: 1250000,
-    favoriteProduct: 15,
-    loyaltyPoints: 2450
+    totalSpent: 1250000
   };
 
   // Help center topics
   const helpTopics = [
-    { icon: '📦', title: 'Cara Berbelanja', desc: 'Panduan lengkap berbelanja di BaleTani' },
-    { icon: '🚚', title: 'Pengiriman & Ongkir', desc: 'Info pengiriman dan biaya ongkos kirim' },
-    { icon: '💳', title: 'Pembayaran', desc: 'Metode pembayaran yang tersedia' },
-    { icon: '↩️', title: 'Pengembalian', desc: 'Kebijakan return dan refund' },
-    { icon: '❓', title: 'FAQ', desc: 'Pertanyaan yang sering diajukan' },
-    { icon: '📞', title: 'Hubungi Kami', desc: 'Customer service dan kontak' }
+    { Icon: ShoppingBagIcon, title: 'Cara Berbelanja', desc: 'Panduan lengkap berbelanja di BaleTani' },
+    { Icon: TruckIcon, title: 'Pengiriman & Ongkir', desc: 'Info pengiriman dan biaya ongkos kirim' },
+    { Icon: TicketIcon, title: 'Pembayaran', desc: 'Metode pembayaran yang tersedia' },
+    { Icon: QuestionMarkCircleIcon, title: 'FAQ', desc: 'Pertanyaan yang sering diajukan' },
+    { Icon: PhoneIcon, title: 'Hubungi Kami', desc: 'Customer service dan kontak' }
   ];
 
   const handleInputChange = (e) => {
@@ -298,18 +282,13 @@ const Profile = () => {
     }
   };
 
-  const renderStars = (rating) => {
-    return '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
-  };
-
   // Main profile menu items
   const profileMenuItems = [
-    { id: 'orders', icon: '📦', title: 'Pesanan Saya', subtitle: `${orderHistory.length} pesanan`, hasNotif: true },
-    { id: 'cart', icon: '🛒', title: 'Keranjang', subtitle: `${cartItems.length} item`, hasNotif: false },
-    { id: 'favorites', icon: '❤️', title: 'Favorit Saya', subtitle: `${favoriteProducts.length} produk`, hasNotif: false },
-    { id: 'vouchers', icon: '🎫', title: 'Voucher Saya', subtitle: `${userVouchers.filter(v => v.status === 'active').length} aktif`, hasNotif: false },
-    { id: 'help', icon: '🆘', title: 'Pusat Bantuan', subtitle: 'FAQ & Customer Service', hasNotif: false },
-    { id: 'settings', icon: '⚙️', title: 'Pengaturan', subtitle: 'Notifikasi & Privasi', hasNotif: false }
+    { id: 'orders', Icon: ShoppingBagIcon, title: 'Pesanan Saya', subtitle: `${orderHistory.length} pesanan`, hasNotif: true },
+    { id: 'cart', Icon: ShoppingCartIcon, title: 'Keranjang', subtitle: `${cartItems.length} item`, hasNotif: false },
+    { id: 'vouchers', Icon: TicketIcon, title: 'Voucher Saya', subtitle: `${userVouchers.filter(v => v.status === 'active').length} aktif`, hasNotif: false },
+    { id: 'help', Icon: QuestionMarkCircleIcon, title: 'Pusat Bantuan', subtitle: 'FAQ & Customer Service', hasNotif: false },
+    { id: 'settings', Icon: Cog6ToothIcon, title: 'Pengaturan', subtitle: 'Notifikasi & Privasi', hasNotif: false }
   ];
 
   const renderContent = () => {
@@ -328,17 +307,18 @@ const Profile = () => {
                 <button
                   onClick={handlePhotoUpload}
                   disabled={isUploadingPhoto}
-                  className="absolute -bottom-1 -right-1 bg-green-500 text-white p-2 rounded-full text-xs hover:bg-green-600 transition-colors"
+                  className="absolute -bottom-1 -right-1 bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors disabled:opacity-50"
                 >
-                  {isUploadingPhoto ? '⏳' : '📷'}
+                  <CameraIcon className="w-4 h-4" />
                 </button>
               </div>
               <div className="flex-1">
                 <div className="flex items-center space-x-2">
                   <h2 className="text-2xl font-bold text-gray-800">{userProfile.name}</h2>
                   {userProfile.isVerified && (
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                      ✓ Terverifikasi
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                      <CheckBadgeIcon className="w-4 h-4" />
+                      Terverifikasi
                     </span>
                   )}
                 </div>
@@ -353,7 +333,7 @@ const Profile = () => {
         {saveStatus === 'success' && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <div className="flex items-center space-x-2">
-              <span className="text-green-500">✅</span>
+              <CheckCircleIcon className="w-5 h-5 text-green-500" />
               <span className="text-green-700 font-medium">
                 Profile berhasil diperbarui!
               </span>
@@ -486,7 +466,7 @@ const Profile = () => {
         </div>
 
         {/* User Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-xl shadow-lg p-6 text-center">
             <div className="text-3xl font-bold text-green-600 mb-2">{userStats.totalOrders}</div>
             <div className="text-sm text-gray-600">Total Pesanan</div>
@@ -496,14 +476,6 @@ const Profile = () => {
               Rp {userStats.totalSpent.toLocaleString('id-ID')}
             </div>
             <div className="text-sm text-gray-600">Total Belanja</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-lg p-6 text-center">
-            <div className="text-lg font-bold text-purple-600 mb-2">{userStats.favoriteProduct}</div>
-            <div className="text-sm text-gray-600">Produk Favorit</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-lg p-6 text-center">
-            <div className="text-3xl font-bold text-yellow-600 mb-2">{userStats.loyaltyPoints}</div>
-            <div className="text-sm text-gray-600">Loyalty Points</div>
           </div>
         </div>
       </div>
@@ -525,7 +497,10 @@ const Profile = () => {
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h4 className="text-lg font-bold text-gray-800 mb-1">Order #{order.id}</h4>
-                <p className="text-sm text-gray-500">📅 {new Date(order.date).toLocaleDateString('id-ID')}</p>
+                <div className="flex items-center gap-1 text-sm text-gray-500">
+                  <CalendarIcon className="w-4 h-4" />
+                  {new Date(order.date).toLocaleDateString('id-ID')}
+                </div>
               </div>
               <div className="text-right">
                 <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(order.status)}`}>
@@ -548,29 +523,15 @@ const Profile = () => {
                 Rp {order.total.toLocaleString('id-ID')}
               </div>
               
-              <div className="flex items-center space-x-4">
-                {order.rating && (
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600">Rating:</span>
-                    <span className="text-yellow-500">{renderStars(order.rating)}</span>
-                  </div>
-                )}
-                
-                <div className="space-x-2">
-                  <button className="bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition-colors">
-                    Detail
+              <div className="space-x-2">
+                <button className="bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition-colors">
+                  Detail
+                </button>
+                {order.status === 'delivered' && (
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition-colors">
+                    Pesan Lagi
                   </button>
-                  {order.status === 'delivered' && !order.rating && (
-                    <button className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition-colors">
-                      Beri Rating
-                    </button>
-                  )}
-                  {order.status === 'delivered' && (
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition-colors">
-                      Pesan Lagi
-                    </button>
-                  )}
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -672,14 +633,14 @@ const Profile = () => {
           <h4 className="text-xl font-bold text-gray-800 mb-6">Kategori Favorit</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { id: 'sayuran', name: 'Sayuran', icon: '🥬' },
-              { id: 'buah-buahan', name: 'Buah-buahan', icon: '🍎' },
-              { id: 'daging', name: 'Daging', icon: '🥩' },
-              { id: 'seafood', name: 'Seafood', icon: '🐟' },
-              { id: 'dairy', name: 'Dairy', icon: '🥛' },
-              { id: 'rempah', name: 'Rempah', icon: '🌶️' },
-              { id: 'beras', name: 'Beras', icon: '🌾' },
-              { id: 'frozen', name: 'Frozen', icon: '🧊' }
+              { id: 'sayuran', name: 'Sayuran' },
+              { id: 'buah-buahan', name: 'Buah-buahan' },
+              { id: 'daging', name: 'Daging' },
+              { id: 'seafood', name: 'Seafood' },
+              { id: 'dairy', name: 'Dairy' },
+              { id: 'rempah', name: 'Rempah' },
+              { id: 'beras', name: 'Beras' },
+              { id: 'frozen', name: 'Frozen' }
             ].map(category => (
               <div
                 key={category.id}
@@ -691,12 +652,14 @@ const Profile = () => {
                 }}
                 className={`cursor-pointer p-4 rounded-xl border-2 transition-all duration-300 text-center ${
                   preferences.favoriteCategories.includes(category.id)
-                    ? 'border-green-500 bg-green-50 text-green-700'
+                    ? 'border-green-500 bg-green-50 text-green-700 shadow-md'
                     : 'border-gray-200 hover:border-green-300 hover:bg-green-50'
                 }`}
               >
-                <div className="text-2xl mb-2">{category.icon}</div>
                 <div className="text-sm font-medium">{category.name}</div>
+                {preferences.favoriteCategories.includes(category.id) && (
+                  <CheckCircleIcon className="w-5 h-5 text-green-600 mx-auto mt-2" />
+                )}
               </div>
             ))}
           </div>
@@ -723,33 +686,36 @@ const Profile = () => {
         <div className="flex justify-center space-x-2 mb-12">
           <button
             onClick={() => setActiveSection('main')}
-            className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
               activeSection === 'main'
-                ? 'bg-green-500 text-white shadow-lg'
+                ? 'bg-green-600 text-white shadow-lg'
                 : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-600'
             }`}
           >
-            👤 Profile
+            <UserCircleIcon className="w-5 h-5" />
+            Profile
           </button>
           <button
             onClick={() => setActiveSection('orders')}
-            className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
               activeSection === 'orders'
-                ? 'bg-blue-500 text-white shadow-lg'
-                : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                ? 'bg-green-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-600'
             }`}
           >
-            📦 Pesanan
+            <ShoppingBagIcon className="w-5 h-5" />
+            Pesanan
           </button>
           <button
             onClick={() => setActiveSection('preferences')}
-            className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
               activeSection === 'preferences'
-                ? 'bg-purple-500 text-white shadow-lg'
-                : 'bg-white text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                ? 'bg-green-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-600'
             }`}
           >
-            ⚙️ Preferensi
+            <Cog6ToothIcon className="w-5 h-5" />
+            Preferensi
           </button>
         </div>
 

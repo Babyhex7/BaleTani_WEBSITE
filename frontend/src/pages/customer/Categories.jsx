@@ -4,7 +4,11 @@ import {
   ShoppingBagIcon, 
   SparklesIcon,
   TruckIcon,
-  FireIcon 
+  FireIcon,
+  MagnifyingGlassIcon,
+  XMarkIcon,
+  FunnelIcon,
+  Squares2X2Icon
 } from '@heroicons/react/24/outline';
 import ProductCard from '../../components/ui/ProductCard';
 import { toast } from 'react-hot-toast';
@@ -14,6 +18,8 @@ const Categories = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('default'); // default, price-low, price-high, name
 
   // Categories data  
   const categories = [
@@ -301,14 +307,45 @@ const Categories = () => {
       : products.filter(p => p.category === cat.id).length
   }));
 
-  // Filter products by category
+  // Filter products by category, search, and sort
   useEffect(() => {
-    if (selectedCategory === 'all') {
-      setFilteredProducts(products);
-    } else {
-      setFilteredProducts(products.filter(product => product.category === selectedCategory));
+    let filtered = products;
+    
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(product => product.category === selectedCategory);
     }
-  }, [selectedCategory, products]);
+    
+    // Filter by search term
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.seller?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.location?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // Sort products
+    switch (sortBy) {
+      case 'price-low':
+        filtered = [...filtered].sort((a, b) => a.price - b.price);
+        break;
+      case 'price-high':
+        filtered = [...filtered].sort((a, b) => b.price - a.price);
+        break;
+      case 'name':
+        filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'rating':
+        filtered = [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        break;
+      default:
+        // Keep original order
+        break;
+    }
+    
+    setFilteredProducts(filtered);
+  }, [selectedCategory, products, searchTerm, sortBy]);
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
@@ -353,26 +390,72 @@ const Categories = () => {
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Jelajahi berbagai kategori produk segar pilihan kami
           </p>
-          
-          {/* Stats */}
-          <div className="flex justify-center gap-8 mt-8">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600">{updatedCategories.length - 1}</div>
-              <div className="text-sm text-gray-600">Kategori</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600">{products.length}</div>
-              <div className="text-sm text-gray-600">Total Produk</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600">100%</div>
-              <div className="text-sm text-gray-600">Fresh Quality</div>
-            </div>
-          </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-12">
+        {/* Search and Filter Section */}
+        <div className="mb-8 space-y-4">
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Cari produk, penjual, atau lokasi..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="block w-full pl-12 pr-12 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white shadow-sm text-base"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Filter and Sort Bar */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200">
+            <div className="flex items-center gap-2 text-gray-700">
+              <Squares2X2Icon className="w-5 h-5 text-green-600" />
+              <span className="font-medium">
+                {filteredProducts.length} dari {products.length} produk
+              </span>
+              {selectedCategory !== 'all' && (
+                <span className="ml-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                  {updatedCategories.find(c => c.id === selectedCategory)?.name}
+                </span>
+              )}
+              {searchTerm && (
+                <span className="ml-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                  Pencarian: "{searchTerm}"
+                </span>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <FunnelIcon className="w-5 h-5 text-gray-500" />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-sm font-medium"
+              >
+                <option value="default">Urutkan: Default</option>
+                <option value="name">Nama (A-Z)</option>
+                <option value="price-low">Harga Terendah</option>
+                <option value="price-high">Harga Tertinggi</option>
+                <option value="rating">Rating Tertinggi</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         {/* Category Grid */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Pilih Kategori</h2>
@@ -407,12 +490,23 @@ const Categories = () => {
         </div>
 
         {/* Products Section */}
-        {selectedCategory !== 'all' && (
+        {(selectedCategory !== 'all' || searchTerm || sortBy !== 'default') && filteredProducts.length > 0 && (
           <div className="mb-8">
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-              <p className="text-green-800 font-medium">
-                Menampilkan produk dari kategori: <span className="font-bold">{updatedCategories.find(c => c.id === selectedCategory)?.name}</span>
-              </p>
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+              <ShoppingBagIcon className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-green-800 font-medium">
+                  {selectedCategory !== 'all' && (
+                    <span>Kategori: <span className="font-bold">{updatedCategories.find(c => c.id === selectedCategory)?.name}</span></span>
+                  )}
+                  {searchTerm && (
+                    <span className="ml-2">• Pencarian: <span className="font-bold">"{searchTerm}"</span></span>
+                  )}
+                  {sortBy !== 'default' && (
+                    <span className="ml-2">• Diurutkan berdasarkan: <span className="font-bold capitalize">{sortBy.replace('-', ' ')}</span></span>
+                  )}
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -429,10 +523,35 @@ const Categories = () => {
           </div>
 
           {filteredProducts.length === 0 ? (
-            <div className="text-center py-16">
-              <ShoppingBagIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum ada produk</h3>
-              <p className="text-gray-600">Produk untuk kategori ini akan segera hadir</p>
+            <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                {searchTerm ? (
+                  <MagnifyingGlassIcon className="w-12 h-12 text-gray-400" />
+                ) : (
+                  <ShoppingBagIcon className="w-12 h-12 text-gray-400" />
+                )}
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                {searchTerm ? 'Produk tidak ditemukan' : 'Belum ada produk'}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {searchTerm 
+                  ? `Tidak ada produk yang cocok dengan "${searchTerm}"`
+                  : 'Produk untuk kategori ini akan segera hadir'
+                }
+              </p>
+              {(searchTerm || selectedCategory !== 'all' || sortBy !== 'default') && (
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSelectedCategory('all');
+                    setSortBy('default');
+                  }}
+                  className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
+                >
+                  Reset Filter
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -41,16 +41,7 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
-    // Generate WhatsApp message
-    const message = `Halo BaleTani! Saya ingin memesan:\n\n${items
-      .map((item) => {
-        const price = item.promoPrice || item.price;
-        return `- ${item.name} x${item.quantity} (Rp ${price.toLocaleString('id-ID')}/${item.unit})`;
-      })
-      .join('\n')}\n\nTotal: Rp ${getTotal().toLocaleString('id-ID')}\n\nTerima kasih!`;
-    
-    const whatsappUrl = `https://wa.me/6285885725027?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    navigate('/checkout');
   };
 
   const handleClearCart = () => {
@@ -281,11 +272,11 @@ const Cart = () => {
                 className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors mb-3 flex items-center justify-center gap-2"
               >
                 <ShoppingCart size={20} />
-                Checkout via WhatsApp
+                Lanjut ke Checkout
               </button>
 
               <p className="text-xs text-gray-500 text-center">
-                Pesanan akan dikirim via WhatsApp untuk konfirmasi
+                Atur metode pengiriman dan pembayaran
               </p>
 
               {/* Benefits */}
