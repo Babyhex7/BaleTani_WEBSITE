@@ -21,16 +21,21 @@ const Order = sequelize.define(
       type: DataTypes.STRING(100),
       allowNull: true,
     },
-    status: {
+    transaction_type: {
+      type: DataTypes.ENUM("online", "offline"),
+      defaultValue: "online",
+      allowNull: false,
+    },
+    order_status: {
       type: DataTypes.ENUM(
-        "pending",
+        "checkout",
+        "paid",
         "processing",
-        "shipped",
-        "delivered",
-        "cancelled",
-        "paid"
+        "out_for_delivery",
+        "completed",
+        "cancelled"
       ),
-      defaultValue: "pending",
+      defaultValue: "checkout",
       allowNull: false,
     },
     total_price: {
