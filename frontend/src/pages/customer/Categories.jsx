@@ -1,4 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  ShoppingBagIcon, 
+  SparklesIcon,
+  TruckIcon,
+  FireIcon 
+} from '@heroicons/react/24/outline';
+import ProductCard from '../../components/ui/ProductCard';
+import { toast } from 'react-hot-toast';
 
 const Categories = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -6,70 +15,46 @@ const Categories = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Mock categories with detailed info
+  // Categories data  
   const categories = [
     {
       id: 'all',
       name: 'Semua Kategori',
-      icon: '🏪',
       description: 'Lihat semua produk segar kami',
+      image: 'https://placehold.co/250x200',
       color: 'from-green-400 to-green-600',
       products: 0
     },
     {
       id: 'sayuran',
       name: 'Sayuran Segar',
-      icon: '🥬',
       description: 'Sayuran organik pilihan dari petani lokal',
+      image: 'https://placehold.co/250x200',
       color: 'from-green-500 to-emerald-600',
       products: 0
     },
     {
       id: 'buah-buahan',
       name: 'Buah-buahan',
-      icon: '🍎',
       description: 'Buah segar kaya vitamin dan antioksidan',
+      image: 'https://placehold.co/250x200',
       color: 'from-red-400 to-pink-600',
       products: 0
     },
     {
       id: 'daging',
       name: 'Daging & Unggas',
-      icon: '🥩',
       description: 'Daging segar berkualitas premium',
+      image: 'https://placehold.co/250x200',
       color: 'from-red-500 to-red-700',
       products: 0
     },
     {
       id: 'seafood',
       name: 'Seafood Fresh',
-      icon: '🐟',
       description: 'Ikan dan seafood segar langsung dari laut',
+      image: 'https://placehold.co/250x200',
       color: 'from-blue-400 to-blue-600',
-      products: 0
-    },
-    {
-      id: 'dairy',
-      name: 'Dairy & Susu',
-      icon: '🥛',
-      description: 'Produk susu dan dairy segar',
-      color: 'from-yellow-300 to-yellow-500',
-      products: 0
-    },
-    {
-      id: 'rempah',
-      name: 'Rempah & Bumbu',
-      icon: '🌶️',
-      description: 'Rempah alami untuk cita rasa otentik',
-      color: 'from-orange-400 to-red-500',
-      products: 0
-    },
-    {
-      id: 'beras',
-      name: 'Beras & Sereal',
-      icon: '🌾',
-      description: 'Beras premium dan aneka sereal sehat',
-      color: 'from-amber-400 to-yellow-600',
       products: 0
     }
   ];
@@ -329,41 +314,48 @@ const Categories = () => {
     setSelectedCategory(categoryId);
   };
 
+  // Format price
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(price);
+  };
+
+  // WhatsApp handler
+  const handleWhatsAppOrder = (productName, price, unit) => {
+    const message = `Halo, saya tertarik dengan produk:\n\n${productName}\nHarga: ${formatPrice(price)}/${unit}\n\nMohon informasi lebih lanjut.`;
+    const phoneNumber = '6282299374545';
+    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappURL, '_blank');
+  };
+
+  // Add to cart handler
+  const handleAddToCart = (product) => {
+    toast.success(`${product.name} ditambahkan ke keranjang`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative mb-6">
-            <div className="animate-spin rounded-full h-32 w-32 border-4 border-gray-200 mx-auto"></div>
-            <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-green-500 absolute top-0 left-1/2 transform -translate-x-1/2"></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl">
-              🏪
-            </div>
-          </div>
-          <div className="space-y-2">
-            <p className="text-xl font-semibold text-gray-800">Memuat Kategori...</p>
-            <p className="text-gray-600">Menyiapkan kategori produk untuk Anda</p>
-          </div>
-        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-800 mb-4">
-            🏪 Kategori Produk
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-            Jelajahi berbagai kategori produk segar pilihan kami. 
-            Dari sayuran organik hingga seafood premium, semua ada di sini!
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="container mx-auto px-4 py-12 text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Kategori Produk</h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Jelajahi berbagai kategori produk segar pilihan kami
           </p>
           
           {/* Stats */}
-          <div className="flex justify-center space-x-8 bg-white rounded-2xl p-6 shadow-lg max-w-2xl mx-auto">
+          <div className="flex justify-center gap-8 mt-8">
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600">{updatedCategories.length - 1}</div>
               <div className="text-sm text-gray-600">Kategori</div>
@@ -378,176 +370,100 @@ const Categories = () => {
             </div>
           </div>
         </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-12">
         {/* Category Grid */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Pilih Kategori</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {updatedCategories.map(category => (
-              <div
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Pilih Kategori</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {updatedCategories.map((category) => (
+              <Link
                 key={category.id}
+                to={category.id === 'all' ? '/products' : `/products?category=${category.id}`}
                 onClick={() => handleCategoryChange(category.id)}
-                className={`cursor-pointer transform transition-all duration-300 hover:scale-105 ${
-                  selectedCategory === category.id ? 'scale-105' : ''
-                }`}
+                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-200"
               >
-                <div className={`bg-gradient-to-br ${category.color} rounded-2xl p-6 text-white shadow-xl hover:shadow-2xl ${
-                  selectedCategory === category.id ? 'ring-4 ring-white ring-opacity-60' : ''
-                }`}>
-                  <div className="text-center">
-                    <div className="text-5xl mb-4">{category.icon}</div>
-                    <h3 className="text-xl font-bold mb-2">{category.name}</h3>
-                    <p className="text-sm opacity-90 mb-4 leading-relaxed">{category.description}</p>
-                    <div className="bg-white bg-opacity-20 rounded-full py-2 px-4">
-                      <span className="text-sm font-semibold">
-                        {category.products} Produk
-                      </span>
-                    </div>
+                <div className="relative overflow-hidden">
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
+                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+                    <span className="text-xs font-semibold text-gray-800">{category.products} produk</span>
                   </div>
                 </div>
-              </div>
+                <div className="p-5">
+                  <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-green-600 transition-colors duration-300">
+                    {category.name}
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{category.description}</p>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
 
-        {/* Selected Category Info */}
+        {/* Products Section */}
         {selectedCategory !== 'all' && (
           <div className="mb-8">
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="text-4xl">
-                    {updatedCategories.find(c => c.id === selectedCategory)?.icon}
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-800">
-                      {updatedCategories.find(c => c.id === selectedCategory)?.name}
-                    </h3>
-                    <p className="text-gray-600">
-                      {updatedCategories.find(c => c.id === selectedCategory)?.description}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-green-600">
-                    {filteredProducts.length}
-                  </div>
-                  <div className="text-sm text-gray-500">Produk tersedia</div>
-                </div>
-              </div>
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+              <p className="text-green-800 font-medium">
+                Menampilkan produk dari kategori: <span className="font-bold">{updatedCategories.find(c => c.id === selectedCategory)?.name}</span>
+              </p>
             </div>
           </div>
         )}
 
         {/* Products Grid */}
-        <div className="mb-8">
+        <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
-              {selectedCategory === 'all' ? 'Semua Produk' : 'Produk Terpilih'}
+            <h2 className="text-2xl font-bold text-gray-900">
+              {selectedCategory === 'all' ? 'Semua Produk' : updatedCategories.find(c => c.id === selectedCategory)?.name}
             </h2>
-            <div className="text-sm text-gray-500">
-              Menampilkan {filteredProducts.length} produk
-            </div>
+            <p className="text-gray-600">
+              {filteredProducts.length} produk ditemukan
+            </p>
           </div>
 
           {filteredProducts.length === 0 ? (
             <div className="text-center py-16">
-              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-4xl">📦</span>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Belum ada produk</h3>
-              <p className="text-gray-600 mb-6">
-                Kategori ini sedang dalam pengembangan. Coba kategori lain!
-              </p>
-              <button
-                onClick={() => handleCategoryChange('all')}
-                className="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
-              >
-                Lihat Semua Produk
-              </button>
+              <ShoppingBagIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum ada produk</h3>
+              <p className="text-gray-600">Produk untuk kategori ini akan segera hadir</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map(product => (
-                <div key={product.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group">
-                  <div className="relative">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute top-4 left-4">
-                      <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        {updatedCategories.find(c => c.id === product.category)?.icon}
-                      </span>
-                    </div>
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">
-                        {product.freshness}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-green-600 transition-colors">
-                      {product.name}
-                    </h3>
-                    
-                    {/* Price */}
-                    <div className="flex items-baseline space-x-1 mb-3">
-                      <span className="text-2xl font-bold text-green-600">
-                        Rp {product.price.toLocaleString('id-ID')}
-                      </span>
-                      <span className="text-sm text-gray-500">/{product.unit}</span>
-                    </div>
-
-                    {/* Rating & Reviews */}
-                    <div className="flex items-center space-x-2 mb-3">
-                      <div className="flex items-center space-x-1 bg-yellow-50 px-2 py-1 rounded-lg">
-                        <span className="text-yellow-500 text-sm">⭐</span>
-                        <span className="text-sm font-medium text-yellow-700">{product.rating}</span>
-                        <span className="text-xs text-gray-500">({product.reviews})</span>
-                      </div>
-                    </div>
-
-                    {/* Seller Info */}
-                    <div className="flex items-center justify-between text-sm text-gray-600 mb-4 py-2 px-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <span>👨‍🌾</span>
-                        <span className="font-medium">{product.seller}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <span>📍</span>
-                        <span>{product.location}</span>
-                      </div>
-                    </div>
-
-                    {/* Action Button */}
-                    <button className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-                      <span className="flex items-center justify-center space-x-2">
-                        <span>🛒</span>
-                        <span>Tambah Keranjang</span>
-                      </span>
-                    </button>
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onWhatsAppOrder={handleWhatsAppOrder}
+                  onAddToCart={handleAddToCart}
+                  formatPrice={formatPrice}
+                />
               ))}
             </div>
           )}
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl p-8 text-white text-center">
-          <h3 className="text-3xl font-bold mb-4">🌟 Tidak Menemukan Yang Anda Cari?</h3>
-          <p className="text-lg mb-6">
+        <div className="mt-16 bg-gradient-to-r from-green-600 to-blue-600 rounded-2xl p-8 text-white text-center">
+          <SparklesIcon className="w-12 h-12 mx-auto mb-4" />
+          <h3 className="text-3xl font-bold mb-4">Tidak Menemukan Yang Anda Cari?</h3>
+          <p className="text-lg mb-6 opacity-90">
             Hubungi kami untuk request produk khusus atau konsultasi kebutuhan fresh market Anda
           </p>
-          <div className="flex justify-center space-x-4">
-            <button className="bg-white text-green-600 font-bold px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors">
-              📞 Hubungi Kami
+          <div className="flex justify-center gap-4">
+            <button className="bg-white text-green-600 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-2">
+              <TruckIcon className="w-5 h-5" />
+              Hubungi Kami
             </button>
-            <button className="bg-yellow-400 text-gray-800 font-bold px-6 py-3 rounded-lg hover:bg-yellow-500 transition-colors">
-              💬 Chat WhatsApp
+            <button className="bg-yellow-400 text-gray-900 font-semibold px-6 py-3 rounded-lg hover:bg-yellow-500 transition-colors flex items-center gap-2">
+              <FireIcon className="w-5 h-5" />
+              Chat WhatsApp
             </button>
           </div>
         </div>
