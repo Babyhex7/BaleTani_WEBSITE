@@ -305,7 +305,9 @@ Terima kasih! 🙏`;
           <div className="space-y-4">
             <div className="relative bg-white rounded-xl overflow-hidden shadow-sm">
               <img
-                src={product.images[selectedImage]}
+                src={typeof product.images[selectedImage] === 'string' 
+                  ? product.images[selectedImage] 
+                  : (product.images[selectedImage]?.image_url || product.images[selectedImage]?.preview || '/api/placeholder/600/600')}
                 alt={product.name}
                 className="w-full h-96 lg:h-[500px] object-cover"
               />
@@ -328,17 +330,19 @@ Terima kasih! 🙏`;
             </div>
 
             {/* Thumbnail Images */}
-            <div className="flex space-x-2 overflow-x-auto">
+            <div className="flex space-x-2 overflow-x-auto pb-2">
               {product.images.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                    selectedImage === index ? 'border-green-600' : 'border-gray-200'
+                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                    selectedImage === index ? 'border-green-600 shadow-lg' : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   <img
-                    src={image}
+                    src={typeof image === 'string' 
+                      ? image 
+                      : (image?.image_url || image?.preview || '/api/placeholder/100/100')}
                     alt={`${product.name} ${index + 1}`}
                     className="w-full h-full object-cover"
                   />

@@ -20,6 +20,7 @@ import Table from '../../components/ui_admin/Table';
 import ModalAdmin, { ConfirmModal } from '../../components/ui_admin/ModalAdmin';
 import { Badge, LoadingSpinner, EmptyState, Alert } from '../../components/ui_admin/CommonComponents';
 import Pagination from '../../components/ui_admin/Pagination';
+import ImageUpload from '../../components/ui_admin/ImageUpload';
 import { 
   mockProducts, 
   mockCategories, 
@@ -144,7 +145,8 @@ const ProductManagement = () => {
       unit: product.unit,
       shelf_life_days: product.shelf_life_days,
       total_stock: product.total_stock,
-      is_active: product.is_active
+      is_active: product.is_active,
+      images: product.images || []
     });
     setShowEditModal(true);
   };
@@ -515,6 +517,19 @@ const ProductManagement = () => {
           size="lg"
         >
           <form onSubmit={handleSubmitAdd} className="space-y-4">
+            {/* Product Images Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Product Images <span className="text-red-500">*</span>
+              </label>
+              <ImageUpload
+                images={formData.images}
+                onChange={(newImages) => setFormData({ ...formData, images: newImages })}
+                maxImages={5}
+                maxSizeMB={5}
+              />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -677,6 +692,19 @@ const ProductManagement = () => {
           size="lg"
         >
           <form onSubmit={handleSubmitEdit} className="space-y-4">
+            {/* Product Images Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Product Images <span className="text-red-500">*</span>
+              </label>
+              <ImageUpload
+                images={formData.images}
+                onChange={(newImages) => setFormData({ ...formData, images: newImages })}
+                maxImages={5}
+                maxSizeMB={5}
+              />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

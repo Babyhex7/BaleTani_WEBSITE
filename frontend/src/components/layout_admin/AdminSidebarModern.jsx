@@ -59,7 +59,6 @@ const AdminSidebarModern = ({ isOpen, setIsOpen }) => {
       permission: 'products',
       submenu: [
         { name: 'Product List', path: '/admin/products', icon: ListBulletIcon },
-        { name: 'Add Product', path: '/admin/products/new', icon: PlusCircleIcon },
         { name: 'Stock Overview', path: '/admin/inventory', icon: ClipboardDocumentListIcon },
         { name: 'Discount Management', path: '/admin/discounts', icon: TagIcon },
         { name: 'Category Management', path: '/admin/categories', icon: FolderIcon },
@@ -71,7 +70,6 @@ const AdminSidebarModern = ({ isOpen, setIsOpen }) => {
       permission: 'procurement',
       submenu: [
         { name: 'Procurement List', path: '/admin/procurement', icon: ListBulletIcon },
-        { name: 'Create Procurement', path: '/admin/procurement/new', icon: PlusCircleIcon },
         { name: 'Approval Status', path: '/admin/procurement/approvals', icon: CheckCircleIcon },
       ],
     },
