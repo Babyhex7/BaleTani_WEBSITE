@@ -39,13 +39,13 @@ const getAllProducts = async (req, res) => {
       {
         model: Category,
         as: "category",
-        attributes: ["id", "name", "slug"],
+        attributes: ["id", "category_name", "description"],
       },
     ];
 
     // Filter berdasarkan kategori
     if (category) {
-      includeConditions[0].where = { slug: category };
+      includeConditions[0].where = { id: category };
     }
 
     // Filter berdasarkan pencarian
@@ -134,7 +134,7 @@ const getProductById = async (req, res) => {
         {
           model: Category,
           as: "category",
-          attributes: ["id", "name", "slug", "description"],
+          attributes: ["id", "category_name", "description"],
         },
       ],
     });
@@ -171,20 +171,21 @@ const getFeaturedProducts = async (req, res) => {
 
     const products = await Product.findAll({
       where: {
-        stock: { [Op.gt]: 10 }, // stok lebih dari 10
-        isActive: true,
+        total_stock: { [Op.gt]: 10 }, // stok lebih dari 10
+        is_active: true,
+        deleted_at: null,
       },
       include: [
         {
           model: Category,
           as: "category",
-          attributes: ["id", "name", "slug"],
+          attributes: ["id", "category_name", "description"],
         },
       ],
       limit: parseInt(limit),
       order: [
-        ["stock", "DESC"],
-        ["price", "ASC"],
+        ["total_stock", "DESC"],
+        ["selling_price", "ASC"],
       ],
     });
 
@@ -209,13 +210,16 @@ const getFeaturedProducts = async (req, res) => {
 const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.findAll({
-      attributes: ["id", "name", "slug", "description"],
+      attributes: ["id", "category_name", "description", "is_active"],
+      where: {
+        deleted_at: null,
+      },
       include: [
         {
           model: Product,
           as: "products",
           attributes: ["id"], // hanya ambil id untuk menghitung
-          where: { isActive: true },
+          where: { is_active: true, deleted_at: null },
           required: false,
         },
       ],
@@ -224,10 +228,10 @@ const getAllCategories = async (req, res) => {
     // Tambahkan jumlah produk per kategori
     const categoriesWithCount = categories.map((category) => ({
       id: category.id,
-      name: category.name,
-      slug: category.slug,
+      category_name: category.category_name,
       description: category.description,
-      productCount: category.products.length,
+      is_active: category.is_active,
+      productCount: category.products ? category.products.length : 0,
     }));
 
     res.status(200).json({
@@ -265,13 +269,14 @@ const searchProducts = async (req, res) => {
           { name: { [Op.like]: `%${keyword}%` } },
           { description: { [Op.like]: `%${keyword}%` } },
         ],
-        isActive: true,
+        is_active: true,
+        deleted_at: null,
       },
       include: [
         {
           model: Category,
           as: "category",
-          attributes: ["id", "name", "slug"],
+          attributes: ["id", "category_name", "description"],
         },
       ],
       limit: parseInt(limit),
@@ -324,24 +329,25 @@ const getProductsByCategory = async (req, res) => {
         orderBy = [["name", "DESC"]];
         break;
       case "price_asc":
-        orderBy = [["price", "ASC"]];
+        orderBy = [["selling_price", "ASC"]];
         break;
       case "price_desc":
-        orderBy = [["price", "DESC"]];
+        orderBy = [["selling_price", "DESC"]];
         break;
     }
 
     // Query produk dalam kategori
     const { count, rows: products } = await Product.findAndCountAll({
       where: {
-        categoryId: category.id,
-        isActive: true,
+        category_id: category.id,
+        is_active: true,
+        deleted_at: null,
       },
       include: [
         {
           model: Category,
           as: "category",
-          attributes: ["id", "name", "slug"],
+          attributes: ["id", "category_name", "description"],
         },
       ],
       offset,
