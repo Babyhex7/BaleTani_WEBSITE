@@ -1,0 +1,746 @@
+/**
+ * Admin Discount Controller
+ * Mengelola CRUD diskon untuk admin
+ */
+
+const { Op } = require("sequelize");
+const {
+  Discount,
+  Product,
+  ProductDiscount,
+  SoftDeleteLog,
+} = require("../models");
+
+/**
+ * GET /api/admin/discounts
+ * Get all discounts with filters and pagination
+ */
+const getAllDiscounts = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      discount_type = "",
+      is_active = "",
+      status = "", // active, expired, upcoming
+      sort_by = "created_at",
+      sort_order = "DESC",
+    } = req.query;
+
+    // Build where clause
+    const whereClause = {
+      deleted_at: null,
+    };
+
+    // Search by name
+    if (search) {
+      whereClause.discount_name = { [Op.like]: `%${search}%` };
+    }
+
+    // Filter by discount type
+    if (discount_type) {
+      whereClause.discount_type = discount_type;
+    }
+
+    // Filter by active status
+    if (is_active !== "") {
+      whereClause.is_active = is_active === "true";
+    }
+
+    // Filter by date status
+    const currentDate = new Date().toISOString().split("T")[0];
+    if (status === "active") {
+      whereClause.start_date = { [Op.lte]: currentDate };
+      whereClause.end_date = { [Op.gte]: currentDate };
+      whereClause.is_active = true;
+    } else if (status === "expired") {
+      whereClause.end_date = { [Op.lt]: currentDate };
+    } else if (status === "upcoming") {
+      whereClause.start_date = { [Op.gt]: currentDate };
+    }
+
+    // Calculate offset
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    // Get discounts with product count
+    const { count, rows: discounts } = await Discount.findAndCountAll({
+      where: whereClause,
+      include: [
+        {
+          model: Product,
+          as: "products",
+          through: {
+            where: { deleted_at: null },
+            attributes: [],
+          },
+          attributes: ["id", "name", "selling_price"],
+          where: { deleted_at: null },
+          required: false,
+        },
+      ],
+      limit: parseInt(limit),
+      offset: offset,
+      order: [[sort_by, sort_order]],
+      distinct: true,
+    });
+
+    // Format response
+    const formattedDiscounts = discounts.map((discount) => {
+      const today = new Date().toISOString().split("T")[0];
+      let discountStatus = "upcoming";
+
+      if (
+        discount.start_date <= today &&
+        discount.end_date >= today &&
+        discount.is_active
+      ) {
+        discountStatus = "active";
+      } else if (discount.end_date < today) {
+        discountStatus = "expired";
+      }
+
+      return {
+        id: discount.id,
+        discount_name: discount.discount_name,
+        discount_type: discount.discount_type,
+        value: discount.value,
+        start_date: discount.start_date,
+        end_date: discount.end_date,
+        is_active: discount.is_active,
+        status: discountStatus,
+        product_count: discount.products ? discount.products.length : 0,
+        products: discount.products || [],
+        created_at: discount.created_at,
+        updated_at: discount.updated_at,
+      };
+    });
+
+    const totalPages = Math.ceil(count / parseInt(limit));
+
+    res.status(200).json({
+      success: true,
+      message: "Diskon berhasil diambil",
+      data: {
+        discounts: formattedDiscounts,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages,
+          totalItems: count,
+          itemsPerPage: parseInt(limit),
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error getting discounts:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal mengambil diskon",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * GET /api/admin/discounts/:id
+ * Get discount detail by ID
+ */
+const getDiscountById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const discount = await Discount.findOne({
+      where: { id, deleted_at: null },
+      include: [
+        {
+          model: Product,
+          as: "products",
+          through: {
+            where: { deleted_at: null },
+            attributes: ["created_at"],
+          },
+          attributes: [
+            "id",
+            "name",
+            "selling_price",
+            "total_stock",
+            "is_active",
+          ],
+          where: { deleted_at: null },
+          required: false,
+        },
+      ],
+    });
+
+    if (!discount) {
+      return res.status(404).json({
+        success: false,
+        message: "Diskon tidak ditemukan",
+      });
+    }
+
+    // Calculate status
+    const today = new Date().toISOString().split("T")[0];
+    let status = "upcoming";
+
+    if (
+      discount.start_date <= today &&
+      discount.end_date >= today &&
+      discount.is_active
+    ) {
+      status = "active";
+    } else if (discount.end_date < today) {
+      status = "expired";
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Detail diskon berhasil diambil",
+      data: {
+        id: discount.id,
+        discount_name: discount.discount_name,
+        discount_type: discount.discount_type,
+        value: discount.value,
+        start_date: discount.start_date,
+        end_date: discount.end_date,
+        is_active: discount.is_active,
+        status: status,
+        product_count: discount.products ? discount.products.length : 0,
+        products: discount.products || [],
+        created_at: discount.created_at,
+        updated_at: discount.updated_at,
+      },
+    });
+  } catch (error) {
+    console.error("Error getting discount detail:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal mengambil detail diskon",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * POST /api/admin/discounts
+ * Create new discount
+ */
+const createDiscount = async (req, res) => {
+  try {
+    const {
+      discount_name,
+      discount_type,
+      value,
+      start_date,
+      end_date,
+      is_active = true,
+      product_ids = [],
+    } = req.body;
+
+    // Validation
+    if (
+      !discount_name ||
+      !discount_type ||
+      !value ||
+      !start_date ||
+      !end_date
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Semua field wajib diisi (discount_name, discount_type, value, start_date, end_date)",
+      });
+    }
+
+    // Validate discount type
+    if (!["percentage", "fixed_amount"].includes(discount_type)) {
+      return res.status(400).json({
+        success: false,
+        message: "Tipe diskon harus 'percentage' atau 'fixed_amount'",
+      });
+    }
+
+    // Validate percentage value
+    if (discount_type === "percentage" && (value < 0 || value > 100)) {
+      return res.status(400).json({
+        success: false,
+        message: "Nilai persentase harus antara 0-100",
+      });
+    }
+
+    // Validate dates
+    if (new Date(start_date) > new Date(end_date)) {
+      return res.status(400).json({
+        success: false,
+        message: "Tanggal mulai tidak boleh lebih besar dari tanggal berakhir",
+      });
+    }
+
+    // Create discount
+    const newDiscount = await Discount.create({
+      discount_name,
+      discount_type,
+      value,
+      start_date,
+      end_date,
+      is_active,
+    });
+
+    // Add products to discount if provided
+    if (product_ids && product_ids.length > 0) {
+      const productDiscounts = product_ids.map((product_id) => ({
+        product_id,
+        discount_id: newDiscount.id,
+      }));
+
+      await ProductDiscount.bulkCreate(productDiscounts);
+    }
+
+    // Fetch created discount with products
+    const discountWithProducts = await Discount.findByPk(newDiscount.id, {
+      include: [
+        {
+          model: Product,
+          as: "products",
+          through: { attributes: [] },
+          attributes: ["id", "name", "selling_price"],
+        },
+      ],
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Diskon berhasil dibuat",
+      data: discountWithProducts,
+    });
+  } catch (error) {
+    console.error("Error creating discount:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal membuat diskon",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * PUT /api/admin/discounts/:id
+ * Update discount
+ */
+const updateDiscount = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      discount_name,
+      discount_type,
+      value,
+      start_date,
+      end_date,
+      is_active,
+      product_ids,
+    } = req.body;
+
+    // Find discount
+    const discount = await Discount.findOne({
+      where: { id, deleted_at: null },
+    });
+
+    if (!discount) {
+      return res.status(404).json({
+        success: false,
+        message: "Diskon tidak ditemukan",
+      });
+    }
+
+    // Validate discount type if provided
+    if (
+      discount_type &&
+      !["percentage", "fixed_amount"].includes(discount_type)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Tipe diskon harus 'percentage' atau 'fixed_amount'",
+      });
+    }
+
+    // Validate percentage value if provided
+    if (
+      discount_type === "percentage" &&
+      value !== undefined &&
+      (value < 0 || value > 100)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Nilai persentase harus antara 0-100",
+      });
+    }
+
+    // Validate dates if both provided
+    const newStartDate = start_date || discount.start_date;
+    const newEndDate = end_date || discount.end_date;
+    if (new Date(newStartDate) > new Date(newEndDate)) {
+      return res.status(400).json({
+        success: false,
+        message: "Tanggal mulai tidak boleh lebih besar dari tanggal berakhir",
+      });
+    }
+
+    // Update discount
+    const updateData = {};
+    if (discount_name !== undefined) updateData.discount_name = discount_name;
+    if (discount_type !== undefined) updateData.discount_type = discount_type;
+    if (value !== undefined) updateData.value = value;
+    if (start_date !== undefined) updateData.start_date = start_date;
+    if (end_date !== undefined) updateData.end_date = end_date;
+    if (is_active !== undefined) updateData.is_active = is_active;
+    updateData.updated_at = new Date();
+
+    await discount.update(updateData);
+
+    // Update products if provided
+    if (product_ids !== undefined) {
+      // Remove all existing product associations
+      await ProductDiscount.update(
+        { deleted_at: new Date() },
+        { where: { discount_id: id, deleted_at: null } }
+      );
+
+      // Add new product associations
+      if (product_ids.length > 0) {
+        const productDiscounts = product_ids.map((product_id) => ({
+          product_id,
+          discount_id: id,
+        }));
+
+        await ProductDiscount.bulkCreate(productDiscounts);
+      }
+    }
+
+    // Fetch updated discount with products
+    const updatedDiscount = await Discount.findByPk(id, {
+      include: [
+        {
+          model: Product,
+          as: "products",
+          through: {
+            where: { deleted_at: null },
+            attributes: [],
+          },
+          attributes: ["id", "name", "selling_price"],
+          where: { deleted_at: null },
+          required: false,
+        },
+      ],
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Diskon berhasil diupdate",
+      data: updatedDiscount,
+    });
+  } catch (error) {
+    console.error("Error updating discount:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal mengupdate diskon",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * DELETE /api/admin/discounts/:id
+ * Soft delete discount
+ */
+const softDeleteDiscount = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const adminId = req.user.userId;
+
+    // Find discount
+    const discount = await Discount.findOne({
+      where: { id, deleted_at: null },
+    });
+
+    if (!discount) {
+      return res.status(404).json({
+        success: false,
+        message: "Diskon tidak ditemukan",
+      });
+    }
+
+    // Soft delete discount
+    await discount.update({
+      deleted_at: new Date(),
+      deleted_by: adminId,
+      is_active: false,
+    });
+
+    // Soft delete all product associations
+    await ProductDiscount.update(
+      {
+        deleted_at: new Date(),
+        deleted_by: adminId,
+      },
+      {
+        where: {
+          discount_id: id,
+          deleted_at: null,
+        },
+      }
+    );
+
+    // Log soft delete
+    await SoftDeleteLog.create({
+      table_name: "discounts",
+      record_id: id,
+      deleted_by: adminId,
+      deleted_at: new Date(),
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Diskon berhasil dihapus",
+    });
+  } catch (error) {
+    console.error("Error deleting discount:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal menghapus diskon",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * POST /api/admin/discounts/:id/restore
+ * Restore soft deleted discount
+ */
+const restoreDiscount = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find deleted discount
+    const discount = await Discount.findOne({
+      where: {
+        id,
+        deleted_at: { [Op.ne]: null },
+      },
+    });
+
+    if (!discount) {
+      return res.status(404).json({
+        success: false,
+        message: "Diskon tidak ditemukan atau belum dihapus",
+      });
+    }
+
+    // Restore discount
+    await discount.update({
+      deleted_at: null,
+      deleted_by: null,
+    });
+
+    // Restore product associations
+    await ProductDiscount.update(
+      {
+        deleted_at: null,
+        deleted_by: null,
+      },
+      {
+        where: {
+          discount_id: id,
+          deleted_at: { [Op.ne]: null },
+        },
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Diskon berhasil dipulihkan",
+      data: discount,
+    });
+  } catch (error) {
+    console.error("Error restoring discount:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal memulihkan diskon",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * PATCH /api/admin/discounts/:id/toggle-status
+ * Toggle discount active status
+ */
+const toggleDiscountStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const discount = await Discount.findOne({
+      where: { id, deleted_at: null },
+    });
+
+    if (!discount) {
+      return res.status(404).json({
+        success: false,
+        message: "Diskon tidak ditemukan",
+      });
+    }
+
+    // Toggle status
+    await discount.update({
+      is_active: !discount.is_active,
+      updated_at: new Date(),
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Diskon berhasil ${
+        discount.is_active ? "diaktifkan" : "dinonaktifkan"
+      }`,
+      data: {
+        id: discount.id,
+        discount_name: discount.discount_name,
+        is_active: discount.is_active,
+      },
+    });
+  } catch (error) {
+    console.error("Error toggling discount status:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal mengubah status diskon",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * POST /api/admin/discounts/:id/products
+ * Add products to discount
+ */
+const addProductsToDiscount = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { product_ids } = req.body;
+
+    if (
+      !product_ids ||
+      !Array.isArray(product_ids) ||
+      product_ids.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "product_ids harus berupa array dan tidak boleh kosong",
+      });
+    }
+
+    // Check if discount exists
+    const discount = await Discount.findOne({
+      where: { id, deleted_at: null },
+    });
+
+    if (!discount) {
+      return res.status(404).json({
+        success: false,
+        message: "Diskon tidak ditemukan",
+      });
+    }
+
+    // Add products (skip if already exists)
+    const productDiscounts = product_ids.map((product_id) => ({
+      product_id,
+      discount_id: id,
+    }));
+
+    await ProductDiscount.bulkCreate(productDiscounts, {
+      ignoreDuplicates: true,
+    });
+
+    // Get updated discount with products
+    const updatedDiscount = await Discount.findByPk(id, {
+      include: [
+        {
+          model: Product,
+          as: "products",
+          through: {
+            where: { deleted_at: null },
+            attributes: [],
+          },
+          attributes: ["id", "name", "selling_price"],
+        },
+      ],
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Produk berhasil ditambahkan ke diskon",
+      data: updatedDiscount,
+    });
+  } catch (error) {
+    console.error("Error adding products to discount:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal menambahkan produk ke diskon",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * DELETE /api/admin/discounts/:id/products/:productId
+ * Remove product from discount
+ */
+const removeProductFromDiscount = async (req, res) => {
+  try {
+    const { id, productId } = req.params;
+    const adminId = req.user.userId;
+
+    // Find product discount association
+    const productDiscount = await ProductDiscount.findOne({
+      where: {
+        discount_id: id,
+        product_id: productId,
+        deleted_at: null,
+      },
+    });
+
+    if (!productDiscount) {
+      return res.status(404).json({
+        success: false,
+        message: "Asosiasi produk-diskon tidak ditemukan",
+      });
+    }
+
+    // Soft delete association
+    await productDiscount.update({
+      deleted_at: new Date(),
+      deleted_by: adminId,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Produk berhasil dihapus dari diskon",
+    });
+  } catch (error) {
+    console.error("Error removing product from discount:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal menghapus produk dari diskon",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  getAllDiscounts,
+  getDiscountById,
+  createDiscount,
+  updateDiscount,
+  softDeleteDiscount,
+  restoreDiscount,
+  toggleDiscountStatus,
+  addProductsToDiscount,
+  removeProductFromDiscount,
+};

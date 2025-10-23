@@ -2,7 +2,9 @@ const express = require("express");
 const dashboardRoutes = require("./dashboard");
 const userRoutes = require("./users");
 const inventoryRoutes = require("./inventory");
-const adminProductRoutes = require("./adminProducts"); // NEW
+const adminProductRoutes = require("./adminProducts");
+const categoryRoutes = require("./categories"); // NEW - Category Management
+const discountRoutes = require("./discounts"); // NEW - Discount Management
 
 const router = express.Router();
 
@@ -17,10 +19,16 @@ router.use("/dashboard", dashboardRoutes);
 // User management routes
 router.use("/users", userRoutes);
 
-// Product Management routes (NEW - dedicated for product CRUD + images)
+// Product Management routes (dedicated for product CRUD + images)
 router.use("/products", adminProductRoutes);
 
-// Inventory management routes (categories and stock overview)
+// Category Management routes (NEW)
+router.use("/categories", categoryRoutes);
+
+// Discount Management routes (NEW)
+router.use("/discounts", discountRoutes);
+
+// Inventory management routes (stock overview & movements)
 router.use("/inventory", inventoryRoutes);
 
 // Shortcut routes for better API structure
