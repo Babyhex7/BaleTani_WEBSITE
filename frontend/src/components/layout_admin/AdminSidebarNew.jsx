@@ -35,7 +35,7 @@ const AdminSidebarNew = () => {
       icon: HomeIcon 
     },
     {
-      name: 'Products & Inventory',
+      name: 'Inventory',
       icon: CubeIcon,
       key: 'products',
       submenu: [
@@ -86,24 +86,24 @@ const AdminSidebarNew = () => {
   const isMenuExpanded = (key) => expandedMenus.includes(key);
 
   return (
-    <div className="bg-green-700 text-white w-64 min-h-screen flex flex-col shadow-lg">
+    <div className="bg-white text-gray-800 w-64 min-h-screen flex flex-col shadow-xl border-r border-gray-200">
       {/* Logo & Brand */}
-      <div className="p-6 border-b border-green-600">
+      <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700">
         <h1 className="text-2xl font-bold text-white">BaleTani</h1>
-        <p className="text-sm text-green-200">Admin Panel</p>
+        <p className="text-sm text-green-100">Admin Panel</p>
       </div>
 
       {/* User Info */}
-      <div className="p-4 border-b border-green-600">
+      <div className="p-4 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-lg">
+          <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
             {admin?.full_name?.charAt(0) || 'A'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white truncate">
+            <p className="text-sm font-semibold text-gray-800 truncate">
               {admin?.full_name || 'Super Admin'}
             </p>
-            <p className="text-xs text-green-200 capitalize">
+            <p className="text-xs text-gray-500 capitalize">
               {admin?.role?.role_name?.replace(/_/g, ' ') || 'Demo Account'}
             </p>
           </div>
@@ -119,7 +119,7 @@ const AdminSidebarNew = () => {
               <div>
                 <button
                   onClick={() => toggleMenu(item.key)}
-                  className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-green-100 hover:bg-green-600 transition-colors"
+                  className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all duration-200"
                 >
                   <div className="flex items-center gap-3">
                     <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -139,10 +139,10 @@ const AdminSidebarNew = () => {
                       <Link
                         key={subItem.path}
                         to={subItem.path}
-                        className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition-colors ${
+                        className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
                           isActive(subItem.path)
-                            ? 'bg-green-800 text-white font-medium'
-                            : 'text-green-100 hover:bg-green-600'
+                            ? 'bg-green-600 text-white font-medium shadow-md'
+                            : 'text-gray-600 hover:bg-green-50 hover:text-green-700'
                         }`}
                       >
                         <span className="text-xs">→</span>
@@ -156,10 +156,10 @@ const AdminSidebarNew = () => {
               // Menu tanpa submenu
               <Link
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                   isActive(item.path)
-                    ? 'bg-green-800 text-white font-medium shadow-md'
-                    : 'text-green-100 hover:bg-green-600'
+                    ? 'bg-green-600 text-white font-medium shadow-md'
+                    : 'text-gray-700 hover:bg-green-50 hover:text-green-700'
                 }`}
               >
                 <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -171,13 +171,13 @@ const AdminSidebarNew = () => {
       </nav>
 
       {/* Logout Button */}
-      <div className="p-4 border-t border-green-600">
+      <div className="p-4 border-t border-gray-200">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-200 hover:bg-red-600 hover:text-white transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200 font-medium"
         >
           <ArrowRightOnRectangleIcon className="w-5 h-5" />
-          <span className="text-sm font-medium">Logout</span>
+          <span className="text-sm">Logout</span>
         </button>
       </div>
     </div>
