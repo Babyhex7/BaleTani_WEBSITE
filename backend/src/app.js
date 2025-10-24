@@ -4,13 +4,10 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
-// Updated CORS configuration
 const errorHandler = require("./middlewares/error.middleware");
-const adminAuthRoutes = require("./routes/adminAuth.routes"); // Admin auth
-const customerAuthRoutes = require("./routes/customerAuth.routes"); // Customer auth
-const productRoutes = require("./routes/products");
-const categoryRoutes = require("./routes/categories");
-const adminRoutes = require("./routes/admin");
+
+// Import main routes (all routes grouped by role)
+const routes = require("./routes");
 
 const app = express();
 
@@ -88,21 +85,10 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// Routes
-app.use("/api/admin/auth", adminAuthRoutes); // Admin auth: /api/admin/auth/login
-app.use("/api/customer/auth", customerAuthRoutes); // Customer auth: /api/customer/auth/login & /api/customer/auth/register
-app.use("/api/products", productRoutes);
-app.use("/api/categories", categoryRoutes);
-app.use("/api/admin", adminRoutes);
-
-// Health check endpoint
-app.get("/api/health", (req, res) => {
-  res.json({
-    success: true,
-    message: "BaleTani Fresh Market API is running!",
-    timestamp: new Date().toISOString(),
-  });
-});
+// ============================================
+// ROUTES - All routes under /api
+// ============================================
+app.use("/api", routes);
 
 // Catch browser extension logs (to prevent CORS errors)
 app.post("/api/log", (req, res) => {
@@ -115,6 +101,7 @@ app.use("*", (req, res) => {
   res.status(404).json({
     success: false,
     message: "API endpoint not found",
+    path: req.originalUrl,
   });
 });
 

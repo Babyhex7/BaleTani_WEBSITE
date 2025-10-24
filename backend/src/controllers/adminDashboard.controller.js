@@ -1,4 +1,4 @@
-const { User, Product, Order, Category } = require("../models");
+const { User, Customer, Product, Order, Category } = require("../models");
 const { Op } = require("sequelize");
 
 /**
@@ -41,9 +41,9 @@ const getDashboardStats = async (req, res, next) => {
       }),
 
       // Total revenue hari ini
-      Order.sum("total_price", {
+      Order.sum("total_amount", {
         where: {
-          status: "paid",
+          payment_status: "paid",
           created_at: {
             [Op.gte]: today,
             [Op.lt]: tomorrow,
@@ -53,19 +53,19 @@ const getDashboardStats = async (req, res, next) => {
 
       // Pending orders
       Order.count({
-        where: { status: "pending" },
+        where: { payment_status: "pending" },
       }),
 
       // Low stock products (stok <= 10)
       Product.count({
         where: {
-          stock: { [Op.lte]: 10 },
+          total_stock: { [Op.lte]: 10 },
         },
       }),
 
       // Total customers
-      User.count({
-        where: { role: "customer" },
+      Customer.count({
+        where: { deleted_at: null },
       }),
 
       // Orders bulan ini
@@ -86,17 +86,17 @@ const getDashboardStats = async (req, res, next) => {
       }),
 
       // Revenue bulan ini
-      Order.sum("total_price", {
+      Order.sum("total_amount", {
         where: {
-          status: "paid",
+          payment_status: "paid",
           created_at: { [Op.gte]: thisMonth },
         },
       }) || 0,
 
       // Revenue bulan lalu
-      Order.sum("total_price", {
+      Order.sum("total_amount", {
         where: {
-          status: "paid",
+          payment_status: "paid",
           created_at: {
             [Op.gte]: lastMonth,
             [Op.lt]: thisMonth,
@@ -158,8 +158,9 @@ const getRecentOrders = async (req, res, next) => {
       attributes: [
         "id",
         "customer_name",
-        "total_price",
-        "status",
+        "total_amount",
+        "payment_status",
+        "order_status",
         "created_at",
       ],
     });
@@ -168,8 +169,9 @@ const getRecentOrders = async (req, res, next) => {
     const formattedOrders = recentOrders.map((order) => ({
       id: order.id,
       customer_name: order.customer_name || order.user?.full_name || "Guest",
-      total_price: parseFloat(order.total_price),
-      status: order.status,
+      total_amount: parseFloat(order.total_amount),
+      payment_status: order.payment_status,
+      order_status: order.order_status,
       created_at: order.created_at,
       items_count: 0, // Bisa ditambahkan query ke order_items jika diperlukan
     }));
@@ -191,26 +193,26 @@ const getLowStockProducts = async (req, res, next) => {
 
     const lowStockProducts = await Product.findAll({
       where: {
-        stock: { [Op.lte]: threshold },
+        total_stock: { [Op.lte]: threshold },
       },
       include: [
         {
           model: Category,
           as: "category",
-          attributes: ["name"],
+          attributes: ["category_name"],
         },
       ],
-      order: [["stock", "ASC"]],
+      order: [["total_stock", "ASC"]],
       limit,
-      attributes: ["id", "name", "stock", "category_id"],
+      attributes: ["id", "name", "total_stock", "category_id"],
     });
 
     // Format data untuk frontend
     const formattedProducts = lowStockProducts.map((product) => ({
       id: product.id,
       name: product.name,
-      stock: product.stock,
-      category: product.category?.name || "Uncategorized",
+      total_stock: product.total_stock,
+      category: product.category?.category_name || "Uncategorized",
       min_stock: threshold,
     }));
 

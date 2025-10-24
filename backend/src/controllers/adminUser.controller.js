@@ -1,4 +1,4 @@
-const { Admin } = require("../models");
+const { Admin, Role } = require("../models");
 const { validationResult } = require("express-validator");
 const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
@@ -6,37 +6,48 @@ const bcrypt = require("bcryptjs");
 /**
  * Admin User Management Controller
  * CRUD operations untuk mengelola admin users dengan RBAC
+ * Only SUPER ADMIN can create/update/delete admin users
  */
 
-// Get all users with pagination and filters
+// Get all admin users with pagination and filters
 const getUsers = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     const search = req.query.search || "";
-    const role = req.query.role || "";
+    const role_name = req.query.role || "";
     const sortBy = req.query.sortBy || "full_name";
     const sortOrder = req.query.sortOrder || "ASC";
 
     // Build where clause
-    const whereClause = {};
+    const whereClause = {
+      deleted_at: null,
+    };
 
     if (search) {
       whereClause[Op.or] = [
         { full_name: { [Op.like]: `%${search}%` } },
-        { email: { [Op.like]: `%${search}%` } },
+        { phone_number: { [Op.like]: `%${search}%` } },
       ];
     }
 
-    if (role) {
-      whereClause.role = role;
+    // Build include for role filter
+    const includeOptions = {
+      model: Role,
+      as: "role",
+      attributes: ["id", "role_name", "description"],
+    };
+
+    if (role_name) {
+      includeOptions.where = { role_name };
     }
 
     // Get users with pagination
     const { count, rows: users } = await Admin.findAndCountAll({
       where: whereClause,
-      attributes: { exclude: ["password"] },
+      include: [includeOptions],
+      attributes: { exclude: ["password_hash"] },
       order: [[sortBy, sortOrder.toUpperCase()]],
       limit,
       offset,
@@ -45,9 +56,14 @@ const getUsers = async (req, res, next) => {
     // Format response
     const formattedUsers = users.map((user) => ({
       id: user.id,
+      phone_number: user.phone_number,
       full_name: user.full_name,
-      email: user.email,
-      role: user.role,
+      role: {
+        id: user.role.id,
+        role_name: user.role.role_name,
+        description: user.role.description,
+      },
+      is_active: user.is_active,
       created_at: user.created_at,
       updated_at: user.updated_at,
     }));

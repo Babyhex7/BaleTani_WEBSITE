@@ -8,39 +8,46 @@ const createRoles = async () => {
     const roles = [
       {
         role_name: "customer",
-        description: "Browse & order products",
+        description:
+          "Browse products, place orders, send details via WhatsApp, make payment, and track delivery",
       },
       {
         role_name: "super_admin",
-        description: "Full system access",
+        description:
+          "Full system access: manage users, products, transactions, and configurations",
       },
       {
         role_name: "super_whatsapp_admin",
-        description: "Manage transactions (status, cancel, customer)",
+        description:
+          "Create, view, and update (status only) online/offline transactions; cancel orders; manage customer data",
       },
       {
         role_name: "super_cashier",
-        description: "Manage online/offline transactions & customers",
+        description:
+          "Create, view, and update (status only) online/offline transactions; cancel orders; manage customer data",
       },
       {
         role_name: "whatsapp_admin",
-        description: "Create/view online transactions, update status",
+        description:
+          "Create and view only online transactions; update order statuses",
       },
       {
         role_name: "cashier",
-        description: "Create/view offline transactions, update status",
+        description:
+          "Create and view only offline transactions; update order statuses",
       },
       {
         role_name: "finance_admin",
-        description: "View inventory, procurement, and reports",
+        description: "View inventory, procurement, and transaction reports",
       },
       {
         role_name: "inventory_admin",
-        description: "Create/update procurement before proposal",
+        description:
+          "Create, Update (until the procurement is proposed) procurement records",
       },
       {
         role_name: "super_inventory_admin",
-        description: "CRUD products & procurement approval",
+        description: "CRUD Procurement, CRUD Product, Approval Procurement",
       },
     ];
 

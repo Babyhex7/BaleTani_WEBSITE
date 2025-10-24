@@ -1,37 +1,46 @@
 const express = require("express");
-const dashboardRoutes = require("./dashboard");
-const userRoutes = require("./users");
-const inventoryRoutes = require("./inventory");
-const adminProductRoutes = require("./adminProducts");
-const categoryRoutes = require("./categories"); // NEW - Category Management
-const discountRoutes = require("./discounts"); // NEW - Discount Management
-
 const router = express.Router();
 
 /**
- * Main Admin Routes
+ * ============================================
+ * ADMIN ROUTES
  * Base path: /api/admin
+ * ============================================
+ * All routes require admin authentication
  */
 
-// Dashboard routes
-router.use("/dashboard", dashboardRoutes);
+// Import sub-routes
+const authRoutes = require("../adminAuth.routes");
+const dashboardRoutes = require("./dashboard");
+const productRoutes = require("./adminProducts");
+const categoryRoutes = require("./categories");
+const discountRoutes = require("./discounts");
+const userRoutes = require("./users");
 
-// User management routes
-router.use("/users", userRoutes);
+/**
+ * PUBLIC ADMIN ROUTES (No auth required)
+ * - Login
+ */
+router.use("/auth", authRoutes);
 
-// Product Management routes (dedicated for product CRUD + images)
-router.use("/products", adminProductRoutes);
+/**
+ * PROTECTED ADMIN ROUTES (Auth required)
+ * Authentication & authorization handled in each route file
+ */
 
-// Category Management routes (NEW)
-router.use("/categories", categoryRoutes);
+// Dashboard & Statistics
+router.use("/dashboard", dashboardRoutes); // /api/admin/dashboard/*
 
-// Discount Management routes (NEW)
-router.use("/discounts", discountRoutes);
+// Product Management (CRUD + Images)
+router.use("/products", productRoutes); // /api/admin/products/*
 
-// Inventory management routes (stock overview & movements)
-router.use("/inventory", inventoryRoutes);
+// Category Management
+router.use("/categories", categoryRoutes); // /api/admin/categories/*
 
-// Shortcut routes for better API structure
-router.use("/orders", require("./dashboard")); // For recent orders endpoint
+// Discount Management
+router.use("/discounts", discountRoutes); // /api/admin/discounts/*
+
+// User & Admin Management
+router.use("/users", userRoutes); // /api/admin/users/*
 
 module.exports = router;

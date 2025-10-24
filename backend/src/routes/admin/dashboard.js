@@ -14,7 +14,12 @@ const router = express.Router();
 
 // Middleware untuk memastikan user adalah admin atau staff
 const requireAdminRole = (req, res, next) => {
-  if (req.user.role !== "admin" && req.user.role !== "staff") {
+  const roleName = req.user.role.role_name;
+  if (
+    roleName !== "admin" &&
+    roleName !== "staff" &&
+    roleName !== "super_admin"
+  ) {
     return res.status(403).json({
       success: false,
       message: "Access denied. Admin or staff role required.",

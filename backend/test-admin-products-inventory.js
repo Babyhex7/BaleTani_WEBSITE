@@ -261,7 +261,7 @@ async function testGetCategories() {
   const options = {
     hostname: BASE_URL,
     port: PORT,
-    path: "/api/categories",
+    path: "/api/admin/categories",
     method: "GET",
     headers: {
       Authorization: `Bearer ${authToken}`,
