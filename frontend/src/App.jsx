@@ -9,9 +9,11 @@ import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRo
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import InventoryManagement from './pages/admin/InventoryManagement';
 import UserManagement from './pages/admin/UserManagement';
+
+// New Admin Pages with Hero Icons
+import AdminDashboardNew from './pages/admin/AdminDashboardNew';
+import ProductListNew from './pages/admin/ProductListNew';
 
 /**
  * Komponen utama aplikasi yang mengatur routing
@@ -141,15 +143,18 @@ function App() {
       } />
 
       {/* Admin routes (untuk admin dan staff) */}
+      
+      {/* Admin Dashboard with Hero Icons */}
       <Route path="/admin/dashboard" element={
         <ProtectedRoute requiredRole="admin">
-          <AdminDashboard />
+          <AdminDashboardNew />
         </ProtectedRoute>
       } />
 
-      <Route path="/admin/inventory" element={
+      {/* Product List with Hero Icons */}
+      <Route path="/admin/products" element={
         <ProtectedRoute requiredRole="admin">
-          <InventoryManagement />
+          <ProductListNew />
         </ProtectedRoute>
       } />
 

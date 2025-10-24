@@ -161,3 +161,24 @@ export const bulkUpdateStock = async (updates) => {
     );
   }
 };
+
+// Default export untuk backward compatibility
+const inventoryService = {
+  // Produk
+  getProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  // Kategori
+  getCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  // Stok & Inventory
+  updateProductStock,
+  getInventoryLogs,
+  bulkUpdateStock,
+};
+
+export default inventoryService;

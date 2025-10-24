@@ -66,3 +66,14 @@ export const markNotificationAsRead = async (notificationId) => {
     throw error.response?.data || { message: "Gagal menandai notifikasi" };
   }
 };
+
+// Default export
+const dashboardService = {
+  getStats: getDashboardStats,
+  getRecentOrders,
+  getLowStockProducts,
+  getAdminNotifications,
+  markNotificationAsRead,
+};
+
+export default dashboardService;
