@@ -50,25 +50,29 @@ router.get(
 
 /**
  * POST /api/admin/products
- * Create new product
+ * Create new product with image upload
  * Access: super_admin, super_inventory_admin
  */
 router.post(
   "/",
   authenticateAdmin,
   roleMiddleware(["super_admin", "super_inventory_admin"]),
+  upload.array("images", 5), // Max 5 images
+  handleMulterError,
   productController.create
 );
 
 /**
  * PUT /api/admin/products/:id
- * Update product
+ * Update product with optional image upload
  * Access: super_admin, super_inventory_admin
  */
 router.put(
   "/:id",
   authenticateAdmin,
   roleMiddleware(["super_admin", "super_inventory_admin"]),
+  upload.array("images", 5), // Max 5 images
+  handleMulterError,
   productController.update
 );
 

@@ -75,6 +75,7 @@ const corsOptions = {
   ],
   exposedHeaders: ["Content-Range", "X-Content-Range"],
   preflightContinue: false,
+  maxAge: 86400, // 24 hours cache for preflight
 };
 
 // Enable CORS pre-flight for all routes
@@ -84,6 +85,13 @@ app.use(cors(corsOptions));
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Static file serving for uploads
+const path = require("path");
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "../../public/uploads"))
+);
 
 // ============================================
 // ROUTES - All routes under /api

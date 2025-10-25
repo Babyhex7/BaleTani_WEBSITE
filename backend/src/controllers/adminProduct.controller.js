@@ -284,6 +284,7 @@ const create = async (req, res) => {
       selling_price,
       unit,
       shelf_life_days,
+      initial_stock,
       is_active = true,
     } = req.body;
 
@@ -318,6 +319,17 @@ const create = async (req, res) => {
       }
     }
 
+    // Parse initial stock (default 0 if not provided)
+    const initialStockValue = initial_stock ? parseFloat(initial_stock) : 0;
+
+    // Validate initial stock (must be >= 0)
+    if (initialStockValue < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Stok awal tidak boleh negatif",
+      });
+    }
+
     // Create product
     const product = await Product.create({
       name,
@@ -327,11 +339,25 @@ const create = async (req, res) => {
       selling_price: parseFloat(selling_price),
       unit,
       shelf_life_days: parseInt(shelf_life_days),
-      total_stock: 0, // Initial stock is 0
+      total_stock: initialStockValue, // Set initial stock from input or default to 0
       is_active: is_active === true || is_active === "true",
       created_at: new Date(),
       updated_at: new Date(),
     });
+
+    // Handle image uploads if files are provided
+    if (req.files && req.files.length > 0) {
+      const imagePromises = req.files.map((file, index) => {
+        return ProductImage.create({
+          product_id: product.id,
+          image_url: `/uploads/products/${file.filename}`,
+          display_order: index + 1,
+          created_at: new Date(),
+          updated_at: new Date(),
+        });
+      });
+      await Promise.all(imagePromises);
+    }
 
     // Fetch created product with relations
     const createdProduct = await Product.findOne({
@@ -341,6 +367,14 @@ const create = async (req, res) => {
           model: Category,
           as: "category",
           attributes: ["id", "category_name"],
+        },
+        {
+          model: ProductImage,
+          as: "images",
+          where: { deleted_at: null },
+          required: false,
+          attributes: ["id", "image_url", "display_order"],
+          order: [["display_order", "ASC"]],
         },
       ],
     });
@@ -430,6 +464,32 @@ const update = async (req, res) => {
       is_active: is_active !== undefined ? is_active : product.is_active,
       updated_at: new Date(),
     });
+
+    // Handle new image uploads if files are provided
+    if (req.files && req.files.length > 0) {
+      // Get current max display_order
+      const currentImages = await ProductImage.findAll({
+        where: { product_id: product.id, deleted_at: null },
+        attributes: ["display_order"],
+        order: [["display_order", "DESC"]],
+        limit: 1,
+      });
+
+      const maxOrder =
+        currentImages.length > 0 ? currentImages[0].display_order : 0;
+
+      // Create new images
+      const imagePromises = req.files.map((file, index) => {
+        return ProductImage.create({
+          product_id: product.id,
+          image_url: `/uploads/products/${file.filename}`,
+          display_order: maxOrder + index + 1,
+          created_at: new Date(),
+          updated_at: new Date(),
+        });
+      });
+      await Promise.all(imagePromises);
+    }
 
     // Fetch updated product with relations
     const updatedProduct = await Product.findOne({

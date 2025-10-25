@@ -31,7 +31,20 @@ export const getProductById = async (id) => {
 // Membuat produk baru
 export const createProduct = async (productData) => {
   try {
-    const response = await adminApiClient.post("/admin/products", productData);
+    // Check if productData is FormData (for image uploads)
+    const isFormData = productData instanceof FormData;
+
+    const response = await adminApiClient.post(
+      "/admin/products",
+      productData,
+      isFormData
+        ? {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        : undefined
+    );
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal membuat produk baru" };
@@ -41,9 +54,19 @@ export const createProduct = async (productData) => {
 // Memperbarui produk
 export const updateProduct = async (id, productData) => {
   try {
+    // Check if productData is FormData (for image uploads)
+    const isFormData = productData instanceof FormData;
+
     const response = await adminApiClient.put(
       `/admin/products/${id}`,
-      productData
+      productData,
+      isFormData
+        ? {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        : undefined
     );
     return response.data;
   } catch (error) {

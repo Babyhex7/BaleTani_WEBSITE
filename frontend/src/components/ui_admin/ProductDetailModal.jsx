@@ -31,6 +31,13 @@ const ProductDetailModal = ({
   const categoryName = category.category_name;
   const hasImages = images.length > 0;
 
+  // Helper function to get full image URL
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return '/placeholder-product.png';
+    if (imageUrl.startsWith('http')) return imageUrl;
+    return `http://localhost:5000${imageUrl}`;
+  };
+
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
   };
@@ -109,7 +116,7 @@ const ProductDetailModal = ({
                     {/* Main Image */}
                     <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-square">
                       <img
-                        src={images[currentImageIndex]?.image_url}
+                        src={getImageUrl(images[currentImageIndex]?.image_url)}
                         alt={productName}
                         className="w-full h-full object-cover"
                       />
@@ -154,7 +161,7 @@ const ProductDetailModal = ({
                             }`}
                           >
                             <img
-                              src={img.image_url}
+                              src={getImageUrl(img.image_url)}
                               alt={`Thumbnail ${index + 1}`}
                               className="w-full h-full object-cover"
                             />

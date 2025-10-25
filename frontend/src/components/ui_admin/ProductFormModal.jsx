@@ -29,6 +29,7 @@ const ProductFormModal = ({
     discount_price: '',
     unit: 'kg',
     shelf_life_days: '',
+    initial_stock: '', // Tambah field stok awal
     is_active: true
   });
 
@@ -54,6 +55,7 @@ const ProductFormModal = ({
         discount_price: product.discount_price || '',
         unit: product.unit || 'kg',
         shelf_life_days: product.shelf_life_days || '',
+        initial_stock: product.total_stock || '', // Load existing stock (read-only)
         is_active: product.is_active ?? true
       });
       
@@ -77,6 +79,7 @@ const ProductFormModal = ({
       discount_price: '',
       unit: 'kg',
       shelf_life_days: '',
+      initial_stock: '', // Reset stok awal
       is_active: true
     });
     setImages([]);
@@ -181,12 +184,34 @@ const ProductFormModal = ({
       // Prepare FormData for multipart/form-data
       const submitData = new FormData();
       
-      // Append product data
+      // Map field names: frontend -> backend
+      const fieldMapping = {
+        'product_name': 'name',  // Frontend uses product_name, backend expects name
+        'description': 'description',
+        'category_id': 'category_id',
+        'product_type': 'product_type',
+        'selling_price': 'selling_price',
+        'discount_price': 'discount_price',
+        'unit': 'unit',
+        'shelf_life_days': 'shelf_life_days',
+        'initial_stock': 'initial_stock', // Tambah mapping stok awal
+        'is_active': 'is_active'
+      };
+      
+      // Append formData dengan mapping yang benar
       Object.keys(formData).forEach(key => {
-        if (formData[key] !== null && formData[key] !== undefined && formData[key] !== '') {
-          submitData.append(key, formData[key]);
+        const value = formData[key];
+        if (value !== null && value !== undefined && value !== '') {
+          const backendFieldName = fieldMapping[key] || key;
+          submitData.append(backendFieldName, value);
         }
       });
+      
+      // Debug: Log FormData contents
+      console.log('FormData to submit:');
+      for (let pair of submitData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
       
       // Append new images
       images.forEach((file) => {
@@ -481,6 +506,57 @@ const ProductFormModal = ({
                     placeholder="7"
                   />
                 </div>
+
+                {/* Stok Awal - Hanya untuk Create Mode */}
+                {mode === 'create' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Stok Awal (opsional)
+                    </label>
+                    <input
+                      type="number"
+                      name="initial_stock"
+                      value={formData.initial_stock}
+                      onChange={handleChange}
+                      disabled={loading}
+                      min="0"
+                      step="0.01"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="0"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      Kosongkan jika ingin diisi lewat Procurement
+                    </p>
+                  </div>
+                )}
+
+                {/* Stok Saat Ini - READ ONLY untuk Edit Mode */}
+                {mode === 'edit' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Stok Saat Ini
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={`${formData.initial_stock || 0} ${formData.unit}`}
+                        disabled
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <p className="mt-1 text-xs text-amber-600 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Stok hanya bisa diubah lewat Procurement
+                    </p>
+                  </div>
+                )}
 
                 {/* Deskripsi */}
                 <div className="md:col-span-2">
