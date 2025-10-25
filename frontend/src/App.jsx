@@ -14,6 +14,7 @@ import UserManagement from './pages/admin/UserManagement';
 // New Admin Pages with Hero Icons
 import AdminDashboardNew from './pages/admin/AdminDashboardNew';
 import ProductListNew from './pages/admin/ProductListNew';
+import CategoryManagement from './pages/admin/CategoryManagement';
 
 /**
  * Komponen utama aplikasi yang mengatur routing
@@ -155,6 +156,13 @@ function App() {
       <Route path="/admin/products" element={
         <ProtectedRoute requiredRole="admin">
           <ProductListNew />
+        </ProtectedRoute>
+      } />
+
+      {/* Category Management */}
+      <Route path="/admin/categories" element={
+        <ProtectedRoute requiredRole="admin">
+          <CategoryManagement />
         </ProtectedRoute>
       } />
 

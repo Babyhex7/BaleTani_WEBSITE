@@ -11,9 +11,7 @@ import adminApiClient from "./adminApiClient";
 export const getProducts = async (params = {}) => {
   try {
     const queryString = new URLSearchParams(params).toString();
-    const response = await adminApiClient.get(
-      `/admin/inventory/products?${queryString}`
-    );
+    const response = await adminApiClient.get(`/admin/products?${queryString}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal mengambil data produk" };
@@ -23,9 +21,7 @@ export const getProducts = async (params = {}) => {
 // Mendapatkan detail produk
 export const getProductById = async (id) => {
   try {
-    const response = await adminApiClient.get(
-      `/admin/inventory/products/${id}`
-    );
+    const response = await adminApiClient.get(`/admin/products/${id}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal mengambil detail produk" };
@@ -35,10 +31,7 @@ export const getProductById = async (id) => {
 // Membuat produk baru
 export const createProduct = async (productData) => {
   try {
-    const response = await adminApiClient.post(
-      "/admin/inventory/products",
-      productData
-    );
+    const response = await adminApiClient.post("/admin/products", productData);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal membuat produk baru" };
@@ -49,7 +42,7 @@ export const createProduct = async (productData) => {
 export const updateProduct = async (id, productData) => {
   try {
     const response = await adminApiClient.put(
-      `/admin/inventory/products/${id}`,
+      `/admin/products/${id}`,
       productData
     );
     return response.data;
@@ -61,9 +54,7 @@ export const updateProduct = async (id, productData) => {
 // Menghapus produk
 export const deleteProduct = async (id) => {
   try {
-    const response = await adminApiClient.delete(
-      `/admin/inventory/products/${id}`
-    );
+    const response = await adminApiClient.delete(`/admin/products/${id}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal menghapus produk" };
@@ -72,13 +63,28 @@ export const deleteProduct = async (id) => {
 
 // === KATEGORI ===
 
-// Mendapatkan daftar kategori
-export const getCategories = async () => {
+// Mendapatkan daftar kategori dengan pagination dan filter
+export const getCategories = async (params = {}) => {
   try {
-    const response = await adminApiClient.get("/admin/inventory/categories");
+    const queryString = new URLSearchParams(params).toString();
+    const response = await adminApiClient.get(
+      `/admin/categories${queryString ? `?${queryString}` : ""}`
+    );
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Gagal mengambil data kategori" };
+  }
+};
+
+// Mendapatkan detail kategori by ID
+export const getCategoryById = async (id) => {
+  try {
+    const response = await adminApiClient.get(`/admin/categories/${id}`);
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data || { message: "Gagal mengambil detail kategori" }
+    );
   }
 };
 
@@ -108,7 +114,7 @@ export const updateCategory = async (id, categoryData) => {
   }
 };
 
-// Menghapus kategori
+// Menghapus kategori (soft delete)
 export const deleteCategory = async (id) => {
   try {
     const response = await adminApiClient.delete(`/admin/categories/${id}`);
@@ -172,6 +178,7 @@ const inventoryService = {
   deleteProduct,
   // Kategori
   getCategories,
+  getCategoryById,
   createCategory,
   updateCategory,
   deleteCategory,
