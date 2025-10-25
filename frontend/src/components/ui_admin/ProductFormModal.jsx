@@ -520,12 +520,18 @@ const ProductFormModal = ({
                       onChange={handleChange}
                       disabled={loading}
                       min="0"
-                      step="0.01"
+                      step="1"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="0"
+                      onKeyPress={(e) => {
+                        // Prevent decimal point input
+                        if (e.key === '.' || e.key === ',') {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                     <p className="mt-1 text-xs text-gray-500">
-                      Kosongkan jika ingin diisi lewat Procurement
+                      Hanya angka bulat (contoh: 10, 50, 100). Kosongkan jika ingin diisi lewat Procurement
                     </p>
                   </div>
                 )}

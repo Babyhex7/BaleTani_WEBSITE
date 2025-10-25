@@ -38,7 +38,7 @@ const Product = sequelize.define(
       allowNull: false,
     },
     total_stock: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.INTEGER, // Changed from DECIMAL to INTEGER (no decimals, like Shopee)
       defaultValue: 0,
     },
     is_active: {

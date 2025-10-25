@@ -320,13 +320,13 @@ const create = async (req, res) => {
     }
 
     // Parse initial stock (default 0 if not provided)
-    const initialStockValue = initial_stock ? parseFloat(initial_stock) : 0;
+    const initialStockValue = initial_stock ? parseInt(initial_stock, 10) : 0;
 
-    // Validate initial stock (must be >= 0)
-    if (initialStockValue < 0) {
+    // Validate initial stock (must be >= 0 and integer)
+    if (initialStockValue < 0 || !Number.isInteger(initialStockValue)) {
       return res.status(400).json({
         success: false,
-        message: "Stok awal tidak boleh negatif",
+        message: "Stok awal harus berupa angka bulat positif",
       });
     }
 

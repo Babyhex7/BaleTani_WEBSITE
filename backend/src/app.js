@@ -29,16 +29,21 @@ app.use(limiter);
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log("✅ CORS: Request with no origin (allowed)");
+      return callback(null, true);
+    }
 
     // Development mode: Allow all localhost and local network IPs
     if (process.env.NODE_ENV !== "production") {
       // Allow localhost with any port
       if (origin.match(/^http:\/\/localhost:\d+$/)) {
+        console.log("✅ CORS: Allowed localhost origin:", origin);
         return callback(null, true);
       }
       // Allow 127.0.0.1 with any port
       if (origin.match(/^http:\/\/127\.0\.0\.1:\d+$/)) {
+        console.log("✅ CORS: Allowed 127.0.0.1 origin:", origin);
         return callback(null, true);
       }
       // Allow local network IPs (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
@@ -47,6 +52,7 @@ const corsOptions = {
           /^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+):\d+$/
         )
       ) {
+        console.log("✅ CORS: Allowed local network origin:", origin);
         return callback(null, true);
       }
     }
@@ -58,6 +64,7 @@ const corsOptions = {
     ].filter(Boolean);
 
     if (allowedOrigins.includes(origin)) {
+      console.log("✅ CORS: Allowed production origin:", origin);
       callback(null, true);
     } else {
       console.log("❌ CORS blocked origin:", origin);
