@@ -18,7 +18,6 @@ import AdminHeaderNew from "../../components/layout_admin/AdminHeaderNew";
 import DiscountFormModal from "../../components/ui_admin/DiscountFormModal";
 import DiscountDetailModal from "../../components/ui_admin/DiscountDetailModal";
 import AssignProductModal from "../../components/ui_admin/AssignProductModal";
-import ToastNotification from "../../components/ui_admin/ToastNotification";
 import DeleteConfirmModal from "../../components/ui_admin/DeleteConfirmModal";
 import inventoryService from "../../services/services_admin/inventoryService";
 
@@ -296,8 +295,7 @@ const DiscountManagement = () => {
         />
 
         <div className="p-6">
-          {/* Toast Notification */}
-          <ToastNotification />
+          {/* Toast Notification dipindah global di main.jsx */}
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">

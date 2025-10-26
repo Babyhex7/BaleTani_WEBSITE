@@ -14,7 +14,6 @@ import AdminHeaderNew from '../../components/layout_admin/AdminHeaderNew';
 import ProductFormModal from '../../components/ui_admin/ProductFormModal';
 import ProductDetailModal from '../../components/ui_admin/ProductDetailModal';
 import DeleteConfirmModal from '../../components/ui_admin/DeleteConfirmModal';
-import ToastNotification from '../../components/ui_admin/ToastNotification';
 import inventoryService from '../../services/services_admin/inventoryService';
 
 const ProductListNew = () => {
@@ -43,12 +42,9 @@ const ProductListNew = () => {
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [modalMode, setModalMode] = useState('create');
+  const [modalMode, setModalMode] = useState('create'); // 'create' atau 'edit'
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-
-  // Notification
-  const [notification, setNotification] = useState(null);
 
   // Fetch data on mount and filter change
   useEffect(() => {
@@ -226,8 +222,11 @@ const ProductListNew = () => {
 
   // Utilities
   const showNotification = (type, message) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification(null), 3000);
+    if (type === 'success') {
+      toast.success(message);
+    } else {
+      toast.error(message);
+    }
   };
 
   const formatCurrency = (value) => {
@@ -290,16 +289,6 @@ const ProductListNew = () => {
         />
         
         <div className="p-6">
-          {/* Notification */}
-          {notification && (
-            <div className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-6 py-3 rounded-lg shadow-lg transition-all ${
-              notification.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
-            }`}>
-              {notification.type === 'success' ? <CheckCircleIcon className="w-5 h-5" /> : <ExclamationCircleIcon className="w-5 h-5" />}
-              <span className="font-medium">{notification.message}</span>
-            </div>
-          )}
-
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -587,8 +576,7 @@ const ProductListNew = () => {
         loading={deleteLoading}
       />
 
-      {/* Toast Notification */}
-      <ToastNotification />
+  {/* Toast Notification dipindah global di main.jsx */}
     </div>
   );
 };
