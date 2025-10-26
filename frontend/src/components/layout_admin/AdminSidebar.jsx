@@ -21,11 +21,25 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       description: 'Ringkasan dan statistik'
     },
     {
-      id: 'inventory',
-      label: 'Inventory',
+      id: 'products',
+      label: 'Products',
       icon: '📦',
-      path: '/admin/inventory',
-      description: 'Manajemen Produk & Stok'
+      path: '/admin/products',
+      description: 'Manajemen Produk'
+    },
+    {
+      id: 'categories',
+      label: 'Categories',
+      icon: '🏷️',
+      path: '/admin/categories',
+      description: 'Manajemen Kategori'
+    },
+    {
+      id: 'discounts',
+      label: 'Discount Management',
+      icon: '🎁',
+      path: '/admin/discounts',
+      description: 'Kelola Diskon & Promo'
     },
     {
       id: 'users',

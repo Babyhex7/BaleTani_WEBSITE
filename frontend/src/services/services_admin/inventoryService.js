@@ -191,6 +191,122 @@ export const bulkUpdateStock = async (updates) => {
   }
 };
 
+// === DISCOUNT MANAGEMENT ===
+
+// Get discounts with pagination and filters
+export const getDiscounts = async (params = {}) => {
+  try {
+    const queryString = new URLSearchParams(params).toString();
+    const response = await adminApiClient.get(
+      `/admin/discounts${queryString ? `?${queryString}` : ""}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Gagal mengambil data diskon" };
+  }
+};
+
+// Get discount detail by id
+export const getDiscountById = async (id) => {
+  try {
+    const response = await adminApiClient.get(`/admin/discounts/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Gagal mengambil detail diskon" };
+  }
+};
+
+// Create discount
+export const createDiscount = async (discountData) => {
+  try {
+    const response = await adminApiClient.post(
+      `/admin/discounts`,
+      discountData
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Gagal membuat diskon" };
+  }
+};
+
+// Update discount
+export const updateDiscount = async (id, discountData) => {
+  try {
+    const response = await adminApiClient.put(
+      `/admin/discounts/${id}`,
+      discountData
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Gagal mengupdate diskon" };
+  }
+};
+
+// Soft delete discount
+export const deleteDiscount = async (id) => {
+  try {
+    const response = await adminApiClient.delete(`/admin/discounts/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Gagal menghapus diskon" };
+  }
+};
+
+// Restore deleted discount (super admin)
+export const restoreDiscount = async (id) => {
+  try {
+    const response = await adminApiClient.post(
+      `/admin/discounts/${id}/restore`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Gagal memulihkan diskon" };
+  }
+};
+
+// Toggle discount active status
+export const toggleDiscountStatus = async (id) => {
+  try {
+    const response = await adminApiClient.patch(
+      `/admin/discounts/${id}/toggle-status`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Gagal mengubah status diskon" };
+  }
+};
+
+// Add products to discount
+export const addProductsToDiscount = async (discountId, productIds = []) => {
+  try {
+    const response = await adminApiClient.post(
+      `/admin/discounts/${discountId}/products`,
+      {
+        product_ids: productIds,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data || { message: "Gagal menambahkan produk ke diskon" }
+    );
+  }
+};
+
+// Remove product from discount
+export const removeProductFromDiscount = async (discountId, productId) => {
+  try {
+    const response = await adminApiClient.delete(
+      `/admin/discounts/${discountId}/products/${productId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data || { message: "Gagal menghapus produk dari diskon" }
+    );
+  }
+};
+
 // Default export untuk backward compatibility
 const inventoryService = {
   // Produk
@@ -209,6 +325,16 @@ const inventoryService = {
   updateProductStock,
   getInventoryLogs,
   bulkUpdateStock,
+  // Discounts
+  getDiscounts,
+  getDiscountById,
+  createDiscount,
+  updateDiscount,
+  deleteDiscount,
+  restoreDiscount,
+  toggleDiscountStatus,
+  addProductsToDiscount,
+  removeProductFromDiscount,
 };
 
 export default inventoryService;
