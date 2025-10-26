@@ -1,308 +1,272 @@
-import { useEffect, useState } from "react";
-import {
+import React from 'react';
+import { 
   XMarkIcon,
   TagIcon,
+  CubeIcon,
   CalendarIcon,
   CheckCircleIcon,
   XCircleIcon,
   ClockIcon,
-  CubeIcon,
   TrashIcon,
-} from "@heroicons/react/24/outline";
-import {
-  getDiscountById,
-  removeProductFromDiscount,
-} from "../../services/services_admin/inventoryService";
+  CurrencyDollarIcon
+} from '@heroicons/react/24/outline';
+import inventoryService from '../../services/services_admin/inventoryService';
 
-const DiscountDetailModal = ({ isOpen, onClose, discount, onRefresh }) => {
-  const [discountDetail, setDiscountDetail] = useState(null);
-  const [loading, setLoading] = useState(false);
+/**
+ * Modal untuk melihat detail diskon (Read-only + Manage Products)
+ */
+const DiscountDetailModal = ({ 
+  isOpen, 
+  onClose, 
+  discount,
+  onRefresh 
+}) => {
+  if (!isOpen || !discount) return null;
 
-  // Fetch detail when modal opens
-  useEffect(() => {
-    if (isOpen && discount) {
-      fetchDiscountDetail();
-    }
-  }, [isOpen, discount]);
-
-  const fetchDiscountDetail = async () => {
-    try {
-      setLoading(true);
-      const response = await getDiscountById(discount.id);
-      if (response.success) {
-        setDiscountDetail(response.data);
-      }
-    } catch (err) {
-      console.error("Error fetching discount detail:", err);
-      alert(err.message || "Gagal mengambil detail diskon");
-    } finally {
-      setLoading(false);
-    }
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
   };
 
-  // Remove product from discount
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(value || 0);
+  };
+
+  const formatValue = (type, value) => {
+    if (type === 'percentage') {
+      return `${value}%`;
+    }
+    return formatCurrency(value);
+  };
+
   const handleRemoveProduct = async (productId) => {
-    const confirm = window.confirm(
-      "Apakah Anda yakin ingin menghapus produk ini dari diskon?"
-    );
+    const confirm = window.confirm('Hapus produk dari diskon ini?');
     if (!confirm) return;
 
     try {
-      const response = await removeProductFromDiscount(discount.id, productId);
-      if (response.success) {
-        // Refresh detail
-        fetchDiscountDetail();
-        // Refresh parent list
-        if (onRefresh) onRefresh();
-      }
+      const discountId = discount.id || discount.discount_id;
+      await inventoryService.removeProductFromDiscount(discountId, productId);
+      alert('Produk berhasil dihapus dari diskon!');
+      if (onRefresh) onRefresh();
+      onClose();
     } catch (err) {
-      console.error("Error removing product:", err);
-      alert(err.message || "Gagal menghapus produk dari diskon");
+      console.error('Error removing product:', err);
+      alert(err.message || 'Gagal menghapus produk');
     }
   };
 
-  // Get status badge
-  const getStatusBadge = (status) => {
-    const badges = {
-      active: (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-green-100 text-green-800">
-          <CheckCircleIcon className="w-5 h-5" />
-          Active
-        </span>
-      ),
-      expired: (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-red-100 text-red-800">
-          <XCircleIcon className="w-5 h-5" />
-          Expired
-        </span>
-      ),
-      upcoming: (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
-          <ClockIcon className="w-5 h-5" />
-          Upcoming
-        </span>
-      ),
-    };
-    return badges[status] || null;
+  const productCount = discount.products?.length || 0;
+  const products = discount.products || [];
+
+  // Get status
+  const getStatus = () => {
+    if (!discount.is_active) return 'inactive';
+    return discount.status || 'active';
   };
 
-  // Format value
-  const formatValue = (type, value) => {
-    if (type === "percentage") {
-      return `${value}%`;
-    }
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(value);
-  };
-
-  // Format date
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("id-ID", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    });
-  };
-
-  // Format price
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
-
-  if (!isOpen) return null;
+  const status = getStatus();
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        {/* Overlay */}
-        <div
-          className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
-          onClick={onClose}
-        ></div>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        onClick={onClose}
+      />
 
-        {/* Modal - Diperbesar ke max-w-4xl */}
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+      {/* Modal */}
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="relative bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
           {/* Header */}
-          <div className="bg-green-600 px-6 py-5 flex items-center justify-between">
-            <h3 className="text-xl font-bold text-white flex items-center gap-2">
-              <TagIcon className="w-7 h-7" />
-              Detail Diskon
-            </h3>
-            <button onClick={onClose} className="text-white hover:text-gray-200">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <TagIcon className="w-6 h-6 text-green-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">
+                Detail Diskon
+              </h3>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-500 transition-colors"
+            >
               <XMarkIcon className="w-6 h-6" />
             </button>
           </div>
 
           {/* Content */}
-          <div className="px-6 py-6">
-            {loading ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-              </div>
-            ) : discountDetail ? (
-              <div className="space-y-6">
-                {/* Discount Info Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  <div className="md:col-span-2 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-5 border border-green-200">
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      Nama Diskon
-                    </label>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {discountDetail.discount_name}
-                    </p>
-                  </div>
-                  <div className="bg-white rounded-lg p-5 border-2 border-gray-200">
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      Status Periode
-                    </label>
-                    <div className="mt-1">
-                      {getStatusBadge(discountDetail.status)}
-                    </div>
-                  </div>
+          <div className="p-6 space-y-6">
+            {/* Nama & Status */}
+            <div>
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    {discount.discount_name}
+                  </h2>
+                  <div className="flex items-center gap-2">
+                    {status === 'active' ? (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-full">
+                        <CheckCircleIcon className="w-4 h-4" />
+                        Aktif
+                      </span>
+                    ) : status === 'expired' ? (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-full">
+                        <XCircleIcon className="w-4 h-4" />
+                        Expired
+                      </span>
+                    ) : status === 'upcoming' ? (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-full">
+                        <ClockIcon className="w-4 h-4" />
+                        Upcoming
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-full">
+                        <XCircleIcon className="w-4 h-4" />
+                        Nonaktif
+                      </span>
+                    )}
 
-                  <div className="bg-purple-50 rounded-lg p-5 border border-purple-200">
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      Tipe Diskon
-                    </label>
-                    <p className="text-lg font-semibold text-gray-900">
-                      {discountDetail.discount_type === "percentage"
-                        ? "📊 Persentase (%)"
-                        : "💰 Fixed Amount (Rp)"}
-                    </p>
-                  </div>
-                  <div className="bg-yellow-50 rounded-lg p-5 border border-yellow-200">
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      Nilai Diskon
-                    </label>
-                    <p className="text-2xl font-bold text-yellow-700">
-                      {formatValue(discountDetail.discount_type, discountDetail.value)}
-                    </p>
-                  </div>
-                  <div className="bg-blue-50 rounded-lg p-5 border border-blue-200">
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      Status Aktif
-                    </label>
-                    <span
-                      className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold ${
-                        discountDetail.is_active
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {discountDetail.is_active ? "✅ Aktif" : "⏸️ Non-aktif"}
+                    <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+                      discount.discount_type === 'percentage' 
+                        ? 'bg-purple-100 text-purple-700'
+                        : 'bg-orange-100 text-orange-700'
+                    }`}>
+                      {discount.discount_type === 'percentage' ? 'Percentage' : 'Fixed Amount'}
                     </span>
                   </div>
-
-                  <div className="bg-orange-50 rounded-lg p-5 border border-orange-200">
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      <CalendarIcon className="w-4 h-4 inline mr-1" />
-                      Tanggal Mulai
-                    </label>
-                    <p className="text-lg font-semibold text-gray-900">
-                      {formatDate(discountDetail.start_date)}
-                    </p>
-                  </div>
-                  <div className="bg-red-50 rounded-lg p-5 border border-red-200">
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      <CalendarIcon className="w-4 h-4 inline mr-1" />
-                      Tanggal Berakhir
-                    </label>
-                    <p className="text-lg font-semibold text-gray-900">
-                      {formatDate(discountDetail.end_date)}
-                    </p>
-                  </div>
-                  <div className="bg-indigo-50 rounded-lg p-5 border border-indigo-200">
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      <CubeIcon className="w-4 h-4 inline mr-1" />
-                      Total Produk
-                    </label>
-                    <p className="text-3xl font-bold text-indigo-600">
-                      {discountDetail.product_count || 0}
-                    </p>
-                  </div>
                 </div>
 
-                {/* Divider */}
-                <div className="border-t-2 border-gray-200"></div>
-
-                {/* Assigned Products */}
-                <div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <CubeIcon className="w-6 h-6 text-green-600" />
-                    Produk yang Mendapat Diskon ({discountDetail.product_count || 0})
-                  </h4>
-
-                  {discountDetail.products && discountDetail.products.length > 0 ? (
-                    <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
-                      {discountDetail.products.map((product) => (
-                        <div
-                          key={product.id}
-                          className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-green-50 rounded-lg border-2 border-gray-200 hover:border-green-400 transition-all"
-                        >
-                          <div className="flex-1">
-                            <p className="font-bold text-gray-900 text-lg mb-2">
-                              {product.name}
-                            </p>
-                            <div className="flex items-center gap-4 text-sm text-gray-700">
-                              <span className="bg-white px-3 py-1 rounded-full border border-gray-300">
-                                💰 Harga: <strong>{formatPrice(product.selling_price)}</strong>
-                              </span>
-                              <span className="bg-white px-3 py-1 rounded-full border border-gray-300">
-                                📦 Stok: <strong>{product.total_stock || 0}</strong>
-                              </span>
-                              <span
-                                className={`px-3 py-1 rounded-full font-semibold ${
-                                  product.is_active
-                                    ? "bg-green-100 text-green-700 border border-green-300"
-                                    : "bg-red-100 text-red-700 border border-red-300"
-                                }`}
-                              >
-                                {product.is_active ? "✅ Aktif" : "❌ Nonaktif"}
-                              </span>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleRemoveProduct(product.id)}
-                            className="ml-4 p-2 text-red-600 hover:text-white hover:bg-red-600 border-2 border-red-600 rounded-lg transition-all"
-                            title="Hapus dari diskon"
-                          >
-                            <TrashIcon className="w-6 h-6" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                      <CubeIcon className="w-16 h-16 mx-auto mb-3 text-gray-400" />
-                      <p className="text-gray-600 font-medium">
-                        Belum ada produk yang mendapat diskon ini
-                      </p>
-                      <p className="text-sm text-gray-500 mt-2">
-                        💡 Gunakan tombol "Pilih Produk" untuk menambahkan produk
-                      </p>
-                    </div>
-                  )}
+                {/* Value Badge */}
+                <div className="text-center">
+                  <div className="flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-1">
+                    <TagIcon className="w-8 h-8 text-yellow-600" />
+                  </div>
+                  <p className="text-xl font-bold text-yellow-600">
+                    {formatValue(discount.discount_type, discount.value)}
+                  </p>
+                  <p className="text-xs text-gray-500">Nilai Diskon</p>
                 </div>
               </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <p>Data diskon tidak ditemukan</p>
+            </div>
+
+            {/* Info Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Start Date */}
+              <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                <CalendarIcon className="w-5 h-5 text-gray-400 mt-0.5" />
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Tanggal Mulai</p>
+                  <p className="text-sm text-gray-900">
+                    {formatDate(discount.start_date)}
+                  </p>
+                </div>
+              </div>
+
+              {/* End Date */}
+              <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                <CalendarIcon className="w-5 h-5 text-gray-400 mt-0.5" />
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Tanggal Selesai</p>
+                  <p className="text-sm text-gray-900">
+                    {formatDate(discount.end_date)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Product Count */}
+              <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                <CubeIcon className="w-5 h-5 text-gray-400 mt-0.5" />
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Jumlah Produk</p>
+                  <p className="text-sm text-gray-900">
+                    {productCount} produk mendapat diskon
+                  </p>
+                </div>
+              </div>
+
+              {/* Active Status */}
+              <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                <CheckCircleIcon className="w-5 h-5 text-gray-400 mt-0.5" />
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Status Aktif</p>
+                  <p className="text-sm text-gray-900">
+                    {discount.is_active ? 'Aktif' : 'Nonaktif'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Products List */}
+            {productCount > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <CubeIcon className="w-5 h-5" />
+                  Produk yang Mendapat Diskon ({productCount})
+                </h4>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {products.map((product) => (
+                    <div 
+                      key={product.id || product.product_id}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="p-2 bg-green-100 rounded">
+                          <CubeIcon className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">
+                            {product.name || product.product_name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-gray-500">
+                              {formatCurrency(product.price)}
+                            </span>
+                            <span className="text-xs text-gray-400">•</span>
+                            <span className="text-xs text-gray-500">
+                              Stok: {product.total_stock || 0} {product.unit || 'unit'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveProduct(product.id || product.product_id)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Hapus dari diskon"
+                      >
+                        <TrashIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {productCount === 0 && (
+              <div className="text-center py-8 bg-gray-50 rounded-lg">
+                <CubeIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-600 text-sm">
+                  Belum ada produk yang mendapat diskon ini
+                </p>
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 bg-gray-50 border-t flex justify-end">
+          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
             <button
               onClick={onClose}
-              className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Tutup
             </button>

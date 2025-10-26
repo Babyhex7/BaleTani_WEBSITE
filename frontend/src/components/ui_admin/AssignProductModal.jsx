@@ -1,366 +1,314 @@
-import { useState, useEffect } from "react";
-import {
+import React, { useState, useEffect } from 'react';
+import { 
   XMarkIcon,
   MagnifyingGlassIcon,
-  PlusCircleIcon,
+  CubeIcon,
   CheckIcon,
-} from "@heroicons/react/24/outline";
-import {
-  getProducts,
-  addProductsToDiscount,
-  getDiscountById,
-} from "../../services/services_admin/inventoryService";
+  ArrowPathIcon
+} from '@heroicons/react/24/outline';
+import inventoryService from '../../services/services_admin/inventoryService';
 
-const AssignProductModal = ({ isOpen, onClose, discount, onSuccess }) => {
+/**
+ * Modal untuk assign products ke discount
+ */
+const AssignProductModal = ({ 
+  isOpen, 
+  onClose, 
+  discount,
+  onSuccess 
+}) => {
   const [products, setProducts] = useState([]);
-  const [assignedProductIds, setAssignedProductIds] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-
-  // Search & Filter
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit] = useState(15);
+  const [saving, setSaving] = useState(false);
 
-  // Fetch products
+  // Already assigned product IDs
+  const assignedProductIds = discount?.products?.map(p => p.id || p.product_id) || [];
+
+  useEffect(() => {
+    if (isOpen && discount) {
+      fetchProducts();
+    }
+  }, [isOpen, discount, currentPage, searchQuery]);
+
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await getProducts({
+      const params = {
         page: currentPage,
-        limit,
-        search: searchTerm,
-        is_active: true, // Only active products
-      });
+        limit: 12,
+        search: searchQuery,
+        is_active: true,
+      };
 
-      if (response.success) {
-        setProducts(response.data.products || []);
-        setTotalPages(response.data.pagination.totalPages);
+      const data = await inventoryService.getProducts(params);
+
+      if (data.success) {
+        setProducts(data.data.products || []);
+        setTotalPages(data.data.pagination?.totalPages || 1);
       }
     } catch (err) {
-      console.error("Error fetching products:", err);
+      console.error('Error fetching products:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch discount detail to get already assigned products
-  const fetchAssignedProducts = async () => {
-    try {
-      const response = await getDiscountById(discount.id);
-      if (response.success) {
-        const assignedIds = (response.data.products || []).map((p) => p.id);
-        setAssignedProductIds(assignedIds);
-      }
-    } catch (err) {
-      console.error("Error fetching assigned products:", err);
-    }
-  };
+  const handleToggleProduct = (productId) => {
+    if (assignedProductIds.includes(productId)) return; // Already assigned
 
-  // Load data when modal opens
-  useEffect(() => {
-    if (isOpen && discount) {
-      fetchProducts();
-      fetchAssignedProducts();
-    }
-  }, [isOpen, discount, currentPage, searchTerm]);
-
-  // Handle search
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
-  };
-
-  // Toggle product selection
-  const toggleProductSelection = (productId) => {
-    setSelectedProducts((prev) => {
+    setSelectedProducts(prev => {
       if (prev.includes(productId)) {
-        return prev.filter((id) => id !== productId);
+        return prev.filter(id => id !== productId);
       } else {
         return [...prev, productId];
       }
     });
   };
 
-  // Select all visible products (not already assigned)
-  const selectAllVisible = () => {
-    const availableProducts = products.filter(
-      (p) => !assignedProductIds.includes(p.id)
-    );
-    const availableIds = availableProducts.map((p) => p.id);
-    setSelectedProducts((prev) => {
-      // Toggle: if all are selected, deselect; otherwise select all
-      const allSelected = availableIds.every((id) => prev.includes(id));
-      if (allSelected) {
-        return prev.filter((id) => !availableIds.includes(id));
-      } else {
-        return [...new Set([...prev, ...availableIds])];
-      }
-    });
+  const handleSelectAll = () => {
+    const availableProducts = products
+      .filter(p => !assignedProductIds.includes(p.id || p.product_id))
+      .map(p => p.id || p.product_id);
+
+    if (selectedProducts.length === availableProducts.length) {
+      setSelectedProducts([]);
+    } else {
+      setSelectedProducts(availableProducts);
+    }
   };
 
-  // Assign products to discount
-  const handleAssign = async () => {
+  const handleSubmit = async () => {
     if (selectedProducts.length === 0) {
-      alert("Pilih minimal 1 produk untuk ditambahkan ke diskon");
+      alert('Pilih minimal 1 produk');
       return;
     }
 
     try {
-      setSubmitting(true);
-      const response = await addProductsToDiscount(discount.id, selectedProducts);
-
-      if (response.success) {
-        alert(
-          `✅ Berhasil menambahkan ${selectedProducts.length} produk ke diskon!`
-        );
-        onSuccess();
-      }
+      setSaving(true);
+      const discountId = discount.id || discount.discount_id;
+      await inventoryService.addProductsToDiscount(discountId, selectedProducts);
+      
+      alert(`Berhasil menambahkan ${selectedProducts.length} produk ke diskon!`);
+      setSelectedProducts([]);
+      if (onSuccess) onSuccess();
+      onClose();
     } catch (err) {
-      console.error("Error assigning products:", err);
-      alert(err.message || "Gagal menambahkan produk ke diskon");
+      console.error('Error assigning products:', err);
+      alert(err.message || 'Gagal menambahkan produk');
     } finally {
-      setSubmitting(false);
+      setSaving(false);
     }
   };
 
-  // Format price
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(price);
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(value || 0);
   };
 
-  // Check if product is already assigned
-  const isAlreadyAssigned = (productId) => {
-    return assignedProductIds.includes(productId);
-  };
+  if (!isOpen || !discount) return null;
 
-  // Check if product is selected
-  const isSelected = (productId) => {
-    return selectedProducts.includes(productId);
-  };
-
-  if (!isOpen) return null;
+  const availableProducts = products.filter(
+    p => !assignedProductIds.includes(p.id || p.product_id)
+  );
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        {/* Overlay */}
-        <div
-          className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
-          onClick={onClose}
-        ></div>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        onClick={onClose}
+      />
 
-        {/* Modal - Diperbesar ke max-w-5xl */}
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full">
+      {/* Modal */}
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col">
           {/* Header */}
-          <div className="bg-green-600 px-6 py-5 flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-bold text-white">Pilih Produk</h3>
-              <p className="text-sm text-green-100 mt-1">
-                📌 {discount?.discount_name}
-              </p>
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <CubeIcon className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Tambah Produk ke Diskon
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {discount.discount_name}
+                </p>
+              </div>
             </div>
-            <button onClick={onClose} className="text-white hover:text-gray-200">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-500 transition-colors"
+            >
               <XMarkIcon className="w-6 h-6" />
             </button>
           </div>
 
-          {/* Content */}
-          <div className="px-6 py-5">
-            {/* Search & Selection Info */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-5">
-              {/* Search */}
-              <div className="flex-1 w-full relative">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Cari produk..."
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-                />
-              </div>
-
-              {/* Selection count */}
-              <div className="flex items-center gap-3">
-                <div className="text-sm text-gray-700 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200 font-semibold">
-                  {selectedProducts.length} produk dipilih
-                </div>
-
-                {/* Select All */}
-                <button
-                  onClick={selectAllVisible}
-                  className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-medium border border-green-300"
-                >
-                  Pilih Semua Halaman Ini
-                </button>
-              </div>
+          {/* Search & Info */}
+          <div className="p-6 border-b border-gray-200 space-y-4">
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Cari produk..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
             </div>
 
-            {/* Products List */}
-            <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
-              {loading ? (
-                <div className="flex items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-                </div>
-              ) : products.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <p className="text-lg font-medium">Tidak ada produk ditemukan</p>
-                  <p className="text-sm mt-2">Coba ubah kata kunci pencarian</p>
-                </div>
-              ) : (
-                <div className="max-h-[500px] overflow-y-auto">
-                  {products.map((product) => {
-                    const alreadyAssigned = isAlreadyAssigned(product.id);
-                    const selected = isSelected(product.id);
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold text-green-600">{selectedProducts.length}</span> produk dipilih
+              </p>
+              {availableProducts.length > 0 && (
+                <button
+                  onClick={handleSelectAll}
+                  className="text-sm text-green-600 hover:text-green-700 font-medium"
+                >
+                  {selectedProducts.length === availableProducts.length ? 'Batal Pilih Semua' : 'Pilih Semua'}
+                </button>
+              )}
+            </div>
+          </div>
 
-                    return (
-                      <div
-                        key={product.id}
-                        className={`flex items-center justify-between p-4 border-b border-gray-200 transition-all ${
-                          alreadyAssigned ? "bg-gray-100 opacity-60" : ""
-                        } ${
-                          selected
-                            ? "bg-green-50 border-l-4 border-l-green-500"
-                            : "hover:bg-gray-50"
-                        }`}
-                      >
-                        <div className="flex items-center gap-4 flex-1">
-                          {/* Checkbox */}
-                          <input
-                            type="checkbox"
-                            checked={selected}
-                            onChange={() => toggleProductSelection(product.id)}
-                            disabled={alreadyAssigned}
-                            className="w-6 h-6 text-green-600 border-gray-300 rounded focus:ring-green-500 disabled:opacity-50 cursor-pointer"
-                          />
+          {/* Products List */}
+          <div className="flex-1 overflow-y-auto p-6">
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <ArrowPathIcon className="w-8 h-8 text-green-600 animate-spin" />
+                <span className="ml-3 text-gray-600">Memuat produk...</span>
+              </div>
+            ) : products.length === 0 ? (
+              <div className="text-center py-12">
+                <CubeIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-600">Tidak ada produk tersedia</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {products.map((product) => {
+                  const productId = product.id || product.product_id;
+                  const isAssigned = assignedProductIds.includes(productId);
+                  const isSelected = selectedProducts.includes(productId);
 
-                          {/* Product Image Placeholder */}
-                          <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center shadow">
-                            <span className="text-gray-500 text-xs font-bold">
-                              IMG
+                  return (
+                    <div
+                      key={productId}
+                      onClick={() => !isAssigned && handleToggleProduct(productId)}
+                      className={`
+                        relative p-4 border rounded-lg cursor-pointer transition-all
+                        ${isAssigned 
+                          ? 'bg-gray-50 border-gray-300 opacity-60 cursor-not-allowed' 
+                          : isSelected
+                            ? 'bg-green-50 border-green-500 border-2'
+                            : 'bg-white border-gray-200 hover:border-green-300'
+                        }
+                      `}
+                    >
+                      {/* Checkbox */}
+                      <div className="flex items-start gap-3">
+                        <div className={`
+                          flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center mt-1
+                          ${isAssigned
+                            ? 'bg-gray-300 border-gray-400'
+                            : isSelected
+                              ? 'bg-green-600 border-green-600'
+                              : 'border-gray-300'
+                          }
+                        `}>
+                          {(isSelected || isAssigned) && (
+                            <CheckIcon className="w-3 h-3 text-white" />
+                          )}
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium text-gray-900 mb-1">
+                            {product.name || product.product_name}
+                          </h4>
+                          
+                          <div className="flex flex-wrap items-center gap-2 text-xs">
+                            <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded">
+                              {formatCurrency(product.price)}
                             </span>
+                            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">
+                              Stok: {product.total_stock || 0} {product.unit || 'unit'}
+                            </span>
+                            {product.Category?.category_name && (
+                              <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded">
+                                {product.Category.category_name}
+                              </span>
+                            )}
                           </div>
 
-                          {/* Product Info */}
-                          <div className="flex-1">
-                            <p className="font-bold text-gray-900 text-base mb-1">
-                              {product.name}
-                            </p>
-                            <div className="flex items-center gap-3 text-sm text-gray-700">
-                              <span className="bg-yellow-50 px-2 py-1 rounded border border-yellow-200">
-                                💰 {formatPrice(product.selling_price)}
+                          {isAssigned && (
+                            <div className="mt-2">
+                              <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded">
+                                ✓ Sudah Terdaftar
                               </span>
-                              <span className="bg-blue-50 px-2 py-1 rounded border border-blue-200">
-                                📦 Stok: {product.total_stock || 0} {product.unit || "unit"}
-                              </span>
-                              {product.category_name && (
-                                <span className="bg-purple-50 px-2 py-1 rounded border border-purple-200 text-purple-700">
-                                  🏷️ {product.category_name}
-                                </span>
-                              )}
                             </div>
-                          </div>
-
-                          {/* Status Badge */}
-                          {alreadyAssigned && (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-green-100 text-green-800 border-2 border-green-300">
-                              <CheckIcon className="w-5 h-5" />
-                              Sudah Terdaftar
-                            </span>
                           )}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Pagination */}
-            {!loading && products.length > 0 && (
-              <div className="mt-5 flex items-center justify-between bg-gray-50 px-4 py-3 rounded-lg border border-gray-200">
-                <div className="text-sm text-gray-700 font-medium">
-                  Halaman {currentPage} dari {totalPages}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white font-medium transition-all"
-                  >
-                    ← Prev
-                  </button>
-                  <button
-                    onClick={() =>
-                      setCurrentPage((p) => Math.min(totalPages, p + 1))
-                    }
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white font-medium transition-all"
-                  >
-                    Next →
-                  </button>
-                </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
 
+          {/* Pagination */}
+          {!loading && products.length > 0 && totalPages > 1 && (
+            <div className="px-6 py-3 border-t border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-600">
+                  Halaman {currentPage} dari {totalPages}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 text-sm border rounded disabled:opacity-50"
+                  >
+                    Sebelumnya
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 text-sm border rounded disabled:opacity-50"
+                  >
+                    Selanjutnya
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Footer */}
-          <div className="px-6 py-4 bg-gray-50 border-t flex justify-between items-center">
-            <div className="text-sm text-gray-700">
-              {selectedProducts.length > 0 && (
-                <span className="font-semibold text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
-                  ✅ {selectedProducts.length} produk siap ditambahkan
-                </span>
-              )}
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={onClose}
-                className="px-6 py-3 text-gray-700 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleAssign}
-                disabled={submitting || selectedProducts.length === 0}
-                className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium min-w-[180px] justify-center"
-              >
-                {submitting ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        fill="none"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Menambahkan...
-                  </>
-                ) : (
-                  <>
-                    <PlusCircleIcon className="w-5 h-5" />
-                    Tambahkan {selectedProducts.length > 0 ? selectedProducts.length : ""}{" "}
-                    Produk
-                  </>
-                )}
-              </button>
-            </div>
+          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Batal
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={selectedProducts.length === 0 || saving}
+              className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? 'Menyimpan...' : `Tambahkan ${selectedProducts.length} Produk`}
+            </button>
           </div>
         </div>
       </div>
