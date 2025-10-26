@@ -5,6 +5,8 @@ import LandingPage from './pages/customer/LandingPage';
 import Home from './pages/customer/Home';
 import Login from './pages/customer/Login';
 import Register from './pages/customer/Register';
+import ProductPage from './pages/customer/ProductPage';
+import PromoPage from './pages/customer/PromoPage';
 import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRoute';
 
 // Admin Pages
@@ -58,29 +60,19 @@ function App() {
       {/* Customer routes (hanya untuk customer) */}
       <Route path="/home" element={
         <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <Home />
-          </CustomerLayout>
+          <Home />
         </ProtectedRoute>
       } />
 
       <Route path="/products" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <div className="container-custom section-padding">
-              <h1 className="text-2xl font-bold">Halaman Produk (Coming Soon)</h1>
-            </div>
-          </CustomerLayout>
+        <ProtectedRoute requireAuth={false}>
+          <ProductPage />
         </ProtectedRoute>
       } />
 
       <Route path="/promo" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <div className="container-custom section-padding">
-              <h1 className="text-2xl font-bold">Halaman Promo (Coming Soon)</h1>
-            </div>
-          </CustomerLayout>
+        <ProtectedRoute requireAuth={false}>
+          <PromoPage />
         </ProtectedRoute>
       } />
 

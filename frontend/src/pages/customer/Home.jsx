@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Star, MessageCircle, Heart, TrendingUp, Package, Clock, Filter, ArrowRight } from 'lucide-react';
+import { ShoppingCart, Star, MessageCircle, Heart, TrendingUp, Package, Clock, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
 import useAuthStore from '../../store/store_customer/useAuthStore';
+import productService from '../../services/services_customer/productService';
 import Button from '../../components/ui/Button';
+import ProductCard from '../../components/ui/ProductCard';
+import Navbar from '../../components/layout/Navbar';
+import Footer from '../../components/layout/Footer';
 
 /**
  * Komponen Home untuk pengguna yang sudah login
@@ -13,50 +16,28 @@ const Home = () => {
   const { user } = useAuthStore();
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-  const [recentOrders, setRecentOrders] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Data produk rekomendasi berdasarkan history user
-  const recommendedProducts = [
-    {
-      id: 1,
-      name: 'Udang Sedang Fresh',
-      price: 65000,
-      originalPrice: 70000,
-      image: '/api/placeholder/300/300',
-      category: 'Seafood',
-      stock: 50,
-      discount: 7,
-      unit: 'kg',
-      rating: 4.8,
-      sold: 125
-    },
-    {
-      id: 7,
-      name: 'Ayam Filet Premium',
-      price: 43000,
-      originalPrice: 48000,
-      image: '/api/placeholder/300/300',
-      category: 'Daging & Unggas',
-      stock: 30,
-      discount: 10,
-      unit: 'kg',
-      rating: 4.9,
-      sold: 89
-    },
-    {
-      id: 24,
-      name: 'Apel Segar',
-      price: 30000,
-      originalPrice: 35000,
-      image: '/api/placeholder/300/300',
-      category: 'Buah',
-      stock: 25,
-      discount: 14,
-      unit: 'kg',
-      rating: 4.7,
-      sold: 156
-    }
-  ];
+  // Fetch featured products from API
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await productService.getFeaturedProducts(6);
+        
+        if (response.success) {
+          setFeaturedProducts(response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching featured products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+  }, []);
 
   // Data promo khusus member
   const memberPromos = [
@@ -108,7 +89,7 @@ const Home = () => {
       setCart([...cart, { ...product, quantity: 1 }]);
     }
     
-    toast.success(`${product.name} ditambahkan ke keranjang`);
+    alert(`${product.name} ditambahkan ke keranjang`);
   };
 
   /**
@@ -120,10 +101,10 @@ const Home = () => {
     
     if (isInWishlist) {
       setWishlist(wishlist.filter(item => item.id !== product.id));
-      toast.success(`${product.name} dihapus dari wishlist`);
+      alert(`${product.name} dihapus dari wishlist`);
     } else {
       setWishlist([...wishlist, product]);
-      toast.success(`${product.name} ditambahkan ke wishlist`);
+      alert(`${product.name} ditambahkan ke wishlist`);
     }
   };
 
@@ -134,22 +115,25 @@ const Home = () => {
    * @param {string} unit - Unit produk
    */
   const handleWhatsAppOrder = (productName, price, unit) => {
-    const message = `Halo, saya ${user?.name} ingin memesan ${productName} seharga ${formatPrice(price)}/${unit}. Mohon info ketersediaan dan cara pemesanannya. Terima kasih!`;
+    const userName = user?.name || 'Customer';
+    const message = `Halo, saya ${userName} ingin memesan ${productName} seharga ${formatPrice(price)}/${unit}. Mohon info ketersediaan dan cara pemesanannya. Terima kasih!`;
     const whatsappUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      
       {/* Welcome Section */}
-      <section className="bg-gradient-to-r from-primary-500 to-primary-600 text-white py-12">
-        <div className="container-custom">
+      <section className="bg-gradient-to-r from-green-600 to-green-700 text-white py-12">
+        <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                Selamat datang kembali, {user?.name}! 👋
+                Selamat datang kembali, {user?.name || 'Customer'}! 👋
               </h1>
-              <p className="text-xl opacity-90">
+              <p className="text-xl opacity-90 text-green-100">
                 Apa yang ingin Anda beli hari ini?
               </p>
             </div>
@@ -170,28 +154,28 @@ const Home = () => {
 
       {/* Quick Actions */}
       <section className="py-8">
-        <div className="container-custom">
+        <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link to="/products" className="card card-hover text-center p-6">
-              <Package className="w-8 h-8 text-primary-500 mx-auto mb-3" />
+            <Link to="/products" className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-300 text-center p-6">
+              <Package className="w-8 h-8 text-green-600 mx-auto mb-3" />
               <h3 className="font-semibold">Semua Produk</h3>
               <p className="text-sm text-gray-600">Lihat katalog lengkap</p>
             </Link>
             
-            <Link to="/cart" className="card card-hover text-center p-6">
-              <ShoppingCart className="w-8 h-8 text-primary-500 mx-auto mb-3" />
+            <Link to="/promo" className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-red-300 text-center p-6">
+              <TrendingUp className="w-8 h-8 text-red-600 mx-auto mb-3" />
+              <h3 className="font-semibold">Promo Spesial</h3>
+              <p className="text-sm text-gray-600">Lihat semua promo</p>
+            </Link>
+            
+            <Link to="/cart" className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-300 text-center p-6">
+              <ShoppingCart className="w-8 h-8 text-green-600 mx-auto mb-3" />
               <h3 className="font-semibold">Keranjang Saya</h3>
               <p className="text-sm text-gray-600">{cart.length} item menunggu</p>
             </Link>
             
-            <Link to="/orders" className="card card-hover text-center p-6">
-              <Clock className="w-8 h-8 text-primary-500 mx-auto mb-3" />
-              <h3 className="font-semibold">Pesanan Saya</h3>
-              <p className="text-sm text-gray-600">Lacak pesanan Anda</p>
-            </Link>
-            
-            <Link to="/wishlist" className="card card-hover text-center p-6">
-              <Heart className="w-8 h-8 text-primary-500 mx-auto mb-3" />
+            <Link to="/wishlist" className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-pink-300 text-center p-6">
+              <Heart className="w-8 h-8 text-pink-600 mx-auto mb-3" />
               <h3 className="font-semibold">Wishlist</h3>
               <p className="text-sm text-gray-600">{wishlist.length} produk favorit</p>
             </Link>
@@ -200,128 +184,94 @@ const Home = () => {
       </section>
 
       {/* Member Promos */}
-      <section className="py-8">
-        <div className="container-custom">
+      <section className="py-8 bg-gradient-to-r from-orange-50 to-red-50">
+        <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">🎉 Promo Khusus Member</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {memberPromos.map((promo) => (
-              <div key={promo.id} className="bg-gradient-to-r from-accent-500 to-accent-600 text-white rounded-xl p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">{promo.title}</h3>
-                    <p className="opacity-90">{promo.description}</p>
-                  </div>
-                  <div className="bg-white text-accent-600 font-bold text-lg px-3 py-1 rounded-lg">
-                    {promo.discount}
-                  </div>
+            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl p-6 shadow-lg">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Diskon 20% Produk Segar</h3>
+                  <p className="opacity-90">Berlaku untuk semua produk kategori Sayuran & Buah</p>
                 </div>
-                <div className="border-t border-white/20 pt-4 mt-4">
-                  <div className="flex justify-between text-sm">
-                    <span>Berlaku sampai: {promo.validUntil}</span>
-                    <span>Min. pembelian: {formatPrice(promo.minPurchase)}</span>
-                  </div>
+                <div className="bg-white text-red-600 font-bold text-lg px-3 py-1 rounded-lg">
+                  20%
                 </div>
               </div>
-            ))}
+              <div className="border-t border-white/20 pt-4 mt-4">
+                <div className="flex justify-between text-sm">
+                  <span>Berlaku sampai: 31 Okt 2025</span>
+                  <span>Min. pembelian: Rp 100.000</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-6 shadow-lg">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Gratis Ongkir</h3>
+                  <p className="opacity-90">Pengiriman gratis ke seluruh Indonesia</p>
+                </div>
+                <div className="bg-white text-green-600 font-bold text-lg px-3 py-1 rounded-lg">
+                  FREE
+                </div>
+              </div>
+              <div className="border-t border-white/20 pt-4 mt-4">
+                <div className="flex justify-between text-sm">
+                  <span>Berlaku sampai: 15 Nov 2025</span>
+                  <span>Min. pembelian: Rp 150.000</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Recommended Products */}
+      {/* Featured Products */}
       <section className="py-8">
-        <div className="container-custom">
+        <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
               <TrendingUp className="inline mr-2" size={24} />
-              Rekomendasi Untuk Anda
+              Produk Unggulan Hari Ini
             </h2>
             <Link to="/products">
-              <Button variant="outline">Lihat Semua</Button>
+              <Button className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2">
+                Lihat Semua
+                <ArrowRight size={16} />
+              </Button>
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {recommendedProducts.map((product) => (
-              <div key={product.id} className="card card-hover group">
-                <div className="relative overflow-hidden rounded-t-xl">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  {product.discount > 0 && (
-                    <div className="promo-badge">
-                      -{product.discount}%
-                    </div>
-                  )}
-                  <button
-                    onClick={() => handleToggleWishlist(product)}
-                    className={`absolute top-2 right-2 p-2 rounded-full ${
-                      wishlist.find(item => item.id === product.id)
-                        ? 'bg-red-500 text-white'
-                        : 'bg-white/80 text-gray-600 hover:bg-white'
-                    } transition-colors`}
-                  >
-                    <Heart size={16} />
-                  </button>
-                  <div className="absolute top-2 left-2 bg-primary-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                    {product.category}
-                  </div>
-                </div>
-                
-                <div className="p-6 space-y-4">
-                  <div>
-                    <h3 className="font-semibold text-lg text-gray-900 mb-2">{product.name}</h3>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl font-bold text-primary-500">
-                        {formatPrice(product.price)}
-                      </span>
-                      <span className="text-sm text-gray-500">/{product.unit}</span>
-                      {product.originalPrice > product.price && (
-                        <span className="text-sm text-gray-500 line-through">
-                          {formatPrice(product.originalPrice)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>Stok: {product.stock}</span>
-                    <div className="flex items-center space-x-1">
-                      <Star className="text-yellow-400 fill-current" size={16} />
-                      <span>{product.rating}</span>
-                      <span>({product.sold} terjual)</span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Button 
-                      variant="primary" 
-                      className="w-full"
-                      onClick={() => handleAddToCart(product)}
-                    >
-                      <ShoppingCart className="mr-2" size={16} />
-                      Tambah ke Keranjang
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => handleWhatsAppOrder(product.name, product.price, product.unit)}
-                    >
-                      <MessageCircle className="mr-2" size={16} />
-                      Pesan via WhatsApp
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent"></div>
+              <p className="mt-4 text-gray-600">Memuat produk...</p>
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  formatPrice={formatPrice}
+                  onWhatsAppOrder={handleWhatsAppOrder}
+                  onAddToCart={handleAddToCart}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-xl">
+              <Package className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+              <p className="text-gray-600">Belum ada produk unggulan</p>
+            </div>
+          )}
         </div>
       </section>
 
       {/* Categories Quick Access */}
       <section className="py-8 bg-white">
-        <div className="container-custom">
+        <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Kategori Populer</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
@@ -333,7 +283,7 @@ const Home = () => {
               <Link 
                 key={category.name}
                 to={category.href}
-                className="card card-hover text-center p-6"
+                className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-300 text-center p-6"
               >
                 <div className="text-4xl mb-3">{category.icon}</div>
                 <h3 className="font-semibold text-gray-900">{category.name}</h3>
@@ -346,20 +296,24 @@ const Home = () => {
 
       {/* Recent Activity */}
       <section className="py-8">
-        <div className="container-custom">
+        <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Aktivitas Terakhir</h2>
-          <div className="card p-6">
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="text-center text-gray-500 py-8">
               <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>Belum ada aktivitas pembelian</p>
+              <p className="font-medium">Belum ada aktivitas pembelian</p>
               <p className="text-sm">Mulai berbelanja untuk melihat riwayat aktivitas Anda</p>
               <Link to="/products" className="mt-4 inline-block">
-                <Button variant="primary">Mulai Belanja</Button>
+                <Button className="bg-green-600 hover:bg-green-700 text-white">
+                  Mulai Belanja
+                </Button>
               </Link>
             </div>
           </div>
         </div>
       </section>
+      
+      <Footer />
     </div>
   );
 };

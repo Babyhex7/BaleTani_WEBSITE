@@ -183,6 +183,25 @@ Discount.belongsToMany(Product, {
   as: "products",
 });
 
+// Direct ProductDiscount relationships (for eager loading)
+Product.hasMany(ProductDiscount, {
+  foreignKey: "product_id",
+  as: "productDiscounts",
+});
+ProductDiscount.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+ProductDiscount.belongsTo(Discount, {
+  foreignKey: "discount_id",
+  as: "discount",
+});
+Discount.hasMany(ProductDiscount, {
+  foreignKey: "discount_id",
+  as: "productDiscounts",
+});
+
 // Customer ↔ Product via Cart
 Customer.belongsToMany(Product, {
   through: Cart,

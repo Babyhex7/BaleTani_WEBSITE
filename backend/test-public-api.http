@@ -1,0 +1,59 @@
+### Test Public Product API
+
+# Get All Products
+GET http://localhost:5000/api/public/products
+Accept: application/json
+
+###
+
+# Get Products with Search
+GET http://localhost:5000/api/public/products?search=tomat
+Accept: application/json
+
+###
+
+# Get Products with Category Filter
+GET http://localhost:5000/api/public/products?category=<CATEGORY_UUID>
+Accept: application/json
+
+###
+
+# Get Products with Price Filter
+GET http://localhost:5000/api/public/products?minPrice=5000&maxPrice=50000
+Accept: application/json
+
+###
+
+# Get Products with Sort
+GET http://localhost:5000/api/public/products?sortBy=price_asc
+Accept: application/json
+
+###
+
+# Get Products with Pagination
+GET http://localhost:5000/api/public/products?page=1&limit=12
+Accept: application/json
+
+###
+
+# Get Products with All Filters
+GET http://localhost:5000/api/public/products?page=1&limit=12&search=segar&category=<UUID>&minPrice=5000&maxPrice=100000&sortBy=newest
+Accept: application/json
+
+###
+
+# Get Product Detail by ID
+GET http://localhost:5000/api/public/products/<PRODUCT_UUID>
+Accept: application/json
+
+###
+
+# Get Featured/Promo Products
+GET http://localhost:5000/api/public/products/featured/promo?limit=8
+Accept: application/json
+
+###
+
+# Get Categories (for filter dropdown)
+GET http://localhost:5000/api/public/categories
+Accept: application/json

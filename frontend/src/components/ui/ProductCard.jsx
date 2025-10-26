@@ -1,74 +1,94 @@
-import { Star, MessageCircle, ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Tag } from 'lucide-react';
 import Button from './Button';
 
 const ProductCard = ({ 
   product, 
-  onWhatsAppOrder, 
   onAddToCart, 
   formatPrice,
   className = '' 
 }) => {
+  // Calculate discount display
+  const hasDiscount = product.discount && product.discount.finalPrice < product.price;
+  const discountPercentage = hasDiscount 
+    ? Math.round(((product.price - product.discount.finalPrice) / product.price) * 100)
+    : 0;
+  
+  const finalPrice = hasDiscount ? product.discount.finalPrice : product.price;
+  
   return (
-    <div className={`group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-200 ${className}`}>
-      <div className="relative overflow-hidden">
+    <div className={`group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-green-300 ${className}`}>
+      {/* Product Image */}
+      <div className="relative overflow-hidden bg-gray-100">
         <img 
           src={product.image} 
           alt={product.name}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+          onError={(e) => {
+            e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+          }}
         />
-        {product.discount > 0 && (
-          <div className="absolute top-3 right-3 bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-full">
-            -{product.discount}%
+        
+        {/* Discount Badge */}
+        {hasDiscount && (
+          <div className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse">
+            -{discountPercentage}%
           </div>
         )}
-        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-semibold px-2 py-1 rounded-full">
-          {product.category}
-        </div>
+        
+        {/* Category Badge - Hijau Tua */}
+        {product.category && (
+          <div className="absolute top-3 left-3 bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md">
+            {typeof product.category === 'string' ? product.category : product.category.name}
+          </div>
+        )}
       </div>
       
-      <div className="p-5 space-y-4">
+      {/* Product Info */}
+      <div className="p-5 space-y-3">
+        {/* Product Name */}
         <div>
-          <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-green-600 transition-colors duration-300">
+          <h3 className="font-bold text-lg text-gray-900 group-hover:text-green-600 transition-colors duration-300 line-clamp-2">
             {product.name}
           </h3>
-          <div className="flex items-center space-x-2 mb-3">
-            <span className="text-xl font-bold text-green-600">
-              {formatPrice(product.price)}
-            </span>
-            <span className="text-sm text-gray-500">/{product.unit}</span>
-            {product.originalPrice > product.price && (
-              <span className="text-sm text-gray-400 line-through">
-                {formatPrice(product.originalPrice)}
+        </div>
+
+        {/* Description */}
+        {product.description && (
+          <p className="text-sm text-gray-600 line-clamp-2">
+            {product.description}
+          </p>
+        )}
+        
+        {/* Price Section - Horizontal Layout */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Current Price */}
+          <span className="text-2xl font-bold text-green-600">
+            {formatPrice(finalPrice)}
+          </span>
+          
+          {/* Original Price (if discount) - Di Samping */}
+          {hasDiscount && (
+            <>
+              <span className="text-lg text-gray-400 line-through">
+                {formatPrice(product.price)}
               </span>
-            )}
-          </div>
+              <span className="text-xs text-red-600 font-semibold bg-red-50 px-2 py-1 rounded">
+                Hemat {formatPrice(product.price - finalPrice)}
+              </span>
+            </>
+          )}
         </div>
         
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center space-x-1 text-gray-600">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span>Stok: {product.stock}</span>
-          </div>
-        
-        </div>
-        
-        <div className="space-y-2 pt-2">
+        {/* Action Button - Tambah ke Keranjang */}
+        <div className="pt-2">
           <Button 
             size="md"
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
-            onClick={() => onWhatsAppOrder(product.name, product.price, product.unit)}
-          >
-            <MessageCircle className="mr-2" size={16} />
-            Pesan WhatsApp
-          </Button>
-          <Button 
-            variant="outline" 
-            size="md"
-            className="w-full border-gray-200 text-gray-700 hover:border-green-600 hover:text-green-600"
-            onClick={() => onAddToCart(product)}
+            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-md hover:shadow-lg transition-all duration-300"
+            onClick={() => onAddToCart && onAddToCart(product)}
+            disabled={product.stock === 0}
           >
             <ShoppingCart className="mr-2" size={16} />
-            Tambah ke Keranjang
+            {product.stock === 0 ? 'Stok Habis' : 'Tambah ke Keranjang'}
           </Button>
         </div>
       </div>
