@@ -11,8 +11,13 @@ const routes = require("./routes");
 
 const app = express();
 
-// Security middleware
-app.use(helmet());
+// Security middleware - Configure helmet to allow cross-origin resources
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow images to be loaded cross-origin
+    contentSecurityPolicy: false, // Disable CSP for development (can be configured for production)
+  })
+);
 
 // Rate limiting
 const limiter = rateLimit({

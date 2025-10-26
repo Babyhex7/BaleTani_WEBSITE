@@ -27,12 +27,9 @@ const ProductFormModal = ({
     category_id: '',
     product_type: 'online',
     selling_price: '',
-    discount_price: '',
-    quantity_per_unit: '1', // Jumlah per unit (contoh: 65 untuk "65 kg")
-    unit: 'kg', // Satuan (kg, liter, pcs, dll)
-    unit_type: 'unit', // Tipe kemasan (pack, box, karton, unit)
+    quantity_info: '', // Info tambahan dokumentasi
     shelf_life_days: '',
-    initial_stock: '', // Jumlah stok (contoh: 5 pack)
+    initial_stock: '', // Total stok
     is_active: true
   });
 
@@ -55,10 +52,7 @@ const ProductFormModal = ({
         category_id: product.category_id || '',
         product_type: product.product_type || 'online',
         selling_price: product.selling_price || '',
-        discount_price: product.discount_price || '',
-        quantity_per_unit: product.quantity_per_unit || '1',
-        unit: product.unit || 'kg',
-        unit_type: product.unit_type || 'unit',
+        quantity_info: product.quantity_info || '',
         shelf_life_days: product.shelf_life_days || '',
         initial_stock: product.total_stock || '', // Load existing stock (read-only)
         is_active: product.is_active ?? true
@@ -81,10 +75,7 @@ const ProductFormModal = ({
       category_id: '',
       product_type: 'online',
       selling_price: '',
-      discount_price: '',
-      quantity_per_unit: '1',
-      unit: 'kg',
-      unit_type: 'unit',
+      quantity_info: '',
       shelf_life_days: '',
       initial_stock: '', // Reset stok awal
       is_active: true
@@ -166,9 +157,10 @@ const ProductFormModal = ({
     if (!formData.selling_price || parseFloat(formData.selling_price) <= 0) {
       newErrors.selling_price = 'Harga jual harus lebih dari 0';
     }
-    
-    if (formData.discount_price && parseFloat(formData.discount_price) >= parseFloat(formData.selling_price)) {
-      newErrors.discount_price = 'Harga diskon harus lebih kecil dari harga jual';
+
+    // Validasi stok wajib untuk create mode
+    if (mode === 'create' && (!formData.initial_stock || parseFloat(formData.initial_stock) < 0)) {
+      newErrors.initial_stock = 'Stok awal wajib diisi dan tidak boleh negatif';
     }
 
     // Validasi minimal 1 gambar untuk create mode
@@ -198,12 +190,9 @@ const ProductFormModal = ({
         'category_id': 'category_id',
         'product_type': 'product_type',
         'selling_price': 'selling_price',
-        'discount_price': 'discount_price',
-        'quantity_per_unit': 'quantity_per_unit',
-        'unit': 'unit',
-        'unit_type': 'unit_type',
+        'quantity_info': 'quantity_info', // Info tambahan
         'shelf_life_days': 'shelf_life_days',
-        'initial_stock': 'initial_stock', // Tambah mapping stok awal
+        'initial_stock': 'initial_stock', // Total stok
         'is_active': 'is_active'
       };
       
@@ -457,104 +446,29 @@ const ProductFormModal = ({
                   )}
                 </div>
 
-                {/* Harga Diskon */}
+                {/* Info Tambahan - Untuk Dokumentasi */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Harga Diskon (Rp)
+                    Info Tambahan <span className="text-gray-400">(opsional)</span>
                   </label>
                   <input
-                    type="number"
-                    name="discount_price"
-                    value={formData.discount_price}
+                    type="text"
+                    name="quantity_info"
+                    value={formData.quantity_info}
                     onChange={handleChange}
                     disabled={loading}
-                    min="0"
-                    step="100"
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                      errors.discount_price ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="45000"
-                  />
-                  {errors.discount_price && (
-                    <p className="mt-1 text-sm text-red-500">{errors.discount_price}</p>
-                  )}
-                </div>
-
-                {/* Jumlah per Unit */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Jumlah per Kemasan <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="quantity_per_unit"
-                    value={formData.quantity_per_unit}
-                    onChange={handleChange}
-                    disabled={loading}
-                    min="1"
-                    step="1"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="65"
+                    placeholder="Contoh: 65 kg, 1 iket isi 7 batang"
                   />
                   <p className="mt-1 text-xs text-gray-500">
-                    Contoh: 65 (untuk 65 kg per pack)
-                  </p>
-                </div>
-
-                {/* Satuan (Unit) */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Satuan <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="unit"
-                    value={formData.unit}
-                    onChange={handleChange}
-                    disabled={loading}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  >
-                    <option value="kg">Kilogram (kg)</option>
-                    <option value="gram">Gram (g)</option>
-                    <option value="liter">Liter (L)</option>
-                    <option value="ml">Mililiter (ml)</option>
-                    <option value="pcs">Pieces (pcs)</option>
-                    <option value="unit">Unit</option>
-                  </select>
-                  <p className="mt-1 text-xs text-gray-500">
-                    Satuan berat/volume
-                  </p>
-                </div>
-
-                {/* Tipe Kemasan (Unit Type) */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Tipe Kemasan
-                  </label>
-                  <select
-                    name="unit_type"
-                    value={formData.unit_type}
-                    onChange={handleChange}
-                    disabled={loading}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  >
-                    <option value="unit">Unit</option>
-                    <option value="pack">Pack</option>
-                    <option value="box">Box</option>
-                    <option value="karton">Karton</option>
-                    <option value="sak">Sak</option>
-                    <option value="bag">Bag</option>
-                    <option value="botol">Botol</option>
-                    <option value="kaleng">Kaleng</option>
-                  </select>
-                  <p className="mt-1 text-xs text-gray-500">
-                    Contoh: Pack, Box, Karton
+                    Info dokumentasi internal, tampil di detail produk
                   </p>
                 </div>
 
                 {/* Shelf Life */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Masa Simpan (hari)
+                    Masa Simpan (hari) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
@@ -568,11 +482,11 @@ const ProductFormModal = ({
                   />
                 </div>
 
-                {/* Stok Awal - Hanya untuk Create Mode */}
+                {/* Stok - WAJIB untuk customer */}
                 {mode === 'create' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Stok Awal (opsional)
+                      Stok Awal <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
@@ -584,16 +498,13 @@ const ProductFormModal = ({
                       step="1"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="5"
-                      onKeyPress={(e) => {
-                        // Prevent decimal point input
-                        if (e.key === '.' || e.key === ',') {
-                          e.preventDefault();
-                        }
-                      }}
                     />
                     <p className="mt-1 text-xs text-gray-500">
-                      Jumlah {formData.unit_type} tersedia (contoh: 5 {formData.unit_type})
+                      Jumlah total stok yang akan tampil ke customer
                     </p>
+                    {errors.initial_stock && (
+                      <p className="mt-1 text-xs text-red-500">{errors.initial_stock}</p>
+                    )}
                   </div>
                 )}
 
@@ -606,7 +517,7 @@ const ProductFormModal = ({
                     <div className="relative">
                       <input
                         type="text"
-                        value={`${formData.initial_stock || 0} ${formData.unit}`}
+                        value={formData.initial_stock || 0}
                         disabled
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
                       />

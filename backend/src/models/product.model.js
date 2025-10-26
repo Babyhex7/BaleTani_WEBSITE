@@ -29,31 +29,20 @@ const Product = sequelize.define(
       type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
     },
-    quantity_per_unit: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 1,
-      comment: "Jumlah per satuan (contoh: 65 untuk 65kg per pack)",
-    },
-    unit: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-      comment: "Satuan berat/volume (kg, liter, gram, pcs, dll)",
-    },
-    unit_type: {
-      type: DataTypes.STRING(20),
+    quantity_info: {
+      type: DataTypes.STRING(100),
       allowNull: true,
-      defaultValue: "unit",
-      comment: "Tipe kemasan (pack, box, karton, unit, dll)",
+      comment:
+        "Info tambahan untuk dokumentasi (contoh: '65 kg', '1 iket isi 7 batang')",
     },
     shelf_life_days: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
     total_stock: {
-      type: DataTypes.INTEGER, // Changed from DECIMAL to INTEGER (no decimals, like Shopee)
+      type: DataTypes.INTEGER,
       defaultValue: 0,
-      comment: "Jumlah unit yang tersedia (contoh: 5 pack)",
+      comment: "Jumlah stok yang ditampilkan ke customer",
     },
     is_active: {
       type: DataTypes.BOOLEAN,

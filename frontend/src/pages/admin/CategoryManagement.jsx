@@ -10,11 +10,13 @@ import {
   XCircleIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
 import AdminSidebarNew from '../../components/layout_admin/AdminSidebarNew';
 import AdminHeaderNew from '../../components/layout_admin/AdminHeaderNew';
 import CategoryFormModal from '../../components/ui_admin/CategoryFormModal';
 import CategoryDetailModal from '../../components/ui_admin/CategoryDetailModal';
 import DeleteConfirmModal from '../../components/ui_admin/DeleteConfirmModal';
+import ToastNotification from '../../components/ui_admin/ToastNotification';
 import inventoryService from '../../services/services_admin/inventoryService';
 
 const CategoryManagement = () => {
@@ -472,6 +474,9 @@ const CategoryManagement = () => {
         itemName={selectedCategory?.category_name}
         loading={deleteLoading}
       />
+
+      {/* Toast Notification */}
+      <ToastNotification />
     </div>
   );
 };

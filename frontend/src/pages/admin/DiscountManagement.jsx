@@ -12,12 +12,13 @@ import {
   CubeIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import AdminSidebarNew from "../../components/layout_admin/AdminSidebarNew";
 import AdminHeaderNew from "../../components/layout_admin/AdminHeaderNew";
 import DiscountFormModal from "../../components/ui_admin/DiscountFormModal";
 import DiscountDetailModal from "../../components/ui_admin/DiscountDetailModal";
 import AssignProductModal from "../../components/ui_admin/AssignProductModal";
+import ToastNotification from "../../components/ui_admin/ToastNotification";
 import DeleteConfirmModal from "../../components/ui_admin/DeleteConfirmModal";
 import inventoryService from "../../services/services_admin/inventoryService";
 
@@ -295,31 +296,8 @@ const DiscountManagement = () => {
         />
 
         <div className="p-6">
-          {/* Toaster untuk notifications */}
-          <Toaster 
-            position="top-right"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: '#363636',
-                color: '#fff',
-              },
-              success: {
-                duration: 3000,
-                iconTheme: {
-                  primary: '#10b981',
-                  secondary: '#fff',
-                },
-              },
-              error: {
-                duration: 4000,
-                iconTheme: {
-                  primary: '#ef4444',
-                  secondary: '#fff',
-                },
-              },
-            }}
-          />
+          {/* Toast Notification */}
+          <ToastNotification />
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
