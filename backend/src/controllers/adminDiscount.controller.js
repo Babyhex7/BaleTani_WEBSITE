@@ -231,6 +231,7 @@ const createDiscount = async (req, res) => {
       discount_name,
       discount_type,
       value,
+      max_discount, // Max potongan untuk percentage
       start_date,
       end_date,
       is_active = true,
@@ -281,6 +282,7 @@ const createDiscount = async (req, res) => {
       discount_name,
       discount_type,
       value,
+      max_discount: max_discount || null,
       start_date,
       end_date,
       is_active,
@@ -334,6 +336,7 @@ const updateDiscount = async (req, res) => {
       discount_name,
       discount_type,
       value,
+      max_discount,
       start_date,
       end_date,
       is_active,
@@ -390,6 +393,7 @@ const updateDiscount = async (req, res) => {
     if (discount_name !== undefined) updateData.discount_name = discount_name;
     if (discount_type !== undefined) updateData.discount_type = discount_type;
     if (value !== undefined) updateData.value = value;
+    if (max_discount !== undefined) updateData.max_discount = max_discount;
     if (start_date !== undefined) updateData.start_date = start_date;
     if (end_date !== undefined) updateData.end_date = end_date;
     if (is_active !== undefined) updateData.is_active = is_active;
@@ -455,7 +459,7 @@ const updateDiscount = async (req, res) => {
 const softDeleteDiscount = async (req, res) => {
   try {
     const { id } = req.params;
-    const adminId = req.user.userId;
+    const adminId = req.user.id; // Fix: req.user.id bukan req.user.userId
 
     // Find discount
     const discount = await Discount.findOne({
@@ -695,7 +699,7 @@ const addProductsToDiscount = async (req, res) => {
 const removeProductFromDiscount = async (req, res) => {
   try {
     const { id, productId } = req.params;
-    const adminId = req.user.userId;
+    const adminId = req.user.id; // Fix: req.user.id bukan req.user.userId
 
     // Find product discount association
     const productDiscount = await ProductDiscount.findOne({

@@ -156,6 +156,11 @@ const DiscountDetailModal = ({
                     {formatValue(discount.discount_type, discount.value)}
                   </p>
                   <p className="text-xs text-gray-500">Nilai Diskon</p>
+                  {discount.discount_type === 'percentage' && discount.max_discount && (
+                    <p className="text-xs text-gray-600 mt-1">
+                      Max: {formatCurrency(discount.max_discount)}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

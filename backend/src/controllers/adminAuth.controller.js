@@ -111,7 +111,7 @@ const getAdminProfile = async (req, res) => {
   try {
     const admin = await Admin.findOne({
       where: {
-        id: req.user.userId,
+        id: req.user.id, // Fix: req.user.id bukan req.user.userId
         deleted_at: null,
         is_active: true,
       },

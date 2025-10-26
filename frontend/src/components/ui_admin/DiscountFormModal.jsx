@@ -17,6 +17,7 @@ const DiscountFormModal = ({
     discount_name: "",
     discount_type: "percentage",
     value: "",
+    max_discount: "", // Max potongan untuk percentage
     start_date: "",
     end_date: "",
     is_active: true,
@@ -32,6 +33,7 @@ const DiscountFormModal = ({
         discount_name: discount.discount_name || "",
         discount_type: discount.discount_type || "percentage",
         value: discount.value || "",
+        max_discount: discount.max_discount || "",
         start_date: discount.start_date || "",
         end_date: discount.end_date || "",
         is_active: discount.is_active ?? true,
@@ -117,6 +119,7 @@ const DiscountFormModal = ({
         discount_name: formData.discount_name.trim(),
         discount_type: formData.discount_type,
         value: parseFloat(formData.value),
+        max_discount: formData.max_discount ? parseFloat(formData.max_discount) : null,
         start_date: formData.start_date,
         end_date: formData.end_date,
         is_active: formData.is_active,
@@ -131,6 +134,7 @@ const DiscountFormModal = ({
           discount_name: "",
           discount_type: "percentage",
           value: "",
+          max_discount: "",
           start_date: "",
           end_date: "",
           is_active: true,
@@ -246,6 +250,33 @@ const DiscountFormModal = ({
                   <p className="text-red-500 text-sm mt-1">{errors.value}</p>
                 )}
               </div>
+
+              {/* Max Potongan - Hanya untuk Percentage */}
+              {formData.discount_type === "percentage" && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Max. Potongan <span className="text-gray-400">(Opsional)</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      name="max_discount"
+                      value={formData.max_discount}
+                      onChange={handleChange}
+                      placeholder="20000"
+                      min="0"
+                      step="1000"
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                      Rp
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Batasan maksimal potongan harga (misal: Rp 20.000)
+                  </p>
+                </div>
+              )}
 
               {/* Tanggal Mulai */}
               <div>

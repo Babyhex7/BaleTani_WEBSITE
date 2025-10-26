@@ -277,7 +277,7 @@ const updateCategory = async (req, res) => {
 const softDeleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const adminId = req.user.userId;
+    const adminId = req.user.id; // Fix: req.user.id bukan req.user.userId
 
     // Find category
     const category = await Category.findOne({
