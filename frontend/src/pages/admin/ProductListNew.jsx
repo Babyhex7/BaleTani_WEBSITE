@@ -8,6 +8,7 @@ import {
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { CubeIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/solid';
+import toast, { Toaster } from 'react-hot-toast';
 import AdminSidebarNew from '../../components/layout_admin/AdminSidebarNew';
 import AdminHeaderNew from '../../components/layout_admin/AdminHeaderNew';
 import ProductFormModal from '../../components/ui_admin/ProductFormModal';
@@ -481,7 +482,12 @@ const ProductListNew = () => {
                             )}
                             <div>
                               <p className="text-sm font-medium text-gray-900">{productName}</p>
-                              <p className="text-xs text-gray-500">{product.unit}</p>
+                              <p className="text-xs text-gray-500">
+                                {product.quantity_per_unit && product.quantity_per_unit > 1
+                                  ? `${product.quantity_per_unit} ${product.unit} per ${product.unit_type || 'unit'}`
+                                  : product.unit
+                                }
+                              </p>
                             </div>
                           </div>
                         </td>
@@ -492,7 +498,14 @@ const ProductListNew = () => {
                             <p className="text-xs text-green-600">Diskon: {formatCurrency(product.discount_price)}</p>
                           )}
                         </td>
-                        <td className="px-6 py-4">{getStockBadge(product.total_stock)}</td>
+                        <td className="px-6 py-4">
+                          {getStockBadge(product.total_stock)}
+                          {product.quantity_per_unit && product.quantity_per_unit > 1 && product.total_stock > 0 && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              {product.total_stock} {product.unit_type || 'unit'}
+                            </p>
+                          )}
+                        </td>
                         <td className="px-6 py-4">{getStatusBadge(product.is_active)}</td>
                         <td className="px-6 py-4">
                           <span className={`px-3 py-1 text-xs font-medium rounded-full ${
@@ -581,6 +594,32 @@ const ProductListNew = () => {
         message="Apakah Anda yakin ingin menghapus produk ini?"
         itemName={selectedProduct?.product_name}
         loading={deleteLoading}
+      />
+
+      {/* Toaster untuk notifications */}
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
       />
     </div>
   );

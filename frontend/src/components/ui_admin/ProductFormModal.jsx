@@ -4,6 +4,7 @@ import {
   PhotoIcon,
   TrashIcon
 } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
 
 /**
  * Modal Form untuk Create & Edit Product
@@ -27,9 +28,11 @@ const ProductFormModal = ({
     product_type: 'online',
     selling_price: '',
     discount_price: '',
-    unit: 'kg',
+    quantity_per_unit: '1', // Jumlah per unit (contoh: 65 untuk "65 kg")
+    unit: 'kg', // Satuan (kg, liter, pcs, dll)
+    unit_type: 'unit', // Tipe kemasan (pack, box, karton, unit)
     shelf_life_days: '',
-    initial_stock: '', // Tambah field stok awal
+    initial_stock: '', // Jumlah stok (contoh: 5 pack)
     is_active: true
   });
 
@@ -53,7 +56,9 @@ const ProductFormModal = ({
         product_type: product.product_type || 'online',
         selling_price: product.selling_price || '',
         discount_price: product.discount_price || '',
+        quantity_per_unit: product.quantity_per_unit || '1',
         unit: product.unit || 'kg',
+        unit_type: product.unit_type || 'unit',
         shelf_life_days: product.shelf_life_days || '',
         initial_stock: product.total_stock || '', // Load existing stock (read-only)
         is_active: product.is_active ?? true
@@ -77,7 +82,9 @@ const ProductFormModal = ({
       product_type: 'online',
       selling_price: '',
       discount_price: '',
+      quantity_per_unit: '1',
       unit: 'kg',
+      unit_type: 'unit',
       shelf_life_days: '',
       initial_stock: '', // Reset stok awal
       is_active: true
@@ -106,7 +113,7 @@ const ProductFormModal = ({
     const totalImages = existingImages.length + images.length + files.length;
     
     if (totalImages > 5) {
-      alert('Maksimal 5 gambar (termasuk gambar yang sudah ada)');
+      toast.error('Maksimal 5 gambar (termasuk gambar yang sudah ada)');
       return;
     }
 
@@ -115,14 +122,14 @@ const ProductFormModal = ({
     const invalidFiles = files.filter(file => !validTypes.includes(file.type));
     
     if (invalidFiles.length > 0) {
-      alert('Hanya file JPG, PNG, dan WEBP yang diperbolehkan');
+      toast.error('Hanya file JPG, PNG, dan WEBP yang diperbolehkan');
       return;
     }
 
     // Validate file sizes (max 2MB per file)
     const oversizedFiles = files.filter(file => file.size > 2 * 1024 * 1024);
     if (oversizedFiles.length > 0) {
-      alert('Ukuran file maksimal 2MB per gambar');
+      toast.error('Ukuran file maksimal 2MB per gambar');
       return;
     }
 
@@ -192,7 +199,9 @@ const ProductFormModal = ({
         'product_type': 'product_type',
         'selling_price': 'selling_price',
         'discount_price': 'discount_price',
+        'quantity_per_unit': 'quantity_per_unit',
         'unit': 'unit',
+        'unit_type': 'unit_type',
         'shelf_life_days': 'shelf_life_days',
         'initial_stock': 'initial_stock', // Tambah mapping stok awal
         'is_active': 'is_active'
@@ -234,7 +243,7 @@ const ProductFormModal = ({
       onClose();
     } catch (error) {
       console.error('Submit error:', error);
-      alert(error.message || 'Terjadi kesalahan saat menyimpan produk');
+      toast.error(error.message || 'Terjadi kesalahan saat menyimpan produk');
     } finally {
       setLoading(false);
     }
@@ -471,10 +480,31 @@ const ProductFormModal = ({
                   )}
                 </div>
 
-                {/* Unit */}
+                {/* Jumlah per Unit */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Satuan
+                    Jumlah per Kemasan <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="quantity_per_unit"
+                    value={formData.quantity_per_unit}
+                    onChange={handleChange}
+                    disabled={loading}
+                    min="1"
+                    step="1"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="65"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Contoh: 65 (untuk 65 kg per pack)
+                  </p>
+                </div>
+
+                {/* Satuan (Unit) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Satuan <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="unit"
@@ -484,10 +514,41 @@ const ProductFormModal = ({
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="kg">Kilogram (kg)</option>
+                    <option value="gram">Gram (g)</option>
+                    <option value="liter">Liter (L)</option>
+                    <option value="ml">Mililiter (ml)</option>
                     <option value="pcs">Pieces (pcs)</option>
-                    <option value="pack">Pack</option>
-                    <option value="liter">Liter</option>
+                    <option value="unit">Unit</option>
                   </select>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Satuan berat/volume
+                  </p>
+                </div>
+
+                {/* Tipe Kemasan (Unit Type) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tipe Kemasan
+                  </label>
+                  <select
+                    name="unit_type"
+                    value={formData.unit_type}
+                    onChange={handleChange}
+                    disabled={loading}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="unit">Unit</option>
+                    <option value="pack">Pack</option>
+                    <option value="box">Box</option>
+                    <option value="karton">Karton</option>
+                    <option value="sak">Sak</option>
+                    <option value="bag">Bag</option>
+                    <option value="botol">Botol</option>
+                    <option value="kaleng">Kaleng</option>
+                  </select>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Contoh: Pack, Box, Karton
+                  </p>
                 </div>
 
                 {/* Shelf Life */}
@@ -522,7 +583,7 @@ const ProductFormModal = ({
                       min="0"
                       step="1"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      placeholder="0"
+                      placeholder="5"
                       onKeyPress={(e) => {
                         // Prevent decimal point input
                         if (e.key === '.' || e.key === ',') {
@@ -531,7 +592,7 @@ const ProductFormModal = ({
                       }}
                     />
                     <p className="mt-1 text-xs text-gray-500">
-                      Hanya angka bulat (contoh: 10, 50, 100). Kosongkan jika ingin diisi lewat Procurement
+                      Jumlah {formData.unit_type} tersedia (contoh: 5 {formData.unit_type})
                     </p>
                   </div>
                 )}

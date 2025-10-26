@@ -282,7 +282,9 @@ const create = async (req, res) => {
       category_id,
       description,
       selling_price,
+      quantity_per_unit = 1,
       unit,
+      unit_type = "unit",
       shelf_life_days,
       initial_stock,
       is_active = true,
@@ -319,6 +321,17 @@ const create = async (req, res) => {
       }
     }
 
+    // Parse quantity_per_unit (default 1 if not provided)
+    const quantityPerUnitValue = quantity_per_unit
+      ? parseInt(quantity_per_unit, 10)
+      : 1;
+    if (quantityPerUnitValue < 1 || !Number.isInteger(quantityPerUnitValue)) {
+      return res.status(400).json({
+        success: false,
+        message: "Jumlah per unit harus berupa angka bulat positif minimal 1",
+      });
+    }
+
     // Parse initial stock (default 0 if not provided)
     const initialStockValue = initial_stock ? parseInt(initial_stock, 10) : 0;
 
@@ -337,7 +350,9 @@ const create = async (req, res) => {
       category_id: category_id || null,
       description: description || null,
       selling_price: parseFloat(selling_price),
+      quantity_per_unit: quantityPerUnitValue,
       unit,
+      unit_type: unit_type || "unit",
       shelf_life_days: parseInt(shelf_life_days),
       total_stock: initialStockValue, // Set initial stock from input or default to 0
       is_active: is_active === true || is_active === "true",
@@ -407,7 +422,9 @@ const update = async (req, res) => {
       category_id,
       description,
       selling_price,
+      quantity_per_unit,
       unit,
+      unit_type,
       shelf_life_days,
       is_active,
     } = req.body;
@@ -446,6 +463,17 @@ const update = async (req, res) => {
       }
     }
 
+    // Validate quantity_per_unit if provided
+    if (quantity_per_unit !== undefined) {
+      const quantityPerUnitValue = parseInt(quantity_per_unit, 10);
+      if (quantityPerUnitValue < 1 || !Number.isInteger(quantityPerUnitValue)) {
+        return res.status(400).json({
+          success: false,
+          message: "Jumlah per unit harus berupa angka bulat positif minimal 1",
+        });
+      }
+    }
+
     // Update product
     await product.update({
       name: name || product.name,
@@ -457,7 +485,12 @@ const update = async (req, res) => {
       selling_price: selling_price
         ? parseFloat(selling_price)
         : product.selling_price,
+      quantity_per_unit:
+        quantity_per_unit !== undefined
+          ? parseInt(quantity_per_unit, 10)
+          : product.quantity_per_unit,
       unit: unit || product.unit,
+      unit_type: unit_type !== undefined ? unit_type : product.unit_type,
       shelf_life_days: shelf_life_days
         ? parseInt(shelf_life_days)
         : product.shelf_life_days,

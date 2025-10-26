@@ -664,9 +664,9 @@ const DiscountManagement = () => {
           setShowFormModal(false);
           setSelectedDiscount(null);
         }}
-        mode={modalMode}
+        isEditMode={modalMode === "edit"}
         discount={selectedDiscount}
-        onSubmit={handleSubmitDiscount}
+        onSuccess={handleSubmitDiscount}
       />
 
       <DiscountDetailModal

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import toast from 'react-hot-toast';
 import {
   createDiscount,
   updateDiscount,
@@ -105,6 +106,7 @@ const DiscountFormModal = ({
     e.preventDefault();
 
     if (!validateForm()) {
+      toast.error("Mohon lengkapi semua field yang diperlukan");
       return;
     }
 
@@ -120,22 +122,23 @@ const DiscountFormModal = ({
         is_active: formData.is_active,
       };
 
-      let response;
-      if (isEditMode && discount) {
-        response = await updateDiscount(discount.id, payload);
-      } else {
-        response = await createDiscount(payload);
-      }
-
-      if (response.success) {
-        alert(
-          isEditMode ? "Diskon berhasil diupdate!" : "Diskon berhasil dibuat!"
-        );
-        onSuccess();
+      // Call onSuccess with the payload - parent will handle the API call
+      if (onSuccess && typeof onSuccess === 'function') {
+        await onSuccess(payload);
+        // Close modal and reset form
+        onClose();
+        setFormData({
+          discount_name: "",
+          discount_type: "percentage",
+          value: "",
+          start_date: "",
+          end_date: "",
+          is_active: true,
+        });
       }
     } catch (err) {
       console.error("Error saving discount:", err);
-      alert(err.message || "Gagal menyimpan diskon");
+      toast.error(err.message || "Gagal menyimpan diskon");
     } finally {
       setLoading(false);
     }
