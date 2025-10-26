@@ -12,6 +12,7 @@ import {
   CubeIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
+import toast, { Toaster } from 'react-hot-toast';
 import AdminSidebarNew from "../../components/layout_admin/AdminSidebarNew";
 import AdminHeaderNew from "../../components/layout_admin/AdminHeaderNew";
 import DiscountFormModal from "../../components/ui_admin/DiscountFormModal";
@@ -50,9 +51,6 @@ const DiscountManagement = () => {
   const [modalMode, setModalMode] = useState("create");
   const [selectedDiscount, setSelectedDiscount] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-
-  // Notification
-  const [notification, setNotification] = useState(null);
 
   // Fetch data on mount and filter change
   useEffect(() => {
@@ -119,7 +117,7 @@ const DiscountManagement = () => {
       const discountId = discount.id || discount.discount_id;
 
       if (!discountId) {
-        showNotification("error", "ID diskon tidak valid");
+        toast.error("ID diskon tidak valid");
         return;
       }
 
@@ -130,7 +128,7 @@ const DiscountManagement = () => {
       }
     } catch (err) {
       console.error("Error viewing discount:", err);
-      showNotification("error", err.message || "Gagal memuat detail diskon");
+      toast.error(err.message || "Gagal memuat detail diskon");
     }
   };
 
@@ -139,7 +137,7 @@ const DiscountManagement = () => {
       const discountId = discount.id || discount.discount_id;
 
       if (!discountId) {
-        showNotification("error", "ID diskon tidak valid");
+        toast.error("ID diskon tidak valid");
         return;
       }
 
@@ -151,7 +149,7 @@ const DiscountManagement = () => {
       }
     } catch (err) {
       console.error("Error editing discount:", err);
-      showNotification("error", err.message || "Gagal memuat data diskon");
+      toast.error(err.message || "Gagal memuat data diskon");
     }
   };
 
@@ -164,11 +162,11 @@ const DiscountManagement = () => {
     try {
       if (modalMode === "create") {
         await inventoryService.createDiscount(formData);
-        showNotification("success", "Diskon berhasil ditambahkan!");
+        toast.success("Diskon berhasil ditambahkan!");
       } else {
         const discountId = selectedDiscount.id || selectedDiscount.discount_id;
         await inventoryService.updateDiscount(discountId, formData);
-        showNotification("success", "Diskon berhasil diperbarui!");
+        toast.success("Diskon berhasil diperbarui!");
       }
 
       await fetchDiscounts();
@@ -176,7 +174,7 @@ const DiscountManagement = () => {
       setSelectedDiscount(null);
     } catch (err) {
       console.error("Error submitting discount:", err);
-      showNotification("error", err.message || "Gagal menyimpan diskon");
+      toast.error(err.message || "Gagal menyimpan diskon");
     }
   };
 
@@ -187,21 +185,21 @@ const DiscountManagement = () => {
       const discountId = selectedDiscount.id || selectedDiscount.discount_id;
 
       if (!discountId) {
-        showNotification("error", "ID diskon tidak valid");
+        toast.error("ID diskon tidak valid");
         setDeleteLoading(false);
         return;
       }
 
       await inventoryService.deleteDiscount(discountId);
 
-      showNotification("success", "Diskon berhasil dihapus!");
+      toast.success("Diskon berhasil dihapus!");
 
       await fetchDiscounts();
       setShowDeleteModal(false);
       setSelectedDiscount(null);
     } catch (err) {
       console.error("Error deleting discount:", err);
-      showNotification("error", err.message || "Gagal menghapus diskon");
+      toast.error(err.message || "Gagal menghapus diskon");
     } finally {
       setDeleteLoading(false);
     }
@@ -213,24 +211,18 @@ const DiscountManagement = () => {
       const response = await inventoryService.toggleDiscountStatus(discountId);
 
       if (response.success) {
-        showNotification("success", "Status diskon berhasil diubah!");
+        toast.success("Status diskon berhasil diubah!");
         fetchDiscounts();
       }
     } catch (err) {
       console.error("Error toggling status:", err);
-      showNotification("error", err.message || "Gagal mengubah status diskon");
+      toast.error(err.message || "Gagal mengubah status diskon");
     }
   };
 
   const handleAssignProducts = (discount) => {
     setSelectedDiscount(discount);
     setShowAssignModal(true);
-  };
-
-  // Utilities
-  const showNotification = (type, message) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification(null), 3000);
   };
 
   // Get status badge
@@ -303,23 +295,31 @@ const DiscountManagement = () => {
         />
 
         <div className="p-6">
-          {/* Notification */}
-          {notification && (
-            <div
-              className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-6 py-3 rounded-lg shadow-lg transition-all ${
-                notification.type === "success"
-                  ? "bg-green-600 text-white"
-                  : "bg-red-600 text-white"
-              }`}
-            >
-              {notification.type === "success" ? (
-                <CheckCircleIcon className="w-5 h-5" />
-              ) : (
-                <XCircleIcon className="w-5 h-5" />
-              )}
-              <span className="font-medium">{notification.message}</span>
-            </div>
-          )}
+          {/* Toaster untuk notifications */}
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+              },
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                duration: 4000,
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">

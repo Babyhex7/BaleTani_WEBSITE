@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   XMarkIcon,
   TagIcon,
@@ -10,6 +10,7 @@ import {
   TrashIcon,
   CurrencyDollarIcon
 } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
 import inventoryService from '../../services/services_admin/inventoryService';
 
 /**
@@ -21,6 +22,8 @@ const DiscountDetailModal = ({
   discount,
   onRefresh 
 }) => {
+  const [confirmDelete, setConfirmDelete] = useState(null);
+
   if (!isOpen || !discount) return null;
 
   const formatDate = (dateString) => {
@@ -49,18 +52,16 @@ const DiscountDetailModal = ({
   };
 
   const handleRemoveProduct = async (productId) => {
-    const confirm = window.confirm('Hapus produk dari diskon ini?');
-    if (!confirm) return;
-
     try {
       const discountId = discount.id || discount.discount_id;
       await inventoryService.removeProductFromDiscount(discountId, productId);
-      alert('Produk berhasil dihapus dari diskon!');
+      toast.success('Produk berhasil dihapus dari diskon!');
+      setConfirmDelete(null);
       if (onRefresh) onRefresh();
       onClose();
     } catch (err) {
       console.error('Error removing product:', err);
-      alert(err.message || 'Gagal menghapus produk');
+      toast.error(err.message || 'Gagal menghapus produk');
     }
   };
 
@@ -239,7 +240,7 @@ const DiscountDetailModal = ({
                         </div>
                       </div>
                       <button
-                        onClick={() => handleRemoveProduct(product.id || product.product_id)}
+                        onClick={() => setConfirmDelete(product.id || product.product_id)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Hapus dari diskon"
                       >
@@ -273,6 +274,31 @@ const DiscountDetailModal = ({
           </div>
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setConfirmDelete(null)} />
+          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Konfirmasi Hapus</h3>
+            <p className="text-gray-600 mb-6">Hapus produk dari diskon ini?</p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConfirmDelete(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => handleRemoveProduct(confirmDelete)}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
+              >
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

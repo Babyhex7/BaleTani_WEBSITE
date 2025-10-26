@@ -6,6 +6,7 @@ import {
   CheckIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
 import inventoryService from '../../services/services_admin/inventoryService';
 
 /**
@@ -83,7 +84,7 @@ const AssignProductModal = ({
 
   const handleSubmit = async () => {
     if (selectedProducts.length === 0) {
-      alert('Pilih minimal 1 produk');
+      toast.error('Pilih minimal 1 produk');
       return;
     }
 
@@ -92,13 +93,13 @@ const AssignProductModal = ({
       const discountId = discount.id || discount.discount_id;
       await inventoryService.addProductsToDiscount(discountId, selectedProducts);
       
-      alert(`Berhasil menambahkan ${selectedProducts.length} produk ke diskon!`);
+      toast.success(`Berhasil menambahkan ${selectedProducts.length} produk ke diskon!`);
       setSelectedProducts([]);
       if (onSuccess) onSuccess();
       onClose();
     } catch (err) {
       console.error('Error assigning products:', err);
-      alert(err.message || 'Gagal menambahkan produk');
+      toast.error(err.message || 'Gagal menambahkan produk');
     } finally {
       setSaving(false);
     }
