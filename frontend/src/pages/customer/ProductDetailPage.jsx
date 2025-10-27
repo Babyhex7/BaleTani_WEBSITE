@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, Package, Tag, Truck } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Tag } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import LoginModal from '../../components/ui/LoginModal';
@@ -141,7 +141,9 @@ const ProductDetailPage = () => {
         <Navbar />
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center">
-            <Package className="w-24 h-24 text-gray-400 mx-auto mb-4" />
+            <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Tag className="w-12 h-12 text-gray-400" />
+            </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Produk Tidak Ditemukan</h2>
             <p className="text-gray-600 mb-6">Maaf, produk yang Anda cari tidak tersedia.</p>
             <Button onClick={() => navigate('/products')}>
@@ -273,11 +275,10 @@ const ProductDetailPage = () => {
                 )}
 
                 {/* Stock Info */}
-                <div className="flex items-center gap-2 mb-6">
-                  <Package size={18} className="text-gray-500" />
+                <div className="mb-6">
                   <span className="text-gray-700">
                     Stok: <span className={`font-semibold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {product.stock > 0 ? `${product.stock} ${product.unit}` : 'Habis'}
+                      {product.stock > 0 ? `${product.stock}` : 'Habis'}
                     </span>
                   </span>
                 </div>
@@ -318,7 +319,7 @@ const ProductDetailPage = () => {
                   <Button
                     onClick={handleAddToCart}
                     disabled={product.stock === 0}
-                    className="flex-1 bg-white border-2 border-green-600 text-green-600 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ShoppingCart size={18} className="mr-2" />
                     Tambah ke Keranjang
@@ -326,28 +327,10 @@ const ProductDetailPage = () => {
                   <Button
                     onClick={handleBuyNow}
                     disabled={product.stock === 0}
-                    className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+                    className="flex-1 bg-white border-2 border-green-600 text-green-600 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Beli Sekarang
                   </Button>
-                </div>
-
-                {/* Info Cards */}
-                <div className="grid grid-cols-2 gap-3 mt-6">
-                  <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                    <Truck className="text-blue-600" size={24} />
-                    <div>
-                      <p className="text-xs text-gray-600">Pengiriman</p>
-                      <p className="text-sm font-semibold text-gray-900">Gratis Ongkir</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                    <Package className="text-green-600" size={24} />
-                    <div>
-                      <p className="text-xs text-gray-600">Kualitas</p>
-                      <p className="text-sm font-semibold text-gray-900">Terjamin Fresh</p>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
