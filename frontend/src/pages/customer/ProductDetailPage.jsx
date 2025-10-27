@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, Tag } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import LoginModal from '../../components/ui/LoginModal';
@@ -184,8 +184,8 @@ const ProductDetailPage = () => {
               
               {/* Left: Images */}
               <div>
-                {/* Main Image */}
-                <div className="bg-gray-100 rounded-xl overflow-hidden mb-4 aspect-square">
+                {/* Main Image with Navigation Arrows */}
+                <div className="relative bg-gray-100 rounded-xl overflow-hidden mb-4 aspect-square group">
                   <img
                     src={getImageUrl(product.images[selectedImage])}
                     alt={product.name}
@@ -194,6 +194,34 @@ const ProductDetailPage = () => {
                       e.target.src = 'https://via.placeholder.com/500x500?text=No+Image';
                     }}
                   />
+                  
+                  {/* Navigation Arrows - hanya muncul jika ada > 1 gambar */}
+                  {product.images.length > 1 && (
+                    <>
+                      {/* Previous Button */}
+                      <button
+                        onClick={() => setSelectedImage(prev => prev > 0 ? prev - 1 : product.images.length - 1)}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
+                        aria-label="Previous image"
+                      >
+                        <ChevronLeft className="text-gray-700" size={24} />
+                      </button>
+                      
+                      {/* Next Button */}
+                      <button
+                        onClick={() => setSelectedImage(prev => prev < product.images.length - 1 ? prev + 1 : 0)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
+                        aria-label="Next image"
+                      >
+                        <ChevronRight className="text-gray-700" size={24} />
+                      </button>
+                      
+                      {/* Image Counter */}
+                      <div className="absolute bottom-4 right-4 px-3 py-1 bg-black/60 text-white text-sm rounded-full font-medium">
+                        {selectedImage + 1} / {product.images.length}
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* Thumbnail Images */}
@@ -308,7 +336,7 @@ const ProductDetailPage = () => {
                         +
                       </button>
                       <span className="text-sm text-gray-500 ml-2">
-                        Maks. {product.stock} {product.unit}
+                        Maks. {product.stock} 
                       </span>
                     </div>
                   </div>
