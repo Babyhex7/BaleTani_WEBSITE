@@ -11,6 +11,7 @@ const router = express.Router();
 
 // Import sub-routes
 const authRoutes = require("../customerAuth.routes");
+const cartRoutes = require("./cart.routes");
 
 /**
  * PUBLIC CUSTOMER ROUTES (No auth required)
@@ -22,12 +23,7 @@ router.use("/auth", authRoutes);
 /**
  * PROTECTED CUSTOMER ROUTES (Auth required)
  * Authentication handled in each route file
- *
- * TODO: Add these routes when needed:
- * - /profile - Customer profile management
- * - /orders - Customer order history
- * - /cart - Shopping cart management
- * - /addresses - Delivery addresses
  */
+router.use("/cart", cartRoutes);
 
 module.exports = router;

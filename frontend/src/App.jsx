@@ -8,6 +8,8 @@ import Register from './pages/customer/Register';
 import ProductPage from './pages/customer/ProductPage';
 import ProductDetailPage from './pages/customer/ProductDetailPage';
 import PromoPage from './pages/customer/PromoPage';
+import CartPage from './pages/customer/CartPage';
+import CheckoutPage from './pages/customer/CheckoutPage';
 import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRoute';
 
 // Admin Pages
@@ -70,6 +72,18 @@ function App() {
       <Route path="/products/:id" element={<ProductDetailPage />} />
 
       <Route path="/promo" element={<PromoPage />} />
+
+      <Route path="/cart" element={
+        <ProtectedRoute requiredRole="customer">
+          <CartPage />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/checkout" element={
+        <ProtectedRoute requiredRole="customer">
+          <CheckoutPage />
+        </ProtectedRoute>
+      } />
 
       <Route path="/categories" element={
         <ProtectedRoute requiredRole="customer">
