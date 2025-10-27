@@ -8,11 +8,17 @@
 @baseUrl = http://localhost:5000
 
 ### Default Credentials
-@adminEmail = admin@baletani.com
-@adminPassword = admin123
+# PENTING: Admin dan Customer SEMUA menggunakan PHONE NUMBER + PASSWORD
 
-@customerEmail = customer@test.com
+# Admin (sudah ada dari seeder)
+@adminPhone = 082111111111
+@adminPassword = admin123
+@adminName = Super Administrator
+
+# Customer (buat dulu via register)
+@customerPhone = 08123456789
 @customerPassword = password123
+@customerName = Customer Test
 
 ### Tokens (auto-update setelah login via response)
 @customerToken = 

@@ -1,13 +1,14 @@
 ###############################################
 # ADMIN AUTHENTICATION API
 # Endpoint: /api/admin/auth/*
+# PENTING: Admin menggunakan PHONE NUMBER + PASSWORD (bukan email!)
 ###############################################
 
 @baseUrl = http://localhost:5000
 @adminToken = paste-admin-token-here
 
 # Default Admin Credentials (sudah ada dari seeder)
-@adminEmail = admin@baletani.com
+@adminPhone = 082111111111
 @adminPassword = admin123
 
 ###############################################
@@ -20,7 +21,7 @@ POST {{baseUrl}}/api/admin/auth/login
 Content-Type: application/json
 
 {
-  "email": "{{adminEmail}}",
+  "phone_number": "{{adminPhone}}",
   "password": "{{adminPassword}}"
 }
 
@@ -41,7 +42,7 @@ Authorization: Bearer {{adminToken}}
 #     "admin": {
 #       "id": "uuid",
 #       "name": "Admin BaleTani",
-#       "email": "admin@baletani.com",
+#       "phone_number": "628xxx...",
 #       "role": {
 #         "id": "uuid",
 #         "name": "superadmin"

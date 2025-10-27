@@ -1,0 +1,105 @@
+###############################################
+# CUSTOMER CART API
+# Endpoint: /api/customer/cart/*
+# Authentication: Required (Customer Token)
+###############################################
+
+@baseUrl = http://localhost:5000
+
+# Customer Credentials (untuk login di 2-customer-auth.http)
+@customerPhone = 08123456789
+@customerPassword = password123
+
+# Paste token setelah login
+@customerToken = paste-token-from-login
+
+# Sample IDs (copy dari response)
+@productId = paste-product-id-here
+@cartItemId = paste-cart-item-id-here
+
+###############################################
+# CART OPERATIONS
+###############################################
+
+### 1. Get Cart (All items in cart)
+GET {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+### 2. Add Product to Cart
+# Ganti @productId dengan ID produk yang valid dari 1-public-api.http
+POST {{baseUrl}}/api/customer/cart/add
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "productId": "{{productId}}",
+  "quantity": 2
+}
+
+### 3. Update Cart Item Quantity
+# Ganti @cartItemId dengan ID item di cart
+PUT {{baseUrl}}/api/customer/cart/{{cartItemId}}
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "quantity": 5
+}
+
+### 4. Remove Item from Cart
+# Ganti @cartItemId dengan ID item yang mau dihapus
+DELETE {{baseUrl}}/api/customer/cart/{{cartItemId}}
+Authorization: Bearer {{customerToken}}
+
+###############################################
+# EXPECTED RESPONSES
+###############################################
+
+# Get Cart Response:
+# {
+#   "success": true,
+#   "message": "Cart fetched successfully",
+#   "data": {
+#     "items": [
+#       {
+#         "id": "cart-item-uuid",
+#         "quantity": 2,
+#         "product": {
+#           "id": "product-uuid",
+#           "name": "Tomat Segar",
+#           "price": "15000.00",
+#           "stock": 50,
+#           "unit": "kg",
+#           "images": [...]
+#         },
+#         "subtotal": "30000.00"
+#       }
+#     ],
+#     "total": "30000.00"
+#   }
+# }
+
+# Add to Cart Response:
+# {
+#   "success": true,
+#   "message": "Product added to cart successfully",
+#   "data": {
+#     "id": "cart-item-uuid",
+#     "quantity": 2
+#   }
+# }
+
+###############################################
+# TESTING WORKFLOW
+###############################################
+# 1. Login terlebih dahulu di 2-customer-auth.http
+#    - Register dengan phone: 08123456789
+#    - Login dan copy token
+# 2. Paste token ke @customerToken di baris 14
+# 3. Get All Products dari 1-public-api.http
+# 4. Copy product ID dan paste ke @productId di baris 17
+# 5. Add to Cart (step 2)
+# 6. Get Cart untuk lihat item (step 1)
+# 7. Copy cart item ID untuk update/delete
+# 8. Update quantity (step 3) atau Remove (step 4)

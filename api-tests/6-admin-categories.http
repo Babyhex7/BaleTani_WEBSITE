@@ -6,8 +6,8 @@
 
 @baseUrl = http://localhost:5000
 
-# Admin Credentials
-@adminEmail = admin@baletani.com
+# Admin Credentials - PENTING: Menggunakan PHONE NUMBER, bukan email
+@adminPhone = 082111111111
 @adminPassword = admin123
 
 # Paste token setelah login di 4-admin-auth.http

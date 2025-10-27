@@ -1,14 +1,16 @@
 ###############################################
 # CUSTOMER AUTHENTICATION API
 # Endpoint: /api/customer/auth/*
+# PENTING: Customer menggunakan PHONE NUMBER, bukan email!
 ###############################################
 
 @baseUrl = http://localhost:5000
-@customerToken = paste-token-here-after-login
+@customerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjRmMTk4MTQ1LTA2YWItNGY4NS04ZjNiLTUyMjRmYWI3OWQ0NiIsInBob25lX251bWJlciI6IjYyODU4ODU3MjUwMjciLCJ0eXBlIjoiY3VzdG9tZXIiLCJpYXQiOjE3NjE1ODIxNzAsImV4cCI6MTc2MTY2ODU3MH0.cYf7k4DJBk_j6cORIrhu1x4J7NjZP7ZSHs_cjlp048M
 
 # Default Test Credentials (buat dulu via register)
-@customerEmail = customer@test.com
-@customerPassword = password123
+@customerPhone = 085885725027
+@customerPassword = 123456
+@customerName = Customer Test
 
 ###############################################
 # AUTHENTICATION
@@ -19,10 +21,9 @@ POST {{baseUrl}}/api/customer/auth/register
 Content-Type: application/json
 
 {
-  "name": "Customer Test",
-  "email": "{{customerEmail}}",
+  "phone_number": "{{customerPhone}}",
+  "full_name": "{{customerName}}",
   "password": "{{customerPassword}}",
-  "phone": "081234567890",
   "address": "Jl. Merdeka No. 123, Jakarta Pusat, DKI Jakarta"
 }
 
@@ -32,7 +33,7 @@ POST {{baseUrl}}/api/customer/auth/login
 Content-Type: application/json
 
 {
-  "email": "{{customerEmail}}",
+  "phone_number": "{{customerPhone}}",
   "password": "{{customerPassword}}"
 }
 
@@ -48,13 +49,14 @@ Authorization: Bearer {{customerToken}}
 # Register Response:
 # {
 #   "success": true,
-#   "message": "Registration successful",
+#   "message": "Registrasi berhasil",
 #   "data": {
 #     "customer": {
 #       "id": "uuid",
-#       "name": "John Doe",
-#       "email": "john.doe@example.com",
-#       "phone": "081234567890"
+#       "phone_number": "628123456789",
+#       "full_name": "Customer Test",
+#       "address": "Jl. Merdeka No. 123, Jakarta",
+#       "role": "customer"
 #     },
 #     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 #   }
@@ -63,12 +65,13 @@ Authorization: Bearer {{customerToken}}
 # Login Response:
 # {
 #   "success": true,
-#   "message": "Login successful",
+#   "message": "Login berhasil",
 #   "data": {
 #     "customer": {
 #       "id": "uuid",
-#       "name": "John Doe",
-#       "email": "john.doe@example.com"
+#       "phone_number": "628123456789",
+#       "full_name": "Customer Test",
+#       "role": "customer"
 #     },
 #     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 #   }
@@ -79,9 +82,8 @@ Authorization: Bearer {{customerToken}}
 #   "success": true,
 #   "data": {
 #     "id": "uuid",
-#     "name": "John Doe",
-#     "email": "john.doe@example.com",
-#     "phone": "081234567890",
+#     "phone_number": "628123456789",
+#     "full_name": "Customer Test",
 #     "address": "Jl. Merdeka No. 123, Jakarta"
 #   }
 # }
@@ -89,8 +91,8 @@ Authorization: Bearer {{customerToken}}
 ###############################################
 # TESTING WORKFLOW
 ###############################################
-# 1. Register customer (step 1)
+# 1. Register customer (step 1) - phone_number akan dinormalisasi ke format 62
 # 2. Login customer (step 2)
 # 3. Copy token dari response login
-# 4. Paste token ke @customerToken di baris 7
+# 4. Paste token ke @customerToken di baris 8
 # 5. Test Get Profile (step 3)
