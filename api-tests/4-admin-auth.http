@@ -1,0 +1,60 @@
+###############################################
+# ADMIN AUTHENTICATION API
+# Endpoint: /api/admin/auth/*
+###############################################
+
+@baseUrl = http://localhost:5000
+@adminToken = paste-admin-token-here
+
+# Default Admin Credentials (sudah ada dari seeder)
+@adminEmail = admin@baletani.com
+@adminPassword = admin123
+
+###############################################
+# ADMIN AUTHENTICATION
+###############################################
+
+### 1. Login Admin
+# IMPORTANT: Copy token dari response dan paste ke @adminToken di atas
+POST {{baseUrl}}/api/admin/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+### 2. Get Admin Profile (Need Authentication)
+GET {{baseUrl}}/api/admin/auth/profile
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+###############################################
+# EXPECTED RESPONSES
+###############################################
+
+# Login Response:
+# {
+#   "success": true,
+#   "message": "Login successful",
+#   "data": {
+#     "admin": {
+#       "id": "uuid",
+#       "name": "Admin BaleTani",
+#       "email": "admin@baletani.com",
+#       "role": {
+#         "id": "uuid",
+#         "name": "superadmin"
+#       }
+#     },
+#     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+#   }
+# }
+
+###############################################
+# TESTING WORKFLOW
+###############################################
+# 1. Login admin (step 1)
+# 2. Copy token dari response
+# 3. Paste token ke @adminToken di baris 7
+# 4. Gunakan token ini untuk semua admin API lainnya

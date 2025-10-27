@@ -1,0 +1,82 @@
+###############################################
+# PUBLIC API - NO AUTHENTICATION REQUIRED
+# Endpoint: /api/public/*
+###############################################
+
+@baseUrl = http://localhost:5000
+
+###############################################
+# PRODUCTS
+###############################################
+
+### 1. Get All Products (with pagination)
+GET {{baseUrl}}/api/public/products?page=1&limit=12&sortBy=newest
+Content-Type: application/json
+
+### 2. Get All Products (with search)
+GET {{baseUrl}}/api/public/products?search=tomat&page=1&limit=12
+Content-Type: application/json
+
+### 3. Get All Products (with category filter)
+# Ganti categoryId dengan ID kategori yang valid
+GET {{baseUrl}}/api/public/products?categoryId=your-category-id-here&page=1&limit=12
+Content-Type: application/json
+
+### 4. Get All Products (with price range)
+GET {{baseUrl}}/api/public/products?minPrice=10000&maxPrice=50000&page=1&limit=12
+Content-Type: application/json
+
+### 5. Get All Products (sort by price)
+GET {{baseUrl}}/api/public/products?sortBy=price_asc&page=1&limit=12
+Content-Type: application/json
+
+### 6. Get Product Detail by ID
+# Ganti dengan ID produk yang valid dari response Get All Products
+GET {{baseUrl}}/api/public/products/1fbda520-6dce-4131-bb42-23d37cffe5b2
+Content-Type: application/json
+
+### 7. Get Promo/Featured Products
+GET {{baseUrl}}/api/public/products/featured/promo?limit=50
+Content-Type: application/json
+
+###############################################
+# CATEGORIES
+###############################################
+
+### 8. Get All Categories
+GET {{baseUrl}}/api/public/categories
+Content-Type: application/json
+
+###############################################
+# EXPECTED RESPONSES
+###############################################
+
+# Get All Products Response:
+# {
+#   "success": true,
+#   "message": "Products fetched successfully",
+#   "data": {
+#     "products": [...],
+#     "pagination": {
+#       "currentPage": 1,
+#       "totalPages": 5,
+#       "totalItems": 48,
+#       "itemsPerPage": 12
+#     }
+#   }
+# }
+
+# Get Product Detail Response:
+# {
+#   "success": true,
+#   "message": "Product detail fetched successfully",
+#   "data": {
+#     "id": "uuid",
+#     "name": "Tomat Segar",
+#     "price": "15000.00",
+#     "stock": 50,
+#     "category": {...},
+#     "images": [...],
+#     "discount": {...}
+#   }
+# }

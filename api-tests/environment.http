@@ -1,0 +1,25 @@
+###############################################
+# ENVIRONMENT VARIABLES
+# Sudah diisi dengan default credentials
+# Token akan auto-update setelah login
+###############################################
+
+### Base URL
+@baseUrl = http://localhost:5000
+
+### Default Credentials
+@adminEmail = admin@baletani.com
+@adminPassword = admin123
+
+@customerEmail = customer@test.com
+@customerPassword = password123
+
+### Tokens (auto-update setelah login via response)
+@customerToken = 
+@adminToken = 
+
+### Sample IDs (copy dari response API)
+@productId = 
+@categoryId = 
+@discountId = 
+@cartItemId = 

@@ -1,0 +1,96 @@
+###############################################
+# CUSTOMER AUTHENTICATION API
+# Endpoint: /api/customer/auth/*
+###############################################
+
+@baseUrl = http://localhost:5000
+@customerToken = paste-token-here-after-login
+
+# Default Test Credentials (buat dulu via register)
+@customerEmail = customer@test.com
+@customerPassword = password123
+
+###############################################
+# AUTHENTICATION
+###############################################
+
+### 1. Register New Customer
+POST {{baseUrl}}/api/customer/auth/register
+Content-Type: application/json
+
+{
+  "name": "Customer Test",
+  "email": "{{customerEmail}}",
+  "password": "{{customerPassword}}",
+  "phone": "081234567890",
+  "address": "Jl. Merdeka No. 123, Jakarta Pusat, DKI Jakarta"
+}
+
+### 2. Login Customer
+# IMPORTANT: Copy token dari response dan paste ke @customerToken di atas
+POST {{baseUrl}}/api/customer/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{customerEmail}}",
+  "password": "{{customerPassword}}"
+}
+
+### 3. Get Customer Profile (Need Authentication)
+GET {{baseUrl}}/api/customer/auth/profile
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+###############################################
+# EXPECTED RESPONSES
+###############################################
+
+# Register Response:
+# {
+#   "success": true,
+#   "message": "Registration successful",
+#   "data": {
+#     "customer": {
+#       "id": "uuid",
+#       "name": "John Doe",
+#       "email": "john.doe@example.com",
+#       "phone": "081234567890"
+#     },
+#     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+#   }
+# }
+
+# Login Response:
+# {
+#   "success": true,
+#   "message": "Login successful",
+#   "data": {
+#     "customer": {
+#       "id": "uuid",
+#       "name": "John Doe",
+#       "email": "john.doe@example.com"
+#     },
+#     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+#   }
+# }
+
+# Get Profile Response:
+# {
+#   "success": true,
+#   "data": {
+#     "id": "uuid",
+#     "name": "John Doe",
+#     "email": "john.doe@example.com",
+#     "phone": "081234567890",
+#     "address": "Jl. Merdeka No. 123, Jakarta"
+#   }
+# }
+
+###############################################
+# TESTING WORKFLOW
+###############################################
+# 1. Register customer (step 1)
+# 2. Login customer (step 2)
+# 3. Copy token dari response login
+# 4. Paste token ke @customerToken di baris 7
+# 5. Test Get Profile (step 3)
