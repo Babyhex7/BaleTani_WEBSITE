@@ -38,6 +38,6 @@ router.get("/featured/promo", publicProductController.getFeaturedProducts);
  * @desc    Get product detail by ID
  * @access  Public
  */
-router.get("/:id", publicProductController.getProductDetail);
+router.get("/:id", publicProductController.getProductById);
 
 module.exports = router;

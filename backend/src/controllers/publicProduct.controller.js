@@ -479,3 +479,147 @@ exports.getFeaturedProducts = async (req, res) => {
     });
   }
 };
+
+/**
+ * Get product detail by ID
+ * @route GET /api/public/products/:id
+ */
+exports.getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Fetch product with all relations
+    const product = await Product.findOne({
+      where: {
+        id,
+        is_active: true,
+        deleted_at: null,
+      },
+      include: [
+        {
+          model: Category,
+          as: "category",
+          attributes: ["id", "category_name"],
+        },
+        {
+          model: ProductImage,
+          as: "images",
+          attributes: ["id", "image_url", "display_order"],
+          where: { deleted_at: null },
+          required: false,
+        },
+        {
+          model: ProductDiscount,
+          as: "productDiscounts",
+          attributes: ["discount_id"],
+          where: { deleted_at: null },
+          required: false,
+          include: [
+            {
+              model: Discount,
+              as: "discount",
+              attributes: [
+                "id",
+                "discount_name",
+                "discount_type",
+                "value",
+                "start_date",
+                "end_date",
+                "is_active",
+              ],
+              where: {
+                is_active: true,
+                deleted_at: null,
+                start_date: { [Op.lte]: new Date() },
+                end_date: { [Op.gte]: new Date() },
+              },
+              required: false,
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    // Calculate discount
+    let discountInfo = null;
+    let finalPrice = product.selling_price;
+
+    if (
+      product.productDiscounts &&
+      product.productDiscounts.length > 0 &&
+      product.productDiscounts[0].discount
+    ) {
+      const discount = product.productDiscounts[0].discount;
+      let discountAmount = 0;
+
+      if (discount.discount_type === "percentage") {
+        discountAmount =
+          (product.selling_price * discount.value) / 100;
+      } else if (discount.discount_type === "fixed_amount") {
+        discountAmount = discount.value;
+      }
+
+      finalPrice = Math.max(0, product.selling_price - discountAmount);
+
+      discountInfo = {
+        id: discount.id,
+        name: discount.discount_name,
+        type: discount.discount_type,
+        value: discount.value,
+        startDate: discount.start_date,
+        endDate: discount.end_date,
+        discountAmount,
+        finalPrice,
+      };
+    }
+
+    // Get all images (sorted by display_order) - with safety check
+    const images = product.images && product.images.length > 0
+      ? product.images
+          .sort((a, b) => a.display_order - b.display_order)
+          .map((img) => img.image_url)
+      : [];
+
+    // Format response
+    const productDetail = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.selling_price,
+      stock: product.total_stock,
+      unit: product.quantity_info || "unit",
+      weight: product.weight,
+      category: {
+        id: product.category?.id,
+        name: product.category?.category_name,
+      },
+      images: images.length > 0 ? images : ["/placeholder-product.jpg"],
+      discount: discountInfo,
+      specifications: {
+        weight: product.weight,
+        unit: product.quantity_info || "unit",
+        stock: product.total_stock,
+      },
+    };
+
+    res.status(200).json({
+      success: true,
+      message: "Product detail fetched successfully",
+      data: productDetail,
+    });
+  } catch (error) {
+    console.error("Error fetching product detail:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch product detail",
+      error: error.message,
+    });
+  }
+};

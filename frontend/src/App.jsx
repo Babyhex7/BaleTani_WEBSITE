@@ -6,6 +6,7 @@ import Home from './pages/customer/Home';
 import Login from './pages/customer/Login';
 import Register from './pages/customer/Register';
 import ProductPage from './pages/customer/ProductPage';
+import ProductDetailPage from './pages/customer/ProductDetailPage';
 import PromoPage from './pages/customer/PromoPage';
 import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRoute';
 
@@ -65,6 +66,8 @@ function App() {
       } />
 
       <Route path="/products" element={<ProductPage />} />
+
+      <Route path="/products/:id" element={<ProductDetailPage />} />
 
       <Route path="/promo" element={<PromoPage />} />
 
