@@ -28,16 +28,16 @@ const ProductCard = ({
           }}
         />
         
-        {/* Discount Badge */}
+        {/* Discount Badge - Kanan Atas */}
         {hasDiscount && (
-          <div className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse">
+          <div className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse z-10">
             -{discountPercentage}%
           </div>
         )}
         
-        {/* Category Badge - Hijau Tua */}
+        {/* Category Badge - Kiri Atas (sejajar dengan diskon) */}
         {product.category && (
-          <div className="absolute top-3 left-3 bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md">
+          <div className="absolute top-3 left-3 bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md max-w-[50%] truncate">
             {typeof product.category === 'string' ? product.category : product.category.name}
           </div>
         )}
@@ -59,23 +59,25 @@ const ProductCard = ({
           </p>
         )}
         
-        {/* Price Section - Horizontal Layout */}
-        <div className="flex items-center gap-3 flex-wrap">
+        {/* Price Section - Responsive Layout */}
+        <div>
           {/* Current Price */}
-          <span className="text-2xl font-bold text-green-600">
-            {formatPrice(finalPrice)}
-          </span>
+          <div className="mb-2">
+            <span className="text-2xl font-bold text-green-600">
+              {formatPrice(finalPrice)}
+            </span>
+          </div>
           
-          {/* Original Price (if discount) - Di Samping */}
+          {/* Original Price (if discount) - Below */}
           {hasDiscount && (
-            <>
-              <span className="text-lg text-gray-400 line-through">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-base text-gray-400 line-through">
                 {formatPrice(product.price)}
               </span>
               <span className="text-xs text-red-600 font-semibold bg-red-50 px-2 py-1 rounded">
                 Hemat {formatPrice(product.price - finalPrice)}
               </span>
-            </>
+            </div>
           )}
         </div>
         

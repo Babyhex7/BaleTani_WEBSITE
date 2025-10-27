@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Tag, Clock, TrendingDown, Search } from 'lucide-react';
+import { Tag, Clock, Search, Filter, X, SlidersHorizontal, MessageCircle } from 'lucide-react';
 import ProductCard from '../../components/ui/ProductCard';
 import Button from '../../components/ui/Button';
 import productService from '../../services/services_customer/productService';
@@ -17,6 +17,12 @@ const PromoPage = () => {
   const [error, setError] = useState(null);
   const [searchInput, setSearchInput] = useState('');
   const [filteredProducts, setFilteredProducts] = useState([]);
+  
+  // Filter states
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
+  const [showFilters, setShowFilters] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   // Format price to Rupiah
   const formatPrice = (price) => {
@@ -34,11 +40,19 @@ const PromoPage = () => {
         setLoading(true);
         setError(null);
         
-        const response = await productService.getFeaturedProducts(20);
+        const response = await productService.getFeaturedProducts(50);
         
         if (response.success) {
           setPromoProducts(response.data);
           setFilteredProducts(response.data);
+          
+          // Extract unique categories
+          const uniqueCategories = [...new Set(
+            response.data
+              .map(p => p.category)
+              .filter(Boolean)
+          )];
+          setCategories(uniqueCategories);
         }
       } catch (err) {
         console.error('Error fetching promo products:', err);
@@ -51,24 +65,66 @@ const PromoPage = () => {
     fetchPromoProducts();
   }, []);
 
-  // Handle search
-  const handleSearch = (e) => {
-    const value = e.target.value.toLowerCase();
-    setSearchInput(value);
-    
-    if (value === '') {
-      setFilteredProducts(promoProducts);
-    } else {
-      const filtered = promoProducts.filter(product =>
-        product.name.toLowerCase().includes(value)
+  // Apply filters
+  useEffect(() => {
+    let filtered = [...promoProducts];
+
+    // Search filter
+    if (searchInput) {
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchInput.toLowerCase())
       );
-      setFilteredProducts(filtered);
     }
+
+    // Category filter
+    if (selectedCategory) {
+      filtered = filtered.filter(product => product.category === selectedCategory);
+    }
+
+    // Sorting
+    switch (sortBy) {
+      case 'price-asc':
+        filtered.sort((a, b) => 
+          (a.discount?.finalPrice || a.price) - (b.discount?.finalPrice || b.price)
+        );
+        break;
+      case 'price-desc':
+        filtered.sort((a, b) => 
+          (b.discount?.finalPrice || b.price) - (a.discount?.finalPrice || a.price)
+        );
+        break;
+      case 'discount':
+        filtered.sort((a, b) => {
+          const discountA = a.discount ? ((a.price - a.discount.finalPrice) / a.price) * 100 : 0;
+          const discountB = b.discount ? ((b.price - b.discount.finalPrice) / b.price) * 100 : 0;
+          return discountB - discountA;
+        });
+        break;
+      case 'newest':
+      default:
+        // Already sorted by newest from backend
+        break;
+    }
+
+    setFilteredProducts(filtered);
+  }, [searchInput, selectedCategory, sortBy, promoProducts]);
+
+  // Clear filters
+  const clearFilters = () => {
+    setSearchInput('');
+    setSelectedCategory('');
+    setSortBy('newest');
+  };
+
+  // Handle search submit
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // Search is already handled by useEffect
   };
 
   // Handle WhatsApp order
   const handleWhatsAppOrder = (productName, price, unit) => {
-    const message = `Halo, saya ingin memesan produk promo:\n\nProduk: ${productName}\nHarga Promo: ${formatPrice(price)}/${unit}\n\nMohon informasi lebih lanjut.`;
+    const message = `Halo, saya ingin memesan produk promo:\n\nProduk: ${productName}\nHarga Promo: ${formatPrice(price)}\n\nMohon informasi lebih lanjut.`;
     const whatsappUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -125,11 +181,11 @@ const PromoPage = () => {
               Jangan lewatkan penawaran terbaik untuk produk segar berkualitas tinggi
             </p>
 
-            {/* Countdown Timer (Static for now) */}
+            {/* Countdown Timer */}
             <div className="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-6 border-2 border-white/30">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <Clock size={24} className="animate-spin" style={{ animationDuration: '3s' }} />
-                <span className="text-xl font-bold">✨ Flash Sale Hari Ini</span>
+                <span className="text-xl font-bold">Flash Sale Hari Ini</span>
               </div>
               <p className="text-center text-sm text-red-100">
                 Diskon hingga 50% - Terbatas!
@@ -137,52 +193,90 @@ const PromoPage = () => {
             </div>
 
             {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
                 placeholder="Cari produk promo..."
                 value={searchInput}
-                onChange={handleSearch}
-                className="w-full pl-12 pr-4 py-4 rounded-full text-gray-900 placeholder-gray-400 shadow-lg focus:outline-none focus:ring-4 focus:ring-red-300"
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="w-full px-6 py-4 pr-32 rounded-full text-gray-900 placeholder-gray-400 shadow-lg focus:outline-none focus:ring-4 focus:ring-red-200 hover:shadow-xl transition-all"
               />
-            </div>
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-medium transition-colors duration-200 flex items-center gap-2 shadow-md hover:shadow-lg"
+              >
+                <Search size={20} />
+                Cari
+              </button>
+            </form>
           </div>
         </div>
       </div>
 
-      {/* Stats Section */}
-      {!loading && promoProducts.length > 0 && (
-        <div className="bg-white border-b border-gray-200 py-8">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 text-center border border-green-200">
-                <div className="text-3xl font-bold text-green-600 mb-2">
-                  {promoProducts.length}
-                </div>
-                <div className="text-sm text-green-700 font-medium">Produk Promo</div>
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        {/* Filters Bar - Mirip ProductPage */}
+        {!loading && !error && promoProducts.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border border-gray-100">
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Filter Toggle Button (Mobile) */}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="lg:hidden flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                <SlidersHorizontal size={20} />
+                Filter
+              </button>
+
+              {/* Category Filter */}
+              <div className={`${showFilters ? 'flex' : 'hidden'} lg:flex items-center gap-2 flex-1`}>
+                <Filter size={20} className="text-gray-500" />
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="">Semua Kategori</option>
+                  {categories.map((category, index) => (
+                    <option key={index} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
               </div>
-              
-              <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 text-center border border-red-200">
-                <div className="text-3xl font-bold text-red-600 mb-2">
-                  {formatPrice(calculateTotalSavings())}
-                </div>
-                <div className="text-sm text-red-700 font-medium">Total Penghematan</div>
+
+              {/* Sort Filter */}
+              <div className={`${showFilters ? 'flex' : 'hidden'} lg:flex items-center gap-2`}>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="newest">Terbaru</option>
+                  <option value="price-asc">Harga Terendah</option>
+                  <option value="price-desc">Harga Tertinggi</option>
+                  <option value="discount">Diskon Terbesar</option>
+                </select>
               </div>
-              
-              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 text-center border border-orange-200">
-                <div className="text-3xl font-bold text-orange-600 mb-2">
-                  <TrendingDown className="inline" size={32} />
-                </div>
-                <div className="text-sm text-orange-700 font-medium">Diskon Hingga 50%</div>
+
+              {/* Reset Button */}
+              {(selectedCategory || sortBy !== 'newest' || searchInput) && (
+                <button
+                  onClick={clearFilters}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                >
+                  <X size={20} />
+                  Reset
+                </button>
+              )}
+
+              {/* Results Count */}
+              <div className="text-sm text-gray-600 font-medium ml-auto">
+                {filteredProducts.length} produk ditemukan
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+        )}
         {/* Loading State */}
         {loading && (
           <div className="text-center py-20">
@@ -205,51 +299,41 @@ const PromoPage = () => {
         {!loading && !error && (
           <>
             {filteredProducts.length > 0 ? (
-              <>
-                <div className="mb-6 text-center">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    {searchInput ? `Hasil Pencarian "${searchInput}"` : '🔥 Produk Promo Terbaik'}
-                  </h2>
-                  <p className="text-gray-600">
-                    {filteredProducts.length} produk dengan harga spesial
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {filteredProducts.map((product) => (
-                    <div key={product.id} className="relative">
-                      {/* Timer Badge on Card */}
-                      {product.discount?.validUntil && (
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
-                          <Clock size={12} />
-                          {getTimeRemaining(product.discount.validUntil)}
-                        </div>
-                      )}
-                      
-                      <ProductCard
-                        product={product}
-                        formatPrice={formatPrice}
-                        onWhatsAppOrder={handleWhatsAppOrder}
-                        onAddToCart={handleAddToCart}
-                        className="mt-3"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredProducts.map((product) => (
+                  <div key={product.id} className="relative">
+                    {/* Timer Badge on Card */}
+                    {product.discount?.validUntil && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+                        <Clock size={12} />
+                        {getTimeRemaining(product.discount.validUntil)}
+                      </div>
+                    )}
+                    
+                    <ProductCard
+                      product={product}
+                      formatPrice={formatPrice}
+                      onAddToCart={handleAddToCart}
+                      className="mt-3"
+                    />
+                  </div>
+                ))}
+              </div>
             ) : (
               <div className="text-center py-20">
-                <div className="text-6xl mb-4">🎁</div>
+                <Tag size={64} className="mx-auto text-gray-300 mb-4" />
                 <h3 className="text-2xl font-bold text-gray-700 mb-2">
-                  {searchInput ? 'Produk Promo Tidak Ditemukan' : 'Belum Ada Promo'}
+                  {searchInput || selectedCategory
+                    ? 'Produk Promo Tidak Ditemukan' 
+                    : 'Belum Ada Promo'}
                 </h3>
                 <p className="text-gray-500 mb-6">
-                  {searchInput 
-                    ? 'Coba kata kunci pencarian lain' 
+                  {searchInput || selectedCategory
+                    ? 'Coba ubah filter atau kata kunci pencarian' 
                     : 'Promo spesial akan segera hadir. Pantau terus!'}
                 </p>
-                {searchInput && (
-                  <Button onClick={() => setSearchInput('')}>
+                {(searchInput || selectedCategory) && (
+                  <Button onClick={clearFilters}>
                     Lihat Semua Promo
                   </Button>
                 )}
@@ -268,10 +352,11 @@ const PromoPage = () => {
               Daftarkan WhatsApp Anda dan dapatkan notifikasi promo terbaru langsung!
             </p>
             <Button 
-              className="bg-white text-green-600 hover:bg-green-50"
+              className="bg-white text-green-600 hover:bg-green-50 flex items-center gap-2 mx-auto"
               onClick={() => window.open('https://wa.me/6281234567890?text=Halo, saya ingin mendapatkan notifikasi promo!', '_blank')}
             >
-              📱 Hubungi via WhatsApp
+              <MessageCircle size={20} />
+              Hubungi via WhatsApp
             </Button>
           </div>
         )}
