@@ -11,6 +11,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   
   const { user, isAuthenticated, logout } = useAuthStore();
+  
+  // Subscribe to items array so component re-renders when cart changes
+  const items = useCartStore((state) => state.items);
   const getTotalItems = useCartStore((state) => state.getTotalItems);
   const totalItems = getTotalItems();
 
