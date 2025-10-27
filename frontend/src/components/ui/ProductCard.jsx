@@ -1,6 +1,7 @@
 import { ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import Button from './Button';
 import LoginModal from './LoginModal';
 import useAuthStore from '../../store/store_customer/useAuthStore';
@@ -9,8 +10,7 @@ import useCartStore from '../../store/store_customer/useCartStore';
 const ProductCard = ({ 
   product, 
   formatPrice,
-  className = '',
-  showToast // Toast function from parent
+  className = ''
 }) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
@@ -37,19 +37,17 @@ const ProductCard = ({
 
     // Check stock
     if (product.stock === 0) {
-      if (showToast) {
-        showToast('Maaf, produk ini sedang habis stok', 'error');
-      }
+      toast.error('Maaf, produk ini sedang habis stok', {
+        duration: 3000,
+      });
       return;
     }
 
     // Add to cart
     addItem(product, 1);
-    if (showToast) {
-      showToast(`${product.name} berhasil ditambahkan ke keranjang!`, 'success');
-    } else {
-      alert(`${product.name} berhasil ditambahkan ke keranjang!`);
-    }
+    toast.success(`${product.name} berhasil ditambahkan ke keranjang!`, {
+      duration: 3000,
+    });
   };
 
   // Navigate to product detail

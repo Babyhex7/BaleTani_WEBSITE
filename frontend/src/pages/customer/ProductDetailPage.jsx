@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ShoppingCart, ArrowLeft, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
+import toast from 'react-hot-toast';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import LoginModal from '../../components/ui/LoginModal';
@@ -25,7 +26,6 @@ const ProductDetailPage = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
 
   // Fetch product detail
   useEffect(() => {
@@ -39,7 +39,7 @@ const ProductDetailPage = () => {
         }
       } catch (error) {
         console.error('Error fetching product detail:', error);
-        showToast('Gagal memuat detail produk', 'error');
+        toast.error('Gagal memuat detail produk', { duration: 3000 });
       } finally {
         setLoading(false);
       }
@@ -71,14 +71,6 @@ const ProductDetailPage = () => {
     return `${backendUrl}/${imagePath}`;
   };
 
-  // Show toast notification
-  const showToast = (message, type = 'info') => {
-    setToast({ show: true, message, type });
-    setTimeout(() => {
-      setToast({ show: false, message: '', type: 'info' });
-    }, 3000);
-  };
-
   // Handle quantity change
   const handleQuantityChange = (delta) => {
     const newQuantity = quantity + delta;
@@ -95,12 +87,14 @@ const ProductDetailPage = () => {
     }
 
     if (product.stock === 0) {
-      showToast('Maaf, produk ini sedang habis stok', 'error');
+      toast.error('Maaf, produk ini sedang habis stok', { duration: 3000 });
       return;
     }
 
     addItem(product, quantity);
-    showToast(`${quantity} ${product.name} berhasil ditambahkan ke keranjang!`, 'success');
+    toast.success(`${quantity} ${product.name} berhasil ditambahkan ke keranjang!`, { 
+      duration: 3000 
+    });
     setQuantity(1);
   };
 
@@ -112,7 +106,7 @@ const ProductDetailPage = () => {
     }
 
     if (product.stock === 0) {
-      showToast('Maaf, produk ini sedang habis stok', 'error');
+      toast.error('Maaf, produk ini sedang habis stok', { duration: 3000 });
       return;
     }
 
@@ -365,19 +359,6 @@ const ProductDetailPage = () => {
           </div>
         </div>
       </div>
-
-      {/* Toast Notification */}
-      {toast.show && (
-        <div className="fixed top-20 right-4 z-50 animate-slide-in-right">
-          <div className={`flex items-center gap-3 p-4 rounded-lg shadow-lg ${
-            toast.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' :
-            toast.type === 'error' ? 'bg-red-50 text-red-800 border border-red-200' :
-            'bg-blue-50 text-blue-800 border border-blue-200'
-          }`}>
-            <p className="text-sm font-medium">{toast.message}</p>
-          </div>
-        </div>
-      )}
 
       {/* Login Modal */}
       <LoginModal 
