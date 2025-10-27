@@ -5,7 +5,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, Trash2 } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Trash2, AlertCircle, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import CartItem from '../../components/layout/CartItem';
@@ -19,7 +20,7 @@ const CartPage = () => {
   const { items, updateQuantity, removeItem, clearCart, getTotalItems, getTotalPrice } = useCartStore();
   
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
+  const [showClearModal, setShowClearModal] = useState(false);
 
   // Calculate totals
   const totalItems = getTotalItems();
@@ -32,21 +33,13 @@ const CartPage = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Show toast notification
-  const showToast = (message, type = 'info') => {
-    setToast({ show: true, message, type });
-    setTimeout(() => {
-      setToast({ show: false, message: '', type: 'info' });
-    }, 3000);
-  };
-
   // Handle quantity update
   const handleUpdateQuantity = (itemId, newQuantity) => {
     try {
       updateQuantity(itemId, newQuantity);
-      showToast('Jumlah berhasil diperbarui', 'success');
+      toast.success('Jumlah berhasil diperbarui');
     } catch (error) {
-      showToast('Gagal memperbarui jumlah', 'error');
+      toast.error('Gagal memperbarui jumlah');
     }
   };
 
@@ -54,28 +47,27 @@ const CartPage = () => {
   const handleRemoveItem = (itemId) => {
     try {
       removeItem(itemId);
-      showToast('Produk berhasil dihapus dari keranjang', 'success');
+      toast.success('Produk berhasil dihapus dari keranjang');
     } catch (error) {
-      showToast('Gagal menghapus produk', 'error');
+      toast.error('Gagal menghapus produk');
     }
   };
 
   // Handle clear cart
   const handleClearCart = () => {
-    if (window.confirm('Apakah Anda yakin ingin mengosongkan keranjang?')) {
-      try {
-        clearCart();
-        showToast('Keranjang berhasil dikosongkan', 'success');
-      } catch (error) {
-        showToast('Gagal mengosongkan keranjang', 'error');
-      }
+    try {
+      clearCart();
+      toast.success('Keranjang berhasil dikosongkan');
+      setShowClearModal(false);
+    } catch (error) {
+      toast.error('Gagal mengosongkan keranjang');
     }
   };
 
   // Handle checkout
   const handleCheckout = () => {
     if (items.length === 0) {
-      showToast('Keranjang Anda kosong', 'error');
+      toast.error('Keranjang Anda kosong');
       return;
     }
     navigate('/checkout');
@@ -149,7 +141,7 @@ const CartPage = () => {
                 Keranjang Belanja
               </h1>
               <button
-                onClick={handleClearCart}
+                onClick={() => setShowClearModal(true)}
                 className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
               >
                 <Trash2 size={18} />
@@ -205,15 +197,54 @@ const CartPage = () => {
         </div>
       </div>
 
-      {/* Toast Notification */}
-      {toast.show && (
-        <div className="fixed top-20 right-4 z-50 animate-slide-in-right">
-          <div className={`flex items-center gap-3 p-4 rounded-lg shadow-lg ${
-            toast.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' :
-            toast.type === 'error' ? 'bg-red-50 text-red-800 border border-red-200' :
-            'bg-blue-50 text-blue-800 border border-blue-200'
-          }`}>
-            <p className="text-sm font-medium">{toast.message}</p>
+      {/* Clear Cart Confirmation Modal */}
+      {showClearModal && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowClearModal(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Icon & Close Button */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full">
+                <AlertCircle className="text-red-600" size={24} />
+              </div>
+              <button
+                onClick={() => setShowClearModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="mb-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Kosongkan Keranjang?
+              </h3>
+              <p className="text-gray-600">
+                Semua produk di keranjang Anda akan dihapus. Tindakan ini tidak dapat dibatalkan.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowClearModal(false)}
+                className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleClearCart}
+                className="flex-1 px-4 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Ya, Kosongkan
+              </button>
+            </div>
           </div>
         </div>
       )}

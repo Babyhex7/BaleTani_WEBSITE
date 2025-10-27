@@ -37,20 +37,23 @@ function App() {
           // Default options
           duration: 3000,
           style: {
-            background: '#fff',
-            color: '#363636',
+            background: '#0b1220',
+            color: '#e6f4ea',
             padding: '16px',
             borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
           },
           // Success
           success: {
             duration: 3000,
             iconTheme: {
               primary: '#10b981',
-              secondary: '#fff',
+              secondary: '#0b1220',
             },
             style: {
+              background: '#0b1220',
+              color: '#e6f4ea',
               border: '1px solid #10b981',
             },
           },
@@ -59,9 +62,11 @@ function App() {
             duration: 4000,
             iconTheme: {
               primary: '#ef4444',
-              secondary: '#fff',
+              secondary: '#0b1220',
             },
             style: {
+              background: '#0b1220',
+              color: '#e6f4ea',
               border: '1px solid #ef4444',
             },
           },

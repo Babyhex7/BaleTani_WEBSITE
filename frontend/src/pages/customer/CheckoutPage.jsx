@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, ArrowLeft, Check, Package, CreditCard, Truck } from 'lucide-react';
+import toast from 'react-hot-toast';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import useAuthStore from '../../store/store_customer/useAuthStore';
@@ -20,7 +21,6 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('qris');
   const [shippingCost, setShippingCost] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
 
   // Calculate totals
   const totalItems = getTotalItems();
@@ -61,14 +61,6 @@ const CheckoutPage = () => {
     return `${backendUrl}${imagePath}`;
   };
 
-  // Show toast
-  const showToast = (message, type = 'info') => {
-    setToast({ show: true, message, type });
-    setTimeout(() => {
-      setToast({ show: false, message: '', type: 'info' });
-    }, 3000);
-  };
-
   // Generate WhatsApp message
   const generateWhatsAppMessage = () => {
     let message = `*PESANAN BARU - BaleTani*\n\n`;
@@ -97,7 +89,7 @@ const CheckoutPage = () => {
   // Handle send order via WhatsApp
   const handleSendOrder = () => {
     if (items.length === 0) {
-      showToast('Keranjang Anda kosong', 'error');
+      toast.error('Keranjang Anda kosong');
       return;
     }
 
@@ -115,7 +107,7 @@ const CheckoutPage = () => {
       // Clear cart after successful order
       setTimeout(() => {
         clearCart();
-        showToast('Pesanan berhasil dikirim ke WhatsApp!', 'success');
+        toast.success('Pesanan berhasil dikirim ke WhatsApp!');
         setTimeout(() => {
           navigate('/products');
         }, 2000);
@@ -123,7 +115,7 @@ const CheckoutPage = () => {
 
     } catch (error) {
       console.error('Error sending order:', error);
-      showToast('Gagal mengirim pesanan', 'error');
+      toast.error('Gagal mengirim pesanan');
     } finally {
       setLoading(false);
     }
