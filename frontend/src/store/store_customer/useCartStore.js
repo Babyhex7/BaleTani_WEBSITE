@@ -12,12 +12,12 @@ const useCartStore = create(
       // State
       items: [],
 
-      // Computed values
-      get totalItems() {
+      // Computed values (as functions)
+      getTotalItems: () => {
         return get().items.reduce((total, item) => total + item.quantity, 0);
       },
 
-      get totalPrice() {
+      getTotalPrice: () => {
         return get().items.reduce(
           (total, item) => total + item.finalPrice * item.quantity,
           0

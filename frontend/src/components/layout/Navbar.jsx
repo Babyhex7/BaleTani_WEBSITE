@@ -11,7 +11,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   
   const { user, isAuthenticated, logout } = useAuthStore();
-  const totalItems = useCartStore((state) => state.totalItems);
+  const getTotalItems = useCartStore((state) => state.getTotalItems);
+  const totalItems = getTotalItems();
 
   const handleLogout = () => {
     logout();

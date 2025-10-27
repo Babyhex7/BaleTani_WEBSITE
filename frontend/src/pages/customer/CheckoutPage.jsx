@@ -14,13 +14,17 @@ import useCartStore from '../../store/store_customer/useCartStore';
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
-  const { items, clearCart, totalItems, totalPrice } = useCartStore();
+  const { items, clearCart, getTotalItems, getTotalPrice } = useCartStore();
 
   const [pickupMethod, setPickupMethod] = useState('ambil-sendiri');
   const [paymentMethod, setPaymentMethod] = useState('qris');
   const [shippingCost, setShippingCost] = useState(0);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
+
+  // Calculate totals
+  const totalItems = getTotalItems();
+  const totalPrice = getTotalPrice();
 
   // Redirect if not authenticated or cart empty
   useEffect(() => {
