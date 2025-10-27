@@ -64,17 +64,9 @@ function App() {
         </ProtectedRoute>
       } />
 
-      <Route path="/products" element={
-        <ProtectedRoute requireAuth={false}>
-          <ProductPage />
-        </ProtectedRoute>
-      } />
+      <Route path="/products" element={<ProductPage />} />
 
-      <Route path="/promo" element={
-        <ProtectedRoute requireAuth={false}>
-          <PromoPage />
-        </ProtectedRoute>
-      } />
+      <Route path="/promo" element={<PromoPage />} />
 
       <Route path="/categories" element={
         <ProtectedRoute requiredRole="customer">
