@@ -1,4 +1,4 @@
-import { ShoppingCart, Tag, FileText } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import Button from './Button';
@@ -111,31 +111,32 @@ const ProductCard = ({
           </h3>
         </div>
 
-        {/* Description - With Icon & Highlight */}
+        {/* Description - No Icon */}
         {product.description && (
-          <div className="flex items-start gap-2">
-            <FileText size={16} className="text-gray-400 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
-              {product.description}
-            </p>
-          </div>
+          <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+            {product.description}
+          </p>
         )}
         
-        {/* Price Section - Responsive Layout */}
+        {/* Price Section - Shopee Style: Horizontal */}
         <div>
-          {/* Current Price */}
-          <div className="mb-2">
+          <div className="flex items-center gap-3">
+            {/* Current Price - Kiri */}
             <span className="text-2xl font-bold text-green-600">
               {formatPrice(finalPrice)}
             </span>
-          </div>
-          
-          {/* Original Price (if discount) - Below */}
-          {hasDiscount && (
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-base text-gray-400 line-through">
+            
+            {/* Original Price - Kanan (if discount) */}
+            {hasDiscount && (
+              <span className="text-sm text-gray-400 line-through">
                 {formatPrice(product.price)}
               </span>
+            )}
+          </div>
+          
+          {/* Badge Hemat - Rata Kiri */}
+          {hasDiscount && (
+            <div className="mt-1">
               <span className="text-xs text-red-600 font-semibold bg-red-50 px-2 py-1 rounded">
                 Hemat {formatPrice(product.price - finalPrice)}
               </span>
