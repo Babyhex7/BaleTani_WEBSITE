@@ -560,8 +560,7 @@ exports.getProductById = async (req, res) => {
       let discountAmount = 0;
 
       if (discount.discount_type === "percentage") {
-        discountAmount =
-          (product.selling_price * discount.value) / 100;
+        discountAmount = (product.selling_price * discount.value) / 100;
       } else if (discount.discount_type === "fixed_amount") {
         discountAmount = discount.value;
       }
@@ -581,11 +580,12 @@ exports.getProductById = async (req, res) => {
     }
 
     // Get all images (sorted by display_order) - with safety check
-    const images = product.images && product.images.length > 0
-      ? product.images
-          .sort((a, b) => a.display_order - b.display_order)
-          .map((img) => img.image_url)
-      : [];
+    const images =
+      product.images && product.images.length > 0
+        ? product.images
+            .sort((a, b) => a.display_order - b.display_order)
+            .map((img) => img.image_url)
+        : [];
 
     // Format response
     const productDetail = {
