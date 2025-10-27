@@ -316,21 +316,21 @@ const ProductDetailPage = () => {
 
                 {/* Action Buttons */}
                 <div className="flex gap-3 mt-auto">
-                  <Button
+                  <button
                     onClick={handleAddToCart}
                     disabled={product.stock === 0}
-                    className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    <ShoppingCart size={18} className="mr-2" />
+                    <ShoppingCart size={18} />
                     Tambah ke Keranjang
-                  </Button>
-                  <Button
+                  </button>
+                  <button
                     onClick={handleBuyNow}
                     disabled={product.stock === 0}
-                    className="flex-1 bg-white border-2 border-green-600 text-green-600 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center px-6 py-3 rounded-lg bg-white border-2 border-green-600 text-green-600 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Beli Sekarang
-                  </Button>
+                  </button>
                 </div>
               </div>
             </div>
