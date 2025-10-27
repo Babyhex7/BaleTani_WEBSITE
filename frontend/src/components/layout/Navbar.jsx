@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, ShoppingCart, User, LogOut } from 'lucide-react';
 import useAuthStore from '../../store/store_customer/useAuthStore';
+import useCartStore from '../../store/store_customer/useCartStore';
 import Button from '../ui/Button';
 
 const Navbar = () => {
@@ -10,6 +11,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   
   const { user, isAuthenticated, logout } = useAuthStore();
+  const totalItems = useCartStore((state) => state.totalItems);
 
   const handleLogout = () => {
     logout();
@@ -25,13 +27,20 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
-  const navLinks = [
-    { name: 'Beranda', href: '/', current: true },
-    { name: 'Produk', href: '/products', current: false },
-    { name: 'Promo', href: '/promo', current: false },
-    { name: 'Kategori', href: '/categories', current: false },
-    { name: 'Kontak', href: '/contact', current: false },
-  ];
+  // Dynamic nav links based on authentication
+  const navLinks = isAuthenticated 
+    ? [
+        { name: 'Beranda', href: '/home', current: true },
+        { name: 'Produk', href: '/products', current: false },
+        { name: 'Promo', href: '/promo', current: false },
+        { name: 'Kategori', href: '/categories', current: false },
+        { name: 'Kontak', href: '/contact', current: false },
+      ]
+    : [
+        { name: 'Produk', href: '/products', current: false },
+        { name: 'Promo', href: '/promo', current: false },
+        { name: 'Kontak', href: '/contact', current: false },
+      ];
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-40">
@@ -39,7 +48,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to={isAuthenticated ? '/home' : '/landing'} className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">B</span>
               </div>
@@ -67,13 +76,20 @@ const Navbar = () => {
 
           {/* Desktop Auth & Cart */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Cart */}
-            <button className="relative p-2 text-gray-600 hover:text-primary-500 transition-colors">
-              <ShoppingCart size={24} />
-              <span className="absolute -top-1 -right-1 bg-accent-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                0
-              </span>
-            </button>
+            {/* Cart - Only show if authenticated */}
+            {isAuthenticated && (
+              <Link 
+                to="/cart"
+                className="relative p-2 text-gray-600 hover:text-primary-500 transition-colors"
+              >
+                <ShoppingCart size={24} />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-accent-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                    {totalItems > 99 ? '99+' : totalItems}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* User Menu */}
             {isAuthenticated ? (
@@ -83,7 +99,7 @@ const Navbar = () => {
                   className="flex items-center space-x-2 text-gray-600 hover:text-primary-500 transition-colors"
                 >
                   <User size={20} />
-                  <span className="text-sm font-medium">{user?.fullName}</span>
+                  <span className="text-sm font-medium">{user?.full_name || user?.email}</span>
                 </button>
 
                 {/* User Dropdown */}
@@ -102,6 +118,13 @@ const Navbar = () => {
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       Pesanan Saya
+                    </Link>
+                    <Link
+                      to="/cart"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      Keranjang ({totalItems})
                     </Link>
                     <hr className="my-1" />
                     <button
