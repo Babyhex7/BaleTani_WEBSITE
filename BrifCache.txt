@@ -1,0 +1,97 @@
+🎯 CACHING IMPLEMENTATION PLAN - BaleTani Project
+📦 PART 1: BACKEND CACHING
+A. Tools yang Dipakai:
+Tool	Purpose	Free?
+node-cache	In-memory caching	✅ Yes
+compression	Response compression	✅ Yes
+redis (optional)	Production-grade cache	✅ Yes (Railway/Render free tier)
+B. Data yang DI-CACHE:
+Endpoint	Cache Key	TTL	Invalidate On
+GET /api/public/products	products:list:{page}:{limit}:{filters}	5 min	Product CRUD
+GET /api/public/products/:id	product:detail:{id}	10 min	Product update/delete
+GET /api/public/products/featured/promo	products:promo:{limit}	5 min	Product/Discount change
+GET /api/public/categories	categories:all	30 min	Category CRUD
+GET /api/admin/dashboard/stats	dashboard:stats	2 min	Any data change
+C. Data yang TIDAK DI-CACHE:
+Endpoint	Reason
+POST/PUT/DELETE semua endpoint	State-changing operations
+/api/customer/cart	Real-time per-user data
+/api/customer/auth/*	Security sensitive
+/api/admin/auth/*	Security sensitive
+D. File yang Perlu Dibuat/Dimodifikasi:
+1. Create Cache Service
+2. Modify Public Product Controller
+3. Modify Admin Product Controller (Cache Invalidation)
+4. Add Categories Caching
+5. Add Category Controller Cache Invalidation
+6. Add Dashboard Stats Caching
+7. Add Cache Monitoring Routes (Admin Only)
+Register di backend/src/routes/admin/index.js:
+
+8. Add Response Compression
+9. Install Dependencies
+E. Backend Implementation Checklist:
+📱 PART 2: FRONTEND CACHING
+A. Tools yang Dipakai:
+Tool	Purpose	Free?
+@tanstack/react-query	API response caching	✅ Yes
+Vite config	Static assets caching	✅ Yes (built-in)
+React.lazy	Code splitting & lazy loading	✅ Yes (built-in)
+B. Data yang DI-CACHE:
+Data	Cache Strategy	TTL	Invalidate On
+Products list	Stale-while-revalidate	5 min	Filter change, manual refetch
+Product detail	Cache-first	10 min	Manual refetch
+Promo products	Stale-while-revalidate	5 min	Manual refetch
+Categories	Cache-first	30 min	Manual refetch
+Cart items	Real-time	0	Every fetch
+User profile	Cache-first	15 min	Logout, update profile
+C. File yang Perlu Dibuat/Dimodifikasi:
+1. Install Dependencies
+2. Setup Query Client
+3. Create Query Hooks for Products
+4. Modify ProductPage to use React Query
+5. Modify ProductDetailPage to use React Query
+6. Modify ProductCard with Prefetch on Hover
+7. Modify PromoPage to use React Query
+8. Optimize Vite Config for Static Assets
+9. Add Lazy Loading for Routes
+10. Create Loader Component
+D. Frontend Implementation Checklist:
+📊 EXPECTED PERFORMANCE IMPROVEMENT
+Before Caching:
+After Caching:
+🎯 TESTING PLAN
+Backend Testing:
+Frontend Testing:
+📋 FINAL SUMMARY
+Backend:
+✅ node-cache untuk in-memory caching
+✅ Cache products, categories, promo, dashboard stats
+✅ Invalidate cache on CRUD operations
+✅ compression untuk response size
+✅ Admin monitoring endpoints
+Frontend:
+✅ React Query untuk API response caching
+✅ Prefetch on hover untuk instant navigation
+✅ Lazy loading routes untuk faster initial load
+✅ Code splitting untuk smaller bundle size
+✅ React Query DevTools untuk debugging
+🚀 READY TO EXECUTE?
+Urutan Eksekusi:
+
+Backend dulu (30-45 menit)
+
+Install dependencies
+Create cache.js
+Modify controllers
+Test dengan REST Client
+Frontend (45-60 menit)
+
+Install React Query
+Setup QueryClient
+Create hooks
+Modify pages
+Test dengan DevTools
+Total waktu: 1.5-2 jam
+
+Mau saya buatkan script otomatis untuk copy-paste semua file sekaligus? 🔥
