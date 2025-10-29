@@ -95,3 +95,41 @@ Test dengan DevTools
 Total waktu: 1.5-2 jam
 
 Mau saya buatkan script otomatis untuk copy-paste semua file sekaligus? 🔥
+
+
+
+📁 STRUKTUR FILE CACHING
+Backend Caching:
+File BARU yang dibuat (terpisah):
+
+File EXISTING yang dimodifikasi (ditambahkan code cache):
+
+Frontend Caching:
+File BARU yang dibuat (terpisah):
+
+File EXISTING yang dimodifikasi:
+
+📊 SUMMARY:
+Backend:
+1 file baru untuk logic caching: backend/src/utils/cache.js
+1 file baru untuk monitoring (opsional): backend/src/routes/admin/cache.js
+5-6 file existing dimodifikasi (controller, routes, app.js)
+Frontend:
+1 file baru untuk hooks: useProducts.js
+1 file baru untuk loader: frontend/src/components/ui/Loader.jsx
+6-7 file existing dimodifikasi (main.jsx, pages, components, vite.config.js)
+🎯 Kesimpulan:
+DIPISAH di file khusus:
+
+Logic caching di utils/cache.js (backend)
+React Query hooks di hooks/hook_customer/useProducts.js (frontend)
+NYAMPUR dengan existing:
+
+Controller, routes, pages → ditambahkan kode untuk pakai cache
+TAPI logic cache tetap di file terpisah, cuma di-import
+Benefit:
+
+✅ Logic cache terorganisir, mudah maintenance
+✅ Bisa matikan/hidupkan cache dengan mudah
+✅ Bisa ganti cache provider (node-cache → Redis) tanpa ubah controller
+✅ Testing lebih mudah (mock cache service)
