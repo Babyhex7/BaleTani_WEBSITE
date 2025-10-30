@@ -8,7 +8,7 @@
 @adminToken = paste-admin-token-here
 
 # Default Admin Credentials (sudah ada dari seeder)
-@adminPhone = 082111111111
+@adminPhone = 6282111111111
 @adminPassword = admin123
 
 ###############################################

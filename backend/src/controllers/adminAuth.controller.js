@@ -6,6 +6,26 @@ const { Admin, Role } = require("../models");
  * Handle login for admin users (using Admin model)
  */
 
+// Function to normalize phone number
+function normalizePhoneNumber(phoneNumber) {
+  // Remove all non-digit characters
+  let cleaned = phoneNumber.replace(/\D/g, "");
+
+  // Handle different formats
+  if (cleaned.startsWith("0")) {
+    // Convert 08xx to 628xx
+    cleaned = "62" + cleaned.substring(1);
+  } else if (cleaned.startsWith("8")) {
+    // Convert 8xx to 628xx
+    cleaned = "62" + cleaned;
+  } else if (!cleaned.startsWith("62")) {
+    // Add 62 if not present
+    cleaned = "62" + cleaned;
+  }
+
+  return cleaned;
+}
+
 // Login Admin
 const loginAdmin = async (req, res) => {
   try {
@@ -19,10 +39,13 @@ const loginAdmin = async (req, res) => {
       });
     }
 
+    // Normalize phone number before query
+    const normalizedPhone = normalizePhoneNumber(phone_number);
+
     // Find admin with role information
     const admin = await Admin.findOne({
       where: {
-        phone_number,
+        phone_number: normalizedPhone,
         deleted_at: null,
         is_active: true,
       },
