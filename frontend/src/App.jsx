@@ -11,6 +11,8 @@ import ProductDetailPage from './pages/customer/ProductDetailPage';
 import PromoPage from './pages/customer/PromoPage';
 import CartPage from './pages/customer/CartPage';
 import CheckoutPage from './pages/customer/CheckoutPage';
+import CategoryPage from './pages/customer/CategoryPage';
+import CategoryDetailPage from './pages/customer/CategoryDetailPage';
 import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRoute';
 
 // Admin Pages
@@ -129,15 +131,11 @@ function App() {
         </ProtectedRoute>
       } />
 
-      <Route path="/categories" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <div className="container-custom section-padding">
-              <h1 className="text-2xl font-bold">Halaman Kategori (Coming Soon)</h1>
-            </div>
-          </CustomerLayout>
-        </ProtectedRoute>
-      } />
+      {/* Categories - Daftar semua kategori */}
+      <Route path="/categories" element={<CategoryPage />} />
+
+      {/* Category Detail - Produk dalam kategori tertentu */}
+      <Route path="/categories/:id" element={<CategoryDetailPage />} />
 
       <Route path="/contact" element={
         <ProtectedRoute requiredRole="customer">

@@ -5,10 +5,10 @@
 
 const express = require("express");
 const router = express.Router();
-const {
-  getAllCategories,
-  getCategoryById,
-} = require("../controllers/publicCategory.controller");
+const { 
+  getAllCategories, 
+  getCategoryById 
+} = require("../../controllers/publicCategory.controller");
 
 /**
  * GET /api/public/categories

@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import Button from '../../components/ui/Button';
 import ProductCard from '../../components/ui/ProductCard';
+// Navbar & Footer disediakan oleh CustomerLayout pada routing level
 
 /**
  * Komponen Landing Page untuk BaleTani Fresh Market
@@ -200,7 +201,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen  bg-white">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative bg-white py-16 lg:py-18">
         <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-white to-blue-50 opacity-40"></div>
@@ -563,6 +564,7 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
     </div>
   );
 };

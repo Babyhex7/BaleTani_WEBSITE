@@ -43,6 +43,7 @@ const Navbar = () => {
     : [
         { name: 'Produk', href: '/products', current: false },
         { name: 'Promo', href: '/promo', current: false },
+        { name: 'Kategori', href: '/categories', current: false },
         { name: 'Kontak', href: '/contact', current: false },
       ];
 

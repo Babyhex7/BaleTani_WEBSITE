@@ -12,7 +12,7 @@ const router = express.Router();
 
 // Import public sub-routes
 const productRoutes = require("./products");
-const categoryRoutes = require("../categories");
+const categoryRoutes = require("./categories");
 
 /**
  * PUBLIC ROUTES (No authentication required)
