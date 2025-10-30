@@ -271,6 +271,18 @@ const ProductDetailModal = ({
                     </div>
                   )}
 
+                  {product.quantity_info && (
+                    <div className="flex items-center gap-3">
+                      <TagIcon className="w-5 h-5 text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-500">Info Tambahan</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {product.quantity_info}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-3">
                     <CurrencyDollarIcon className="w-5 h-5 text-gray-400" />
                     <div>
