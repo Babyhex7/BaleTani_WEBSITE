@@ -70,7 +70,7 @@ const CheckoutPage = () => {
     message += `*Produk:*\n`;
     items.forEach((item, index) => {
       const subtotal = item.finalPrice * item.quantity;
-      message += `${index + 1}. ${item.name} (${item.quantity} ${item.unit}) - ${formatPrice(subtotal)}\n`;
+      message += `${index + 1}. ${item.name} (${item.quantity}x) - ${formatPrice(subtotal)}\n`;
     });
     
     message += `\n*Ringkasan:*\n`;
@@ -172,7 +172,7 @@ const CheckoutPage = () => {
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900">{item.name}</h3>
                         <p className="text-sm text-gray-600">
-                          {formatPrice(item.finalPrice)} / {item.unit}
+                          {formatPrice(item.finalPrice)}
                         </p>
                       </div>
 

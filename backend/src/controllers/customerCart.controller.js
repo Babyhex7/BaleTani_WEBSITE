@@ -35,9 +35,9 @@ exports.getCart = async (req, res) => {
                 "id",
                 "name",
                 "description",
-                "price",
-                "stock",
-                "unit",
+                "selling_price",
+                "total_stock",
+                "quantity_info",
               ],
               include: [
                 {
@@ -297,7 +297,7 @@ exports.updateCartItem = async (req, res) => {
         {
           model: Product,
           as: "product",
-          attributes: ["stock", "unit"],
+          attributes: ["total_stock", "quantity_info"],
         },
       ],
     });
@@ -310,10 +310,12 @@ exports.updateCartItem = async (req, res) => {
     }
 
     // Check stock
-    if (cartItem.product.stock < quantity) {
+    if (cartItem.product.total_stock < quantity) {
       return res.status(400).json({
         success: false,
-        message: `Not enough stock. Available: ${cartItem.product.stock} ${cartItem.product.unit}`,
+        message: `Not enough stock. Available: ${
+          cartItem.product.total_stock
+        } ${cartItem.product.quantity_info || "unit"}`,
       });
     }
 

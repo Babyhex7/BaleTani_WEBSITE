@@ -69,7 +69,6 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, disabled = false }) => {
           <span className="text-lg font-bold text-green-600">
             {formatPrice(item.finalPrice)}
           </span>
-          <span className="text-sm text-gray-500">/ {item.unit}</span>
           {hasDiscount && (
             <>
               <span className="text-sm text-gray-400 line-through">
