@@ -132,7 +132,7 @@ const getCategoryById = async (req, res) => {
         "name",
         "description",
         "selling_price",
-        "unit",
+        "quantity_info",
         "total_stock",
         "created_at",
       ],
@@ -144,7 +144,7 @@ const getCategoryById = async (req, res) => {
       name: product.name,
       description: product.description,
       price: product.selling_price,
-      unit: product.unit,
+      unit: product.quantity_info || null,
       stock: product.total_stock,
       image:
         product.images && product.images.length > 0

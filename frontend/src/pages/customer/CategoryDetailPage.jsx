@@ -3,7 +3,7 @@
  * Displays all products in a specific category
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   MagnifyingGlassIcon,
@@ -23,6 +23,23 @@ import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import ProductCard from '../../components/ui/ProductCard';
 import axios from 'axios';
+
+// Custom debounce hook
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 
 // Icon mapping untuk kategori
 const getCategoryIcon = (categoryName) => {
@@ -55,6 +72,9 @@ const CategoryDetailPage = () => {
     totalItems: 0,
   });
 
+  // Debounce search input - hanya trigger API setelah user berhenti mengetik 500ms
+  const debouncedSearch = useDebounce(searchInput, 500);
+
   // Format price
   const formatPrice = (price) => {
     return new Intl.NumberFormat('id-ID', {
@@ -73,7 +93,7 @@ const CategoryDetailPage = () => {
           params: {
             page: pagination.currentPage,
             limit: 12,
-            search: searchInput,
+            search: debouncedSearch,
             sort_by: sortBy === 'newest' ? 'created_at' : sortBy === 'price-low' ? 'selling_price' : 'selling_price',
             sort_order: sortBy === 'newest' ? 'DESC' : sortBy === 'price-low' ? 'ASC' : 'DESC',
           }
@@ -94,7 +114,7 @@ const CategoryDetailPage = () => {
     };
 
     fetchCategoryDetail();
-  }, [id, pagination.currentPage, searchInput, sortBy]);
+  }, [id, pagination.currentPage, debouncedSearch, sortBy]);
 
   // Handle search
   const handleSearch = (e) => {
@@ -238,9 +258,15 @@ const CategoryDetailPage = () => {
                   placeholder="Cari produk dalam kategori ini..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="w-full px-4 py-2 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-4 py-2 pl-10 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
                 <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                {/* Loading indicator saat mengetik */}
+                {searchInput && searchInput !== debouncedSearch && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                  </div>
+                )}
               </form>
             </div>
 
