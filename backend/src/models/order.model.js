@@ -18,6 +18,18 @@ const Order = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    customer_name: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    customer_email: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    customer_phone: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+    },
     transaction_type: {
       type: DataTypes.ENUM("online", "offline"),
       allowNull: false,
@@ -26,11 +38,19 @@ const Order = sequelize.define(
       type: DataTypes.ENUM("cash", "transfer", "qris"),
       allowNull: false,
     },
+    payment_proof_url: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+    },
     delivery_method: {
       type: DataTypes.ENUM("self_pickup", "delivery"),
       allowNull: false,
     },
     delivery_address: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    delivery_notes: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
@@ -50,8 +70,20 @@ const Order = sequelize.define(
       type: DataTypes.DECIMAL(15, 2),
       allowNull: false,
     },
+    admin_notes: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    processed_by: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
+    processed_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     payment_status: {
-      type: DataTypes.ENUM("pending", "paid", "failed"),
+      type: DataTypes.ENUM("pending", "paid", "failed", "unpaid", "refunded"),
       allowNull: false,
     },
     order_status: {
@@ -61,9 +93,24 @@ const Order = sequelize.define(
         "processing",
         "out_for_delivery",
         "completed",
-        "cancelled"
+        "cancelled",
+        "pending_payment",
+        "shipped",
+        "delivered"
       ),
       allowNull: false,
+    },
+    cancelled_reason: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    cancelled_by: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
+    cancelled_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
     created_by: {
       type: DataTypes.UUID,

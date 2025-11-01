@@ -18,6 +18,7 @@ import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRo
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin';
 import UserManagement from './pages/admin/UserManagement';
+import OrderManagement from './pages/admin/OrderManagement';
 
 // New Admin Pages with Hero Icons
 import AdminDashboardNew from './pages/admin/AdminDashboardNew';
@@ -223,21 +224,14 @@ function App() {
         </ProtectedRoute>
       } />
 
-      {/* Coming soon admin routes */}
+      {/* Order Management */}
       <Route path="/admin/orders" element={
         <ProtectedRoute requiredRole="admin">
-          <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">🛒 Order Management</h1>
-              <p className="text-gray-600">Fitur ini akan segera hadir!</p>
-              <a href="/admin/dashboard" className="mt-4 inline-block text-green-600 hover:text-green-700">
-                ← Kembali ke Dashboard
-              </a>
-            </div>
-          </div>
+          <OrderManagement />
         </ProtectedRoute>
       } />
 
+      {/* Coming soon admin routes */}
       <Route path="/admin/accounting" element={
         <ProtectedRoute requiredRole="admin">
           <div className="min-h-screen flex items-center justify-center bg-gray-100">

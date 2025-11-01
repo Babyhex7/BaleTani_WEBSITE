@@ -11,7 +11,7 @@
 @adminPassword = admin123
 
 # Paste token setelah login di 4-admin-auth.http
-@adminToken = paste-admin-token-here
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjOGRlMmMzNy01ODU5LTQ2ZmQtYmY5Yy05ZDE5YzIwMWNjZGYiLCJ0eXBlIjoiYWRtaW4iLCJpYXQiOjE3NjE5OTYxNzIsImV4cCI6MTc2MjYwMDk3Mn0.Uv4znICVdfWw66ar71fcuD_JwudDdTn7Qz4Ye5opELQ
 
 # Sample ID
 @categoryId = paste-category-id-here

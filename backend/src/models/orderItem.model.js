@@ -17,6 +17,10 @@ const OrderItem = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    product_name: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     quantity: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
@@ -25,17 +29,26 @@ const OrderItem = sequelize.define(
       type: DataTypes.STRING(20),
       allowNull: false,
     },
-    price_per_unit: {
+    original_price: {
       type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
+      comment: "Harga asli produk per unit",
     },
-    discount_per_unit: {
+    discount_price: {
       type: DataTypes.DECIMAL(12, 2),
       defaultValue: 0,
+      comment: "Harga setelah diskon per unit (jika ada diskon)",
+    },
+    final_price: {
+      type: DataTypes.DECIMAL(12, 2),
+      allowNull: false,
+      defaultValue: 0,
+      comment: "Harga final per unit yang dibayar customer",
     },
     subtotal: {
       type: DataTypes.DECIMAL(15, 2),
       allowNull: false,
+      comment: "final_price * quantity",
     },
     created_at: {
       type: DataTypes.DATE,

@@ -16,6 +16,7 @@ const productRoutes = require("./adminProducts");
 const categoryRoutes = require("./categories");
 const discountRoutes = require("./discounts");
 const userRoutes = require("./users");
+const orderRoutes = require("./orders");
 
 /**
  * PUBLIC ADMIN ROUTES (No auth required)
@@ -39,6 +40,9 @@ router.use("/categories", categoryRoutes); // /api/admin/categories/*
 
 // Discount Management
 router.use("/discounts", discountRoutes); // /api/admin/discounts/*
+
+// Order Management
+router.use("/orders", orderRoutes); // /api/admin/orders/*
 
 // User & Admin Management
 router.use("/users", userRoutes); // /api/admin/users/*

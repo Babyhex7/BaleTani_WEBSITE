@@ -11,6 +11,7 @@ const ProcurementItem = require("./procurementItem.model");
 const Cart = require("./cart.model");
 const Order = require("./order.model");
 const OrderItem = require("./orderItem.model");
+const OrderStatusHistory = require("./orderStatusHistory.model");
 const SoftDeleteLog = require("./softDeleteLog.model");
 const StockMovement = require("./stockMovement.model");
 
@@ -86,6 +87,45 @@ Order.hasMany(OrderItem, {
 OrderItem.belongsTo(Order, {
   foreignKey: "order_id",
   as: "order",
+});
+
+// Order → OrderStatusHistory
+Order.hasMany(OrderStatusHistory, {
+  foreignKey: "order_id",
+  as: "statusHistory",
+});
+OrderStatusHistory.belongsTo(Order, {
+  foreignKey: "order_id",
+  as: "order",
+});
+
+// Admin → OrderStatusHistory
+Admin.hasMany(OrderStatusHistory, {
+  foreignKey: "changed_by",
+  as: "statusChanges",
+});
+OrderStatusHistory.belongsTo(Admin, {
+  foreignKey: "changed_by",
+  as: "admin",
+});
+
+// Admin → Orders (processed_by, cancelled_by)
+Admin.hasMany(Order, {
+  foreignKey: "processed_by",
+  as: "processedOrders",
+});
+Order.belongsTo(Admin, {
+  foreignKey: "processed_by",
+  as: "processor",
+});
+
+Admin.hasMany(Order, {
+  foreignKey: "cancelled_by",
+  as: "cancelledOrders",
+});
+Order.belongsTo(Admin, {
+  foreignKey: "cancelled_by",
+  as: "canceller",
 });
 
 // Procurement → ProcurementItems
@@ -263,6 +303,7 @@ module.exports = {
   Cart,
   Order,
   OrderItem,
+  OrderStatusHistory,
   SoftDeleteLog,
   StockMovement,
   // Legacy exports for backward compatibility

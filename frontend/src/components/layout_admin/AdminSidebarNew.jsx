@@ -54,13 +54,9 @@ const AdminSidebarNew = () => {
       ]
     },
     {
-      name: 'Sales & Transactions',
-      icon: ShoppingCartIcon,
-      key: 'sales',
-      submenu: [
-        { name: 'Orders', path: '/admin/orders' },
-        { name: 'Transactions', path: '/admin/transactions' },
-      ]
+      name: 'Orders',
+      path: '/admin/orders',
+      icon: ShoppingCartIcon
     },
     {
       name: 'Customers',
