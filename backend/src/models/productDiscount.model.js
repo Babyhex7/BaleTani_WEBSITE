@@ -17,6 +17,16 @@ const ProductDiscount = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    original_price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+      comment: "Harga asli produk saat di-assign ke diskon",
+    },
+    discounted_price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+      comment: "Harga setelah diskon",
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

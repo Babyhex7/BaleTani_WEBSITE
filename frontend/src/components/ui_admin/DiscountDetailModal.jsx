@@ -234,9 +234,27 @@ const DiscountDetailModal = ({
                             {product.name || product.product_name}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-gray-500">
-                              {formatCurrency(product.price)}
-                            </span>
+                            {/* Harga Asli (coret) */}
+                            {product.ProductDiscount?.original_price && (
+                              <span className="text-xs text-gray-400 line-through">
+                                {formatCurrency(product.ProductDiscount.original_price)}
+                              </span>
+                            )}
+                            {/* Harga Diskon */}
+                            {product.ProductDiscount?.discounted_price && (
+                              <>
+                                <span className="text-xs text-gray-400">→</span>
+                                <span className="text-xs font-semibold text-green-600">
+                                  {formatCurrency(product.ProductDiscount.discounted_price)}
+                                </span>
+                              </>
+                            )}
+                            {/* Fallback ke selling_price jika tidak ada ProductDiscount */}
+                            {!product.ProductDiscount?.original_price && (
+                              <span className="text-xs text-gray-500">
+                                {formatCurrency(product.selling_price || product.price || 0)}
+                              </span>
+                            )}
                             <span className="text-xs text-gray-400">•</span>
                             <span className="text-xs text-gray-500">
                               Stok: {product.total_stock || 0} {product.unit || 'unit'}

@@ -72,7 +72,7 @@ const getAllDiscounts = async (req, res) => {
           as: "products",
           through: {
             where: { deleted_at: null },
-            attributes: [],
+            attributes: ["original_price", "discounted_price"],
           },
           attributes: ["id", "name", "selling_price"],
           where: { deleted_at: null },
@@ -157,7 +157,7 @@ const getDiscountById = async (req, res) => {
           as: "products",
           through: {
             where: { deleted_at: null },
-            attributes: ["created_at"],
+            attributes: ["original_price", "discounted_price", "created_at"],
           },
           attributes: [
             "id",
@@ -290,10 +290,34 @@ const createDiscount = async (req, res) => {
 
     // Add products to discount if provided
     if (product_ids && product_ids.length > 0) {
-      const productDiscounts = product_ids.map((product_id) => ({
-        product_id,
-        discount_id: newDiscount.id,
-      }));
+      // Get products to calculate prices
+      const products = await Product.findAll({
+        where: { id: product_ids, deleted_at: null },
+        attributes: ["id", "selling_price"],
+      });
+
+      const productDiscounts = products.map((product) => {
+        const originalPrice = parseFloat(product.selling_price);
+        let discountedPrice = originalPrice;
+
+        // Calculate discounted price
+        if (discount_type === "percentage") {
+          const discountAmount = (originalPrice * value) / 100;
+          discountedPrice = originalPrice - discountAmount;
+        } else if (discount_type === "fixed_amount") {
+          discountedPrice = originalPrice - value;
+        }
+
+        // Ensure discounted price is not negative
+        discountedPrice = Math.max(0, discountedPrice);
+
+        return {
+          product_id: product.id,
+          discount_id: newDiscount.id,
+          original_price: originalPrice,
+          discounted_price: discountedPrice,
+        };
+      });
 
       await ProductDiscount.bulkCreate(productDiscounts);
     }
@@ -409,12 +433,40 @@ const updateDiscount = async (req, res) => {
         { where: { discount_id: id, deleted_at: null } }
       );
 
-      // Add new product associations
+      // Add new product associations with calculated prices
       if (product_ids.length > 0) {
-        const productDiscounts = product_ids.map((product_id) => ({
-          product_id,
-          discount_id: id,
-        }));
+        // Get products to calculate prices
+        const products = await Product.findAll({
+          where: { id: product_ids, deleted_at: null },
+          attributes: ["id", "selling_price"],
+        });
+
+        const productDiscounts = products.map((product) => {
+          const originalPrice = parseFloat(product.selling_price);
+          let discountedPrice = originalPrice;
+
+          // Calculate discounted price based on updated discount values
+          const discountType =
+            updateData.discount_type || discount.discount_type;
+          const discountValue = updateData.value || discount.value;
+
+          if (discountType === "percentage") {
+            const discountAmount = (originalPrice * discountValue) / 100;
+            discountedPrice = originalPrice - discountAmount;
+          } else if (discountType === "fixed_amount") {
+            discountedPrice = originalPrice - discountValue;
+          }
+
+          // Ensure discounted price is not negative
+          discountedPrice = Math.max(0, discountedPrice);
+
+          return {
+            product_id: product.id,
+            discount_id: id,
+            original_price: originalPrice,
+            discounted_price: discountedPrice,
+          };
+        });
 
         await ProductDiscount.bulkCreate(productDiscounts);
       }
@@ -428,7 +480,7 @@ const updateDiscount = async (req, res) => {
           as: "products",
           through: {
             where: { deleted_at: null },
-            attributes: [],
+            attributes: ["original_price", "discounted_price"],
           },
           attributes: ["id", "name", "selling_price"],
           where: { deleted_at: null },
@@ -653,10 +705,34 @@ const addProductsToDiscount = async (req, res) => {
     }
 
     // Add products (skip if already exists)
-    const productDiscounts = product_ids.map((product_id) => ({
-      product_id,
-      discount_id: id,
-    }));
+    // Get products to calculate prices
+    const products = await Product.findAll({
+      where: { id: product_ids, deleted_at: null },
+      attributes: ["id", "selling_price"],
+    });
+
+    const productDiscounts = products.map((product) => {
+      const originalPrice = parseFloat(product.selling_price);
+      let discountedPrice = originalPrice;
+
+      // Calculate discounted price
+      if (discount.discount_type === "percentage") {
+        const discountAmount = (originalPrice * discount.value) / 100;
+        discountedPrice = originalPrice - discountAmount;
+      } else if (discount.discount_type === "fixed_amount") {
+        discountedPrice = originalPrice - discount.value;
+      }
+
+      // Ensure discounted price is not negative
+      discountedPrice = Math.max(0, discountedPrice);
+
+      return {
+        product_id: product.id,
+        discount_id: id,
+        original_price: originalPrice,
+        discounted_price: discountedPrice,
+      };
+    });
 
     await ProductDiscount.bulkCreate(productDiscounts, {
       ignoreDuplicates: true,
@@ -670,7 +746,7 @@ const addProductsToDiscount = async (req, res) => {
           as: "products",
           through: {
             where: { deleted_at: null },
-            attributes: [],
+            attributes: ["original_price", "discounted_price"],
           },
           attributes: ["id", "name", "selling_price"],
         },
