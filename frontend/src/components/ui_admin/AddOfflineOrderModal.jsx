@@ -17,7 +17,7 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash");
-  const [deliveryMethod, setDeliveryMethod] = useState("pickup");
+  const [deliveryMethod, setDeliveryMethod] = useState("self_pickup");
   const [deliveryFee, setDeliveryFee] = useState(0);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [adminNotes, setAdminNotes] = useState("");
@@ -43,7 +43,8 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
       // Fetch active products with product_type = 'offline' only
       const response = await adminApiClient.get('/admin/products', {
         params: {
-          is_active: 1,
+          // Backend expects string 'true'/'false' via querystring; boolean true becomes 'true'
+          is_active: true,
           product_type: 'offline', // Only fetch offline products
           limit: 1000,
           page: 1
@@ -51,8 +52,9 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
       });
       
       if (response.data.success && response.data.data.products) {
-        setProducts(response.data.data.products);
-        console.log('Offline products loaded:', response.data.data.products.length);
+        const list = response.data.data.products.filter(p => p.product_type === 'offline');
+        setProducts(list);
+        console.log('Offline products loaded:', list.length);
       } else {
         throw new Error('Invalid response format');
       }
@@ -118,12 +120,12 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
 
     // Update price when product changes
     if (field === "product_id") {
-      const product = products.find((p) => p.id === parseInt(value));
+      const product = products.find((p) => p.id === value);
       if (product) {
-        newItems[index].price = product.selling_price;
+        const price = typeof product.selling_price === "number" ? product.selling_price : Number(product.selling_price) || 0;
+        newItems[index].price = price;
         newItems[index].product_name = product.name;
-        newItems[index].subtotal =
-          product.selling_price * newItems[index].quantity;
+        newItems[index].subtotal = price * newItems[index].quantity;
       }
     }
 
@@ -186,7 +188,7 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
         discount_amount: parseFloat(discountAmount || 0),
         admin_notes: adminNotes,
         items: validItems.map((item) => ({
-          product_id: parseInt(item.product_id),
+          product_id: item.product_id, // UUID string, don't parse to int
           quantity: parseInt(item.quantity),
         })),
       };
@@ -342,12 +344,8 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                     required
                   >
                     <option value="cash">Cash (Tunai)</option>
-                    <option value="transfer_bca">Transfer BCA</option>
-                    <option value="transfer_bri">Transfer BRI</option>
-                    <option value="transfer_mandiri">Transfer Mandiri</option>
-                    <option value="gopay">GoPay</option>
-                    <option value="ovo">OVO</option>
-                    <option value="dana">DANA</option>
+                    <option value="transfer">Transfer</option>
+                    <option value="qris">QRIS</option>
                   </select>
                   <p className="text-xs text-gray-500 mt-1">
                     {paymentMethod === "cash"
@@ -365,14 +363,13 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                     onChange={(e) => {
                       setDeliveryMethod(e.target.value);
                       // Auto set delivery fee
-                      setDeliveryFee(e.target.value === "pickup" ? 0 : 10000);
+                      setDeliveryFee(e.target.value === "self_pickup" ? 0 : 10000);
                     }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
                   >
-                    <option value="pickup">Ambil di Toko</option>
+                    <option value="self_pickup">Ambil di Toko</option>
                     <option value="delivery">Delivery</option>
-                    <option value="courier">Kurir</option>
                   </select>
                 </div>
 
