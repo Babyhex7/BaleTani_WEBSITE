@@ -1,9 +1,9 @@
 /**
  * Update Status Modal Component
- * Modal untuk update order status dan payment status
+ * Modal untuk update order status
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, AlertCircle } from "lucide-react";
 import orderService from "../../services/orderService";
 
@@ -17,6 +17,33 @@ const UpdateStatusModal = ({ order, useDummyData, onClose, onSuccess }) => {
   const [error, setError] = useState(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+
+  // Auto-sync payment_status dengan order_status
+  useEffect(() => {
+    let newPaymentStatus = formData.payment_status;
+    
+    switch (formData.order_status) {
+      case 'pending_payment':
+        newPaymentStatus = 'unpaid';
+        break;
+      case 'paid':
+      case 'processing':
+      case 'shipped':
+      case 'delivered':
+      case 'completed':
+        newPaymentStatus = 'paid';
+        break;
+      case 'cancelled':
+        newPaymentStatus = 'refunded';
+        break;
+      default:
+        break;
+    }
+    
+    if (newPaymentStatus !== formData.payment_status) {
+      setFormData(prev => ({ ...prev, payment_status: newPaymentStatus }));
+    }
+  }, [formData.order_status]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -182,27 +209,9 @@ const UpdateStatusModal = ({ order, useDummyData, onClose, onSuccess }) => {
                 </option>
               ))}
             </select>
-          </div>
-
-          {/* Payment Status */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Payment Status
-            </label>
-            <select
-              value={formData.payment_status}
-              onChange={(e) =>
-                setFormData({ ...formData, payment_status: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={loading}
-            >
-              {paymentStatusOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              Payment status akan otomatis disesuaikan
+            </p>
           </div>
 
           {/* Notes */}

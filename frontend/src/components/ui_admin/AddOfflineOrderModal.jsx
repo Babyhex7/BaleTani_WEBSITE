@@ -4,7 +4,21 @@
  */
 
 import { useState, useEffect } from "react";
-import { XMarkIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { 
+  XMarkIcon, 
+  PlusIcon, 
+  TrashIcon,
+  UserIcon,
+  PhoneIcon,
+  EnvelopeIcon,
+  MapPinIcon,
+  ChatBubbleLeftIcon,
+  CreditCardIcon,
+  TruckIcon,
+  ShoppingCartIcon,
+  DocumentTextIcon,
+  BanknotesIcon
+} from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 import orderService from "../../services/orderService";
 import adminApiClient from "../../services/services_admin/adminApiClient";
@@ -233,12 +247,17 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-xl font-semibold text-gray-900">
-            ➕ Tambah Order Offline
-          </h2>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <ShoppingCartIcon className="w-6 h-6 text-green-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Tambah Order Offline
+            </h2>
+          </div>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600"
@@ -255,12 +274,16 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left Column - Customer Info */}
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-gray-700 uppercase border-b pb-2">
-                  👤 Informasi Customer
-                </h3>
+                <div className="flex items-center gap-2 border-b pb-2">
+                  <UserIcon className="w-5 h-5 text-gray-600" />
+                  <h3 className="text-sm font-semibold text-gray-700 uppercase">
+                    Informasi Customer
+                  </h3>
+                </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <UserIcon className="w-4 h-4 text-gray-500" />
                     Nama Customer <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -274,7 +297,8 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <PhoneIcon className="w-4 h-4 text-gray-500" />
                     Nomor Telepon <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -288,7 +312,8 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <EnvelopeIcon className="w-4 h-4 text-gray-500" />
                     Email (Opsional)
                   </label>
                   <input
@@ -301,7 +326,8 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <MapPinIcon className="w-4 h-4 text-gray-500" />
                     Alamat (Opsional)
                   </label>
                   <textarea
@@ -314,7 +340,8 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <ChatBubbleLeftIcon className="w-4 h-4 text-gray-500" />
                     Catatan Pengiriman
                   </label>
                   <textarea
@@ -329,12 +356,16 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
 
               {/* Right Column - Order Details */}
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-gray-700 uppercase border-b pb-2">
-                  📦 Detail Order
-                </h3>
+                <div className="flex items-center gap-2 border-b pb-2">
+                  <ShoppingCartIcon className="w-5 h-5 text-gray-600" />
+                  <h3 className="text-sm font-semibold text-gray-700 uppercase">
+                    Detail Order
+                  </h3>
+                </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <CreditCardIcon className="w-4 h-4 text-gray-500" />
                     Metode Pembayaran <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -355,7 +386,8 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <TruckIcon className="w-4 h-4 text-gray-500" />
                     Metode Pengiriman <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -374,7 +406,8 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <BanknotesIcon className="w-4 h-4 text-gray-500" />
                     Biaya Pengiriman (Rp)
                   </label>
                   <input
@@ -388,7 +421,8 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <BanknotesIcon className="w-4 h-4 text-gray-500" />
                     Diskon (Rp)
                   </label>
                   <input
@@ -402,7 +436,8 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                    <DocumentTextIcon className="w-4 h-4 text-gray-500" />
                     Catatan Admin
                   </label>
                   <textarea
@@ -419,9 +454,12 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
             {/* Products Section */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-gray-700 uppercase">
-                  🛒 Produk
-                </h3>
+                <div className="flex items-center gap-2">
+                  <ShoppingCartIcon className="w-5 h-5 text-gray-600" />
+                  <h3 className="text-sm font-semibold text-gray-700 uppercase">
+                    Produk
+                  </h3>
+                </div>
                 <button
                   type="button"
                   onClick={addItem}
@@ -522,9 +560,12 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
 
             {/* Price Summary */}
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 border border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4 flex items-center gap-2">
-                💰 Ringkasan Harga
-              </h3>
+              <div className="flex items-center gap-2 mb-4">
+                <BanknotesIcon className="w-5 h-5 text-gray-600" />
+                <h3 className="text-sm font-semibold text-gray-700 uppercase">
+                  Ringkasan Harga
+                </h3>
+              </div>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Subtotal Produk:</span>

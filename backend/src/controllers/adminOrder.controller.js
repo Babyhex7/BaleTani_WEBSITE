@@ -216,13 +216,13 @@ const getOrderById = async (req, res) => {
         {
           model: Admin,
           as: "processor",
-          attributes: ["id", "full_name", "email"],
+          attributes: ["id", "full_name", "phone_number"],
           required: false,
         },
         {
           model: Admin,
           as: "canceller",
-          attributes: ["id", "full_name", "email"],
+          attributes: ["id", "full_name", "phone_number"],
           required: false,
         },
         {
@@ -363,7 +363,7 @@ const updateOrderStatus = async (req, res) => {
         {
           model: Customer,
           as: "customer",
-          attributes: ["id", "full_name", "email"],
+          attributes: ["id", "full_name", "phone_number", "address"],
           required: false,
         },
         {
@@ -373,7 +373,7 @@ const updateOrderStatus = async (req, res) => {
             {
               model: Admin,
               as: "admin",
-              attributes: ["id", "full_name"],
+              attributes: ["id", "full_name", "phone_number"],
               required: false,
             },
           ],
