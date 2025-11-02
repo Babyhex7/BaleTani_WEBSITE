@@ -28,6 +28,7 @@ import UpdateStatusModal from "../../components/ui_admin/UpdateStatusModal";
 import OrderFilters from "../../components/ui_admin/OrderFilters";
 import StatisticsCard from "../../components/ui_admin/StatisticsCard";
 import Pagination from "../../components/ui_admin/Pagination";
+import AddOfflineOrderModal from "../../components/ui_admin/AddOfflineOrderModal";
 
 const OrderManagement = () => {
   // State untuk data
@@ -58,10 +59,11 @@ const OrderManagement = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
   // Toggle untuk menggunakan dummy data atau real API
-  const [useDummyData, setUseDummyData] = useState(true);
+  const [useDummyData, setUseDummyData] = useState(false);
 
   /**
    * Fetch orders dari API atau dummy data
@@ -217,11 +219,14 @@ const OrderManagement = () => {
 
   // Format currency
   const formatCurrency = (amount) => {
+    // Safeguard against undefined/null/NaN values
+    const n = typeof amount === "number" ? amount : Number(amount);
+    const safe = Number.isFinite(n) ? n : 0;
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
-    }).format(amount);
+    }).format(safe);
   };
 
   return (
@@ -300,7 +305,7 @@ const OrderManagement = () => {
                 <h2 className="text-xl font-bold text-gray-900">Daftar Orders</h2>
                 
                 <button
-                  onClick={() => toast.info("Fitur Add Order coming soon!")}
+                  onClick={() => setShowAddModal(true)}
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
                 >
                   <PlusIcon className="w-5 h-5" />
@@ -422,6 +427,17 @@ const OrderManagement = () => {
               useDummyData={useDummyData}
               onClose={() => setShowStatusModal(false)}
               onSuccess={handleStatusUpdated}
+            />
+          )}
+
+          {showAddModal && (
+            <AddOfflineOrderModal
+              isOpen={showAddModal}
+              onClose={() => setShowAddModal(false)}
+              onSuccess={() => {
+                fetchOrders();
+                fetchStatistics();
+              }}
             />
           )}
         </div>

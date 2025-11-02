@@ -17,11 +17,13 @@ const OrderTable = ({ orders, loading, onViewDetail, onUpdateStatus }) => {
    * Format currency
    */
   const formatCurrency = (amount) => {
+    const n = typeof amount === "number" ? amount : Number(amount);
+    const safe = Number.isFinite(n) ? n : 0;
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
-    }).format(amount);
+    }).format(safe);
   };
 
   /**
@@ -233,9 +235,6 @@ const OrderTable = ({ orders, loading, onViewDetail, onUpdateStatus }) => {
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm font-medium text-gray-900">
                   {formatCurrency(order.total_amount)}
-                </div>
-                <div className="text-xs text-gray-500">
-                  Items: {formatCurrency(order.item_subtotal)}
                 </div>
               </td>
 

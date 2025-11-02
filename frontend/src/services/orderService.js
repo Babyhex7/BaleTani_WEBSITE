@@ -96,6 +96,14 @@ const orderService = {
     );
     return response.data;
   },
+
+  /**
+   * Create offline order (manual input by admin)
+   */
+  createOfflineOrder: async (orderData) => {
+    const response = await api.post("/admin/orders/create-offline", orderData);
+    return response.data;
+  },
 };
 
 export default orderService;

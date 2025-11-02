@@ -11,6 +11,8 @@ const {
   OrderStatusHistory,
   Customer,
   Product,
+  ProductDiscount,
+  Discount,
   Admin,
 } = require("../models");
 
@@ -50,9 +52,9 @@ const getAllOrders = async (req, res) => {
       ];
     }
 
-    // Filter by order type
+    // Filter by order type (transaction_type in database)
     if (order_type && ["online", "offline"].includes(order_type)) {
-      whereClause.order_type = order_type;
+      whereClause.transaction_type = order_type;
     }
 
     // Filter by order status
@@ -129,7 +131,7 @@ const getAllOrders = async (req, res) => {
     const formattedOrders = orders.map((order) => ({
       id: order.id,
       order_number: order.order_number,
-      order_type: order.order_type,
+      order_type: order.transaction_type, // Use transaction_type from database
       customer_name: order.customer_name || order.customer?.full_name || "-",
       customer_email: order.customer_email || "-",
       customer_phone:
@@ -138,7 +140,7 @@ const getAllOrders = async (req, res) => {
       delivery_method: order.delivery_method,
       order_status: order.order_status,
       payment_status: order.payment_status,
-      item_subtotal: parseFloat(order.item_subtotal || 0),
+      subtotal: parseFloat(order.item_subtotal || 0), // Rename to subtotal for frontend
       delivery_fee: parseFloat(order.delivery_fee || 0),
       discount_amount: parseFloat(order.discount_amount || 0),
       total_amount: parseFloat(order.total_amount || 0),
@@ -562,15 +564,15 @@ const getOrderStatistics = async (req, res) => {
       raw: true,
     });
 
-    // Count by order type
+    // Count by order type (transaction_type in database)
     const typeCounts = await Order.findAll({
       where: whereClause,
       attributes: [
-        "order_type",
+        ["transaction_type", "order_type"], // Alias transaction_type as order_type
         [sequelize.fn("COUNT", sequelize.col("id")), "count"],
         [sequelize.fn("SUM", sequelize.col("total_amount")), "total_revenue"],
       ],
-      group: ["order_type"],
+      group: ["transaction_type"],
       raw: true,
     });
 
@@ -608,6 +610,236 @@ const getOrderStatistics = async (req, res) => {
   }
 };
 
+/**
+ * POST /api/admin/orders/create-offline
+ * Create offline order (manual input by admin)
+ */
+const createOfflineOrder = async (req, res) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const {
+      customer_name,
+      customer_phone,
+      customer_email,
+      delivery_address,
+      delivery_notes,
+      payment_method,
+      delivery_method,
+      delivery_fee = 0,
+      discount_amount = 0,
+      admin_notes,
+      items, // Array of { product_id, quantity }
+    } = req.body;
+
+    const adminId = req.user.id;
+
+    // Validation
+    if (!customer_name || !customer_phone) {
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: "Nama customer dan nomor telepon harus diisi",
+      });
+    }
+
+    if (!payment_method || !delivery_method) {
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: "Metode pembayaran dan pengiriman harus dipilih",
+      });
+    }
+
+    if (!items || items.length === 0) {
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: "Minimal harus ada 1 produk",
+      });
+    }
+
+    // Get or create offline customer (use first customer or create dummy)
+    let customer = await Customer.findOne({ transaction });
+    if (!customer) {
+      customer = await Customer.create(
+        {
+          full_name: "Offline Customer",
+          phone_number: "000000000000",
+          password_hash: "dummy",
+          is_active: true,
+        },
+        { transaction }
+      );
+    }
+
+    // Generate order number
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const random = String(Math.floor(Math.random() * 10000)).padStart(4, "0");
+    const orderNumber = `ORD-${year}${month}${day}-${random}`;
+
+    // Calculate totals from items
+    let subtotal = 0;
+    const orderItems = [];
+
+    for (const item of items) {
+      const product = await Product.findByPk(item.product_id, { transaction });
+
+      if (!product) {
+        await transaction.rollback();
+        return res.status(404).json({
+          success: false,
+          message: `Produk dengan ID ${item.product_id} tidak ditemukan`,
+        });
+      }
+
+      // Check stock
+      if (product.total_stock < item.quantity) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: `Stok ${product.name} tidak mencukupi. Tersedia: ${product.total_stock}`,
+        });
+      }
+
+      // Check if product has active discount
+      const productDiscount = await ProductDiscount.findOne({
+        where: { product_id: item.product_id },
+        include: [
+          {
+            model: Discount,
+            as: "discount",
+            where: {
+              is_active: 1,
+              start_date: { [Op.lte]: new Date() },
+              end_date: { [Op.gte]: new Date() },
+            },
+            required: false,
+          },
+        ],
+        transaction,
+      });
+
+      const originalPrice = parseFloat(product.selling_price);
+      const discountPrice =
+        productDiscount && productDiscount.discount
+          ? parseFloat(productDiscount.discounted_price)
+          : null;
+      const finalPrice = discountPrice || originalPrice;
+      const itemSubtotal = finalPrice * item.quantity;
+
+      subtotal += itemSubtotal;
+
+      orderItems.push({
+        product_id: item.product_id,
+        product_name: product.name,
+        quantity: item.quantity,
+        original_price: originalPrice,
+        discount_price: discountPrice,
+        final_price: finalPrice,
+        subtotal: itemSubtotal,
+      });
+    }
+
+    const totalAmount =
+      subtotal + parseFloat(delivery_fee) - parseFloat(discount_amount);
+
+    // Determine order status based on payment method
+    const orderStatus = payment_method === "cash" ? "paid" : "pending_payment";
+    const paymentStatus = payment_method === "cash" ? "paid" : "unpaid";
+
+    // Create order
+    const order = await Order.create(
+      {
+        order_number: orderNumber,
+        transaction_type: "offline", // Use transaction_type field
+        customer_id: customer.id, // customer_id is required
+        customer_name,
+        customer_phone,
+        customer_email: customer_email || null,
+        delivery_address: delivery_address || null,
+        delivery_notes: delivery_notes || null,
+        payment_method,
+        delivery_method,
+        order_status: orderStatus,
+        payment_status: paymentStatus,
+        item_subtotal: subtotal, // Use item_subtotal field (database field name)
+        delivery_fee: parseFloat(delivery_fee),
+        discount_amount: parseFloat(discount_amount),
+        total_amount: totalAmount,
+        admin_notes: admin_notes || null,
+        created_by: adminId,
+        processed_by: adminId,
+        processed_at: new Date(),
+      },
+      { transaction }
+    );
+
+    // Create order items and update stock
+    for (const item of orderItems) {
+      await OrderItem.create(
+        {
+          order_id: order.id,
+          ...item,
+        },
+        { transaction }
+      );
+
+      // Update product stock
+      const product = await Product.findByPk(item.product_id, { transaction });
+      await product.update(
+        {
+          total_stock: product.total_stock - item.quantity,
+        },
+        { transaction }
+      );
+    }
+
+    // Create status history
+    await OrderStatusHistory.create(
+      {
+        order_id: order.id,
+        old_status: null,
+        new_status: orderStatus,
+        notes: `Order offline dibuat oleh admin. Payment: ${payment_method}`,
+        changed_by: adminId,
+        changed_at: new Date(),
+      },
+      { transaction }
+    );
+
+    // Commit transaction
+    await transaction.commit();
+
+    // Fetch created order with relations
+    const createdOrder = await Order.findByPk(order.id, {
+      include: [
+        {
+          model: OrderItem,
+          as: "items",
+        },
+      ],
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Order offline berhasil dibuat",
+      data: createdOrder,
+    });
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Error creating offline order:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal membuat order offline",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAllOrders,
   getOrderById,
@@ -615,4 +847,5 @@ module.exports = {
   updateAdminNotes,
   cancelOrder,
   getOrderStatistics,
+  createOfflineOrder,
 };

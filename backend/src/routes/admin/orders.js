@@ -12,6 +12,7 @@ const {
   updateAdminNotes,
   cancelOrder,
   getOrderStatistics,
+  createOfflineOrder,
 } = require("../../controllers/adminOrder.controller");
 const { authenticateAdmin } = require("../../middlewares/auth.middleware");
 
@@ -23,6 +24,7 @@ router.get("/statistics", getOrderStatistics);
 
 // CRUD Operations
 router.get("/", getAllOrders);
+router.post("/create-offline", createOfflineOrder);
 router.get("/:id", getOrderById);
 router.put("/:id/status", updateOrderStatus);
 router.put("/:id/notes", updateAdminNotes);
