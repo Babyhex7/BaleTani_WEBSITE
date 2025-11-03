@@ -5,6 +5,7 @@ const {
   loginCustomer,
   getCustomerProfile,
 } = require("../controllers/customerAuth.controller");
+const { logout } = require("../controllers/customerProfile.controller");
 const { authenticateCustomer } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
@@ -36,5 +37,6 @@ const validateCustomerLogin = [
 router.post("/register", validateCustomerRegister, registerCustomer);
 router.post("/login", validateCustomerLogin, loginCustomer);
 router.get("/profile", authenticateCustomer, getCustomerProfile);
+router.post("/logout", authenticateCustomer, logout);
 
 module.exports = router;

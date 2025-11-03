@@ -24,6 +24,9 @@ const ProductCard = ({
     : 0;
   
   const finalPrice = hasDiscount ? product.discount.finalPrice : product.price;
+  
+  // Get promo name
+  const promoName = hasDiscount && product.discount?.name ? product.discount.name : null;
 
   // Handle add to cart with auth check
   const handleAddToCart = (e) => {

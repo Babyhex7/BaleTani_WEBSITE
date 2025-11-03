@@ -13,6 +13,7 @@ const router = express.Router();
 const authRoutes = require("../customerAuth.routes");
 const cartRoutes = require("./cart.routes");
 const orderRoutes = require("./order.routes");
+const profileRoutes = require("./profile.routes");
 
 /**
  * PUBLIC CUSTOMER ROUTES (No auth required)
@@ -27,5 +28,6 @@ router.use("/auth", authRoutes);
  */
 router.use("/cart", cartRoutes);
 router.use("/orders", orderRoutes);
+router.use("/profile", profileRoutes);
 
 module.exports = router;

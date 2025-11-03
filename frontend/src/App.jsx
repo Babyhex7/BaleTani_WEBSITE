@@ -14,6 +14,7 @@ import CheckoutPage from './pages/customer/CheckoutPage';
 import OrderSuccessPage from './pages/customer/OrderSuccessPage';
 import CategoryPage from './pages/customer/CategoryPage';
 import CategoryDetailPage from './pages/customer/CategoryDetailPage';
+import ProfilePage from './pages/customer/ProfilePage';
 import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRoute';
 
 // Admin Pages
@@ -137,6 +138,13 @@ function App() {
       <Route path="/order-success" element={
         <ProtectedRoute requiredRole="customer">
           <OrderSuccessPage />
+        </ProtectedRoute>
+      } />
+
+      {/* Profile Page - Halaman profile customer */}
+      <Route path="/profile" element={
+        <ProtectedRoute requiredRole="customer">
+          <ProfilePage />
         </ProtectedRoute>
       } />
 

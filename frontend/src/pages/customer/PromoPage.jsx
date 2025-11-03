@@ -43,12 +43,14 @@ const PromoPage = () => {
         const response = await productService.getFeaturedProducts(50);
         
         if (response.success) {
-          setPromoProducts(response.data);
-          setFilteredProducts(response.data);
+          // Filter only products with discount
+          const productsWithDiscount = response.data.filter(p => p.discount && p.discount.finalPrice < p.price);
+          setPromoProducts(productsWithDiscount);
+          setFilteredProducts(productsWithDiscount);
           
           // Extract unique categories
           const uniqueCategories = [...new Set(
-            response.data
+            productsWithDiscount
               .map(p => p.category)
               .filter(Boolean)
           )];
@@ -64,6 +66,22 @@ const PromoPage = () => {
 
     fetchPromoProducts();
   }, []);
+
+  // Group products by promo
+  const groupedByPromo = filteredProducts.reduce((acc, product) => {
+    if (product.discount && product.discount.name) {
+      const promoName = product.discount.name;
+      if (!acc[promoName]) {
+        acc[promoName] = {
+          name: promoName,
+          description: product.discount.description || '',
+          products: []
+        };
+      }
+      acc[promoName].products.push(product);
+    }
+    return acc;
+  }, {});
 
   // Apply filters
   useEffect(() => {
@@ -295,27 +313,61 @@ const PromoPage = () => {
           </div>
         )}
 
-        {/* Products Grid */}
+        {/* Products Grid - Grouped by Promo */}
         {!loading && !error && (
           <>
-            {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredProducts.map((product) => (
-                  <div key={product.id} className="relative">
-                    {/* Timer Badge on Card */}
-                    {product.discount?.validUntil && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
-                        <Clock size={12} />
-                        {getTimeRemaining(product.discount.validUntil)}
+            {Object.keys(groupedByPromo).length > 0 ? (
+              <div className="space-y-12">
+                {Object.values(groupedByPromo).map((promo, index) => (
+                  <div key={index} className="space-y-6">
+                    {/* Promo Header Section */}
+                    <div className="bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 border-l-4 border-red-500 rounded-lg p-6 shadow-sm">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0">
+                          <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center">
+                            <Tag className="text-white" size={24} />
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                            🎉 {promo.name}
+                          </h3>
+                          {promo.description && (
+                            <p className="text-gray-700 leading-relaxed">
+                              {promo.description}
+                            </p>
+                          )}
+                          <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
+                            <span className="bg-white px-3 py-1 rounded-full border border-gray-200 font-semibold">
+                              {promo.products.length} Produk Tersedia
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    )}
-                    
-                    <ProductCard
-                      product={product}
-                      formatPrice={formatPrice}
-                      onAddToCart={handleAddToCart}
-                      className="mt-3"
-                    />
+                    </div>
+
+                    {/* Products Grid for this Promo */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {promo.products.map((product) => (
+                        <div key={product.id} className="relative">
+                          {/* Timer Badge on Card */}
+                          {product.discount?.validUntil && (
+                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+                              <Clock size={12} />
+                              {getTimeRemaining(product.discount.validUntil)}
+                            </div>
+                          )}
+                          
+                          <ProductCard
+                            product={product}
+                      
+                            formatPrice={formatPrice}
+                            onAddToCart={handleAddToCart}
+                            className="mt-3"
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>

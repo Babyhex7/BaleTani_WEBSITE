@@ -450,6 +450,7 @@ exports.getFeaturedProducts = async (req, res) => {
       return {
         id: productData.id,
         name: productData.name,
+        description: productData.description,
         price: parseFloat(productData.selling_price),
         stock: productData.total_stock,
         category: productData.category?.category_name,
