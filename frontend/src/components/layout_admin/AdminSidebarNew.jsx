@@ -59,9 +59,13 @@ const AdminSidebarNew = () => {
       icon: ShoppingCartIcon
     },
     {
-      name: 'Customers',
-      path: '/admin/customers',
-      icon: UsersIcon
+      name: 'User Management',
+      icon: UsersIcon,
+      key: 'users',
+      submenu: [
+        { name: 'Customer Management', path: '/admin/customers' },
+        { name: 'Admin Management', path: '/admin/admins' },
+      ]
     },
     {
       name: 'Reports & Insights',

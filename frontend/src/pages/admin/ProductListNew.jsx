@@ -14,6 +14,7 @@ import AdminHeaderNew from '../../components/layout_admin/AdminHeaderNew';
 import ProductFormModal from '../../components/ui_admin/ProductFormModal';
 import ProductDetailModal from '../../components/ui_admin/ProductDetailModal';
 import DeleteConfirmModal from '../../components/ui_admin/DeleteConfirmModal';
+import Pagination from '../../components/ui_admin/Pagination';
 import inventoryService from '../../services/services_admin/inventoryService';
 
 const ProductListNew = () => {
@@ -29,6 +30,8 @@ const ProductListNew = () => {
   const [filterStatus, setFilterStatus] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Stats
   const [stats, setStats] = useState({
@@ -49,7 +52,7 @@ const ProductListNew = () => {
   // Fetch data on mount and filter change
   useEffect(() => {
     fetchProducts();
-  }, [currentPage, searchQuery, filterType, filterStatus]);
+  }, [currentPage, searchQuery, filterType, filterStatus, itemsPerPage]);
 
   useEffect(() => {
     fetchCategories();
@@ -61,7 +64,7 @@ const ProductListNew = () => {
       setLoading(true);
       const params = {
         page: currentPage,
-        limit: 10,
+        limit: itemsPerPage,
         search: searchQuery,
         product_type: filterType,
         status: filterStatus
@@ -69,14 +72,12 @@ const ProductListNew = () => {
 
       const data = await inventoryService.getProducts(params);
       
-      console.log('API Response:', data); // Debug log
-      
       if (data.success) {
         const products = data.data.products || [];
-        console.log('Products loaded:', products); // Debug log
         
         setProducts(products);
         setTotalPages(data.data.pagination?.totalPages || 1);
+        setTotalItems(data.data.pagination?.totalItems || 0);
         
         setStats({
           total: products.length,
@@ -516,26 +517,18 @@ const ProductListNew = () => {
             </div>
 
             {/* Pagination */}
-            {!loading && !error && products.length > 0 && totalPages > 1 && (
-              <div className="px-6 py-4 border-t flex items-center justify-between">
-                <p className="text-sm text-gray-600">Halaman {currentPage} dari {totalPages}</p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 text-sm border rounded-lg disabled:opacity-50"
-                  >
-                    Sebelumnya
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 text-sm border rounded-lg disabled:opacity-50"
-                  >
-                    Selanjutnya
-                  </button>
-                </div>
-              </div>
+            {!loading && !error && products.length > 0 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(newLimit) => {
+                  setItemsPerPage(newLimit);
+                  setCurrentPage(1);
+                }}
+              />
             )}
           </div>
         </div>
