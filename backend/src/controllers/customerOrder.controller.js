@@ -397,7 +397,11 @@ const getOrderDetail = async (req, res) => {
         },
       ],
       order: [
-        [{ model: OrderStatusHistory, as: "statusHistory" }, "changed_at", "DESC"],
+        [
+          { model: OrderStatusHistory, as: "statusHistory" },
+          "changed_at",
+          "DESC",
+        ],
       ],
     });
 
