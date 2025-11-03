@@ -240,14 +240,14 @@ const AssignProductModal = ({
                           
                           <div className="flex flex-wrap items-center gap-2 text-xs">
                             <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded">
-                              {formatCurrency(product.price)}
+                              {formatCurrency(product.selling_price || product.price || 0)}
                             </span>
                             <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">
-                              Stok: {product.total_stock || 0} {product.unit || 'unit'}
+                              Stok: {product.total_stock || 0} unit
                             </span>
-                            {product.Category?.category_name && (
+                            {(product.Category?.category_name || product.category?.category_name) && (
                               <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded">
-                                {product.Category.category_name}
+                                {product.Category?.category_name || product.category?.category_name}
                               </span>
                             )}
                           </div>
