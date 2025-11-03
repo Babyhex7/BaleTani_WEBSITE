@@ -21,10 +21,6 @@ const ProcurementItem = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
-    unit: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-    },
     purchase_price_per_unit: {
       type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
@@ -41,15 +37,6 @@ const ProcurementItem = sequelize.define(
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
       allowNull: false,
-    },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
-    deleted_by: {
-      type: DataTypes.UUID,
-      allowNull: true,
     },
   },
   {

@@ -8,49 +8,40 @@ const Customer = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      primaryKey: true
     },
     phone_number: {
       type: DataTypes.STRING(20),
       allowNull: false,
-      unique: true,
+      unique: true
     },
     full_name: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: false
     },
     password_hash: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: false
     },
     address: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: true
     },
     is_active: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      defaultValue: true
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
     },
     updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
+    }
     },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
-    deleted_by: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-  },
   {
     tableName: "customers",
     timestamps: false, // We handle timestamps manually
@@ -86,8 +77,8 @@ const Customer = sequelize.define(
             salt
           );
         }
-      },
-    },
+      }
+    }
   }
 );
 

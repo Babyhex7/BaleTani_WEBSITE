@@ -173,7 +173,6 @@ const getFeaturedProducts = async (req, res) => {
       where: {
         total_stock: { [Op.gt]: 10 }, // stok lebih dari 10
         is_active: true,
-        deleted_at: null,
       },
       include: [
         {
@@ -211,15 +210,13 @@ const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.findAll({
       attributes: ["id", "category_name", "description", "is_active"],
-      where: {
-        deleted_at: null,
-      },
+      // where clause cleaned,
       include: [
         {
           model: Product,
           as: "products",
           attributes: ["id"], // hanya ambil id untuk menghitung
-          where: { is_active: true, deleted_at: null },
+          where: { is_active: true },
           required: false,
         },
       ],
@@ -270,7 +267,6 @@ const searchProducts = async (req, res) => {
           { description: { [Op.like]: `%${keyword}%` } },
         ],
         is_active: true,
-        deleted_at: null,
       },
       include: [
         {
@@ -341,7 +337,6 @@ const getProductsByCategory = async (req, res) => {
       where: {
         category_id: category.id,
         is_active: true,
-        deleted_at: null,
       },
       include: [
         {

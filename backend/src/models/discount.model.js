@@ -7,57 +7,48 @@ const Discount = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      primaryKey: true
     },
     discount_name: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: false
     },
     discount_type: {
       type: DataTypes.ENUM("percentage", "fixed_amount"),
-      allowNull: false,
+      allowNull: false
     },
     value: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
+      allowNull: false
     },
     start_date: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: false
     },
     end_date: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: false
     },
     is_active: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      defaultValue: true
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
     },
     updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
+    }
     },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
-    deleted_by: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-  },
   {
     tableName: "discounts",
     timestamps: false,
     paranoid: false,
-    underscored: true,
+    underscored: true
   }
 );
 

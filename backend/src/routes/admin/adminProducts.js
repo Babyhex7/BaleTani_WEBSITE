@@ -78,26 +78,14 @@ router.put(
 
 /**
  * DELETE /api/admin/products/:id
- * Soft delete product (Super Admin only)
+ * Hard delete product (Super Admin only)
  * Access: super_admin only
  */
 router.delete(
   "/:id",
   authenticateAdmin,
   roleMiddleware(["super_admin"]),
-  productController.softDelete
-);
-
-/**
- * POST /api/admin/products/:id/restore
- * Restore soft deleted product (Super Admin only)
- * Access: super_admin only
- */
-router.post(
-  "/:id/restore",
-  authenticateAdmin,
-  roleMiddleware(["super_admin"]),
-  productController.restore
+  productController.deleteProduct
 );
 
 // ============================================

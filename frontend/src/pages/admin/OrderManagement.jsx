@@ -352,8 +352,9 @@ const OrderManagement = () => {
                     <option value="pending_payment">Pending Payment</option>
                     <option value="paid">Paid</option>
                     <option value="processing">Processing</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
+                    <option value="ready_for_pickup">Ready for Pickup</option>
+                    <option value="out_for_delivery">Out for Delivery</option>
+                    <option value="completed">Completed</option>
                     <option value="cancelled">Cancelled</option>
                   </select>
                 </div>

@@ -4,7 +4,7 @@
  */
 
 const { Op } = require("sequelize");
-const { Category, Product, SoftDeleteLog } = require("../models");
+const { Category, Product } = require("../models");
 
 /**
  * GET /api/admin/categories
@@ -22,9 +22,7 @@ const getAllCategories = async (req, res) => {
     } = req.query;
 
     // Build where clause
-    const whereClause = {
-      deleted_at: null,
-    };
+    const whereClause = {};
 
     // Search by name or description
     if (search) {
@@ -50,7 +48,7 @@ const getAllCategories = async (req, res) => {
           model: Product,
           as: "products",
           attributes: ["id"],
-          where: { deleted_at: null, is_active: true },
+          where: { is_active: true },
           required: false,
         },
       ],
@@ -105,12 +103,12 @@ const getCategoryById = async (req, res) => {
     const { id } = req.params;
 
     const category = await Category.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
       include: [
         {
           model: Product,
           as: "products",
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           attributes: [
             "id",
@@ -174,7 +172,6 @@ const createCategory = async (req, res) => {
     const existingCategory = await Category.findOne({
       where: {
         category_name,
-        deleted_at: null,
       },
     });
 
@@ -218,7 +215,7 @@ const updateCategory = async (req, res) => {
 
     // Find category
     const category = await Category.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
     });
 
     if (!category) {
@@ -233,7 +230,6 @@ const updateCategory = async (req, res) => {
       const existingCategory = await Category.findOne({
         where: {
           category_name,
-          deleted_at: null,
           id: { [Op.ne]: id },
         },
       });
@@ -272,16 +268,15 @@ const updateCategory = async (req, res) => {
 
 /**
  * DELETE /api/admin/categories/:id
- * Soft delete category (Super Admin only)
+ * Hard delete category (Super Admin only)
  */
-const softDeleteCategory = async (req, res) => {
+const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const adminId = req.user.id; // Fix: req.user.id bukan req.user.userId
 
     // Find category
     const category = await Category.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
     });
 
     if (!category) {
@@ -291,89 +286,38 @@ const softDeleteCategory = async (req, res) => {
       });
     }
 
-    // Check if category has active products
-    const activeProductCount = await Product.count({
+    // Check if category has products
+    const productCount = await Product.count({
       where: {
         category_id: id,
-        deleted_at: null,
-        is_active: true,
       },
     });
 
-    if (activeProductCount > 0) {
+    if (productCount > 0) {
       return res.status(400).json({
         success: false,
-        message: `Kategori tidak dapat dihapus karena masih memiliki ${activeProductCount} produk aktif`,
+        message: `Kategori tidak dapat dihapus karena masih memiliki ${productCount} produk`,
       });
     }
 
-    // Soft delete
-    await category.update({
-      deleted_at: new Date(),
-      deleted_by: adminId,
-    });
+    const categoryName = category.category_name;
 
-    // Log soft delete
-    await SoftDeleteLog.create({
-      table_name: "product_categories",
-      record_id: id,
-      deleted_by: adminId,
-      deleted_at: new Date(),
-    });
+    // Hard delete
+    await category.destroy();
 
     res.status(200).json({
       success: true,
       message: "Kategori berhasil dihapus",
+      data: {
+        id: id,
+        category_name: categoryName,
+      },
     });
   } catch (error) {
     console.error("Error deleting category:", error);
     res.status(500).json({
       success: false,
       message: "Gagal menghapus kategori",
-      error: error.message,
-    });
-  }
-};
-
-/**
- * POST /api/admin/categories/:id/restore
- * Restore soft deleted category (Super Admin only)
- */
-const restoreCategory = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Find deleted category
-    const category = await Category.findOne({
-      where: {
-        id,
-        deleted_at: { [Op.ne]: null },
-      },
-    });
-
-    if (!category) {
-      return res.status(404).json({
-        success: false,
-        message: "Kategori tidak ditemukan atau belum dihapus",
-      });
-    }
-
-    // Restore category
-    await category.update({
-      deleted_at: null,
-      deleted_by: null,
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Kategori berhasil dipulihkan",
-      data: category,
-    });
-  } catch (error) {
-    console.error("Error restoring category:", error);
-    res.status(500).json({
-      success: false,
-      message: "Gagal memulihkan kategori",
       error: error.message,
     });
   }
@@ -388,7 +332,7 @@ const toggleCategoryStatus = async (req, res) => {
     const { id } = req.params;
 
     const category = await Category.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
     });
 
     if (!category) {
@@ -430,7 +374,6 @@ module.exports = {
   getCategoryById,
   createCategory,
   updateCategory,
-  softDeleteCategory,
-  restoreCategory,
+  deleteCategory,
   toggleCategoryStatus,
 };

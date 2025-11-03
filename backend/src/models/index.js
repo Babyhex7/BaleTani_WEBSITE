@@ -12,7 +12,6 @@ const Cart = require("./cart.model");
 const Order = require("./order.model");
 const OrderItem = require("./orderItem.model");
 const OrderStatusHistory = require("./orderStatusHistory.model");
-const SoftDeleteLog = require("./softDeleteLog.model");
 const StockMovement = require("./stockMovement.model");
 
 // =============================
@@ -275,20 +274,6 @@ Product.hasMany(Cart, {
   as: "carts",
 });
 
-// =============================
-// SOFT DELETE LOGS
-// =============================
-
-// User → SoftDeleteLog (deleted_by)
-Admin.hasMany(SoftDeleteLog, {
-  foreignKey: "deleted_by",
-  as: "deleteLogs",
-});
-SoftDeleteLog.belongsTo(Admin, {
-  foreignKey: "deleted_by",
-  as: "deleter",
-});
-
 module.exports = {
   Admin,
   Role,
@@ -304,7 +289,6 @@ module.exports = {
   Order,
   OrderItem,
   OrderStatusHistory,
-  SoftDeleteLog,
   StockMovement,
   // Legacy exports for backward compatibility
   User: Admin,

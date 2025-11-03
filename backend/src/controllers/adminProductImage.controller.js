@@ -14,7 +14,7 @@ const upload = async (req, res) => {
 
     // Check if product exists
     const product = await Product.findOne({
-      where: { id: id, deleted_at: null },
+      where: { id: id },
     });
 
     if (!product) {
@@ -42,7 +42,6 @@ const upload = async (req, res) => {
     const maxOrder = await ProductImage.max("display_order", {
       where: {
         product_id: id,
-        deleted_at: null,
       },
     });
 
@@ -117,7 +116,7 @@ const reorder = async (req, res) => {
 
     // Check if product exists
     const product = await Product.findOne({
-      where: { id: id, deleted_at: null },
+      where: { id: id },
     });
 
     if (!product) {
@@ -133,7 +132,6 @@ const reorder = async (req, res) => {
       where: {
         id: { [Op.in]: imageIds },
         product_id: id,
-        deleted_at: null,
       },
     });
 
@@ -163,7 +161,6 @@ const reorder = async (req, res) => {
     const updatedImages = await ProductImage.findAll({
       where: {
         product_id: id,
-        deleted_at: null,
       },
       order: [["display_order", "ASC"]],
       attributes: ["id", "image_url", "display_order"],
@@ -199,12 +196,12 @@ const deleteImage = async (req, res) => {
 
     // Find image
     const image = await ProductImage.findOne({
-      where: { id: imageId, deleted_at: null },
+      where: { id: imageId },
       include: [
         {
           model: Product,
           as: "product",
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: true,
         },
       ],
@@ -249,7 +246,6 @@ const deleteImage = async (req, res) => {
     const remainingImages = await ProductImage.findAll({
       where: {
         product_id: productId,
-        deleted_at: null,
       },
       order: [["display_order", "ASC"]],
       attributes: ["id", "image_url", "display_order"],
@@ -283,7 +279,7 @@ const getByProduct = async (req, res) => {
 
     // Check if product exists
     const product = await Product.findOne({
-      where: { id: id, deleted_at: null },
+      where: { id: id },
     });
 
     if (!product) {
@@ -297,7 +293,6 @@ const getByProduct = async (req, res) => {
     const images = await ProductImage.findAll({
       where: {
         product_id: id,
-        deleted_at: null,
       },
       order: [["display_order", "ASC"]],
       attributes: ["id", "image_url", "display_order", "created_at"],

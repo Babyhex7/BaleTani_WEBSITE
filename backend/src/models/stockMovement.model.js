@@ -7,11 +7,11 @@ const StockMovement = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      primaryKey: true
     },
     product_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
     },
     movement_type: {
       type: DataTypes.ENUM(
@@ -20,52 +20,43 @@ const StockMovement = sequelize.define(
         "adjustment",
         "expired"
       ),
-      allowNull: false,
+      allowNull: false
     },
     quantity_change: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
+      allowNull: false
     },
     stock_before: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
+      allowNull: false
     },
     stock_after: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
+      allowNull: false
     },
     reference_id: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: true
     },
     reference_type: {
       type: DataTypes.STRING(50),
-      allowNull: true,
+      allowNull: true
     },
     created_by: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
+    }
     },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
-    deleted_by: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-  },
   {
     tableName: "stock_movements_reporting",
     timestamps: false,
     paranoid: false,
-    underscored: true,
+    underscored: true
   }
 );
 

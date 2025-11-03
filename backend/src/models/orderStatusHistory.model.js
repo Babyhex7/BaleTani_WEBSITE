@@ -12,30 +12,30 @@ const OrderStatusHistory = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      primaryKey: true
     },
     order_id: {
       type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: "orders",
-        key: "id",
-      },
+        key: "id"
+      }
     },
     old_status: {
       type: DataTypes.STRING(50),
       allowNull: true,
-      comment: "Previous order status",
+      comment: "Previous order status"
     },
     new_status: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      comment: "New order status",
+      comment: "New order status"
     },
     notes: {
       type: DataTypes.TEXT,
       allowNull: true,
-      comment: "Additional notes about the status change",
+      comment: "Additional notes about the status change"
     },
     changed_by: {
       type: DataTypes.UUID,
@@ -43,19 +43,19 @@ const OrderStatusHistory = sequelize.define(
       comment: "Admin ID who made the change",
       references: {
         model: "admins",
-        key: "id",
-      },
+        key: "id"
+      }
     },
     changed_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
-    },
+      allowNull: false
+    }
   },
   {
     tableName: "order_status_history",
     timestamps: false,
-    underscored: true,
+    underscored: true
   }
 );
 

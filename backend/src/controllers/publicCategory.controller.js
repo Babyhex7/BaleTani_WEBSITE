@@ -20,7 +20,6 @@ const getAllCategories = async (req, res) => {
 
     // Build where clause
     const whereClause = {
-      deleted_at: null,
       is_active: true,
     };
 
@@ -37,7 +36,7 @@ const getAllCategories = async (req, res) => {
           model: Product,
           as: "products",
           attributes: ["id"],
-          where: { deleted_at: null, is_active: true },
+          where: { is_active: true },
           required: false,
         },
       ],
@@ -86,7 +85,7 @@ const getCategoryById = async (req, res) => {
 
     // Find category
     const category = await Category.findOne({
-      where: { id, deleted_at: null, is_active: true },
+      where: { id, is_active: true },
       attributes: ["id", "category_name", "description"],
     });
 
@@ -100,7 +99,6 @@ const getCategoryById = async (req, res) => {
     // Build where clause for products
     const productWhereClause = {
       category_id: id,
-      deleted_at: null,
       is_active: true,
     };
 
@@ -144,7 +142,6 @@ const getCategoryById = async (req, res) => {
       name: product.name,
       description: product.description,
       price: product.selling_price,
-      unit: product.quantity_info || null,
       stock: product.total_stock,
       image:
         product.images && product.images.length > 0

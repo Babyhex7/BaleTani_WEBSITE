@@ -61,8 +61,9 @@ const OrderDetailModal = ({ orderId, useDummyData, onClose, onUpdateStatus }) =>
       pending_payment: { label: "Pending Payment", color: "bg-yellow-100 text-yellow-800" },
       paid: { label: "Paid", color: "bg-blue-100 text-blue-800" },
       processing: { label: "Processing", color: "bg-purple-100 text-purple-800" },
-      shipped: { label: "Shipped", color: "bg-indigo-100 text-indigo-800" },
-      delivered: { label: "Delivered", color: "bg-green-100 text-green-800" },
+      ready_for_pickup: { label: "Ready for Pickup", color: "bg-cyan-100 text-cyan-800" },
+      out_for_delivery: { label: "Out for Delivery", color: "bg-indigo-100 text-indigo-800" },
+      completed: { label: "Completed", color: "bg-green-100 text-green-800" },
       cancelled: { label: "Cancelled", color: "bg-red-100 text-red-800" },
     };
 
@@ -157,12 +158,6 @@ const OrderDetailModal = ({ orderId, useDummyData, onClose, onUpdateStatus }) =>
                 <p className="text-sm text-gray-600">Phone</p>
                 <p className="font-medium">{order.customer_phone}</p>
               </div>
-              {order.customer_email && order.customer_email !== "-" && (
-                <div>
-                  <p className="text-sm text-gray-600">Email</p>
-                  <p className="font-medium">{order.customer_email}</p>
-                </div>
-              )}
             </div>
           </div>
 
@@ -228,7 +223,7 @@ const OrderDetailModal = ({ orderId, useDummyData, onClose, onUpdateStatus }) =>
                   <div className="flex-1">
                     <p className="font-medium">{item.product_name}</p>
                     <p className="text-sm text-gray-600">
-                      {item.quantity} {item.unit} × {formatCurrency(item.final_price)}
+                      {item.quantity} × {formatCurrency(item.final_price)}
                       {item.discount_price > 0 && (
                         <span className="ml-2 text-xs text-red-600">
                           (Disc: {formatCurrency(item.discount_price)})

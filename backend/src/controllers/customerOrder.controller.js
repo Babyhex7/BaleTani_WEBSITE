@@ -5,6 +5,7 @@
 
 const { Op } = require("sequelize");
 const { sequelize } = require("../config/database");
+const { getWIBDate } = require("../utils/dateHelper");
 const {
   Order,
   OrderItem,
@@ -100,7 +101,6 @@ const createOrder = async (req, res) => {
       const product = await Product.findOne({
         where: {
           id: item.product_id,
-          deleted_at: null,
           is_active: true,
         },
       });
@@ -130,7 +130,6 @@ const createOrder = async (req, res) => {
         product_id: item.product_id,
         product_name: product.name,
         quantity: item.quantity,
-        unit: product.quantity_info || "pcs",
         original_price: itemPrice,
         discount_price: 0,
         final_price: itemPrice,
@@ -141,7 +140,7 @@ const createOrder = async (req, res) => {
       await product.update(
         {
           total_stock: product.total_stock - item.quantity,
-          updated_at: new Date(),
+          updated_at: getWIBDate(),
         },
         { transaction }
       );
@@ -156,7 +155,7 @@ const createOrder = async (req, res) => {
 
     // Set initial status based on payment method
     let orderStatus = "pending_payment";
-    let paymentStatus = "unpaid";
+    let paymentStatus = "pending";
 
     if (payment_method === "cash") {
       // Cash = bayar di tempat, langsung set paid
@@ -171,7 +170,6 @@ const createOrder = async (req, res) => {
         transaction_type: "online",
         customer_id: customerId,
         customer_name,
-        customer_email: null, // NO EMAIL
         customer_phone,
         payment_method,
         payment_proof_url: null,
@@ -187,8 +185,8 @@ const createOrder = async (req, res) => {
         admin_notes: null,
         processed_by: null,
         processed_at: null,
-        created_at: new Date(),
-        updated_at: new Date(),
+        created_at: getWIBDate(),
+        updated_at: getWIBDate(),
       },
       { transaction }
     );
@@ -199,8 +197,8 @@ const createOrder = async (req, res) => {
         {
           order_id: order.id,
           ...itemData,
-          created_at: new Date(),
-          updated_at: new Date(),
+          created_at: getWIBDate(),
+          updated_at: getWIBDate(),
         },
         { transaction }
       );
@@ -214,7 +212,7 @@ const createOrder = async (req, res) => {
         new_status: orderStatus,
         changed_by: customerId,
         notes: "Order created by customer",
-        created_at: new Date(),
+        changed_at: getWIBDate(),
       },
       { transaction }
     );
@@ -259,7 +257,6 @@ const createOrder = async (req, res) => {
         items: createdOrder.orderItems.map((item) => ({
           product_name: item.product_name,
           quantity: parseFloat(item.quantity),
-          unit: item.unit,
           final_price: parseFloat(item.final_price),
           subtotal: parseFloat(item.subtotal),
         })),
@@ -303,7 +300,6 @@ const getMyOrders = async (req, res) => {
 
     const whereClause = {
       customer_id: customerId,
-      deleted_at: null,
     };
 
     if (status) {
@@ -375,7 +371,6 @@ const getOrderDetail = async (req, res) => {
 
     const whereClause = {
       id: id,
-      deleted_at: null,
     };
 
     // Only show customer's own orders

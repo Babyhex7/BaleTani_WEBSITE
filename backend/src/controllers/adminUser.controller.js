@@ -22,8 +22,7 @@ const getUsers = async (req, res, next) => {
 
     // Build where clause
     const whereClause = {
-      deleted_at: null,
-    };
+      };
 
     if (search) {
       whereClause[Op.or] = [

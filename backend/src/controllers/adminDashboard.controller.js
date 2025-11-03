@@ -65,7 +65,7 @@ const getDashboardStats = async (req, res, next) => {
 
       // Total customers
       Customer.count({
-        where: { deleted_at: null },
+        // where clause cleaned,
       }),
 
       // Orders bulan ini

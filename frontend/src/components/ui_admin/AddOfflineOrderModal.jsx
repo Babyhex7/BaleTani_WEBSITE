@@ -27,7 +27,6 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
   // Form states
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash");
@@ -193,7 +192,6 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
       const orderData = {
         customer_name: customerName,
         customer_phone: customerPhone,
-        customer_email: customerEmail,
         delivery_address: deliveryAddress,
         delivery_notes: deliveryNotes,
         payment_method: paymentMethod,
@@ -229,7 +227,6 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
     // Reset form
     setCustomerName("");
     setCustomerPhone("");
-    setCustomerEmail("");
     setDeliveryAddress("");
     setDeliveryNotes("");
     setPaymentMethod("cash");
@@ -308,20 +305,6 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="08xx-xxxx-xxxx"
                     required
-                  />
-                </div>
-
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
-                    <EnvelopeIcon className="w-4 h-4 text-gray-500" />
-                    Email (Opsional)
-                  </label>
-                  <input
-                    type="email"
-                    value={customerEmail}
-                    onChange={(e) => setCustomerEmail(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="email@example.com"
                   />
                 </div>
 

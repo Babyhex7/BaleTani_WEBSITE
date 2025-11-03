@@ -89,7 +89,7 @@ exports.getAllProducts = async (req, res) => {
           model: ProductImage,
           as: "images",
           attributes: ["id", "image_url", "display_order"],
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           separate: true,
           order: [["display_order", "ASC"]],
@@ -98,7 +98,7 @@ exports.getAllProducts = async (req, res) => {
           model: ProductDiscount,
           as: "productDiscounts",
           required: false,
-          where: { deleted_at: null },
+          // where clause cleaned,
           include: [
             {
               model: Discount,
@@ -107,7 +107,6 @@ exports.getAllProducts = async (req, res) => {
                 is_active: true,
                 start_date: { [Op.lte]: new Date() },
                 end_date: { [Op.gte]: new Date() },
-                deleted_at: null,
               },
               required: false,
             },
@@ -164,7 +163,6 @@ exports.getAllProducts = async (req, res) => {
         description: productData.description,
         price: parseFloat(productData.selling_price),
         stock: productData.total_stock,
-        unit: productData.quantity_info || "unit",
         shelfLifeDays: productData.shelf_life_days,
         category: productData.category
           ? {
@@ -183,7 +181,7 @@ exports.getAllProducts = async (req, res) => {
     // Get categories for filter dropdown
     const categories = await Category.findAll({
       attributes: ["id", "category_name"],
-      where: { is_active: true, deleted_at: null },
+      where: { is_active: true },
     });
 
     // Calculate pagination info
@@ -250,7 +248,7 @@ exports.getProductDetail = async (req, res) => {
           model: ProductImage,
           as: "images",
           attributes: ["id", "image_url", "display_order"],
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           separate: true,
           order: [["display_order", "ASC"]],
@@ -258,7 +256,7 @@ exports.getProductDetail = async (req, res) => {
         {
           model: ProductDiscount,
           as: "productDiscounts",
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           include: [
             {
@@ -268,7 +266,6 @@ exports.getProductDetail = async (req, res) => {
                 is_active: true,
                 start_date: { [Op.lte]: new Date() },
                 end_date: { [Op.gte]: new Date() },
-                deleted_at: null,
               },
               required: false,
             },
@@ -325,7 +322,6 @@ exports.getProductDetail = async (req, res) => {
       description: productData.description,
       price: parseFloat(productData.selling_price),
       stock: productData.total_stock,
-      unit: productData.quantity_info || "unit",
       shelfLifeDays: productData.shelf_life_days,
       category: productData.category
         ? {
@@ -372,21 +368,20 @@ exports.getFeaturedProducts = async (req, res) => {
       where: {
         is_active: true,
         total_stock: { [Op.gt]: 0 },
-        deleted_at: null,
       },
       include: [
         {
           model: Category,
           as: "category",
           attributes: ["id", "category_name"],
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
         },
         {
           model: ProductImage,
           as: "images",
           attributes: ["id", "image_url", "display_order"],
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           separate: true,
           order: [["display_order", "ASC"]],
@@ -395,7 +390,7 @@ exports.getFeaturedProducts = async (req, res) => {
           model: ProductDiscount,
           as: "productDiscounts",
           attributes: ["id", "product_id", "discount_id", "created_at"],
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: true, // Only get products that have discounts
           include: [
             {
@@ -414,7 +409,6 @@ exports.getFeaturedProducts = async (req, res) => {
                 is_active: true,
                 start_date: { [Op.lte]: new Date() },
                 end_date: { [Op.gte]: new Date() },
-                deleted_at: null,
               },
               required: true, // Only get discounts that are currently active
             },
@@ -458,7 +452,6 @@ exports.getFeaturedProducts = async (req, res) => {
         name: productData.name,
         price: parseFloat(productData.selling_price),
         stock: productData.total_stock,
-        unit: productData.quantity_info || "unit",
         category: productData.category?.category_name,
         image: primaryImage?.image_url || "/placeholder-product.jpg",
         discount: discountInfo,
@@ -493,7 +486,6 @@ exports.getProductById = async (req, res) => {
       where: {
         id,
         is_active: true,
-        deleted_at: null,
       },
       include: [
         {
@@ -505,14 +497,14 @@ exports.getProductById = async (req, res) => {
           model: ProductImage,
           as: "images",
           attributes: ["id", "image_url", "display_order"],
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
         },
         {
           model: ProductDiscount,
           as: "productDiscounts",
           attributes: ["discount_id"],
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           include: [
             {
@@ -529,7 +521,6 @@ exports.getProductById = async (req, res) => {
               ],
               where: {
                 is_active: true,
-                deleted_at: null,
                 start_date: { [Op.lte]: new Date() },
                 end_date: { [Op.gte]: new Date() },
               },
@@ -594,7 +585,6 @@ exports.getProductById = async (req, res) => {
       description: product.description,
       price: product.selling_price,
       stock: product.total_stock,
-      unit: product.quantity_info || "unit",
       weight: product.weight,
       category: {
         id: product.category?.id,
@@ -604,7 +594,6 @@ exports.getProductById = async (req, res) => {
       discount: discountInfo,
       specifications: {
         weight: product.weight,
-        unit: product.quantity_info || "unit",
         stock: product.total_stock,
       },
     };

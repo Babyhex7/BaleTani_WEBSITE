@@ -46,7 +46,6 @@ const loginAdmin = async (req, res) => {
     const admin = await Admin.findOne({
       where: {
         phone_number: normalizedPhone,
-        deleted_at: null,
         is_active: true,
       },
       include: [
@@ -135,7 +134,6 @@ const getAdminProfile = async (req, res) => {
     const admin = await Admin.findOne({
       where: {
         id: req.user.id, // Fix: req.user.id bukan req.user.userId
-        deleted_at: null,
         is_active: true,
       },
       include: [

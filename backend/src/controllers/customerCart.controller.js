@@ -44,7 +44,7 @@ exports.getCart = async (req, res) => {
                   model: ProductImage,
                   as: "images",
                   attributes: ["image_url", "display_order"],
-                  where: { deleted_at: null },
+                  // where clause cleaned,
                   required: false,
                   order: [["display_order", "ASC"]],
                 },
@@ -52,7 +52,7 @@ exports.getCart = async (req, res) => {
                   model: ProductDiscount,
                   as: "productDiscounts",
                   required: false,
-                  where: { deleted_at: null },
+                  // where clause cleaned,
                   include: [
                     {
                       model: Discount,
@@ -70,7 +70,6 @@ exports.getCart = async (req, res) => {
                         is_active: true,
                         start_date: { [Op.lte]: new Date() },
                         end_date: { [Op.gte]: new Date() },
-                        deleted_at: null,
                       },
                       required: false,
                     },
@@ -128,7 +127,6 @@ exports.getCart = async (req, res) => {
         price: parseFloat(product.price),
         finalPrice: finalPrice,
         stock: product.stock,
-        unit: product.unit,
         quantity: item.quantity,
         subtotal: subtotal,
         image:
@@ -191,7 +189,7 @@ exports.addToCart = async (req, res) => {
 
     // Check if product exists and has enough stock
     const product = await Product.findOne({
-      where: { id: product_id, deleted_at: null },
+      where: { id: product_id },
     });
 
     if (!product) {
@@ -204,7 +202,7 @@ exports.addToCart = async (req, res) => {
     if (product.stock < quantity) {
       return res.status(400).json({
         success: false,
-        message: `Not enough stock. Available: ${product.stock} ${product.unit}`,
+        message: `Not enough stock. Available: ${product.stock}`,
       });
     }
 
@@ -232,7 +230,7 @@ exports.addToCart = async (req, res) => {
       if (product.stock < newQuantity) {
         return res.status(400).json({
           success: false,
-          message: `Cannot add more. Maximum stock: ${product.stock} ${product.unit}`,
+          message: `Cannot add more. Maximum stock: ${product.stock}`,
         });
       }
 

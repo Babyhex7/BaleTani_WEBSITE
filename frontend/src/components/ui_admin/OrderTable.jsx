@@ -60,13 +60,18 @@ const OrderTable = ({ orders, loading, onViewDetail, onUpdateStatus }) => {
         color: "bg-purple-100 text-purple-800",
         icon: ShoppingBagIcon,
       },
-      shipped: {
-        label: "Shipped",
+      ready_for_pickup: {
+        label: "Ready for Pickup",
+        color: "bg-cyan-100 text-cyan-800",
+        icon: ShoppingBagIcon,
+      },
+      out_for_delivery: {
+        label: "Out for Delivery",
         color: "bg-indigo-100 text-indigo-800",
         icon: ShoppingBagIcon,
       },
-      delivered: {
-        label: "Delivered",
+      completed: {
+        label: "Completed",
         color: "bg-green-100 text-green-800",
         icon: CheckCircleIcon,
       },

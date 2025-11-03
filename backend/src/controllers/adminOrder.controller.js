@@ -5,6 +5,7 @@
 
 const { Op } = require("sequelize");
 const { sequelize } = require("../config/database");
+const { getWIBDate } = require("../utils/dateHelper");
 const {
   Order,
   OrderItem,
@@ -38,16 +39,13 @@ const getAllOrders = async (req, res) => {
     } = req.query;
 
     // Build where clause
-    const whereClause = {
-      deleted_at: null,
-    };
+    const whereClause = {};
 
-    // Search by order number, customer name, email, phone
+    // Search by order number, customer name, phone
     if (search) {
       whereClause[Op.or] = [
         { order_number: { [Op.like]: `%${search}%` } },
         { customer_name: { [Op.like]: `%${search}%` } },
-        { customer_email: { [Op.like]: `%${search}%` } },
         { customer_phone: { [Op.like]: `%${search}%` } },
       ];
     }
@@ -112,7 +110,6 @@ const getAllOrders = async (req, res) => {
             "id",
             "product_name",
             "quantity",
-            "unit",
             "original_price",
             "discount_price",
             "final_price",
@@ -133,7 +130,6 @@ const getAllOrders = async (req, res) => {
       order_number: order.order_number,
       order_type: order.transaction_type, // Use transaction_type from database
       customer_name: order.customer_name || order.customer?.full_name || "-",
-      customer_email: order.customer_email || "-",
       customer_phone:
         order.customer_phone || order.customer?.phone_number || "-",
       payment_method: order.payment_method,
@@ -193,7 +189,7 @@ const getOrderById = async (req, res) => {
     const { id } = req.params;
 
     const order = await Order.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
       include: [
         {
           model: Customer,
@@ -276,7 +272,7 @@ const updateOrderStatus = async (req, res) => {
 
     // Find order
     const order = await Order.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
     });
 
     if (!order) {
@@ -286,25 +282,17 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    // Validate status values
+    // Validate status values (UPDATED to match new ENUM)
     const validOrderStatuses = [
       "pending_payment",
       "paid",
       "processing",
-      "shipped",
-      "delivered",
-      "cancelled",
-      "checkout",
+      "ready_for_pickup",
       "out_for_delivery",
       "completed",
+      "cancelled",
     ];
-    const validPaymentStatuses = [
-      "unpaid",
-      "paid",
-      "refunded",
-      "pending",
-      "failed",
-    ];
+    const validPaymentStatuses = ["pending", "paid", "failed", "refunded"];
 
     if (order_status && !validOrderStatuses.includes(order_status)) {
       return res.status(400).json({
@@ -327,7 +315,7 @@ const updateOrderStatus = async (req, res) => {
 
     // Build update data
     const updateData = {
-      updated_at: new Date(),
+      updated_at: getWIBDate(),
     };
 
     if (order_status) updateData.order_status = order_status;
@@ -339,7 +327,7 @@ const updateOrderStatus = async (req, res) => {
       !order.processed_by
     ) {
       updateData.processed_by = adminId;
-      updateData.processed_at = new Date();
+      updateData.processed_at = getWIBDate();
     }
 
     // Update order
@@ -353,7 +341,7 @@ const updateOrderStatus = async (req, res) => {
         new_status: order_status,
         notes: notes || null,
         changed_by: adminId,
-        changed_at: new Date(),
+        changed_at: getWIBDate(),
       });
     }
 
@@ -408,7 +396,7 @@ const updateAdminNotes = async (req, res) => {
     const { admin_notes } = req.body;
 
     const order = await Order.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
     });
 
     if (!order) {
@@ -420,7 +408,7 @@ const updateAdminNotes = async (req, res) => {
 
     await order.update({
       admin_notes,
-      updated_at: new Date(),
+      updated_at: getWIBDate(),
     });
 
     res.status(200).json({
@@ -456,7 +444,7 @@ const cancelOrder = async (req, res) => {
     }
 
     const order = await Order.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
     });
 
     if (!order) {
@@ -482,8 +470,8 @@ const cancelOrder = async (req, res) => {
       order_status: "cancelled",
       cancelled_reason,
       cancelled_by: adminId,
-      cancelled_at: new Date(),
-      updated_at: new Date(),
+      cancelled_at: getWIBDate(),
+      updated_at: getWIBDate(),
     });
 
     // Log to history
@@ -493,13 +481,13 @@ const cancelOrder = async (req, res) => {
       new_status: "cancelled",
       notes: `Dibatalkan: ${cancelled_reason}`,
       changed_by: adminId,
-      changed_at: new Date(),
+      changed_at: getWIBDate(),
     });
 
     // TODO: Restore product stock if needed
     // Get order items and restore stock
     const orderItems = await OrderItem.findAll({
-      where: { order_id: id, deleted_at: null },
+      where: { order_id: id },
     });
 
     for (const item of orderItems) {
@@ -532,7 +520,7 @@ const getOrderStatistics = async (req, res) => {
   try {
     const { date_from, date_to } = req.query;
 
-    const whereClause = { deleted_at: null };
+    const whereClause = {};
 
     // Filter by date range
     if (date_from && date_to) {
@@ -621,7 +609,6 @@ const createOfflineOrder = async (req, res) => {
     const {
       customer_name,
       customer_phone,
-      customer_email,
       delivery_address,
       delivery_notes,
       payment_method,
@@ -729,14 +716,15 @@ const createOfflineOrder = async (req, res) => {
           ? parseFloat(productDiscount.discounted_price)
           : null;
       const finalPrice = discountPrice || originalPrice;
-      const itemSubtotal = finalPrice * item.quantity;
+      const qty = parseFloat(item.quantity);
+      const itemSubtotal = finalPrice * qty;
 
       subtotal += itemSubtotal;
 
       orderItems.push({
         product_id: item.product_id,
         product_name: product.name,
-        quantity: item.quantity,
+        quantity: qty,
         original_price: originalPrice,
         discount_price: discountPrice,
         final_price: finalPrice,
@@ -749,7 +737,7 @@ const createOfflineOrder = async (req, res) => {
 
     // Determine order status based on payment method
     const orderStatus = payment_method === "cash" ? "paid" : "pending_payment";
-    const paymentStatus = payment_method === "cash" ? "paid" : "unpaid";
+    const paymentStatus = payment_method === "cash" ? "paid" : "pending";
 
     // Create order
     const order = await Order.create(
@@ -759,7 +747,6 @@ const createOfflineOrder = async (req, res) => {
         customer_id: customer.id, // customer_id is required
         customer_name,
         customer_phone,
-        customer_email: customer_email || null,
         delivery_address: delivery_address || null,
         delivery_notes: delivery_notes || null,
         payment_method,
@@ -773,7 +760,9 @@ const createOfflineOrder = async (req, res) => {
         admin_notes: admin_notes || null,
         created_by: adminId,
         processed_by: adminId,
-        processed_at: new Date(),
+        processed_at: getWIBDate(),
+        created_at: getWIBDate(),
+        updated_at: getWIBDate(),
       },
       { transaction }
     );
@@ -806,7 +795,7 @@ const createOfflineOrder = async (req, res) => {
         new_status: orderStatus,
         notes: `Order offline dibuat oleh admin. Payment: ${payment_method}`,
         changed_by: adminId,
-        changed_at: new Date(),
+        changed_at: getWIBDate(),
       },
       { transaction }
     );
@@ -819,7 +808,7 @@ const createOfflineOrder = async (req, res) => {
       include: [
         {
           model: OrderItem,
-          as: "items",
+          as: "orderItems",
         },
       ],
     });
@@ -830,8 +819,11 @@ const createOfflineOrder = async (req, res) => {
       data: createdOrder,
     });
   } catch (error) {
-    await transaction.rollback();
+    if (transaction && !transaction.finished) {
+      await transaction.rollback();
+    }
     console.error("Error creating offline order:", error);
+    console.error("Stack trace:", error.stack);
     res.status(500).json({
       success: false,
       message: "Gagal membuat order offline",

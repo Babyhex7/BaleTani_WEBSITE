@@ -4,12 +4,7 @@
  */
 
 const { Op } = require("sequelize");
-const {
-  Discount,
-  Product,
-  ProductDiscount,
-  SoftDeleteLog,
-} = require("../models");
+const { Discount, Product, ProductDiscount } = require("../models");
 
 /**
  * GET /api/admin/discounts
@@ -29,9 +24,7 @@ const getAllDiscounts = async (req, res) => {
     } = req.query;
 
     // Build where clause
-    const whereClause = {
-      deleted_at: null,
-    };
+    const whereClause = {};
 
     // Search by name
     if (search) {
@@ -71,11 +64,11 @@ const getAllDiscounts = async (req, res) => {
           model: Product,
           as: "products",
           through: {
-            where: { deleted_at: null },
+            // where clause cleaned,
             attributes: ["original_price", "discounted_price"],
           },
           attributes: ["id", "name", "selling_price"],
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
         },
       ],
@@ -150,13 +143,13 @@ const getDiscountById = async (req, res) => {
     const { id } = req.params;
 
     const discount = await Discount.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
       include: [
         {
           model: Product,
           as: "products",
           through: {
-            where: { deleted_at: null },
+            // where clause cleaned,
             attributes: ["original_price", "discounted_price", "created_at"],
           },
           attributes: [
@@ -166,7 +159,7 @@ const getDiscountById = async (req, res) => {
             "total_stock",
             "is_active",
           ],
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
         },
       ],
@@ -292,7 +285,7 @@ const createDiscount = async (req, res) => {
     if (product_ids && product_ids.length > 0) {
       // Get products to calculate prices
       const products = await Product.findAll({
-        where: { id: product_ids, deleted_at: null },
+        where: { id: product_ids },
         attributes: ["id", "selling_price"],
       });
 
@@ -369,7 +362,7 @@ const updateDiscount = async (req, res) => {
 
     // Find discount
     const discount = await Discount.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
     });
 
     if (!discount) {
@@ -430,14 +423,14 @@ const updateDiscount = async (req, res) => {
       // Remove all existing product associations
       await ProductDiscount.update(
         { deleted_at: new Date() },
-        { where: { discount_id: id, deleted_at: null } }
+        { where: { discount_id: id } }
       );
 
       // Add new product associations with calculated prices
       if (product_ids.length > 0) {
         // Get products to calculate prices
         const products = await Product.findAll({
-          where: { id: product_ids, deleted_at: null },
+          where: { id: product_ids },
           attributes: ["id", "selling_price"],
         });
 
@@ -479,11 +472,11 @@ const updateDiscount = async (req, res) => {
           model: Product,
           as: "products",
           through: {
-            where: { deleted_at: null },
+            // where clause cleaned,
             attributes: ["original_price", "discounted_price"],
           },
           attributes: ["id", "name", "selling_price"],
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
         },
       ],
@@ -506,16 +499,15 @@ const updateDiscount = async (req, res) => {
 
 /**
  * DELETE /api/admin/discounts/:id
- * Soft delete discount
+ * Hard delete discount
  */
-const softDeleteDiscount = async (req, res) => {
+const deleteDiscount = async (req, res) => {
   try {
     const { id } = req.params;
-    const adminId = req.user.id; // Fix: req.user.id bukan req.user.userId
 
     // Find discount
     const discount = await Discount.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
     });
 
     if (!discount) {
@@ -525,34 +517,15 @@ const softDeleteDiscount = async (req, res) => {
       });
     }
 
-    // Soft delete discount
-    await discount.update({
-      deleted_at: new Date(),
-      deleted_by: adminId,
-      is_active: false,
-    });
-
-    // Soft delete all product associations
-    await ProductDiscount.update(
-      {
-        deleted_at: new Date(),
-        deleted_by: adminId,
+    // Delete all product associations first
+    await ProductDiscount.destroy({
+      where: {
+        discount_id: id,
       },
-      {
-        where: {
-          discount_id: id,
-          deleted_at: null,
-        },
-      }
-    );
-
-    // Log soft delete
-    await SoftDeleteLog.create({
-      table_name: "discounts",
-      record_id: id,
-      deleted_by: adminId,
-      deleted_at: new Date(),
     });
+
+    // Hard delete discount
+    await discount.destroy();
 
     res.status(200).json({
       success: true,
@@ -570,61 +543,9 @@ const softDeleteDiscount = async (req, res) => {
 
 /**
  * POST /api/admin/discounts/:id/restore
- * Restore soft deleted discount
+ * Restore deleted discount (REMOVED - not needed with hard delete)
  */
-const restoreDiscount = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Find deleted discount
-    const discount = await Discount.findOne({
-      where: {
-        id,
-        deleted_at: { [Op.ne]: null },
-      },
-    });
-
-    if (!discount) {
-      return res.status(404).json({
-        success: false,
-        message: "Diskon tidak ditemukan atau belum dihapus",
-      });
-    }
-
-    // Restore discount
-    await discount.update({
-      deleted_at: null,
-      deleted_by: null,
-    });
-
-    // Restore product associations
-    await ProductDiscount.update(
-      {
-        deleted_at: null,
-        deleted_by: null,
-      },
-      {
-        where: {
-          discount_id: id,
-          deleted_at: { [Op.ne]: null },
-        },
-      }
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Diskon berhasil dipulihkan",
-      data: discount,
-    });
-  } catch (error) {
-    console.error("Error restoring discount:", error);
-    res.status(500).json({
-      success: false,
-      message: "Gagal memulihkan diskon",
-      error: error.message,
-    });
-  }
-};
+// Function removed - hard delete doesn't support restore
 
 /**
  * PATCH /api/admin/discounts/:id/toggle-status
@@ -635,7 +556,7 @@ const toggleDiscountStatus = async (req, res) => {
     const { id } = req.params;
 
     const discount = await Discount.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
     });
 
     if (!discount) {
@@ -694,7 +615,7 @@ const addProductsToDiscount = async (req, res) => {
 
     // Check if discount exists
     const discount = await Discount.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
     });
 
     if (!discount) {
@@ -707,7 +628,7 @@ const addProductsToDiscount = async (req, res) => {
     // Add products (skip if already exists)
     // Get products to calculate prices
     const products = await Product.findAll({
-      where: { id: product_ids, deleted_at: null },
+      where: { id: product_ids },
       attributes: ["id", "selling_price"],
     });
 
@@ -745,7 +666,7 @@ const addProductsToDiscount = async (req, res) => {
           model: Product,
           as: "products",
           through: {
-            where: { deleted_at: null },
+            // where clause cleaned,
             attributes: ["original_price", "discounted_price"],
           },
           attributes: ["id", "name", "selling_price"],
@@ -782,7 +703,6 @@ const removeProductFromDiscount = async (req, res) => {
       where: {
         discount_id: id,
         product_id: productId,
-        deleted_at: null,
       },
     });
 
@@ -818,8 +738,7 @@ module.exports = {
   getDiscountById,
   createDiscount,
   updateDiscount,
-  softDeleteDiscount,
-  restoreDiscount,
+  deleteDiscount,
   toggleDiscountStatus,
   addProductsToDiscount,
   removeProductFromDiscount,

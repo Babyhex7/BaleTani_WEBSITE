@@ -7,45 +7,36 @@ const Cart = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      primaryKey: true
     },
     customer_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
     },
     product_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
     },
     quantity: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
+      allowNull: false
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
     },
     updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
+    }
     },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
-    deleted_by: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-  },
   {
     tableName: "carts",
     timestamps: false,
     paranoid: false,
-    underscored: true,
+    underscored: true
   }
 );
 

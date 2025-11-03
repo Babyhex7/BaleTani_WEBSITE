@@ -58,15 +58,6 @@ const Product = sequelize.define(
       defaultValue: DataTypes.NOW,
       allowNull: false,
     },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
-    deleted_by: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
   },
   {
     tableName: "products",

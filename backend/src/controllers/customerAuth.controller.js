@@ -43,7 +43,6 @@ const registerCustomer = async (req, res) => {
     const existingCustomer = await Customer.findOne({
       where: {
         phone_number: normalizedPhone,
-        deleted_at: null,
       },
     });
 
@@ -118,7 +117,6 @@ const loginCustomer = async (req, res) => {
     const customer = await Customer.findOne({
       where: {
         phone_number: normalizedPhone,
-        deleted_at: null,
         is_active: true,
       },
     });
@@ -179,7 +177,6 @@ const getCustomerProfile = async (req, res) => {
     const customer = await Customer.findOne({
       where: {
         id: req.customer.id,
-        deleted_at: null,
         is_active: true,
       },
       attributes: ["id", "phone_number", "full_name", "address", "created_at"],

@@ -24,12 +24,12 @@ const UpdateStatusModal = ({ order, useDummyData, onClose, onSuccess }) => {
     
     switch (formData.order_status) {
       case 'pending_payment':
-        newPaymentStatus = 'unpaid';
+        newPaymentStatus = 'pending';
         break;
       case 'paid':
       case 'processing':
-      case 'shipped':
-      case 'delivered':
+      case 'ready_for_pickup':
+      case 'out_for_delivery':
       case 'completed':
         newPaymentStatus = 'paid';
         break;
@@ -98,13 +98,15 @@ const UpdateStatusModal = ({ order, useDummyData, onClose, onSuccess }) => {
     { value: "pending_payment", label: "Pending Payment" },
     { value: "paid", label: "Paid" },
     { value: "processing", label: "Processing" },
-    { value: "shipped", label: "Shipped" },
-    { value: "delivered", label: "Delivered" },
+    { value: "ready_for_pickup", label: "Ready for Pickup" },
+    { value: "out_for_delivery", label: "Out for Delivery" },
+    { value: "completed", label: "Completed" },
   ];
 
   const paymentStatusOptions = [
-    { value: "unpaid", label: "Unpaid" },
+    { value: "pending", label: "Pending" },
     { value: "paid", label: "Paid" },
+    { value: "failed", label: "Failed" },
     { value: "refunded", label: "Refunded" },
   ];
 

@@ -8,49 +8,40 @@ const Admin = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      primaryKey: true
     },
     phone_number: {
       type: DataTypes.STRING(20),
       allowNull: false,
-      unique: true,
+      unique: true
     },
     full_name: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: false
     },
     role_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
     },
     password_hash: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: false
     },
     is_active: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      defaultValue: true
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
     },
     updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
+    }
     },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
-    deleted_by: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-  },
   {
     tableName: "users", // Still use users table
     timestamps: false,
@@ -76,8 +67,8 @@ const Admin = sequelize.define(
         if (admin.changed("phone_number")) {
           admin.phone_number = normalizePhoneNumber(admin.phone_number);
         }
-      },
-    },
+      }
+    }
   }
 );
 

@@ -7,144 +7,131 @@ const Order = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      primaryKey: true
     },
     order_number: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      unique: true,
+      unique: true
     },
     customer_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
     },
     customer_name: {
       type: DataTypes.STRING(255),
-      allowNull: true,
-    },
-    customer_email: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
+      allowNull: true
     },
     customer_phone: {
       type: DataTypes.STRING(20),
-      allowNull: true,
+      allowNull: true
     },
     transaction_type: {
       type: DataTypes.ENUM("online", "offline"),
-      allowNull: false,
+      allowNull: false
     },
     payment_method: {
       type: DataTypes.ENUM("cash", "transfer", "qris"),
-      allowNull: false,
+      allowNull: false
     },
     payment_proof_url: {
       type: DataTypes.STRING(500),
-      allowNull: true,
+      allowNull: true
     },
     delivery_method: {
       type: DataTypes.ENUM("self_pickup", "delivery"),
-      allowNull: false,
+      allowNull: false
     },
     delivery_address: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: true
     },
     delivery_notes: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: true
     },
     item_subtotal: {
       type: DataTypes.DECIMAL(15, 2),
-      allowNull: false,
+      allowNull: false
     },
     delivery_fee: {
       type: DataTypes.DECIMAL(10, 2),
-      defaultValue: 0,
+      defaultValue: 0
     },
     discount_amount: {
       type: DataTypes.DECIMAL(10, 2),
-      defaultValue: 0,
+      defaultValue: 0
     },
     total_amount: {
       type: DataTypes.DECIMAL(15, 2),
-      allowNull: false,
+      allowNull: false
     },
     admin_notes: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: true
     },
     processed_by: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: true
     },
     processed_at: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: true
     },
     payment_status: {
-      type: DataTypes.ENUM("pending", "paid", "failed", "unpaid", "refunded"),
+      type: DataTypes.ENUM("pending", "paid", "failed", "refunded"),
       allowNull: false,
+      defaultValue: "pending"
     },
     order_status: {
       type: DataTypes.ENUM(
-        "checkout",
+        "pending_payment",
         "paid",
         "processing",
+        "ready_for_pickup",
         "out_for_delivery",
         "completed",
-        "cancelled",
-        "pending_payment",
-        "shipped",
-        "delivered"
+        "cancelled"
       ),
       allowNull: false,
+      defaultValue: "pending_payment"
     },
     cancelled_reason: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: true
     },
     cancelled_by: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: true
     },
     cancelled_at: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: true
     },
     created_by: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: true
     },
     updated_by: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: true
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
     },
     updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
+    }
     },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
-    deleted_by: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-  },
   {
     tableName: "orders",
     timestamps: false,
     paranoid: false,
-    underscored: true,
+    underscored: true
   }
 );
 

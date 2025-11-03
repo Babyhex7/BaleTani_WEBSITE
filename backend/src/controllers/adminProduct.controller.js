@@ -5,7 +5,6 @@ const {
   ProductImage,
   Discount,
   ProductDiscount,
-  SoftDeleteLog,
   ProcurementItem,
   OrderItem,
 } = require("../models");
@@ -30,7 +29,7 @@ const getAll = async (req, res) => {
 
     // Build where clause
     const whereClause = {
-      deleted_at: null, // Only get non-deleted products
+      // Only get non-deleted products
     };
 
     // Search by name or description
@@ -78,7 +77,7 @@ const getAll = async (req, res) => {
         {
           model: ProductImage,
           as: "images",
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           attributes: ["id", "image_url", "display_order"],
           order: [["display_order", "ASC"]],
@@ -87,11 +86,10 @@ const getAll = async (req, res) => {
           model: Discount,
           as: "discounts",
           through: {
-            where: { deleted_at: null },
+            // where clause cleaned,
             attributes: [],
           },
           where: {
-            deleted_at: null,
             is_active: true,
             start_date: { [Op.lte]: new Date() },
             end_date: { [Op.gte]: new Date() },
@@ -174,7 +172,6 @@ const getById = async (req, res) => {
     const product = await Product.findOne({
       where: {
         id: id,
-        deleted_at: null,
       },
       include: [
         {
@@ -185,7 +182,7 @@ const getById = async (req, res) => {
         {
           model: ProductImage,
           as: "images",
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           attributes: ["id", "image_url", "display_order", "created_at"],
           order: [["display_order", "ASC"]],
@@ -194,10 +191,10 @@ const getById = async (req, res) => {
           model: Discount,
           as: "discounts",
           through: {
-            where: { deleted_at: null },
+            // where clause cleaned,
             attributes: ["created_at"],
           },
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           attributes: [
             "id",
@@ -212,7 +209,7 @@ const getById = async (req, res) => {
         {
           model: ProcurementItem,
           as: "procurementItems",
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           limit: 10,
           order: [["created_at", "DESC"]],
@@ -220,7 +217,6 @@ const getById = async (req, res) => {
             "id",
             "procurement_id",
             "quantity",
-            "unit",
             "purchase_price_per_unit",
             "subtotal",
             "expiry_date",
@@ -230,7 +226,7 @@ const getById = async (req, res) => {
         {
           model: OrderItem,
           as: "orderItems",
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           limit: 10,
           order: [["created_at", "DESC"]],
@@ -238,7 +234,6 @@ const getById = async (req, res) => {
             "id",
             "order_id",
             "quantity",
-            "unit",
             "original_price",
             "discount_price",
             "final_price",
@@ -309,7 +304,7 @@ const create = async (req, res) => {
     // Validate category if provided
     if (category_id) {
       const category = await Category.findOne({
-        where: { id: category_id, deleted_at: null },
+        where: { id: category_id },
       });
 
       if (!category) {
@@ -372,7 +367,7 @@ const create = async (req, res) => {
         {
           model: ProductImage,
           as: "images",
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           attributes: ["id", "image_url", "display_order"],
           order: [["display_order", "ASC"]],
@@ -415,7 +410,7 @@ const update = async (req, res) => {
 
     // Find product
     const product = await Product.findOne({
-      where: { id: id, deleted_at: null },
+      where: { id: id },
     });
 
     if (!product) {
@@ -436,7 +431,7 @@ const update = async (req, res) => {
     // Validate category if provided
     if (category_id) {
       const category = await Category.findOne({
-        where: { id: category_id, deleted_at: null },
+        where: { id: category_id },
       });
 
       if (!category) {
@@ -471,7 +466,7 @@ const update = async (req, res) => {
     if (req.files && req.files.length > 0) {
       // Get current max display_order
       const currentImages = await ProductImage.findAll({
-        where: { product_id: product.id, deleted_at: null },
+        where: { product_id: product.id },
         attributes: ["display_order"],
         order: [["display_order", "DESC"]],
         limit: 1,
@@ -505,7 +500,7 @@ const update = async (req, res) => {
         {
           model: ProductImage,
           as: "images",
-          where: { deleted_at: null },
+          // where clause cleaned,
           required: false,
           attributes: ["id", "image_url", "display_order"],
         },
@@ -529,17 +524,15 @@ const update = async (req, res) => {
 
 /**
  * DELETE /admin/products/:id
- * Soft delete product
+ * Hard delete product
  */
-const softDelete = async (req, res) => {
+const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { reason = "" } = req.body;
-    const adminId = req.user.id;
 
     // Find product
     const product = await Product.findOne({
-      where: { id: id, deleted_at: null },
+      where: { id: id },
     });
 
     if (!product) {
@@ -549,89 +542,34 @@ const softDelete = async (req, res) => {
       });
     }
 
-    // Soft delete product
-    await product.update({
-      deleted_at: new Date(),
-      deleted_by: adminId,
-      updated_at: new Date(),
+    const productName = product.name;
+
+    // Delete related ProductDiscount entries first
+    await ProductDiscount.destroy({
+      where: { product_id: id },
     });
 
-    // Log to soft_delete_logs
-    await SoftDeleteLog.create({
-      table_name: "products",
-      record_id: product.id,
-      deleted_by: adminId,
-      deleted_reason: reason,
-      deleted_at: new Date(),
+    // Delete product images
+    await ProductImage.destroy({
+      where: { product_id: id },
     });
+
+    // Hard delete product
+    await product.destroy();
 
     return res.status(200).json({
       success: true,
       message: "Produk berhasil dihapus",
       data: {
-        id: product.id,
-        name: product.name,
-        deleted_at: product.deleted_at,
+        id: id,
+        name: productName,
       },
     });
   } catch (error) {
-    console.error("Soft delete product error:", error);
+    console.error("Delete product error:", error);
     return res.status(500).json({
       success: false,
       message: "Terjadi kesalahan saat menghapus produk",
-      error: error.message,
-    });
-  }
-};
-
-/**
- * POST /admin/products/:id/restore
- * Restore soft deleted product
- */
-const restore = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Find soft deleted product
-    const product = await Product.findOne({
-      where: {
-        id: id,
-        deleted_at: { [Op.ne]: null },
-      },
-    });
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Produk yang dihapus tidak ditemukan",
-      });
-    }
-
-    // Restore product
-    await product.update({
-      deleted_at: null,
-      deleted_by: null,
-      updated_at: new Date(),
-    });
-
-    // Delete log from soft_delete_logs
-    await SoftDeleteLog.destroy({
-      where: {
-        table_name: "products",
-        record_id: product.id,
-      },
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Produk berhasil dipulihkan",
-      data: product,
-    });
-  } catch (error) {
-    console.error("Restore product error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan saat memulihkan produk",
       error: error.message,
     });
   }
@@ -642,6 +580,5 @@ module.exports = {
   getById,
   create,
   update,
-  softDelete,
-  restore,
+  deleteProduct,
 };

@@ -73,26 +73,14 @@ router.put(
 
 /**
  * DELETE /api/admin/discounts/:id
- * Soft delete discount (Super Admin only)
+ * Hard delete discount (Super Admin only)
  * Access: super_admin only
  */
 router.delete(
   "/:id",
   authenticateAdmin,
   roleMiddleware(["super_admin"]),
-  discountController.softDeleteDiscount
-);
-
-/**
- * POST /api/admin/discounts/:id/restore
- * Restore soft deleted discount (Super Admin only)
- * Access: super_admin only
- */
-router.post(
-  "/:id/restore",
-  authenticateAdmin,
-  roleMiddleware(["super_admin"]),
-  discountController.restoreDiscount
+  discountController.deleteDiscount
 );
 
 /**

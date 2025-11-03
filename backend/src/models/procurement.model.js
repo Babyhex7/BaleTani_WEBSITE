@@ -7,82 +7,73 @@ const Procurement = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      primaryKey: true
     },
     procurement_number: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      unique: true,
+      unique: true
     },
     supplier_name: {
       type: DataTypes.STRING(150),
-      allowNull: false,
+      allowNull: false
     },
     procurement_date: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: false
     },
     total_amount: {
       type: DataTypes.DECIMAL(15, 2),
-      allowNull: false,
+      allowNull: false
     },
     status: {
       type: DataTypes.ENUM("pending", "approved", "rejected"),
-      defaultValue: "pending",
+      defaultValue: "pending"
     },
     notes: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: true
     },
     created_by: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
     },
     approved_by: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: true
     },
     approved_at: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: true
     },
     rejected_by: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: true
     },
     rejected_at: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: true
     },
     rejection_reason: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: true
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
     },
     updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
+    }
     },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
-    deleted_by: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-  },
   {
     tableName: "procurements",
     timestamps: false,
     paranoid: false,
-    underscored: true,
+    underscored: true
   }
 );
 

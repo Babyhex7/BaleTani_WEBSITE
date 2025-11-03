@@ -7,46 +7,37 @@ const ProductDiscount = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      primaryKey: true
     },
     product_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
     },
     discount_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
     },
     original_price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
-      comment: "Harga asli produk saat di-assign ke diskon",
+      comment: "Harga asli produk saat di-assign ke diskon"
     },
     discounted_price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
-      comment: "Harga setelah diskon",
+      comment: "Harga setelah diskon"
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
+    }
     },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
-    deleted_by: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-  },
   {
     tableName: "product_discounts",
     timestamps: false,
     paranoid: false,
-    underscored: true,
+    underscored: true
   }
 );
 

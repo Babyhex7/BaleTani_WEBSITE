@@ -69,26 +69,14 @@ router.put(
 
 /**
  * DELETE /api/admin/categories/:id
- * Soft delete category (Super Admin only)
+ * Hard delete category (Super Admin only)
  * Access: super_admin only
  */
 router.delete(
   "/:id",
   authenticateAdmin,
   roleMiddleware(["super_admin"]),
-  categoryController.softDeleteCategory
-);
-
-/**
- * POST /api/admin/categories/:id/restore
- * Restore soft deleted category (Super Admin only)
- * Access: super_admin only
- */
-router.post(
-  "/:id/restore",
-  authenticateAdmin,
-  roleMiddleware(["super_admin"]),
-  categoryController.restoreCategory
+  categoryController.deleteCategory
 );
 
 /**

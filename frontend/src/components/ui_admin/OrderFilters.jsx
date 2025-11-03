@@ -39,8 +39,9 @@ const OrderFilters = ({ filters, onFilterChange, onReset }) => {
             <option value="pending_payment">Pending Payment</option>
             <option value="paid">Paid</option>
             <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
+            <option value="ready_for_pickup">Ready for Pickup</option>
+            <option value="out_for_delivery">Out for Delivery</option>
+            <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
           </select>
         </div>
@@ -56,8 +57,9 @@ const OrderFilters = ({ filters, onFilterChange, onReset }) => {
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">All Payment</option>
-            <option value="unpaid">Unpaid</option>
+            <option value="pending">Pending</option>
             <option value="paid">Paid</option>
+            <option value="failed">Failed</option>
             <option value="refunded">Refunded</option>
           </select>
         </div>

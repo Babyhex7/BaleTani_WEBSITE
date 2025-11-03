@@ -7,40 +7,31 @@ const ProductImage = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      primaryKey: true
     },
     product_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
     },
     image_url: {
       type: DataTypes.STRING(500),
-      allowNull: false,
+      allowNull: false
     },
     display_order: {
       type: DataTypes.INTEGER,
-      defaultValue: 0,
+      defaultValue: 0
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
+    }
     },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
-    deleted_by: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-  },
   {
     tableName: "product_images",
     timestamps: false,
     paranoid: false,
-    underscored: true,
+    underscored: true
   }
 );
 
