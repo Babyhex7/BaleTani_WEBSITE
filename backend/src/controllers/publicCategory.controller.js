@@ -4,7 +4,13 @@
  */
 
 const { Op } = require("sequelize");
-const { Category, Product, ProductImage } = require("../models");
+const {
+  Category,
+  Product,
+  ProductImage,
+  ProductDiscount,
+  Discount,
+} = require("../models");
 
 /**
  * GET /api/public/categories
@@ -121,6 +127,33 @@ const getCategoryById = async (req, res) => {
           where: { is_primary: true },
           required: false,
         },
+        {
+          model: ProductDiscount,
+          as: "productDiscounts",
+          attributes: ["id", "product_id", "discount_id"],
+          required: false,
+          include: [
+            {
+              model: Discount,
+              as: "discount",
+              attributes: [
+                "id",
+                "discount_name",
+                "discount_type",
+                "value",
+                "start_date",
+                "end_date",
+                "is_active",
+              ],
+              where: {
+                is_active: true,
+                start_date: { [Op.lte]: new Date() },
+                end_date: { [Op.gte]: new Date() },
+              },
+              required: false,
+            },
+          ],
+        },
       ],
       limit: parseInt(limit),
       offset: offset,
@@ -137,18 +170,46 @@ const getCategoryById = async (req, res) => {
     });
 
     // Format products
-    const formattedProducts = products.map((product) => ({
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      price: product.selling_price,
-      stock: product.total_stock,
-      image:
-        product.images && product.images.length > 0
-          ? product.images[0].image_url
-          : null,
-      created_at: product.created_at,
-    }));
+    const formattedProducts = products.map((product) => {
+      const productData = product.toJSON();
+
+      // Get active discount
+      const activeDiscount = productData.productDiscounts?.[0];
+      const discount = activeDiscount?.discount;
+
+      let discountInfo = null;
+      if (discount) {
+        let discountAmount = 0;
+        if (discount.discount_type === "percentage") {
+          discountAmount = (productData.selling_price * discount.value) / 100;
+        } else if (discount.discount_type === "fixed_amount") {
+          discountAmount = discount.value;
+        }
+
+        discountInfo = {
+          id: discount.id,
+          name: discount.discount_name,
+          type: discount.discount_type,
+          value: parseFloat(discount.value),
+          finalPrice: Math.max(0, productData.selling_price - discountAmount),
+          validUntil: discount.end_date,
+        };
+      }
+
+      return {
+        id: productData.id,
+        name: productData.name,
+        description: productData.description,
+        price: parseFloat(productData.selling_price),
+        stock: productData.total_stock,
+        image:
+          productData.images && productData.images.length > 0
+            ? productData.images[0].image_url
+            : null,
+        discount: discountInfo,
+        created_at: productData.created_at,
+      };
+    });
 
     const totalPages = Math.ceil(count / parseInt(limit));
 

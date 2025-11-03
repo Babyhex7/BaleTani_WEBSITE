@@ -311,6 +311,7 @@ const CategoryDetailPage = () => {
                     stock: product.stock,
                     image: product.image,
                     category: category.category_name,
+                    discount: product.discount,
                   }}
                   formatPrice={formatPrice}
                 />
