@@ -12,6 +12,7 @@ const router = express.Router();
 // Import sub-routes
 const authRoutes = require("../customerAuth.routes");
 const cartRoutes = require("./cart.routes");
+const orderRoutes = require("./order.routes");
 
 /**
  * PUBLIC CUSTOMER ROUTES (No auth required)
@@ -25,5 +26,6 @@ router.use("/auth", authRoutes);
  * Authentication handled in each route file
  */
 router.use("/cart", cartRoutes);
+router.use("/orders", orderRoutes);
 
 module.exports = router;

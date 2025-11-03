@@ -11,14 +11,17 @@ import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
+import customerOrderService from '../../services/services_customer/customerOrderService';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
   const { items, clearCart, getTotalItems, getTotalPrice } = useCartStore();
 
-  const [pickupMethod, setPickupMethod] = useState('ambil-sendiri');
-  const [paymentMethod, setPaymentMethod] = useState('qris');
+  const [pickupMethod, setPickupMethod] = useState('self_pickup');
+  const [paymentMethod, setPaymentMethod] = useState('transfer');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [deliveryNotes, setDeliveryNotes] = useState('');
   const [shippingCost, setShippingCost] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +40,7 @@ const CheckoutPage = () => {
 
   // Update shipping cost based on pickup method
   useEffect(() => {
-    setShippingCost(pickupMethod === 'pengantaran' ? 5000 : 0);
+    setShippingCost(pickupMethod === 'delivery' ? 10000 : 0);
   }, [pickupMethod]);
 
   // Format price
@@ -61,61 +64,62 @@ const CheckoutPage = () => {
     return `${backendUrl}${imagePath}`;
   };
 
-  // Generate WhatsApp message
-  const generateWhatsAppMessage = () => {
-    let message = `*PESANAN BARU - BaleTani*\n\n`;
-    message += `Nama: ${user?.name || 'Customer'}\n`;
-    message += `HP: ${user?.phone || '-'}\n\n`;
-    
-    message += `*Produk:*\n`;
-    items.forEach((item, index) => {
-      const subtotal = item.finalPrice * item.quantity;
-      message += `${index + 1}. ${item.name} (${item.quantity}x) - ${formatPrice(subtotal)}\n`;
-    });
-    
-    message += `\n*Ringkasan:*\n`;
-    message += `Subtotal: ${formatPrice(totalPrice)}\n`;
-    message += `Biaya Kirim: ${shippingCost === 0 ? 'GRATIS' : formatPrice(shippingCost)}\n`;
-    message += `Total: ${formatPrice(totalPrice + shippingCost)}\n\n`;
-    
-    message += `*Pengambilan:* ${pickupMethod === 'ambil-sendiri' ? 'Ambil Sendiri' : 'Pengantaran'}\n`;
-    message += `*Pembayaran:* ${paymentMethod === 'qris' ? 'QRIS' : paymentMethod === 'transfer' ? 'Transfer Bank' : 'Tunai'}\n\n`;
-    
-    message += `Terima kasih! 🙏`;
-    
-    return message;
-  };
-
-  // Handle send order via WhatsApp
-  const handleSendOrder = () => {
+  // Handle create order
+  const handleCreateOrder = async () => {
     if (items.length === 0) {
       toast.error('Keranjang Anda kosong');
+      return;
+    }
+
+    // Validation - gunakan full_name dan phone_number sesuai response backend
+    if (!user?.full_name || !user?.phone_number) {
+      toast.error('Data customer tidak lengkap. Silakan login ulang.');
+      console.error('User data:', user);
+      return;
+    }
+
+    if (pickupMethod === 'delivery' && !deliveryAddress.trim()) {
+      toast.error('Alamat pengiriman wajib diisi untuk metode delivery');
       return;
     }
 
     setLoading(true);
 
     try {
-      const message = generateWhatsAppMessage();
-      const encodedMessage = encodeURIComponent(message);
-      const phoneNumber = '6281234567890'; // Replace with actual admin WhatsApp number
-      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+      // Prepare order data - gunakan field yang benar
+      const orderData = {
+        customer_name: user.full_name,
+        customer_phone: user.phone_number,
+        delivery_method: pickupMethod,
+        delivery_address: pickupMethod === 'delivery' ? deliveryAddress : null,
+        delivery_notes: deliveryNotes || null,
+        payment_method: paymentMethod,
+        items: items.map((item) => ({
+          product_id: item.id,
+          quantity: item.quantity,
+        })),
+      };
 
-      // Open WhatsApp in new tab
-      window.open(whatsappUrl, '_blank');
+      // Create order via API
+      const response = await customerOrderService.createOrder(orderData);
 
-      // Clear cart after successful order
-      setTimeout(() => {
+      if (response.success) {
+        // Clear cart
         clearCart();
-        toast.success('Pesanan berhasil dikirim ke WhatsApp!');
-        setTimeout(() => {
-          navigate('/products');
-        }, 2000);
-      }, 1000);
+        
+        // Show success message
+        toast.success('Pesanan berhasil dibuat!');
 
+        // Redirect to success page with order data
+        navigate('/order-success', {
+          state: { orderData: response.data },
+        });
+      } else {
+        toast.error(response.message || 'Gagal membuat pesanan');
+      }
     } catch (error) {
-      console.error('Error sending order:', error);
-      toast.error('Gagal mengirim pesanan');
+      console.error('Create order error:', error);
+      toast.error(error.message || 'Gagal membuat pesanan');
     } finally {
       setLoading(false);
     }
@@ -202,15 +206,15 @@ const CheckoutPage = () => {
                 <div className="space-y-3">
                   {/* Ambil Sendiri */}
                   <label className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    pickupMethod === 'ambil-sendiri' 
+                    pickupMethod === 'self_pickup' 
                       ? 'border-green-600 bg-green-50' 
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
                       type="radio"
                       name="pickup"
-                      value="ambil-sendiri"
-                      checked={pickupMethod === 'ambil-sendiri'}
+                      value="self_pickup"
+                      checked={pickupMethod === 'self_pickup'}
                       onChange={(e) => setPickupMethod(e.target.value)}
                       className="mt-1"
                     />
@@ -218,7 +222,7 @@ const CheckoutPage = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <Package size={18} className="text-green-600" />
                         <span className="font-semibold text-gray-900">Ambil Sendiri</span>
-                        {pickupMethod === 'ambil-sendiri' && (
+                        {pickupMethod === 'self_pickup' && (
                           <Check size={16} className="text-green-600 ml-auto" />
                         )}
                       </div>
@@ -227,17 +231,17 @@ const CheckoutPage = () => {
                     </div>
                   </label>
 
-                  {/* Pengantaran */}
+                  {/* Delivery */}
                   <label className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    pickupMethod === 'pengantaran' 
+                    pickupMethod === 'delivery' 
                       ? 'border-green-600 bg-green-50' 
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
                       type="radio"
                       name="pickup"
-                      value="pengantaran"
-                      checked={pickupMethod === 'pengantaran'}
+                      value="delivery"
+                      checked={pickupMethod === 'delivery'}
                       onChange={(e) => setPickupMethod(e.target.value)}
                       className="mt-1"
                     />
@@ -245,15 +249,46 @@ const CheckoutPage = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <Truck size={18} className="text-blue-600" />
                         <span className="font-semibold text-gray-900">Pengantaran</span>
-                        {pickupMethod === 'pengantaran' && (
+                        {pickupMethod === 'delivery' && (
                           <Check size={16} className="text-green-600 ml-auto" />
                         )}
                       </div>
                       <p className="text-sm text-gray-600">Dikirim ke alamat Anda</p>
-                      <p className="text-sm font-semibold text-gray-900">Mulai Rp 5.000</p>
+                      <p className="text-sm font-semibold text-gray-900">Rp 10.000</p>
                     </div>
                   </label>
                 </div>
+
+                {/* Delivery Address (show only if delivery selected) */}
+                {pickupMethod === 'delivery' && (
+                  <div className="mt-4 space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Alamat Pengiriman <span className="text-red-500">*</span>
+                      </label>
+                      <textarea
+                        value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        rows={3}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        placeholder="Jalan, No. Rumah, RT/RW, Kelurahan, Kecamatan, Kota"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Catatan Pengiriman (Opsional)
+                      </label>
+                      <textarea
+                        value={deliveryNotes}
+                        onChange={(e) => setDeliveryNotes(e.target.value)}
+                        rows={2}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        placeholder="Catatan untuk kurir (misal: warna pagar, patokan)"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Payment Method */}
@@ -377,20 +412,20 @@ const CheckoutPage = () => {
                       </span>
                     </div>
 
-                    {/* Send Order Button */}
+                    {/* Create Order Button */}
                     <button
-                      onClick={handleSendOrder}
+                      onClick={handleCreateOrder}
                       disabled={loading || items.length === 0}
                       className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShoppingCart size={18} />
-                      {loading ? 'Mengirim...' : 'Kirim Pesanan via WhatsApp'}
+                      {loading ? 'Membuat Pesanan...' : 'Buat Pesanan'}
                     </button>
 
                     {/* Info */}
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                       <p className="text-xs text-blue-800">
-                        <strong>Info:</strong> Pesanan akan dikirim ke WhatsApp BaleTani. Mohon konfirmasi pembayaran dalam 10 menit.
+                        <strong>Info:</strong> Setelah pesanan dibuat, Anda akan diarahkan ke halaman konfirmasi untuk mengirim detail pesanan ke WhatsApp admin.
                       </p>
                     </div>
                   </div>
@@ -402,7 +437,7 @@ const CheckoutPage = () => {
                     <Package size={16} className="text-gray-500" />
                     <span className="text-gray-600">Pengambilan:</span>
                     <span className="font-semibold text-gray-900">
-                      {pickupMethod === 'ambil-sendiri' ? 'Ambil Sendiri' : 'Pengantaran'}
+                      {pickupMethod === 'self_pickup' ? 'Ambil Sendiri' : 'Pengantaran'}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">

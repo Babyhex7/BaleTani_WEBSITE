@@ -11,6 +11,7 @@ import ProductDetailPage from './pages/customer/ProductDetailPage';
 import PromoPage from './pages/customer/PromoPage';
 import CartPage from './pages/customer/CartPage';
 import CheckoutPage from './pages/customer/CheckoutPage';
+import OrderSuccessPage from './pages/customer/OrderSuccessPage';
 import CategoryPage from './pages/customer/CategoryPage';
 import CategoryDetailPage from './pages/customer/CategoryDetailPage';
 import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRoute';
@@ -129,6 +130,12 @@ function App() {
       <Route path="/checkout" element={
         <ProtectedRoute requiredRole="customer">
           <CheckoutPage />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/order-success" element={
+        <ProtectedRoute requiredRole="customer">
+          <OrderSuccessPage />
         </ProtectedRoute>
       } />
 

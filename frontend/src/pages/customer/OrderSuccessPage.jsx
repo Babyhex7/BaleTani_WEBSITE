@@ -1,0 +1,259 @@
+/**
+ * ORDER SUCCESS PAGE
+ * Success page after checkout with payment instructions
+ */
+
+import { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { CheckCircle, Home, ShoppingBag, MessageCircle } from 'lucide-react';
+import Navbar from '../../components/layout/Navbar';
+import Footer from '../../components/layout/Footer';
+
+const OrderSuccessPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const orderData = location.state?.orderData;
+
+  useEffect(() => {
+    // Redirect jika tidak ada order data
+    if (!orderData) {
+      navigate('/');
+    }
+  }, [orderData, navigate]);
+
+  if (!orderData) {
+    return null;
+  }
+
+  // Format currency
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  // Payment instructions based on method
+  const getPaymentInstructions = () => {
+    switch (orderData.payment_method) {
+      case 'transfer':
+        return {
+          title: 'Transfer Bank',
+          instructions: [
+            'Transfer ke rekening berikut:',
+            'Bank BCA - 1234567890',
+            'a/n BaleTani Fresh Market',
+            `Nominal: ${formatCurrency(orderData.total_amount)}`,
+            'Setelah transfer, konfirmasi ke admin via WhatsApp',
+          ],
+        };
+      case 'qris':
+        return {
+          title: 'QRIS',
+          instructions: [
+            'Scan QR Code berikut untuk pembayaran',
+            `Nominal: ${formatCurrency(orderData.total_amount)}`,
+            'Setelah pembayaran, konfirmasi ke admin via WhatsApp',
+          ],
+        };
+      case 'cash':
+        return {
+          title: 'Bayar di Tempat',
+          instructions: [
+            'Pembayaran dilakukan saat pengambilan/pengantaran barang',
+            `Total yang harus dibayar: ${formatCurrency(orderData.total_amount)}`,
+            'Siapkan uang pas untuk mempermudah transaksi',
+          ],
+        };
+      default:
+        return { title: '', instructions: [] };
+    }
+  };
+
+  const paymentInfo = getPaymentInstructions();
+
+  // WhatsApp message
+  const sendWhatsApp = () => {
+    const adminPhone = '6281234567890'; // Ganti dengan nomor WA admin
+    
+    let message = `*KONFIRMASI PESANAN BALETANI*\n\n`;
+    message += `Order Number: *${orderData.order_number}*\n`;
+    message += `Nama: ${orderData.customer_name}\n`;
+    message += `Telepon: ${orderData.customer_phone}\n\n`;
+    
+    message += `*Detail Pesanan:*\n`;
+    orderData.items.forEach((item, index) => {
+      message += `${index + 1}. ${item.product_name}\n`;
+      message += `   ${item.quantity} ${item.unit} x ${formatCurrency(item.final_price)} = ${formatCurrency(item.subtotal)}\n`;
+    });
+    
+    message += `\n*Ringkasan:*\n`;
+    message += `Subtotal: ${formatCurrency(orderData.item_subtotal)}\n`;
+    message += `Ongkir: ${formatCurrency(orderData.delivery_fee)}\n`;
+    message += `*TOTAL: ${formatCurrency(orderData.total_amount)}*\n\n`;
+    
+    message += `Metode Pengiriman: ${orderData.delivery_method === 'delivery' ? 'Delivery' : 'Ambil di Toko'}\n`;
+    if (orderData.delivery_address) {
+      message += `Alamat: ${orderData.delivery_address}\n`;
+    }
+    
+    message += `Metode Pembayaran: ${paymentInfo.title}\n\n`;
+    
+    if (orderData.payment_method !== 'cash') {
+      message += `Saya akan segera melakukan pembayaran.\n`;
+    }
+    
+    message += `Terima kasih! 🌾`;
+
+    const whatsappUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Navbar />
+
+      <div className="flex-grow container mx-auto px-4 py-12 max-w-3xl">
+        {/* Success Icon */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
+            <CheckCircle className="w-12 h-12 text-green-600" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Pesanan Berhasil Dibuat!
+          </h1>
+          <p className="text-gray-600">
+            Terima kasih telah berbelanja di BaleTani
+          </p>
+        </div>
+
+        {/* Order Info Card */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="border-b pb-4 mb-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm text-gray-600">Order Number</p>
+                <p className="text-xl font-bold text-green-600">
+                  {orderData.order_number}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-600">Total Pembayaran</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {formatCurrency(orderData.total_amount)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Order Items */}
+          <div className="mb-4">
+            <h3 className="font-semibold text-gray-900 mb-3">Detail Pesanan</h3>
+            <div className="space-y-2">
+              {orderData.items.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between text-sm bg-gray-50 p-3 rounded"
+                >
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">{item.product_name}</p>
+                    <p className="text-gray-500">
+                      {item.quantity} {item.unit} × {formatCurrency(item.final_price)}
+                    </p>
+                  </div>
+                  <p className="font-medium text-gray-900">
+                    {formatCurrency(item.subtotal)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Summary */}
+          <div className="border-t pt-4 space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Subtotal Produk</span>
+              <span className="font-medium">{formatCurrency(orderData.item_subtotal)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Ongkos Kirim</span>
+              <span className="font-medium">{formatCurrency(orderData.delivery_fee)}</span>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="font-semibold text-gray-900">Total</span>
+              <span className="font-bold text-lg text-green-600">
+                {formatCurrency(orderData.total_amount)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Instructions */}
+        {orderData.payment_method !== 'cash' && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+            <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+              <MessageCircle className="w-5 h-5" />
+              Instruksi Pembayaran - {paymentInfo.title}
+            </h3>
+            <ul className="space-y-2">
+              {paymentInfo.instructions.map((instruction, index) => (
+                <li key={index} className="text-sm text-blue-800 flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-0.5">•</span>
+                  <span>{instruction}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="space-y-3">
+          {/* WhatsApp Button */}
+          <button
+            onClick={sendWhatsApp}
+            className="w-full bg-green-600 text-white py-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-3 font-semibold text-lg"
+          >
+            <MessageCircle className="w-6 h-6" />
+            Kirim Pesanan via WhatsApp
+          </button>
+
+          <p className="text-center text-sm text-gray-500">
+            Klik tombol di atas untuk mengirim detail pesanan ke admin WhatsApp
+          </p>
+
+          {/* Other Actions */}
+          <div className="grid grid-cols-2 gap-4 pt-4">
+            <button
+              onClick={() => navigate('/')}
+              className="py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 font-medium"
+            >
+              <Home className="w-5 h-5" />
+              Ke Beranda
+            </button>
+            <button
+              onClick={() => navigate('/products')}
+              className="py-3 border-2 border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors flex items-center justify-center gap-2 font-medium"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              Belanja Lagi
+            </button>
+          </div>
+        </div>
+
+        {/* Info Box */}
+        <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800">
+            <strong>Penting:</strong> Pesanan Anda akan diproses setelah admin menerima
+            konfirmasi melalui WhatsApp. Mohon segera hubungi admin untuk mempercepat
+            proses pesanan Anda.
+          </p>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default OrderSuccessPage;
