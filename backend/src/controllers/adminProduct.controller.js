@@ -144,9 +144,9 @@ const getAll = async (req, res) => {
       data: {
         products: formattedProducts,
         pagination: {
-          total: count,
-          page: parseInt(page),
-          limit: parseInt(limit),
+          total_items: count,
+          current_page: parseInt(page),
+          items_per_page: parseInt(limit),
           total_pages: Math.ceil(count / parseInt(limit)),
         },
       },

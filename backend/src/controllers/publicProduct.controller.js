@@ -193,12 +193,12 @@ exports.getAllProducts = async (req, res) => {
       data: {
         products: formattedProducts,
         pagination: {
-          currentPage: parseInt(page),
-          totalPages,
-          totalItems: count,
-          itemsPerPage: pageLimit,
-          hasNextPage: parseInt(page) < totalPages,
-          hasPrevPage: parseInt(page) > 1,
+          current_page: parseInt(page),
+          total_pages: totalPages,
+          total_items: count,
+          items_per_page: pageLimit,
+          has_next_page: parseInt(page) < totalPages,
+          has_prev_page: parseInt(page) > 1,
         },
         filters: {
           categories: categories.map((cat) => ({

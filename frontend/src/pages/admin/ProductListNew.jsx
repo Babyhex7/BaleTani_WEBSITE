@@ -76,8 +76,8 @@ const ProductListNew = () => {
         const products = data.data.products || [];
         
         setProducts(products);
-        setTotalPages(data.data.pagination?.totalPages || 1);
-        setTotalItems(data.data.pagination?.totalItems || 0);
+        setTotalPages(data.data.pagination?.total_pages || 1);
+        setTotalItems(data.data.pagination?.total_items || 0);
         
         setStats({
           total: products.length,

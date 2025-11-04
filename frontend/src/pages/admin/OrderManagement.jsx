@@ -117,8 +117,8 @@ const OrderManagement = () => {
         });
 
         setOrders(response.data.orders);
-        setTotalPages(response.data.pagination.totalPages);
-        setTotalItems(response.data.pagination.totalItems);
+        setTotalPages(response.data.pagination.total_pages);
+        setTotalItems(response.data.pagination.total_items);
       }
     } catch (err) {
       console.error("Error fetching orders:", err);

@@ -117,10 +117,10 @@ const getAllDiscounts = async (req, res) => {
       data: {
         discounts: formattedDiscounts,
         pagination: {
-          currentPage: parseInt(page),
-          totalPages,
-          totalItems: count,
-          itemsPerPage: parseInt(limit),
+          current_page: parseInt(page),
+          total_pages: totalPages,
+          total_items: count,
+          items_per_page: parseInt(limit),
         },
       },
     });

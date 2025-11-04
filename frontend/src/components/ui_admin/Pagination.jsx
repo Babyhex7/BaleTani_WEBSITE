@@ -34,7 +34,8 @@ const Pagination = ({
     return pages;
   };
 
-  if (totalPages <= 1) return null;
+  // Temporarily disabled to show pagination even with 1 page (for testing)
+  // if (totalPages <= 1) return null;
 
   return (
     <div className={`flex items-center justify-between bg-white px-4 py-3 sm:px-6 ${className}`}>

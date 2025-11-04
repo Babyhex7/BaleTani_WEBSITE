@@ -21,8 +21,7 @@ const getUsers = async (req, res, next) => {
     const sortOrder = req.query.sortOrder || "ASC";
 
     // Build where clause
-    const whereClause = {
-      };
+    const whereClause = {};
 
     if (search) {
       whereClause[Op.or] = [
@@ -72,10 +71,10 @@ const getUsers = async (req, res, next) => {
       data: {
         users: formattedUsers,
         pagination: {
-          currentPage: page,
-          totalPages: Math.ceil(count / limit),
-          totalItems: count,
-          itemsPerPage: limit,
+          current_page: page,
+          total_pages: Math.ceil(count / limit),
+          total_items: count,
+          items_per_page: limit,
         },
       },
     });

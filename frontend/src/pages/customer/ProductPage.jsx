@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Search, Filter, X, SlidersHorizontal } from 'lucide-react';
 import ProductCard from '../../components/ui/ProductCard';
 import Button from '../../components/ui/Button';
+import Pagination from '../../components/ui/Pagination';
 import useProducts from '../../hooks/hook_customer/useProducts';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
@@ -78,36 +79,6 @@ const ProductPage = () => {
     // TODO: Implement cart functionality
     console.log('Add to cart:', product);
     alert(`${product.name} ditambahkan ke keranjang!`);
-  };
-
-  // Pagination buttons
-  const renderPagination = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, pagination.currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
-
-    if (endPage - startPage < maxVisiblePages - 1) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => changePage(i)}
-          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-            i === pagination.currentPage
-              ? 'bg-green-600 text-white shadow-md'
-              : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-600 border border-gray-200'
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    return pages;
   };
 
   return (
@@ -281,27 +252,13 @@ const ProductPage = () => {
             )}
 
             {/* Pagination */}
-            {pagination.totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-8">
-                <button
-                  onClick={() => changePage(pagination.currentPage - 1)}
-                  disabled={!pagination.hasPrevPage}
-                  className="px-4 py-2 rounded-lg font-medium bg-white text-gray-700 border border-gray-200 hover:bg-green-50 hover:text-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                >
-                  ← Sebelumnya
-                </button>
-                
-                {renderPagination()}
-                
-                <button
-                  onClick={() => changePage(pagination.currentPage + 1)}
-                  disabled={!pagination.hasNextPage}
-                  className="px-4 py-2 rounded-lg font-medium bg-white text-gray-700 border border-gray-200 hover:bg-green-50 hover:text-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                >
-                  Selanjutnya →
-                </button>
-              </div>
-            )}
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalItems={pagination.totalItems}
+              itemsPerPage={pagination.limit || 12}
+              onPageChange={changePage}
+            />
           </>
         )}
       </div>

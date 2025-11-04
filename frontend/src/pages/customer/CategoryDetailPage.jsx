@@ -22,6 +22,7 @@ import {
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import ProductCard from '../../components/ui/ProductCard';
+import Pagination from '../../components/ui/Pagination';
 import axios from 'axios';
 
 // Custom debounce hook
@@ -103,7 +104,13 @@ const CategoryDetailPage = () => {
           setCategory(response.data.data.category);
           setProducts(response.data.data.products);
           setFilteredProducts(response.data.data.products);
-          setPagination(response.data.data.pagination);
+          // Map snake_case to camelCase for internal use
+          setPagination({
+            currentPage: response.data.data.pagination.current_page || 1,
+            totalPages: response.data.data.pagination.total_pages || 1,
+            totalItems: response.data.data.pagination.total_items || 0,
+            itemsPerPage: response.data.data.pagination.items_per_page || 12,
+          });
         }
       } catch (err) {
         console.error('Error fetching category detail:', err);
@@ -138,36 +145,6 @@ const CategoryDetailPage = () => {
     setSearchInput('');
     setSortBy('newest');
     setPagination(prev => ({ ...prev, currentPage: 1 }));
-  };
-
-  // Pagination buttons
-  const renderPagination = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, pagination.currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
-
-    if (endPage - startPage < maxVisiblePages - 1) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => handlePageChange(i)}
-          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-            i === pagination.currentPage
-              ? 'bg-green-600 text-white shadow-md'
-              : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-600 border border-gray-200'
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    return pages;
   };
 
   if (loading) {
@@ -319,27 +296,13 @@ const CategoryDetailPage = () => {
             </div>
 
             {/* Pagination */}
-            {pagination.totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-8">
-                <button
-                  onClick={() => handlePageChange(pagination.currentPage - 1)}
-                  disabled={pagination.currentPage === 1}
-                  className="px-4 py-2 rounded-lg font-medium bg-white text-gray-700 hover:bg-green-50 hover:text-green-600 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                >
-                  Sebelumnya
-                </button>
-                
-                {renderPagination()}
-                
-                <button
-                  onClick={() => handlePageChange(pagination.currentPage + 1)}
-                  disabled={pagination.currentPage === pagination.totalPages}
-                  className="px-4 py-2 rounded-lg font-medium bg-white text-gray-700 hover:bg-green-50 hover:text-green-600 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                >
-                  Selanjutnya
-                </button>
-              </div>
-            )}
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalItems={pagination.totalItems}
+              itemsPerPage={pagination.itemsPerPage || 12}
+              onPageChange={handlePageChange}
+            />
           </>
         ) : (
           <div className="text-center py-20">

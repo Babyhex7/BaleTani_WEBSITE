@@ -32,7 +32,21 @@ const productService = {
       const response = await apiClient.get(
         `/public/products?${queryParams.toString()}`
       );
-      return response.data;
+
+      // Map snake_case pagination to camelCase for internal use
+      const data = response.data;
+      if (data.success && data.data.pagination) {
+        data.data.pagination = {
+          currentPage: data.data.pagination.current_page || 1,
+          totalPages: data.data.pagination.total_pages || 1,
+          totalItems: data.data.pagination.total_items || 0,
+          itemsPerPage: data.data.pagination.items_per_page || 12,
+          hasNextPage: data.data.pagination.has_next_page || false,
+          hasPrevPage: data.data.pagination.has_prev_page || false,
+        };
+      }
+
+      return data;
     } catch (error) {
       console.error("Error fetching products:", error);
       throw error.response?.data || error;
