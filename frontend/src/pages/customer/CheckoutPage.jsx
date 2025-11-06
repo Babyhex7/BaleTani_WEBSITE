@@ -20,6 +20,7 @@ const CheckoutPage = () => {
 
   const [pickupMethod, setPickupMethod] = useState('self_pickup');
   const [paymentMethod, setPaymentMethod] = useState('transfer');
+  const [selectedBank, setSelectedBank] = useState(''); // TAMBAHAN
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryNotes, setDeliveryNotes] = useState('');
   const [shippingCost, setShippingCost] = useState(0);
@@ -83,6 +84,12 @@ const CheckoutPage = () => {
       return;
     }
 
+    // Validasi bank untuk transfer
+    if (paymentMethod === 'transfer' && !selectedBank) {
+      toast.error('Pilih bank terlebih dahulu (BRI/BCA/MANDIRI)');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -94,6 +101,7 @@ const CheckoutPage = () => {
         delivery_address: pickupMethod === 'delivery' ? deliveryAddress : null,
         delivery_notes: deliveryNotes || null,
         payment_method: paymentMethod,
+        bank_name: paymentMethod === 'transfer' ? selectedBank : null, // TAMBAHAN
         items: items.map((item) => ({
           product_id: item.id,
           quantity: item.quantity,
@@ -301,7 +309,7 @@ const CheckoutPage = () => {
                   {/* QRIS */}
                   <label className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
                     paymentMethod === 'qris' 
-                      ? 'border-green-600 bg-green-50' 
+                      ? 'border-green-600' 
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
@@ -325,35 +333,108 @@ const CheckoutPage = () => {
                   </label>
 
                   {/* Transfer Bank */}
-                  <label className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  <div className={`rounded-lg border-2 transition-all ${
                     paymentMethod === 'transfer' 
-                      ? 'border-green-600 bg-green-50' 
-                      : 'border-gray-200 hover:border-green-300'
+                      ? 'border-green-600' 
+                      : 'border-gray-200'
                   }`}>
-                    <input
-                      type="radio"
-                      name="payment"
-                      value="transfer"
-                      checked={paymentMethod === 'transfer'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <CreditCard size={18} className="text-blue-600" />
-                        <span className="font-semibold text-gray-900">Transfer Bank</span>
-                        {paymentMethod === 'transfer' && (
-                          <Check size={16} className="text-green-600 ml-auto" />
-                        )}
+                    <label className="flex items-start gap-4 p-4 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="payment"
+                        value="transfer"
+                        checked={paymentMethod === 'transfer'}
+                        onChange={(e) => {
+                          setPaymentMethod(e.target.value);
+                          setSelectedBank(''); // Reset bank selection
+                        }}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <CreditCard size={18} className="text-blue-600" />
+                          <span className="font-semibold text-gray-900">Transfer Bank (Virtual Account)</span>
+                          {paymentMethod === 'transfer' && (
+                            <Check size={16} className="text-green-600 ml-auto" />
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600">Bayar via ATM/Mobile Banking</p>
                       </div>
-                      <p className="text-sm text-gray-600">Pilih bank tujuan</p>
-                    </div>
-                  </label>
+                    </label>
+
+                    {/* Bank Selection - tampil jika transfer dipilih */}
+                    {paymentMethod === 'transfer' && (
+                      <div className="px-4 pb-4 pt-2 border-t border-gray-200">
+                        <p className="text-sm font-medium text-gray-700 mb-3">Pilih Bank:</p>
+                        <div className="grid grid-cols-3 gap-3">
+                          {/* BRI */}
+                          <label className={`flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition ${
+                            selectedBank === 'BRI' 
+                              ? 'border-blue-600 bg-blue-50' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="bank"
+                              value="BRI"
+                              checked={selectedBank === 'BRI'}
+                              onChange={(e) => setSelectedBank(e.target.value)}
+                              className="sr-only"
+                            />
+                            <div className="text-center">
+                              <p className="font-bold text-lg text-blue-600">BRI</p>
+                              <p className="text-xs text-gray-600 mt-1">Bank BRI</p>
+                            </div>
+                          </label>
+
+                          {/* BCA */}
+                          <label className={`flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition ${
+                            selectedBank === 'BCA' 
+                              ? 'border-blue-600 bg-blue-50' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="bank"
+                              value="BCA"
+                              checked={selectedBank === 'BCA'}
+                              onChange={(e) => setSelectedBank(e.target.value)}
+                              className="sr-only"
+                            />
+                            <div className="text-center">
+                              <p className="font-bold text-lg text-blue-700">BCA</p>
+                              <p className="text-xs text-gray-600 mt-1">Bank BCA</p>
+                            </div>
+                          </label>
+
+                          {/* MANDIRI */}
+                          <label className={`flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition ${
+                            selectedBank === 'MANDIRI' 
+                              ? 'border-blue-600 bg-blue-50' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="bank"
+                              value="MANDIRI"
+                              checked={selectedBank === 'MANDIRI'}
+                              onChange={(e) => setSelectedBank(e.target.value)}
+                              className="sr-only"
+                            />
+                            <div className="text-center">
+                              <p className="font-bold text-lg text-yellow-600">MANDIRI</p>
+                              <p className="text-xs text-gray-600 mt-1">Bank Mandiri</p>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Tunai */}
                   <label className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
                     paymentMethod === 'tunai' 
-                      ? 'border-green-600 bg-green-50' 
+                      ? 'border-green-600' 
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input

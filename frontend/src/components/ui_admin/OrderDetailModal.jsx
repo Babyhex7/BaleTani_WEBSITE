@@ -198,6 +198,37 @@ const OrderDetailModal = ({ orderId, useDummyData, onClose, onUpdateStatus }) =>
                 <p className="text-sm text-gray-600">Status</p>
                 <p className="font-medium capitalize">{order.payment_status}</p>
               </div>
+              
+              {/* Payment Detail (VA) - TAMBAHAN */}
+              {order.payment_detail && (
+                <>
+                  {order.payment_detail.bank && (
+                    <div>
+                      <p className="text-sm text-gray-600">Bank</p>
+                      <p className="font-semibold text-blue-600">{order.payment_detail.bank}</p>
+                    </div>
+                  )}
+                  {order.payment_detail.virtual_account && (
+                    <div>
+                      <p className="text-sm text-gray-600">Virtual Account</p>
+                      <p className="font-mono font-semibold">{order.payment_detail.virtual_account}</p>
+                    </div>
+                  )}
+                  {order.payment_detail.account_name && (
+                    <div className="col-span-2">
+                      <p className="text-sm text-gray-600">Account Name</p>
+                      <p className="font-medium">{order.payment_detail.account_name}</p>
+                    </div>
+                  )}
+                  {order.payment_detail.paid_at && (
+                    <div className="col-span-2">
+                      <p className="text-sm text-gray-600">Paid At</p>
+                      <p className="font-medium">{formatDate(order.payment_detail.paid_at)}</p>
+                    </div>
+                  )}
+                </>
+              )}
+
               {order.payment_proof_url && (
                 <div className="col-span-2">
                   <p className="text-sm text-gray-600 mb-2">Payment Proof</p>

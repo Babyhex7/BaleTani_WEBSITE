@@ -118,7 +118,7 @@ const Navbar = () => {
                       Profil Saya
                     </Link>
                     <Link
-                      to="/orders"
+                      to="/purchase-history"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
@@ -212,7 +212,7 @@ const Navbar = () => {
                       Profil Saya
                     </Link>
                     <Link
-                      to="/orders"
+                      to="/purchase-history"
                       className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors"
                       onClick={closeMenu}
                     >

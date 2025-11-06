@@ -38,12 +38,25 @@ const OrderSuccessPage = () => {
   const getPaymentInstructions = () => {
     switch (orderData.payment_method) {
       case 'transfer':
+      case 'bank_transfer':
+        // Jika ada payment detail dengan VA
+        if (orderData.payment) {
+          return {
+            title: `Transfer Bank - ${orderData.payment.bank}`,
+            instructions: [
+              `Bank: ${orderData.payment.bank}`,
+              `Virtual Account: ${orderData.payment.virtual_account}`,
+              `a/n: ${orderData.payment.account_name}`,
+              `Nominal: ${formatCurrency(orderData.total_amount)}`,
+              'Transfer sebelum: ' + new Date(orderData.payment.expired_at).toLocaleString('id-ID'),
+              'Setelah transfer, konfirmasi ke admin via WhatsApp',
+            ],
+          };
+        }
         return {
           title: 'Transfer Bank',
           instructions: [
-            'Transfer ke rekening berikut:',
-            'Bank BCA - 1234567890',
-            'a/n BaleTani Fresh Market',
+            'Informasi pembayaran akan dikirim segera',
             `Nominal: ${formatCurrency(orderData.total_amount)}`,
             'Setelah transfer, konfirmasi ke admin via WhatsApp',
           ],
@@ -57,6 +70,7 @@ const OrderSuccessPage = () => {
             'Setelah pembayaran, konfirmasi ke admin via WhatsApp',
           ],
         };
+      case 'tunai':
       case 'cash':
         return {
           title: 'Bayar di Tempat',
@@ -72,6 +86,15 @@ const OrderSuccessPage = () => {
   };
 
   const paymentInfo = getPaymentInstructions();
+
+  // Copy VA to clipboard
+  const copyVA = () => {
+    if (orderData.payment?.virtual_account) {
+      navigator.clipboard.writeText(orderData.payment.virtual_account);
+      // You can add toast notification here
+      alert('Nomor Virtual Account berhasil disalin!');
+    }
+  };
 
   // WhatsApp message
   const sendWhatsApp = () => {
@@ -190,20 +213,78 @@ const OrderSuccessPage = () => {
         </div>
 
         {/* Payment Instructions */}
-        {orderData.payment_method !== 'cash' && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-            <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+        {orderData.payment_method !== 'tunai' && orderData.payment_method !== 'cash' && (
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-6">
+            <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2 text-lg">
               <MessageCircle className="w-5 h-5" />
-              Instruksi Pembayaran - {paymentInfo.title}
+              Informasi Pembayaran
             </h3>
-            <ul className="space-y-2">
-              {paymentInfo.instructions.map((instruction, index) => (
-                <li key={index} className="text-sm text-blue-800 flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-0.5">•</span>
-                  <span>{instruction}</span>
-                </li>
-              ))}
-            </ul>
+            
+            {/* Jika transfer bank dengan VA */}
+            {orderData.payment && orderData.payment.virtual_account && (
+              <div className="bg-white rounded-lg p-4 mb-4 border border-blue-300">
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Bank</p>
+                    <p className="text-lg font-bold text-blue-900">{orderData.payment.bank}</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Virtual Account</p>
+                    <div className="flex items-center gap-2 bg-gray-50 p-3 rounded border border-gray-300">
+                      <p className="text-xl font-mono font-bold text-blue-900 tracking-wider flex-1">
+                        {orderData.payment.virtual_account}
+                      </p>
+                      <button
+                        onClick={copyVA}
+                        className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition font-medium"
+                      >
+                        Salin
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Atas Nama</p>
+                    <p className="font-semibold text-gray-900">{orderData.payment.account_name}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Total Pembayaran</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {formatCurrency(orderData.total_amount)}
+                    </p>
+                  </div>
+
+                  {orderData.payment.expired_at && (
+                    <div className="bg-yellow-50 border border-yellow-300 rounded p-3 mt-3">
+                      <p className="text-sm text-yellow-800">
+                        ⏰ Selesaikan pembayaran sebelum:
+                      </p>
+                      <p className="font-semibold text-yellow-900">
+                        {new Date(orderData.payment.expired_at).toLocaleString('id-ID', {
+                          dateStyle: 'full',
+                          timeStyle: 'short'
+                        })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Instruksi umum */}
+            <div className="space-y-2">
+              <p className="font-medium text-blue-900 mb-2">Cara Pembayaran:</p>
+              <ul className="space-y-2">
+                {paymentInfo.instructions.map((instruction, index) => (
+                  <li key={index} className="text-sm text-blue-800 flex items-start gap-2">
+                    <span className="text-blue-600 font-bold mt-0.5">•</span>
+                    <span>{instruction}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
 

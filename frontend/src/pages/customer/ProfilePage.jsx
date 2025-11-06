@@ -20,7 +20,7 @@ const ProfilePage = () => {
   
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("profile"); // profile, orders, or pesanan
+  const [activeTab, setActiveTab] = useState("profile"); // only profile tab now
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
@@ -97,24 +97,6 @@ const ProfilePage = () => {
             >
               <UserCircleIcon className="w-5 h-5" />
               Profile
-            </button>
-            <button
-              onClick={() => setActiveTab("orders")}
-              className={`flex items-center gap-2 px-6 py-3 font-semibold transition-all ${
-                activeTab === "orders"
-                  ? "text-green-600 border-b-2 border-green-600"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <ShoppingBagIcon className="w-5 h-5" />
-              Pesanan
-            </button>
-            <button
-              onClick={() => navigate("/purchase-history")}
-              className="flex items-center gap-2 px-6 py-3 font-semibold text-gray-500 hover:text-gray-700 transition-all"
-            >
-              <ShoppingBagIcon className="w-5 h-5" />
-              Pesanan Saya
             </button>
           </div>
 
@@ -221,18 +203,6 @@ const ProfilePage = () => {
                   <div className="text-sm text-gray-600">Total Belanja</div>
                 </div>
               </div>
-            </div>
-          )}
-
-          {activeTab === "orders" && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-              <ShoppingBagIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Fitur Pesanan (Coming Soon)
-              </h3>
-              <p className="text-gray-600">
-                Halaman daftar pesanan akan segera tersedia
-              </p>
             </div>
           )}
         </div>

@@ -15,6 +15,7 @@ const {
   ProductDiscount,
   Discount,
   Admin,
+  PaymentDetail,
 } = require("../models");
 
 /**
@@ -117,6 +118,19 @@ const getAllOrders = async (req, res) => {
           ],
           required: false,
         },
+        {
+          model: PaymentDetail,
+          as: "payment",
+          attributes: [
+            "payment_method",
+            "bank_name",
+            "virtual_account",
+            "account_name",
+            "payment_status",
+            "paid_at",
+          ],
+          required: false,
+        },
       ],
       limit: parseInt(limit),
       offset: offset,
@@ -143,6 +157,17 @@ const getAllOrders = async (req, res) => {
       items_count: order.orderItems ? order.orderItems.length : 0,
       created_at: order.created_at,
       updated_at: order.updated_at,
+      // TAMBAHAN: Payment detail info
+      payment_detail: order.payment
+        ? {
+            method: order.payment.payment_method,
+            bank: order.payment.bank_name,
+            virtual_account: order.payment.virtual_account,
+            account_name: order.payment.account_name,
+            status: order.payment.payment_status,
+            paid_at: order.payment.paid_at,
+          }
+        : null,
     }));
 
     const totalPages = Math.ceil(count / parseInt(limit));
@@ -208,6 +233,11 @@ const getOrderById = async (req, res) => {
               required: false,
             },
           ],
+        },
+        {
+          model: PaymentDetail,
+          as: "payment",
+          required: false,
         },
         {
           model: Admin,

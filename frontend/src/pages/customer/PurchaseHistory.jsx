@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Loader, PackageX } from 'lucide-react';
+import Navbar from '../../components/layout/Navbar';
+import Footer from '../../components/layout/Footer';
 import OrderStats from '../../components/ui_customer/OrderStats';
 import OrderFilters from '../../components/ui_customer/OrderFilters';
 import OrderCard from '../../components/ui_customer/OrderCard';
@@ -159,16 +161,19 @@ const PurchaseHistory = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <ShoppingBag className="w-8 h-8 text-green-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Riwayat Pesanan</h1>
+    <>
+      <Navbar />
+      
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <ShoppingBag className="w-8 h-8 text-green-600" />
+              <h1 className="text-3xl font-bold text-gray-900">Riwayat Pesanan</h1>
+            </div>
+            <p className="text-gray-600">Kelola dan lacak semua pesanan Anda di sini</p>
           </div>
-          <p className="text-gray-600">Kelola dan lacak semua pesanan Anda di sini</p>
-        </div>
 
         {/* Statistics Cards */}
         <OrderStats stats={stats} />
@@ -294,8 +299,11 @@ const PurchaseHistory = () => {
             onClose={() => setToast({ show: false, type: '', message: '' })}
           />
         )}
+        </div>
       </div>
-    </div>
+
+      <Footer />
+    </>
   );
 };
 

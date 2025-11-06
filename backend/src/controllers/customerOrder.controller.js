@@ -13,6 +13,7 @@ const {
   Customer,
   OrderStatusHistory,
   Cart,
+  PaymentDetail,
 } = require("../models");
 
 /**
@@ -30,6 +31,7 @@ const createOrder = async (req, res) => {
       delivery_address,
       delivery_notes,
       payment_method,
+      bank_name, // TAMBAHAN: BRI, BCA, MANDIRI
       items, // [{ product_id, quantity }]
     } = req.body;
 
@@ -217,6 +219,31 @@ const createOrder = async (req, res) => {
       { transaction }
     );
 
+    // CREATE PAYMENT DETAIL (JIKA TRANSFER BANK)
+    let paymentDetail = null;
+    if (payment_method === "transfer" || payment_method === "bank_transfer") {
+      // Validasi bank_name
+      if (!bank_name || !["BRI", "BCA", "MANDIRI"].includes(bank_name)) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: "Pilih bank terlebih dahulu (BRI/BCA/MANDIRI)",
+        });
+      }
+
+      // Generate Virtual Account menggunakan static method dari model
+      paymentDetail = await PaymentDetail.create(
+        {
+          order_id: order.id,
+          payment_method: "bank_transfer",
+          bank_name: bank_name,
+          account_name: "BaleTani Fresh Market",
+          payment_status: "pending",
+        },
+        { transaction }
+      );
+    }
+
     // Clear customer cart if authenticated
     if (customerId) {
       await Cart.destroy({
@@ -227,40 +254,59 @@ const createOrder = async (req, res) => {
 
     await transaction.commit();
 
-    // Fetch created order with items
+    // Fetch created order with items and payment detail
     const createdOrder = await Order.findByPk(order.id, {
       include: [
         {
           model: OrderItem,
           as: "orderItems",
         },
+        {
+          model: PaymentDetail,
+          as: "payment",
+        },
       ],
     });
+
+    // Prepare response
+    const responseData = {
+      id: createdOrder.id,
+      order_number: createdOrder.order_number,
+      customer_name: createdOrder.customer_name,
+      customer_phone: createdOrder.customer_phone,
+      payment_method: createdOrder.payment_method,
+      delivery_method: createdOrder.delivery_method,
+      delivery_address: createdOrder.delivery_address,
+      item_subtotal: parseFloat(createdOrder.item_subtotal),
+      delivery_fee: parseFloat(createdOrder.delivery_fee),
+      total_amount: parseFloat(createdOrder.total_amount),
+      order_status: createdOrder.order_status,
+      payment_status: createdOrder.payment_status,
+      created_at: createdOrder.created_at,
+      items: createdOrder.orderItems.map((item) => ({
+        product_name: item.product_name,
+        quantity: parseFloat(item.quantity),
+        final_price: parseFloat(item.final_price),
+        subtotal: parseFloat(item.subtotal),
+      })),
+    };
+
+    // Add payment detail if exists (for bank transfer)
+    if (createdOrder.payment) {
+      responseData.payment = {
+        method: createdOrder.payment.payment_method,
+        bank: createdOrder.payment.bank_name,
+        virtual_account: createdOrder.payment.virtual_account,
+        account_name: createdOrder.payment.account_name,
+        expired_at: createdOrder.payment.expired_at,
+        status: createdOrder.payment.payment_status,
+      };
+    }
 
     return res.status(201).json({
       success: true,
       message: "Order berhasil dibuat",
-      data: {
-        id: createdOrder.id,
-        order_number: createdOrder.order_number,
-        customer_name: createdOrder.customer_name,
-        customer_phone: createdOrder.customer_phone,
-        payment_method: createdOrder.payment_method,
-        delivery_method: createdOrder.delivery_method,
-        delivery_address: createdOrder.delivery_address,
-        item_subtotal: parseFloat(createdOrder.item_subtotal),
-        delivery_fee: parseFloat(createdOrder.delivery_fee),
-        total_amount: parseFloat(createdOrder.total_amount),
-        order_status: createdOrder.order_status,
-        payment_status: createdOrder.payment_status,
-        created_at: createdOrder.created_at,
-        items: createdOrder.orderItems.map((item) => ({
-          product_name: item.product_name,
-          quantity: parseFloat(item.quantity),
-          final_price: parseFloat(item.final_price),
-          subtotal: parseFloat(item.subtotal),
-        })),
-      },
+      data: responseData,
     });
   } catch (error) {
     // Only rollback if transaction is still active (not committed/rolled back)
