@@ -10,6 +10,12 @@ const {
   getMyOrders,
   getOrderDetail,
 } = require("../../controllers/customerOrder.controller");
+const {
+  getCustomerOrders,
+  getOrderDetail: getOrderHistoryDetail,
+  reorderItems,
+  cancelOrder,
+} = require("../../controllers/customerOrderHistory.controller");
 const { authenticateCustomer } = require("../../middlewares/auth.middleware");
 
 /**
@@ -20,15 +26,43 @@ const { authenticateCustomer } = require("../../middlewares/auth.middleware");
 router.post("/create", authenticateCustomer, createOrder);
 
 /**
+ * @route   GET /api/customer/orders/history
+ * @desc    Get customer's order history with filters & pagination
+ * @access  Private (Customer only)
+ */
+router.get("/history", authenticateCustomer, getCustomerOrders);
+
+/**
+ * @route   GET /api/customer/orders/history/:id
+ * @desc    Get order history detail with timeline
+ * @access  Private (Customer only)
+ */
+router.get("/history/:id", authenticateCustomer, getOrderHistoryDetail);
+
+/**
+ * @route   POST /api/customer/orders/:id/reorder
+ * @desc    Reorder - add all items from order to cart
+ * @access  Private (Customer only)
+ */
+router.post("/:id/reorder", authenticateCustomer, reorderItems);
+
+/**
+ * @route   PUT /api/customer/orders/:id/cancel
+ * @desc    Cancel order
+ * @access  Private (Customer only)
+ */
+router.put("/:id/cancel", authenticateCustomer, cancelOrder);
+
+/**
  * @route   GET /api/customer/orders
- * @desc    Get customer's order history
+ * @desc    Get customer's order history (legacy)
  * @access  Private (Customer only)
  */
 router.get("/", authenticateCustomer, getMyOrders);
 
 /**
  * @route   GET /api/customer/orders/:id
- * @desc    Get order detail by ID
+ * @desc    Get order detail by ID (legacy)
  * @access  Private (Customer only - own orders)
  */
 router.get("/:id", authenticateCustomer, getOrderDetail);

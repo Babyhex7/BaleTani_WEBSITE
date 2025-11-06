@@ -15,6 +15,7 @@ import OrderSuccessPage from './pages/customer/OrderSuccessPage';
 import CategoryPage from './pages/customer/CategoryPage';
 import CategoryDetailPage from './pages/customer/CategoryDetailPage';
 import ProfilePage from './pages/customer/ProfilePage';
+import PurchaseHistory from './pages/customer/PurchaseHistory';
 import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRoute';
 
 // Admin Pages
@@ -145,6 +146,13 @@ function App() {
       <Route path="/profile" element={
         <ProtectedRoute requiredRole="customer">
           <ProfilePage />
+        </ProtectedRoute>
+      } />
+
+      {/* Purchase History - Riwayat Pembelian Customer */}
+      <Route path="/purchase-history" element={
+        <ProtectedRoute requiredRole="customer">
+          <PurchaseHistory />
         </ProtectedRoute>
       } />
 

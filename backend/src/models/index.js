@@ -12,6 +12,7 @@ const Cart = require("./cart.model");
 const Order = require("./order.model");
 const OrderItem = require("./orderItem.model");
 const OrderStatusHistory = require("./orderStatusHistory.model");
+const PaymentDetail = require("./paymentDetail.model");
 const StockMovement = require("./stockMovement.model");
 
 // =============================
@@ -94,6 +95,16 @@ Order.hasMany(OrderStatusHistory, {
   as: "statusHistory",
 });
 OrderStatusHistory.belongsTo(Order, {
+  foreignKey: "order_id",
+  as: "order",
+});
+
+// Order → PaymentDetail (One-to-One)
+Order.hasOne(PaymentDetail, {
+  foreignKey: "order_id",
+  as: "payment",
+});
+PaymentDetail.belongsTo(Order, {
   foreignKey: "order_id",
   as: "order",
 });
@@ -289,6 +300,7 @@ module.exports = {
   Order,
   OrderItem,
   OrderStatusHistory,
+  PaymentDetail,
   StockMovement,
   // Legacy exports for backward compatibility
   User: Admin,
