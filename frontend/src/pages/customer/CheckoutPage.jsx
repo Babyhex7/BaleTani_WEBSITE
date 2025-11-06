@@ -215,7 +215,7 @@ const CheckoutPage = () => {
                   {/* Ambil Sendiri */}
                   <label className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
                     pickupMethod === 'self_pickup' 
-                      ? 'border-green-600 bg-green-50' 
+                      ? 'border-green-600' 
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
@@ -242,7 +242,7 @@ const CheckoutPage = () => {
                   {/* Delivery */}
                   <label className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
                     pickupMethod === 'delivery' 
-                      ? 'border-green-600 bg-green-50' 
+                      ? 'border-green-600' 
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
