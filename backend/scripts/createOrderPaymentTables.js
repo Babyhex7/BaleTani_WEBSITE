@@ -48,12 +48,12 @@ async function createTables() {
     `);
     console.log("✅ Table payment_details created");
 
-      // Ensure column types are aligned with models (id UUID in orders)
-      await sequelize.query(`
+    // Ensure column types are aligned with models (id UUID in orders)
+    await sequelize.query(`
         ALTER TABLE payment_details 
         MODIFY COLUMN order_id CHAR(36) NOT NULL;
       `);
-      console.log('✅ Ensured payment_details.order_id uses CHAR(36)');
+    console.log("✅ Ensured payment_details.order_id uses CHAR(36)");
 
     // 2. Update orders table (tambah field jika belum ada)
     await sequelize.query(`

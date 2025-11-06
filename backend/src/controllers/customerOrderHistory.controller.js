@@ -148,7 +148,7 @@ exports.getCustomerOrders = async (req, res) => {
             product_name: item.product_name,
             product_image: item.product?.images?.[0]?.image_url || null,
             quantity: parseFloat(item.quantity || 0),
-            unit: 'pcs',
+            unit: "pcs",
             price: parseFloat(item.final_price ?? item.original_price ?? 0),
             subtotal: parseFloat(item.subtotal || 0),
           })),
@@ -257,17 +257,18 @@ exports.getOrderDetail = async (req, res) => {
       },
 
       // Items
-      items: order.orderItems?.map((item) => ({
-        id: item.id,
-        product_id: item.product_id,
-        product_name: item.product_name,
-        product_image: item.product?.images?.[0]?.image_url || null,
-        quantity: parseFloat(item.quantity),
-        unit: 'pcs', // Default unit
-        price: parseFloat(item.final_price ?? item.original_price ?? 0),
-        subtotal: parseFloat(item.subtotal),
-        product_stock: item.product?.total_stock || 0,
-      })) || [],
+      items:
+        order.orderItems?.map((item) => ({
+          id: item.id,
+          product_id: item.product_id,
+          product_name: item.product_name,
+          product_image: item.product?.images?.[0]?.image_url || null,
+          quantity: parseFloat(item.quantity),
+          unit: "pcs", // Default unit
+          price: parseFloat(item.final_price ?? item.original_price ?? 0),
+          subtotal: parseFloat(item.subtotal),
+          product_stock: item.product?.total_stock || 0,
+        })) || [],
 
       // Payment summary
       payment: {
@@ -276,7 +277,7 @@ exports.getOrderDetail = async (req, res) => {
           : order.payment_method,
         bank: order.payment?.bank_name,
         virtual_account: order.payment?.virtual_account,
-        account_name: order.payment?.account_name || 'BaleTani Fresh Market',
+        account_name: order.payment?.account_name || "BaleTani Fresh Market",
         status: order.payment?.payment_status || order.payment_status,
         paid_at: order.payment?.paid_at,
         expired_at: order.payment?.expired_at,
@@ -368,7 +369,9 @@ exports.reorderItems = async (req, res) => {
       }
 
       if ((product.total_stock ?? 0) < item.quantity) {
-        outOfStockItems.push(`${item.product_name} (stok: ${product.total_stock ?? 0})`);
+        outOfStockItems.push(
+          `${item.product_name} (stok: ${product.total_stock ?? 0})`
+        );
         continue;
       }
 
