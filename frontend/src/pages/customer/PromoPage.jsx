@@ -8,6 +8,7 @@ import { Tag, Clock, Search, Filter, X, SlidersHorizontal, MessageCircle } from 
 import ProductCard from '../../components/ui/ProductCard';
 import Button from '../../components/ui/Button';
 import productService from '../../services/services_customer/productService';
+import useDebounce from '../../hooks/useDebounce';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 
@@ -17,6 +18,9 @@ const PromoPage = () => {
   const [error, setError] = useState(null);
   const [searchInput, setSearchInput] = useState('');
   const [filteredProducts, setFilteredProducts] = useState([]);
+  
+  // Debounce search input
+  const debouncedSearch = useDebounce(searchInput, 500);
   
   // Filter states
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -83,14 +87,14 @@ const PromoPage = () => {
     return acc;
   }, {});
 
-  // Apply filters
+  // Apply filters (with debounced search)
   useEffect(() => {
     let filtered = [...promoProducts];
 
-    // Search filter
-    if (searchInput) {
+    // Search filter (using debounced value)
+    if (debouncedSearch) {
       filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchInput.toLowerCase())
+        product.name.toLowerCase().includes(debouncedSearch.toLowerCase())
       );
     }
 
@@ -125,7 +129,7 @@ const PromoPage = () => {
     }
 
     setFilteredProducts(filtered);
-  }, [searchInput, selectedCategory, sortBy, promoProducts]);
+  }, [debouncedSearch, selectedCategory, sortBy, promoProducts]);
 
   // Clear filters
   const clearFilters = () => {

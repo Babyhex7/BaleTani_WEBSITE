@@ -21,6 +21,7 @@ import AssignProductModal from "../../components/ui_admin/AssignProductModal";
 import DeleteConfirmModal from "../../components/ui_admin/DeleteConfirmModal";
 import Pagination from "../../components/ui_admin/Pagination";
 import inventoryService from "../../services/services_admin/inventoryService";
+import useDebounce from "../../hooks/useDebounce";
 
 const DiscountManagement = () => {
   // State management
@@ -36,6 +37,9 @@ const DiscountManagement = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Debounce search query
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
   // Stats
   const [stats, setStats] = useState({
@@ -55,10 +59,10 @@ const DiscountManagement = () => {
   const [selectedDiscount, setSelectedDiscount] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  // Fetch data on mount and filter change
+  // Fetch data on mount and filter change (with debounced search)
   useEffect(() => {
     fetchDiscounts();
-  }, [currentPage, searchQuery, filterStatus, filterType, itemsPerPage]);
+  }, [currentPage, debouncedSearch, filterStatus, filterType, itemsPerPage]);
 
   // API Calls
   const fetchDiscounts = async () => {
@@ -67,7 +71,7 @@ const DiscountManagement = () => {
       const params = {
         page: currentPage,
         limit: itemsPerPage,
-        search: searchQuery,
+        search: debouncedSearch,
         status: filterStatus,
         discount_type: filterType,
       };

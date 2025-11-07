@@ -6,6 +6,7 @@ import Pagination from '../../components/ui_admin/Pagination';
 import ModalAdmin, { ConfirmModal } from '../../components/ui_admin/ModalAdmin';
 import { LoadingSpinner, Alert, Badge } from '../../components/ui_admin/CommonComponents';
 import { getUsers, createUser, updateUser, deleteUser, updateUserRole } from '../../services/services_admin/userService';
+import useDebounce from '../../hooks/useDebounce';
 
 /**
  * Halaman User Management - Kelola Data Pengguna
@@ -25,6 +26,9 @@ const UserManagement = () => {
   const [selectedRole, setSelectedRole] = useState('');
   const [sortField, setSortField] = useState('full_name');
   const [sortDirection, setSortDirection] = useState('asc');
+
+  // Debounce search value
+  const debouncedSearch = useDebounce(searchValue, 500);
 
   // State untuk modal
   const [showUserModal, setShowUserModal] = useState(false);
@@ -84,7 +88,7 @@ const UserManagement = () => {
 
   useEffect(() => {
     loadData();
-  }, [currentPage, itemsPerPage, searchValue, selectedRole, sortField, sortDirection]);
+  }, [currentPage, itemsPerPage, debouncedSearch, selectedRole, sortField, sortDirection]);
 
   const loadData = async () => {
     try {
@@ -94,13 +98,13 @@ const UserManagement = () => {
       // Simulasi loading
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Filter dan search logic untuk mock data
+      // Filter dan search logic untuk mock data (with debounced search)
       let filteredUsers = [...mockUsers];
 
-      if (searchValue) {
+      if (debouncedSearch) {
         filteredUsers = filteredUsers.filter(user =>
-          user.full_name.toLowerCase().includes(searchValue.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchValue.toLowerCase())
+          user.full_name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          user.email.toLowerCase().includes(debouncedSearch.toLowerCase())
         );
       }
 

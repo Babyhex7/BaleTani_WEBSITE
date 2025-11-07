@@ -18,6 +18,7 @@ import CategoryDetailModal from '../../components/ui_admin/CategoryDetailModal';
 import DeleteConfirmModal from '../../components/ui_admin/DeleteConfirmModal';
 import Pagination from '../../components/ui_admin/Pagination';
 import inventoryService from '../../services/services_admin/inventoryService';
+import useDebounce from '../../hooks/useDebounce';
 
 const CategoryManagement = () => {
   // State management
@@ -32,6 +33,9 @@ const CategoryManagement = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Debounce search query
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
   // Stats
   const [stats, setStats] = useState({
@@ -48,10 +52,10 @@ const CategoryManagement = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  // Fetch data on mount and filter change
+  // Fetch data on mount and filter change (with debounced search)
   useEffect(() => {
     fetchCategories();
-  }, [currentPage, searchQuery, filterStatus, itemsPerPage]);
+  }, [currentPage, debouncedSearch, filterStatus, itemsPerPage]);
 
   // API Calls
   const fetchCategories = async () => {
@@ -60,7 +64,7 @@ const CategoryManagement = () => {
       const params = {
         page: currentPage,
         limit: itemsPerPage,
-        search: searchQuery,
+        search: debouncedSearch,
         is_active: filterStatus
       };
 

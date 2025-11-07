@@ -16,6 +16,7 @@ import ProductDetailModal from '../../components/ui_admin/ProductDetailModal';
 import DeleteConfirmModal from '../../components/ui_admin/DeleteConfirmModal';
 import Pagination from '../../components/ui_admin/Pagination';
 import inventoryService from '../../services/services_admin/inventoryService';
+import useDebounce from '../../hooks/useDebounce';
 
 const ProductListNew = () => {
   // State management
@@ -33,6 +34,9 @@ const ProductListNew = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  // Debounce search query
+  const debouncedSearch = useDebounce(searchQuery, 500);
+
   // Stats
   const [stats, setStats] = useState({
     total: 0,
@@ -49,10 +53,10 @@ const ProductListNew = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  // Fetch data on mount and filter change
+  // Fetch data on mount and filter change (with debounced search)
   useEffect(() => {
     fetchProducts();
-  }, [currentPage, searchQuery, filterType, filterStatus, itemsPerPage]);
+  }, [currentPage, debouncedSearch, filterType, filterStatus, itemsPerPage]);
 
   useEffect(() => {
     fetchCategories();
@@ -65,7 +69,7 @@ const ProductListNew = () => {
       const params = {
         page: currentPage,
         limit: itemsPerPage,
-        search: searchQuery,
+        search: debouncedSearch,
         product_type: filterType,
         status: filterStatus
       };

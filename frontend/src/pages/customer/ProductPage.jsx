@@ -3,12 +3,13 @@
  * Displays all products with search, filter, and pagination
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Filter, X, SlidersHorizontal } from 'lucide-react';
 import ProductCard from '../../components/ui/ProductCard';
 import Button from '../../components/ui/Button';
 import Pagination from '../../components/ui/Pagination';
 import useProducts from '../../hooks/hook_customer/useProducts';
+import useDebounce from '../../hooks/useDebounce';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 
@@ -32,6 +33,14 @@ const ProductPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSort, setSelectedSort] = useState('newest');
 
+  // Debounce search input
+  const debouncedSearch = useDebounce(searchInput, 500);
+
+  // Auto-search when debounced value changes
+  useEffect(() => {
+    searchProducts(debouncedSearch);
+  }, [debouncedSearch]);
+
   // Format price to Rupiah
   const formatPrice = (price) => {
     return new Intl.NumberFormat('id-ID', {
@@ -41,7 +50,7 @@ const ProductPage = () => {
     }).format(price);
   };
 
-  // Handle search
+  // Handle search form submit (optional - just in case user presses Enter)
   const handleSearch = (e) => {
     e.preventDefault();
     searchProducts(searchInput);

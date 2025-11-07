@@ -17,6 +17,7 @@ import CustomerFormModal from '../../components/ui_admin/CustomerFormModal';
 import DeleteConfirmModal from '../../components/ui_admin/DeleteConfirmModal';
 import Pagination from '../../components/ui_admin/Pagination';
 import * as customerService from '../../services/services_admin/customerService';
+import useDebounce from '../../hooks/useDebounce';
 
 const CustomerManagement = () => {
   // State management
@@ -31,6 +32,9 @@ const CustomerManagement = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Debounce search query
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
   // Stats
   const [stats, setStats] = useState({
@@ -47,10 +51,10 @@ const CustomerManagement = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  // Fetch data on mount dan filter change
+  // Fetch data on mount dan filter change (with debounced search)
   useEffect(() => {
     fetchCustomers();
-  }, [currentPage, searchQuery, filterStatus, itemsPerPage]);
+  }, [currentPage, debouncedSearch, filterStatus, itemsPerPage]);
 
   // API Calls
   /**
@@ -62,7 +66,7 @@ const CustomerManagement = () => {
       const params = {
         page: currentPage,
         limit: itemsPerPage,
-        search: searchQuery,
+        search: debouncedSearch,
         is_active: filterStatus,
         sort_by: 'created_at',
         sort_order: 'DESC'

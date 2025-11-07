@@ -29,6 +29,7 @@ import OrderFilters from "../../components/ui_admin/OrderFilters";
 import StatisticsCard from "../../components/ui_admin/StatisticsCard";
 import Pagination from "../../components/ui_admin/Pagination";
 import AddOfflineOrderModal from "../../components/ui_admin/AddOfflineOrderModal";
+import useDebounce from "../../hooks/useDebounce";
 
 const OrderManagement = () => {
   // State untuk data
@@ -54,6 +55,9 @@ const OrderManagement = () => {
     date_to: "",
     search: "",
   });
+
+  // Debounce search filter
+  const debouncedSearch = useDebounce(filters.search, 500);
 
   // State untuk modals
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -95,8 +99,8 @@ const OrderManagement = () => {
             (o) => o.order_type === filters.order_type
           );
         }
-        if (filters.search) {
-          const searchLower = filters.search.toLowerCase();
+        if (debouncedSearch) {
+          const searchLower = debouncedSearch.toLowerCase();
           filteredOrders = filteredOrders.filter(
             (o) =>
               o.order_number.toLowerCase().includes(searchLower) ||
@@ -208,10 +212,10 @@ const OrderManagement = () => {
     alert("Fitur export sedang dalam pengembangan");
   };
 
-  // Load data on mount dan ketika filters/page berubah
+  // Load data on mount dan ketika filters/page berubah (with debounced search)
   useEffect(() => {
     fetchOrders();
-  }, [currentPage, limit, filters, useDummyData]);
+  }, [currentPage, limit, filters.order_status, filters.payment_status, filters.order_type, filters.payment_method, filters.delivery_method, filters.date_from, filters.date_to, debouncedSearch, useDummyData]);
 
   useEffect(() => {
     fetchStatistics();

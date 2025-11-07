@@ -20,6 +20,7 @@ import {
 } from '@heroicons/react/24/solid';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
+import useDebounce from '../../hooks/useDebounce';
 import axios from 'axios';
 
 // Icon mapping untuk kategori berdasarkan nama
@@ -44,6 +45,9 @@ const CategoryPage = () => {
   const [searchInput, setSearchInput] = useState('');
   const [sortBy, setSortBy] = useState('name');
 
+  // Debounce search input
+  const debouncedSearch = useDebounce(searchInput, 500);
+
   // Fetch categories from API
   useEffect(() => {
     const fetchCategories = async () => {
@@ -66,14 +70,14 @@ const CategoryPage = () => {
     fetchCategories();
   }, []);
 
-  // Filter and sort categories
+  // Filter and sort categories (with debounced search)
   useEffect(() => {
     let result = [...categories];
 
-    // Search filter
-    if (searchInput) {
+    // Search filter (using debounced value)
+    if (debouncedSearch) {
       result = result.filter(category =>
-        category.category_name.toLowerCase().includes(searchInput.toLowerCase())
+        category.category_name.toLowerCase().includes(debouncedSearch.toLowerCase())
       );
     }
 
@@ -90,7 +94,7 @@ const CategoryPage = () => {
     }
 
     setFilteredCategories(result);
-  }, [searchInput, sortBy, categories]);
+  }, [debouncedSearch, sortBy, categories]);
 
   // Handle search
   const handleSearch = (e) => {
