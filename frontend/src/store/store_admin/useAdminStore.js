@@ -11,6 +11,7 @@ const useAdminStore = create(
       // Admin Auth State
       admin: null,
       token: null,
+      permissions: [], // RBAC permissions array dari backend
       isAuthenticated: false,
       isLoading: false,
 
@@ -45,11 +46,16 @@ const useAdminStore = create(
       userError: null,
 
       // Admin Auth Actions
-      login: (admin, token) => {
-        console.log("[AdminStore] Login:", { admin, hasToken: !!token });
+      login: (admin, token, permissions = []) => {
+        console.log("[AdminStore] Login:", {
+          admin,
+          hasToken: !!token,
+          permissionsCount: permissions.length,
+        });
         set({
           admin,
           token,
+          permissions, // Simpan permissions dari backend RBAC
           isAuthenticated: true,
         });
       },
@@ -59,6 +65,7 @@ const useAdminStore = create(
         set({
           admin: null,
           token: null,
+          permissions: [], // Clear permissions saat logout
           isAuthenticated: false,
         });
         // Clear admin storage dari localStorage
@@ -73,6 +80,41 @@ const useAdminStore = create(
         set((state) => ({
           admin: { ...state.admin, ...adminData },
         }));
+      },
+
+      // Update permissions (untuk refresh permissions tanpa re-login)
+      updatePermissions: (permissions) => {
+        console.log("[AdminStore] Update permissions:", permissions.length);
+        set({ permissions });
+      },
+
+      // Helper untuk check permission (RBAC)
+      hasPermission: (module, action) => {
+        const { permissions, admin } = get();
+
+        // Super admin punya akses ke semua
+        if (admin?.role === "super_admin") {
+          return true;
+        }
+
+        // Check di permissions array
+        return permissions.some(
+          (p) => p.module === module && p.action === action
+        );
+      },
+
+      // Helper untuk check multiple permissions (salah satu harus match)
+      hasAnyPermission: (checks) => {
+        const { hasPermission } = get();
+        return checks.some(({ module, action }) =>
+          hasPermission(module, action)
+        );
+      },
+
+      // Helper untuk check role
+      hasRole: (roleName) => {
+        const { admin } = get();
+        return admin?.role === roleName;
       },
 
       // Actions untuk Dashboard
@@ -160,6 +202,7 @@ const useAdminStore = create(
         set({
           admin: null,
           token: null,
+          permissions: [], // Reset permissions
           isAuthenticated: false,
           isLoading: false,
           dashboardStats: null,
@@ -186,10 +229,11 @@ const useAdminStore = create(
     }),
     {
       name: "baletani-admin-storage",
-      // Persist admin auth dan data penting
+      // Persist admin auth, permissions, dan data penting
       partialize: (state) => ({
         admin: state.admin,
         token: state.token,
+        permissions: state.permissions, // Persist permissions untuk RBAC
         isAuthenticated: state.isAuthenticated,
         dashboardStats: state.dashboardStats,
         categories: state.categories,

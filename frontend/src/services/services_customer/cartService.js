@@ -3,7 +3,7 @@
  * API calls for cart operations
  */
 
-import api from "../api";
+import api from "./apiClient";
 
 const cartService = {
   /**

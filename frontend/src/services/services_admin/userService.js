@@ -98,3 +98,33 @@ export const getUserStats = async () => {
     );
   }
 };
+
+// Mendapatkan daftar roles
+export const getRoles = async () => {
+  try {
+    const response = await adminApiClient.get("/admin/users/roles");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Gagal mengambil daftar roles" };
+  }
+};
+
+// Export default object dengan semua fungsi
+export default {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+  updateUserRole,
+  resetUserPassword,
+  getUserStats,
+  getRoles,
+  // Alias untuk compatibility
+  getAllAdmins: getUsers,
+  getAllRoles: getRoles,
+  getAdminById: getUserById,
+  createAdmin: createUser,
+  updateAdmin: updateUser,
+  deleteAdmin: deleteUser,
+};

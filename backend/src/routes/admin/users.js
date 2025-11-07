@@ -1,25 +1,20 @@
 const express = require("express");
 const { body } = require("express-validator");
-const { authMiddleware } = require("../../middlewares/auth.middleware");
+const {
+  authenticateAdmin,
+  roleMiddleware,
+} = require("../../middlewares/auth.middleware");
 const adminUserController = require("../../controllers/adminUser.controller");
 
 const router = express.Router();
 
 /**
  * Routes untuk Admin User Management
- * Semua routes memerlukan authentication dan role admin
+ * Hanya super_admin yang bisa manage admin users
  */
 
-// Middleware untuk memastikan user adalah admin
-const requireAdminRole = (req, res, next) => {
-  if (req.user.role !== "admin") {
-    return res.status(403).json({
-      success: false,
-      message: "Access denied. Admin role required.",
-    });
-  }
-  next();
-};
+// Middleware untuk memastikan user adalah super_admin
+const requireSuperAdmin = roleMiddleware(["super_admin"]);
 
 // Validation rules
 const userValidationRules = [
@@ -29,15 +24,12 @@ const userValidationRules = [
     .isLength({ min: 2, max: 100 })
     .withMessage("Full name must be between 2 and 100 characters"),
 
-  body("email")
-    .isEmail()
-    .withMessage("Valid email is required")
-    .normalizeEmail(),
-
-  body("role")
+  body("phone_number")
     .optional()
-    .isIn(["customer", "staff", "admin"])
-    .withMessage("Role must be customer, staff, or admin"),
+    .matches(/^(08|628)[0-9]{8,12}$/)
+    .withMessage("Phone number must be valid Indonesian format"),
+
+  body("role_id").optional().isUUID().withMessage("Role ID must be valid UUID"),
 ];
 
 const createUserValidationRules = [
@@ -53,47 +45,56 @@ const updateUserValidationRules = [
     .isLength({ min: 2, max: 100 })
     .withMessage("Full name must be between 2 and 100 characters"),
 
-  body("email")
+  body("phone_number")
     .optional()
-    .isEmail()
-    .withMessage("Valid email is required")
-    .normalizeEmail(),
+    .matches(/^(08|628)[0-9]{8,12}$/)
+    .withMessage("Phone number must be valid Indonesian format"),
 
   body("password")
     .optional()
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
 
-  body("role")
-    .optional()
-    .isIn(["customer", "staff", "admin"])
-    .withMessage("Role must be customer, staff, or admin"),
+  body("role_id").optional().isUUID().withMessage("Role ID must be valid UUID"),
 ];
 
 // GET /admin/users - Get all users with pagination and filters
-router.get("/", authMiddleware, requireAdminRole, adminUserController.getUsers);
+router.get(
+  "/",
+  authenticateAdmin,
+  requireSuperAdmin,
+  adminUserController.getUsers
+);
+
+// GET /admin/users/roles - Get all roles
+router.get(
+  "/roles",
+  authenticateAdmin,
+  requireSuperAdmin,
+  adminUserController.getRoles
+);
 
 // GET /admin/users/stats - Get user statistics
 router.get(
   "/stats",
-  authMiddleware,
-  requireAdminRole,
+  authenticateAdmin,
+  requireSuperAdmin,
   adminUserController.getUserStats
 );
 
 // GET /admin/users/:id - Get user by ID
 router.get(
   "/:id",
-  authMiddleware,
-  requireAdminRole,
+  authenticateAdmin,
+  requireSuperAdmin,
   adminUserController.getUserById
 );
 
 // POST /admin/users - Create new user
 router.post(
   "/",
-  authMiddleware,
-  requireAdminRole,
+  authenticateAdmin,
+  requireSuperAdmin,
   createUserValidationRules,
   adminUserController.createUser
 );
@@ -101,8 +102,8 @@ router.post(
 // PUT /admin/users/:id - Update user
 router.put(
   "/:id",
-  authMiddleware,
-  requireAdminRole,
+  authenticateAdmin,
+  requireSuperAdmin,
   updateUserValidationRules,
   adminUserController.updateUser
 );
@@ -110,29 +111,25 @@ router.put(
 // DELETE /admin/users/:id - Delete user
 router.delete(
   "/:id",
-  authMiddleware,
-  requireAdminRole,
+  authenticateAdmin,
+  requireSuperAdmin,
   adminUserController.deleteUser
 );
 
 // PATCH /admin/users/:id/role - Update user role
 router.patch(
   "/:id/role",
-  authMiddleware,
-  requireAdminRole,
-  [
-    body("role")
-      .isIn(["customer", "staff", "admin"])
-      .withMessage("Role must be customer, staff, or admin"),
-  ],
+  authenticateAdmin,
+  requireSuperAdmin,
+  [body("role_id").isUUID().withMessage("Role ID must be valid UUID")],
   adminUserController.updateUserRole
 );
 
 // PATCH /admin/users/:id/reset-password - Reset user password
 router.patch(
   "/:id/reset-password",
-  authMiddleware,
-  requireAdminRole,
+  authenticateAdmin,
+  requireSuperAdmin,
   [
     body("password")
       .isLength({ min: 6 })

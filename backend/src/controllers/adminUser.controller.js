@@ -16,7 +16,8 @@ const getUsers = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     const search = req.query.search || "";
-    const role_name = req.query.role || "";
+    const role_id = req.query.role_id || "";
+    const is_active = req.query.is_active || "";
     const sortBy = req.query.sortBy || "full_name";
     const sortOrder = req.query.sortOrder || "ASC";
 
@@ -30,6 +31,11 @@ const getUsers = async (req, res, next) => {
       ];
     }
 
+    // Add is_active filter
+    if (is_active !== "") {
+      whereClause.is_active = is_active === "true" || is_active === true;
+    }
+
     // Build include for role filter
     const includeOptions = {
       model: Role,
@@ -37,8 +43,8 @@ const getUsers = async (req, res, next) => {
       attributes: ["id", "role_name", "description"],
     };
 
-    if (role_name) {
-      includeOptions.where = { role_name };
+    if (role_id) {
+      includeOptions.where = { id: role_id };
     }
 
     // Get users with pagination
@@ -50,6 +56,12 @@ const getUsers = async (req, res, next) => {
       limit,
       offset,
     });
+
+    // Get stats
+    const totalAdmins = await Admin.count();
+    const activeAdmins = await Admin.count({ where: { is_active: true } });
+    const inactiveAdmins = await Admin.count({ where: { is_active: false } });
+    const totalRoles = await Role.count();
 
     // Format response
     const formattedUsers = users.map((user) => ({
@@ -69,12 +81,18 @@ const getUsers = async (req, res, next) => {
     res.json({
       success: true,
       data: {
-        users: formattedUsers,
+        data: formattedUsers,
         pagination: {
-          current_page: page,
-          total_pages: Math.ceil(count / limit),
-          total_items: count,
-          items_per_page: limit,
+          currentPage: page,
+          totalPages: Math.ceil(count / limit),
+          totalItems: count,
+          itemsPerPage: limit,
+        },
+        stats: {
+          total: totalAdmins,
+          active: activeAdmins,
+          inactive: inactiveAdmins,
+          totalRoles: totalRoles,
         },
       },
     });
@@ -89,19 +107,50 @@ const getUserById = async (req, res, next) => {
     const { id } = req.params;
 
     const user = await Admin.findByPk(id, {
-      attributes: { exclude: ["password"] },
+      attributes: { exclude: ["password_hash"] },
+      include: [
+        {
+          model: Role,
+          as: "role",
+          attributes: ["id", "role_name", "description"],
+          include: [
+            {
+              model: require("../models").Permission,
+              as: "permissions",
+              attributes: ["id", "module", "action", "description"],
+              through: { attributes: [] },
+            },
+          ],
+        },
+      ],
     });
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "Admin user not found",
       });
     }
 
+    // Format response dengan permissions
+    const formattedUser = {
+      id: user.id,
+      phone_number: user.phone_number,
+      full_name: user.full_name,
+      role: {
+        id: user.role.id,
+        role_name: user.role.role_name,
+        description: user.role.description,
+      },
+      permissions: user.role.permissions || [],
+      is_active: user.is_active,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+    };
+
     res.json({
       success: true,
-      data: { user },
+      data: formattedUser,
     });
   } catch (error) {
     next(error);
@@ -121,41 +170,66 @@ const createUser = async (req, res, next) => {
       });
     }
 
-    const { full_name, email, password, role = "customer" } = req.body;
+    const { full_name, phone_number, password, role_id, is_active } = req.body;
+
+    // Normalize phone number
+    let normalizedPhone = phone_number;
+    if (phone_number.startsWith("08")) {
+      normalizedPhone = "628" + phone_number.substring(1);
+    } else if (phone_number.startsWith("+62")) {
+      normalizedPhone = "628" + phone_number.substring(3);
+    }
 
     // Check if user already exists
-    const existingUser = await Admin.findOne({ where: { email } });
+    const existingUser = await Admin.findOne({
+      where: { phone_number: normalizedPhone },
+    });
+
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "User with this email already exists",
+        message: "Admin with this phone number already exists",
       });
     }
 
-    // Validasi role
-    const validRoles = ["customer", "staff", "admin"];
-    if (!validRoles.includes(role)) {
+    // Validate role_id exists
+    const roleExists = await Role.findByPk(role_id);
+    if (!roleExists) {
       return res.status(400).json({
         success: false,
         message: "Invalid role specified",
       });
     }
 
-    // Create new user
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password, salt);
+
+    // Create new admin user
     const user = await Admin.create({
       full_name,
-      email,
-      password,
-      role,
+      phone_number: normalizedPhone,
+      password_hash,
+      role_id,
+      is_active: is_active !== undefined ? is_active : true,
     });
 
-    // Return user data without password
-    const { password: _, ...userData } = user.toJSON();
+    // Fetch complete user with role
+    const createdUser = await Admin.findByPk(user.id, {
+      attributes: { exclude: ["password_hash"] },
+      include: [
+        {
+          model: Role,
+          as: "role",
+          attributes: ["id", "role_name", "description"],
+        },
+      ],
+    });
 
     res.status(201).json({
       success: true,
-      message: "User created successfully",
-      data: { user: userData },
+      message: "Admin user created successfully",
+      data: { user: createdUser },
     });
   } catch (error) {
     next(error);
@@ -175,7 +249,7 @@ const updateUser = async (req, res, next) => {
     }
 
     const { id } = req.params;
-    const { full_name, email, password, role } = req.body;
+    const { full_name, phone_number, password, role_id, is_active } = req.body;
 
     const user = await Admin.findByPk(id);
     if (!user) {
@@ -185,11 +259,19 @@ const updateUser = async (req, res, next) => {
       });
     }
 
-    // Check if email is already taken by another user
-    if (email && email !== user.email) {
+    // Check if phone number is already taken by another user
+    if (phone_number && phone_number !== user.phone_number) {
+      // Normalize phone number
+      let normalizedPhone = phone_number;
+      if (phone_number.startsWith("08")) {
+        normalizedPhone = "628" + phone_number.substring(1);
+      } else if (phone_number.startsWith("+62")) {
+        normalizedPhone = "628" + phone_number.substring(3);
+      }
+
       const existingUser = await Admin.findOne({
         where: {
-          email,
+          phone_number: normalizedPhone,
           id: { [Op.ne]: id },
         },
       });
@@ -197,7 +279,7 @@ const updateUser = async (req, res, next) => {
       if (existingUser) {
         return res.status(400).json({
           success: false,
-          message: "Email is already taken by another user",
+          message: "Phone number is already taken by another user",
         });
       }
     }
@@ -205,21 +287,37 @@ const updateUser = async (req, res, next) => {
     // Prepare update data
     const updateData = {};
     if (full_name) updateData.full_name = full_name;
-    if (email) updateData.email = email;
-    if (role) {
-      const validRoles = ["customer", "staff", "admin"];
-      if (!validRoles.includes(role)) {
+
+    if (phone_number) {
+      let normalizedPhone = phone_number;
+      if (phone_number.startsWith("08")) {
+        normalizedPhone = "628" + phone_number.substring(1);
+      } else if (phone_number.startsWith("+62")) {
+        normalizedPhone = "628" + phone_number.substring(3);
+      }
+      updateData.phone_number = normalizedPhone;
+    }
+
+    if (role_id) {
+      // Validate role exists
+      const roleExists = await Role.findByPk(role_id);
+      if (!roleExists) {
         return res.status(400).json({
           success: false,
           message: "Invalid role specified",
         });
       }
-      updateData.role = role;
+      updateData.role_id = role_id;
+    }
+
+    if (is_active !== undefined) {
+      updateData.is_active = is_active;
     }
 
     // Hash password if provided
     if (password) {
-      updateData.password = await bcrypt.hash(password, 12);
+      const salt = await bcrypt.genSalt(10);
+      updateData.password_hash = await bcrypt.hash(password, salt);
     }
 
     // Update user
@@ -274,10 +372,11 @@ const deleteUser = async (req, res, next) => {
 const updateUserRole = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { role } = req.body;
+    const { role_id } = req.body;
 
-    const validRoles = ["customer", "staff", "admin"];
-    if (!validRoles.includes(role)) {
+    // Validate role exists
+    const roleExists = await Role.findByPk(role_id);
+    if (!roleExists) {
       return res.status(400).json({
         success: false,
         message: "Invalid role specified",
@@ -293,21 +392,31 @@ const updateUserRole = async (req, res, next) => {
     }
 
     // Prevent changing own role
-    if (parseInt(id) === req.user.id) {
+    if (id === req.user.id) {
       return res.status(400).json({
         success: false,
         message: "You cannot change your own role",
       });
     }
 
-    await user.update({ role });
+    await user.update({ role_id });
 
-    const { password: _, ...userData } = user.toJSON();
+    // Fetch updated user with role
+    const updatedUser = await Admin.findByPk(id, {
+      attributes: { exclude: ["password_hash"] },
+      include: [
+        {
+          model: Role,
+          as: "role",
+          attributes: ["id", "role_name", "description"],
+        },
+      ],
+    });
 
     res.json({
       success: true,
       message: "User role updated successfully",
-      data: { user: userData },
+      data: { user: updatedUser },
     });
   } catch (error) {
     next(error);
@@ -336,8 +445,9 @@ const resetUserPassword = async (req, res, next) => {
     }
 
     // Hash new password
-    const hashedPassword = await bcrypt.hash(password, 12);
-    await user.update({ password: hashedPassword });
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    await user.update({ password_hash: hashedPassword });
 
     res.json({
       success: true,
@@ -351,19 +461,63 @@ const resetUserPassword = async (req, res, next) => {
 // Get user statistics
 const getUserStats = async (req, res, next) => {
   try {
-    const [totalAdmins, totalStaff, totalCustomers] = await Promise.all([
-      Admin.count({ where: { role: "admin" } }),
-      Admin.count({ where: { role: "staff" } }),
-      Admin.count({ where: { role: "customer" } }),
+    // Get total admins and active admins
+    const [totalAdmins, activeAdmins] = await Promise.all([
+      Admin.count(),
+      Admin.count({ where: { is_active: true } }),
     ]);
+
+    // Get total by role
+    const roles = await Role.findAll({
+      attributes: [
+        "id",
+        "role_name",
+        [
+          require("sequelize").fn(
+            "COUNT",
+            require("sequelize").col("users.id")
+          ),
+          "user_count",
+        ],
+      ],
+      include: [
+        {
+          model: Admin,
+          as: "users",
+          attributes: [],
+        },
+      ],
+      group: ["Role.id"],
+      raw: true,
+    });
 
     res.json({
       success: true,
       data: {
         totalAdmins,
-        totalStaff,
-        totalCustomers,
-        totalUsers: totalAdmins + totalStaff + totalCustomers,
+        activeAdmins,
+        inactiveAdmins: totalAdmins - activeAdmins,
+        roleBreakdown: roles,
+        totalRoles: roles.length,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all roles
+const getRoles = async (req, res, next) => {
+  try {
+    const roles = await Role.findAll({
+      attributes: ["id", "role_name", "description"],
+      order: [["role_name", "ASC"]],
+    });
+
+    res.json({
+      success: true,
+      data: {
+        data: roles,
       },
     });
   } catch (error) {
@@ -380,4 +534,5 @@ module.exports = {
   updateUserRole,
   resetUserPassword,
   getUserStats,
+  getRoles,
 };

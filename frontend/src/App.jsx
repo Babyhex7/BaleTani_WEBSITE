@@ -22,6 +22,7 @@ import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRo
 import AdminLogin from './pages/admin/AdminLogin';
 import UserManagement from './pages/admin/UserManagement';
 import OrderManagement from './pages/admin/OrderManagement';
+import AdminManagement from './pages/admin/AdminManagement';
 
 // New Admin Pages with Hero Icons
 import AdminDashboardNew from './pages/admin/AdminDashboardNew';
@@ -246,6 +247,13 @@ function App() {
       <Route path="/admin/customers" element={
         <ProtectedRoute requiredRole="admin">
           <CustomerManagement />
+        </ProtectedRoute>
+      } />
+
+      {/* Admin Management */}
+      <Route path="/admin/admins" element={
+        <ProtectedRoute requiredRole="admin">
+          <AdminManagement />
         </ProtectedRoute>
       } />
 

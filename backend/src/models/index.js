@@ -1,5 +1,7 @@
 const Admin = require("./admin.model");
 const Role = require("./role.model");
+const Permission = require("./permission.model");
+const RolePermission = require("./rolePermission.model");
 const Customer = require("./customer.model");
 const Category = require("./category.model");
 const Product = require("./product.model");
@@ -28,6 +30,40 @@ Admin.belongsTo(Role, {
   foreignKey: "role_id",
   as: "role",
 });
+
+// =============================
+// MANY-TO-MANY: ROLE & PERMISSION
+// =============================
+
+// Role ← → Permission (melalui RolePermission)
+Role.belongsToMany(Permission, {
+  through: RolePermission,
+  foreignKey: "role_id",
+  otherKey: "permission_id",
+  as: "permissions",
+});
+
+Permission.belongsToMany(Role, {
+  through: RolePermission,
+  foreignKey: "permission_id",
+  otherKey: "role_id",
+  as: "roles",
+});
+
+// Relasi langsung untuk RolePermission
+RolePermission.belongsTo(Role, {
+  foreignKey: "role_id",
+  as: "role",
+});
+
+RolePermission.belongsTo(Permission, {
+  foreignKey: "permission_id",
+  as: "permission",
+});
+
+// =============================
+// PRODUCT & CATEGORY
+// =============================
 
 // Category → Products
 Category.hasMany(Product, {
@@ -288,6 +324,8 @@ Product.hasMany(Cart, {
 module.exports = {
   Admin,
   Role,
+  Permission,
+  RolePermission,
   Customer,
   Category,
   Product,

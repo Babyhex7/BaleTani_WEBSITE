@@ -30,17 +30,21 @@ const adminAuthService = {
           role:
             typeof user.role === "string"
               ? user.role
-              : user.role?.role_name || "admin",
+              : user.role?.name || user.role?.role_name || "admin",
+          // Simpan permissions array dari backend RBAC
+          permissions: user.permissions || [],
         };
 
         console.log("[AdminAuthService] Login success:", {
           admin: normalizedAdmin,
           hasToken: !!token,
+          permissions: normalizedAdmin.permissions.length,
         });
 
         return {
           admin: normalizedAdmin,
           token,
+          permissions: normalizedAdmin.permissions,
           message: response.data.message || "Login berhasil",
         };
       } else {

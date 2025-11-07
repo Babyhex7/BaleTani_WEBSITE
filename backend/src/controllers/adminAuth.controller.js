@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { Admin, Role } = require("../models");
+const { Admin, Role, Permission } = require("../models");
 
 /**
  * Admin Authentication Controller
@@ -102,6 +102,18 @@ const loginAdmin = async (req, res) => {
       { expiresIn: "7d" } // Admin token expires in 7 days
     );
 
+    // Ambil permissions untuk role ini
+    const role = await Role.findByPk(admin.role.id, {
+      include: [
+        {
+          model: Permission,
+          as: "permissions",
+          attributes: ["id", "module", "action", "description"],
+          through: { attributes: [] }, // Exclude junction table attributes
+        },
+      ],
+    });
+
     res.json({
       success: true,
       message: "Login berhasil",
@@ -112,9 +124,11 @@ const loginAdmin = async (req, res) => {
           full_name: admin.full_name,
           role: {
             id: admin.role.id,
-            role_name: admin.role.role_name,
+            name: admin.role.role_name,
             description: admin.role.description,
+            level: admin.role.level,
           },
+          permissions: role.permissions || [],
         },
         token,
       },

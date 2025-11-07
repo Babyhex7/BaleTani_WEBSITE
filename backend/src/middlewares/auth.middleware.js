@@ -1,7 +1,10 @@
 const jwt = require("jsonwebtoken");
-const { User, Customer, Role } = require("../models");
+const { Admin, Customer, Role, Permission } = require("../models");
 
-// Middleware untuk Admin Authentication
+/**
+ * Middleware untuk ADMIN Authentication (dengan RBAC)
+ * Admin memiliki role dan permissions yang di-load dari database
+ */
 const authenticateAdmin = async (req, res, next) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
@@ -23,7 +26,8 @@ const authenticateAdmin = async (req, res, next) => {
       });
     }
 
-    const user = await User.findOne({
+    // Cari admin dengan role dan permissions (RBAC)
+    const admin = await Admin.findOne({
       where: {
         id: decoded.userId,
         is_active: true,
@@ -33,38 +37,66 @@ const authenticateAdmin = async (req, res, next) => {
           model: Role,
           as: "role",
           attributes: ["id", "role_name", "description"],
+          include: [
+            {
+              model: Permission,
+              as: "permissions",
+              attributes: ["id", "module", "action", "description"],
+              through: { attributes: [] }, // Exclude junction table
+            },
+          ],
         },
       ],
       attributes: { exclude: ["password_hash"] },
     });
 
-    if (!user) {
+    if (!admin) {
+      return res.status(401).json({
+        success: false,
+        message: "Token tidak valid. Admin tidak ditemukan.",
+      });
+    }
+
+    // Set admin info ke req.user dengan permissions
+    req.user = {
+      id: admin.id,
+      phone_number: admin.phone_number,
+      full_name: admin.full_name,
+      role_id: admin.role_id,
+      role: admin.role,
+      permissions: admin.role?.permissions || [],
+      is_active: admin.is_active,
+    };
+
+    next();
+  } catch (error) {
+    console.error("Admin auth middleware error:", error);
+
+    if (error.name === "JsonWebTokenError") {
       return res.status(401).json({
         success: false,
         message: "Token tidak valid.",
       });
     }
 
-    // Check if user has admin role (not customer)
-    if (user.role.role_name === "customer") {
-      return res.status(403).json({
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
         success: false,
-        message: "Akses ditolak.",
+        message: "Token sudah kadaluarsa. Silakan login kembali.",
       });
     }
 
-    req.user = user;
-    next();
-  } catch (error) {
-    console.error("Admin auth middleware error:", error);
-    res.status(401).json({
+    res.status(500).json({
       success: false,
-      message: "Token tidak valid.",
+      message: "Error saat autentikasi admin.",
     });
   }
 };
 
-// Middleware untuk Customer Authentication
+/**
+ * Middleware untuk CUSTOMER Authentication (tanpa RBAC)
+ * Customer hanya basic auth, tidak ada role/permissions
+ */
 const authenticateCustomer = async (req, res, next) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
@@ -86,6 +118,7 @@ const authenticateCustomer = async (req, res, next) => {
       });
     }
 
+    // Cari customer (TANPA role/permissions - basic auth only)
     const customer = await Customer.findOne({
       where: {
         id: decoded.id,
@@ -97,35 +130,71 @@ const authenticateCustomer = async (req, res, next) => {
     if (!customer) {
       return res.status(401).json({
         success: false,
+        message: "Token tidak valid. Customer tidak ditemukan.",
+      });
+    }
+
+    // Set customer info ke req.customer (tanpa role/permissions)
+    req.customer = {
+      id: customer.id,
+      phone_number: customer.phone_number,
+      full_name: customer.full_name,
+      email: customer.email,
+      is_active: customer.is_active,
+    };
+
+    next();
+  } catch (error) {
+    console.error("Customer auth middleware error:", error);
+
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({
+        success: false,
         message: "Token tidak valid.",
       });
     }
 
-    req.customer = customer;
-    next();
-  } catch (error) {
-    console.error("Customer auth middleware error:", error);
-    res.status(401).json({
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        message: "Token sudah kadaluarsa. Silakan login kembali.",
+      });
+    }
+
+    res.status(500).json({
       success: false,
-      message: "Token tidak valid.",
+      message: "Error saat autentikasi customer.",
     });
   }
 };
 
-// Middleware untuk RBAC (Role-Based Access Control) - hanya untuk admin
+/**
+ * Middleware untuk RBAC (Role-Based Access Control)
+ * Hanya untuk ADMIN - mengecek apakah admin punya role yang diizinkan
+ *
+ * @param {Array} allowedRoles - Array role yang diizinkan, contoh: ['super_admin', 'cashier']
+ */
 const roleMiddleware = (allowedRoles) => {
   return (req, res, next) => {
+    // Pastikan user adalah admin (sudah melewati authenticateAdmin)
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: "Akses ditolak. User tidak ditemukan.",
+        message: "Unauthorized. Admin authentication required.",
       });
     }
 
-    if (!allowedRoles.includes(req.user.role.role_name)) {
+    // Super admin bisa akses semua
+    if (req.user.role?.role_name === "super_admin") {
+      return next();
+    }
+
+    // Cek apakah role admin ada di allowed roles
+    if (!allowedRoles.includes(req.user.role?.role_name)) {
       return res.status(403).json({
         success: false,
-        message: "Akses ditolak. Permissions tidak mencukupi.",
+        message: `Access denied. Required roles: ${allowedRoles.join(", ")}`,
+        currentRole: req.user.role?.role_name,
       });
     }
 
@@ -138,7 +207,7 @@ const authMiddleware = authenticateAdmin;
 
 module.exports = {
   authMiddleware, // Legacy support
-  authenticateAdmin,
-  authenticateCustomer,
-  roleMiddleware,
+  authenticateAdmin, // ADMIN dengan RBAC
+  authenticateCustomer, // CUSTOMER tanpa RBAC (basic auth only)
+  roleMiddleware, // RBAC checker untuk admin
 };

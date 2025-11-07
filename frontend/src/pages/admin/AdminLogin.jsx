@@ -66,11 +66,12 @@ const AdminLogin = () => {
       // Gunakan adminAuthService, bukan apiClient biasa
       const response = await adminAuthService.login(loginData);
       
-      // response sudah berisi { admin, token, message }
+      // response berisi { admin, token, permissions, message }
       console.log('[AdminLogin] Login response:', response);
+      console.log('[AdminLogin] Permissions count:', response.permissions?.length || 0);
       
-      // Save ke admin store
-      login(response.admin, response.token);
+      // Save ke admin store dengan permissions
+      login(response.admin, response.token, response.permissions || []);
       
       toast.success(response.message || 'Login berhasil!');
       
@@ -214,7 +215,10 @@ const AdminLogin = () => {
           {/* Info */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
-              Default login: <span className="font-mono text-gray-700">6282111111111</span> / <span className="font-mono text-gray-700">admin123</span>
+              Test login: <span className="font-mono text-gray-700">081234567808</span> / <span className="font-mono text-gray-700">admin123</span>
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              Super Admin dengan akses penuh ke semua modul
             </p>
           </div>
         </div>

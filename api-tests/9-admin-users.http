@@ -1,0 +1,323 @@
+### Admin User Management API Tests
+### Base URL
+@baseUrl = http://localhost:5000/api
+@adminToken = {{login_super_admin.response.body.token}}
+@userId = {{get_all_users.response.body.data.users[0].id}}
+
+###############################################
+# 1. LOGIN TESTS - BERBAGAI ROLE ADMIN
+###############################################
+
+### 1.1 Login sebagai Super Admin
+# @name login_super_admin
+POST {{baseUrl}}/admin/auth/login
+Content-Type: application/json
+
+{
+  "phone_number": "081234567808",
+  "password": "admin123"
+}
+
+### 1.2 Login sebagai Kasir
+# @name login_cashier
+POST {{baseUrl}}/admin/auth/login
+Content-Type: application/json
+
+{
+  "phone_number": "081234567801",
+  "password": "kasir123"
+}
+
+### 1.3 Login sebagai Admin WhatsApp
+# @name login_whatsapp_admin
+POST {{baseUrl}}/admin/auth/login
+Content-Type: application/json
+
+{
+  "phone_number": "081234567802",
+  "password": "wa123"
+}
+
+### 1.4 Login sebagai Admin Inventori
+# @name login_inventory_admin
+POST {{baseUrl}}/admin/auth/login
+Content-Type: application/json
+
+{
+  "phone_number": "081234567803",
+  "password": "inv123"
+}
+
+### 1.5 Login sebagai Admin Finance
+# @name login_finance_admin
+POST {{baseUrl}}/admin/auth/login
+Content-Type: application/json
+
+{
+  "phone_number": "081234567804",
+  "password": "fin123"
+}
+
+### 1.6 Login sebagai Super Kasir
+# @name login_super_cashier
+POST {{baseUrl}}/admin/auth/login
+Content-Type: application/json
+
+{
+  "phone_number": "081234567805",
+  "password": "superkasir123"
+}
+
+### 1.7 Login sebagai Super Admin Inventori
+# @name login_super_inventory
+POST {{baseUrl}}/admin/auth/login
+Content-Type: application/json
+
+{
+  "phone_number": "081234567806",
+  "password": "superinv123"
+}
+
+### 1.8 Login sebagai Super Admin WhatsApp
+# @name login_super_whatsapp
+POST {{baseUrl}}/admin/auth/login
+Content-Type: application/json
+
+{
+  "phone_number": "081234567807",
+  "password": "superwa123"
+}
+
+###############################################
+# 2. GET ALL ROLES (Super Admin Only)
+###############################################
+
+### 2.1 Get All Roles - Super Admin
+# @name get_all_roles
+GET {{baseUrl}}/admin/users/roles
+Authorization: Bearer {{adminToken}}
+
+### 2.2 Get All Roles - Kasir (Harus 403 Forbidden)
+GET {{baseUrl}}/admin/users/roles
+Authorization: Bearer {{login_cashier.response.body.token}}
+
+###############################################
+# 3. GET ALL USERS (Super Admin Only)
+###############################################
+
+### 3.1 Get All Users - Super Admin (Default Pagination)
+# @name get_all_users
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{adminToken}}
+
+### 3.2 Get All Users - With Pagination
+GET {{baseUrl}}/admin/users?page=1&limit=5
+Authorization: Bearer {{adminToken}}
+
+### 3.3 Get All Users - Filter by Role
+GET {{baseUrl}}/admin/users?role_id=ROLE_UUID_HERE
+Authorization: Bearer {{adminToken}}
+
+### 3.4 Get All Users - Filter by Status (Active)
+GET {{baseUrl}}/admin/users?is_active=true
+Authorization: Bearer {{adminToken}}
+
+### 3.5 Get All Users - Search by Name
+GET {{baseUrl}}/admin/users?search=admin
+Authorization: Bearer {{adminToken}}
+
+### 3.6 Get All Users - Kasir (Harus 403 Forbidden)
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{login_cashier.response.body.token}}
+
+###############################################
+# 4. GET USER STATISTICS
+###############################################
+
+### 4.1 Get User Stats - Super Admin
+GET {{baseUrl}}/admin/users/stats
+Authorization: Bearer {{adminToken}}
+
+### 4.2 Get User Stats - Kasir (Harus 403 Forbidden)
+GET {{baseUrl}}/admin/users/stats
+Authorization: Bearer {{login_cashier.response.body.token}}
+
+###############################################
+# 5. GET USER BY ID
+###############################################
+
+### 5.1 Get User by ID - Super Admin
+GET {{baseUrl}}/admin/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+### 5.2 Get Specific User (Super Admin)
+GET {{baseUrl}}/admin/users/YOUR_USER_ID_HERE
+Authorization: Bearer {{adminToken}}
+
+###############################################
+# 6. CREATE NEW USER (Super Admin Only)
+###############################################
+
+### 6.1 Create New Admin User - Super Admin
+# @name create_new_user
+POST {{baseUrl}}/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "full_name": "Test Admin Baru",
+  "phone_number": "081234567899",
+  "password": "test123",
+  "role_id": "YOUR_ROLE_ID_HERE",
+  "is_active": true
+}
+
+### 6.2 Create New User - Kasir (Harus 403 Forbidden)
+POST {{baseUrl}}/admin/users
+Authorization: Bearer {{login_cashier.response.body.token}}
+Content-Type: application/json
+
+{
+  "full_name": "Test Gagal",
+  "phone_number": "081234567888",
+  "password": "test123",
+  "role_id": "YOUR_ROLE_ID_HERE"
+}
+
+###############################################
+# 7. UPDATE USER (Super Admin Only)
+###############################################
+
+### 7.1 Update User - Super Admin
+PUT {{baseUrl}}/admin/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "full_name": "Admin Updated",
+  "is_active": true
+}
+
+### 7.2 Update User Password
+PUT {{baseUrl}}/admin/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "newpassword123"
+}
+
+### 7.3 Update User - Kasir (Harus 403 Forbidden)
+PUT {{baseUrl}}/admin/users/{{userId}}
+Authorization: Bearer {{login_cashier.response.body.token}}
+Content-Type: application/json
+
+{
+  "full_name": "Test Gagal Update"
+}
+
+###############################################
+# 8. UPDATE USER ROLE (Super Admin Only)
+###############################################
+
+### 8.1 Update User Role - Super Admin
+PATCH {{baseUrl}}/admin/users/{{userId}}/role
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "role_id": "YOUR_NEW_ROLE_ID_HERE"
+}
+
+### 8.2 Update User Role - Kasir (Harus 403 Forbidden)
+PATCH {{baseUrl}}/admin/users/{{userId}}/role
+Authorization: Bearer {{login_cashier.response.body.token}}
+Content-Type: application/json
+
+{
+  "role_id": "YOUR_ROLE_ID_HERE"
+}
+
+###############################################
+# 9. RESET USER PASSWORD (Super Admin Only)
+###############################################
+
+### 9.1 Reset User Password - Super Admin
+PATCH {{baseUrl}}/admin/users/{{userId}}/reset-password
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "newresetpassword123"
+}
+
+### 9.2 Reset Password - Kasir (Harus 403 Forbidden)
+PATCH {{baseUrl}}/admin/users/{{userId}}/reset-password
+Authorization: Bearer {{login_cashier.response.body.token}}
+Content-Type: application/json
+
+{
+  "password": "test123"
+}
+
+###############################################
+# 10. DELETE USER (Super Admin Only)
+###############################################
+
+### 10.1 Delete User - Super Admin
+DELETE {{baseUrl}}/admin/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+### 10.2 Delete User - Kasir (Harus 403 Forbidden)
+DELETE {{baseUrl}}/admin/users/{{userId}}
+Authorization: Bearer {{login_cashier.response.body.token}}
+
+###############################################
+# 11. VERIFY TOKEN & PERMISSIONS
+###############################################
+
+### 11.1 Get Current Admin Profile (Verify Token)
+GET {{baseUrl}}/admin/auth/me
+Authorization: Bearer {{adminToken}}
+
+### 11.2 Verify Super Admin Token
+GET {{baseUrl}}/admin/auth/me
+Authorization: Bearer {{login_super_admin.response.body.token}}
+
+### 11.3 Verify Kasir Token
+GET {{baseUrl}}/admin/auth/me
+Authorization: Bearer {{login_cashier.response.body.token}}
+
+### 11.4 Verify Finance Admin Token
+GET {{baseUrl}}/admin/auth/me
+Authorization: Bearer {{login_finance_admin.response.body.token}}
+
+###############################################
+# EXPECTED RESULTS:
+###############################################
+# 1. Super Admin (081234567808):
+#    - Bisa akses SEMUA endpoint ✅
+#    - Role: super_admin
+#    - Permissions: 29 permissions (ALL)
+#
+# 2. Kasir (081234567801):
+#    - TIDAK bisa akses /admin/users/** (403 Forbidden) ❌
+#    - Role: cashier
+#    - Permissions: Terbatas (offline_orders, b2b_transactions)
+#
+# 3. Admin WhatsApp (081234567802):
+#    - TIDAK bisa akses /admin/users/** (403 Forbidden) ❌
+#    - Role: whatsapp_admin
+#    - Permissions: Terbatas (online_orders)
+#
+# 4. Admin Inventori (081234567803):
+#    - TIDAK bisa akses /admin/users/** (403 Forbidden) ❌
+#    - Role: inventory_admin
+#    - Permissions: Terbatas (products, procurement)
+#
+# 5. Admin Finance (081234567804):
+#    - TIDAK bisa akses /admin/users/** (403 Forbidden) ❌
+#    - Role: finance_admin
+#    - Permissions: Terbatas (reports)
+#
+###############################################
