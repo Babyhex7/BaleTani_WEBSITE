@@ -231,7 +231,16 @@ const createOrder = async (req, res) => {
         });
       }
 
-      // Generate Virtual Account menggunakan static method dari model
+      // Dummy account numbers untuk masing-masing bank
+      const bankAccounts = {
+        BRI: "0021-01-123456-50-9",
+        BCA: "1234567890",
+        MANDIRI: "1370012345678",
+      };
+
+      const accountNumber = bankAccounts[bank_name];
+      const expiry = PaymentDetail.getExpiryTime();
+
       paymentDetail = await PaymentDetail.create(
         {
           order_id: order.id,
@@ -239,6 +248,9 @@ const createOrder = async (req, res) => {
           bank_name: bank_name,
           account_name: "BaleTani Fresh Market",
           payment_status: "pending",
+          virtual_account: accountNumber,
+          amount: totalAmount,
+          expired_at: expiry,
         },
         { transaction }
       );

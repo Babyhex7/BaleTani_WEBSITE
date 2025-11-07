@@ -6,6 +6,7 @@ import Button from './Button';
 import LoginModal from './LoginModal';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
+import { getImageUrl as getImageUrlUtil, handleImageError } from '../../utils/imageUtils';
 
 const ProductCard = ({ 
   product, 
@@ -57,9 +58,6 @@ const ProductCard = ({
   const handleCardClick = () => {
     navigate(`/products/${product.id}`);
   };
-
-  // Import image utilities
-  const { getImageUrl: getImageUrlUtil, handleImageError } = require('../../utils/imageUtils');
   
   return (
     <div 

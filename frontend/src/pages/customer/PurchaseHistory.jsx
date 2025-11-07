@@ -9,6 +9,7 @@ import OrderDetailModal from '../../components/ui_customer/OrderDetailModal';
 import Pagination from '../../components/ui/Pagination';
 import Toast from '../../components/ui/Toast';
 import { getOrders, getOrderDetail, reorderItems, cancelOrder } from '../../services/services_customer/orderHistoryService';
+import { useDebounce } from '../../hooks/useDebounce';
 
 /**
  * PurchaseHistory Page
@@ -27,6 +28,9 @@ const PurchaseHistory = () => {
   const [dateRange, setDateRange] = useState('');
   const [sortBy, setSortBy] = useState('newest');
 
+  // Debounced search query (500ms delay)
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -41,10 +45,15 @@ const PurchaseHistory = () => {
   // Toast
   const [toast, setToast] = useState({ show: false, type: '', message: '' });
 
+  // Reset to page 1 when search/filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchQuery, filterStatus, dateRange, sortBy]);
+
   // Fetch orders
   useEffect(() => {
     fetchOrders();
-  }, [currentPage, searchQuery, filterStatus, dateRange, sortBy]);
+  }, [currentPage, debouncedSearchQuery, filterStatus, dateRange, sortBy]);
 
   const fetchOrders = async () => {
     try {
@@ -52,7 +61,7 @@ const PurchaseHistory = () => {
       setError(null);
 
       const params = {
-        search: searchQuery,
+        search: debouncedSearchQuery,
         status: filterStatus,
         date_range: dateRange,
         sort: sortBy,

@@ -60,14 +60,6 @@ exports.getCustomerOrders = async (req, res) => {
       }
     }
 
-    // Search by order number or product name
-    if (search) {
-      whereClause[Op.or] = [
-        { order_number: { [Op.like]: `%${search}%` } },
-        { customer_name: { [Op.like]: `%${search}%` } },
-      ];
-    }
-
     // Sorting
     let orderBy = [["created_at", "DESC"]]; // Default: newest
     switch (sort) {
@@ -84,6 +76,31 @@ exports.getCustomerOrders = async (req, res) => {
 
     // Pagination
     const offset = (page - 1) * limit;
+
+    // Search: cari di order number, customer name, ATAU product name
+    if (search) {
+      // Cari orders yang memiliki item dengan product_name yang cocok
+      const ordersWithMatchingProducts = await OrderItem.findAll({
+        where: {
+          product_name: { [Op.like]: `%${search}%` },
+        },
+        attributes: ["order_id"],
+        raw: true,
+      });
+
+      const orderIdsWithMatchingProducts = ordersWithMatchingProducts.map(
+        (item) => item.order_id
+      );
+
+      // Gabungkan kondisi: order_number/customer_name ATAU order_id dari product search
+      whereClause[Op.or] = [
+        { order_number: { [Op.like]: `%${search}%` } },
+        { customer_name: { [Op.like]: `%${search}%` } },
+        ...(orderIdsWithMatchingProducts.length > 0
+          ? [{ id: { [Op.in]: orderIdsWithMatchingProducts } }]
+          : []),
+      ];
+    }
 
     // Fetch orders with items and payment details
     const { count, rows: orders } = await Order.findAndCountAll({
