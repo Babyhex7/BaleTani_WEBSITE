@@ -58,19 +58,8 @@ const ProductCard = ({
     navigate(`/products/${product.id}`);
   };
 
-  // Get correct image URL
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return 'https://via.placeholder.com/300x300?text=No+Image';
-    
-    // If already a full URL, return as is
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return imagePath;
-    }
-    
-    // If relative path, prepend backend URL
-    const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
-    return `${backendUrl}/${imagePath}`;
-  };
+  // Import image utilities
+  const { getImageUrl: getImageUrlUtil, handleImageError } = require('../../utils/imageUtils');
   
   return (
     <div 
@@ -80,12 +69,10 @@ const ProductCard = ({
       {/* Product Image */}
       <div className="relative overflow-hidden bg-gray-100">
         <img 
-          src={getImageUrl(product.image)} 
+          src={getImageUrlUtil(product.image, 'product')} 
           alt={product.name}
           className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
-          onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
-          }}
+          onError={(e) => handleImageError(e, 'product')}
         />
         
         {/* Discount Badge - Kanan Atas */}

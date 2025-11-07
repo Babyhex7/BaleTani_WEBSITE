@@ -35,15 +35,41 @@ const startServer = async () => {
 };
 
 // Handle unhandled promise rejections
-process.on("unhandledRejection", (err) => {
-  console.error("❌ Unhandled Rejection:", err);
-  process.exit(1);
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("❌ Unhandled Promise Rejection at:", promise);
+  console.error("Reason:", reason);
+  // Jangan exit di development, biar server tetap jalan
+  if (process.env.NODE_ENV === "production") {
+    console.error("⚠️ Shutting down server due to unhandled rejection...");
+    process.exit(1);
+  } else {
+    console.log("⚠️ Server masih jalan (development mode)");
+  }
 });
 
 // Handle uncaught exceptions
 process.on("uncaughtException", (err) => {
   console.error("❌ Uncaught Exception:", err);
-  process.exit(1);
+  // Jangan exit di development
+  if (process.env.NODE_ENV === "production") {
+    console.error("⚠️ Shutting down server due to uncaught exception...");
+    process.exit(1);
+  } else {
+    console.log("⚠️ Server masih jalan (development mode)");
+  }
+});
+
+// Handle SIGTERM (Graceful shutdown)
+process.on("SIGTERM", async () => {
+  console.log("\n⏳ SIGTERM signal received: closing server gracefully");
+  try {
+    await sequelize.close();
+    console.log("✅ Database connection closed");
+    process.exit(0);
+  } catch (error) {
+    console.error("❌ Error during shutdown:", error);
+    process.exit(1);
+  }
 });
 
 startServer();

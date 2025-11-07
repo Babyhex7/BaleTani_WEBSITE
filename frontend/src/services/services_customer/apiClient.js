@@ -5,13 +5,14 @@ import { debugLog } from "../../utils/debugLogger";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
-// Create axios instance
+// Create axios instance with improved configuration
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 30000, // Naik dari 10s ke 30s untuk request yang lebih lambat
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // Allow cookies untuk CORS
 });
 
 // Request interceptor to add auth token
@@ -21,7 +22,7 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    debugLog('API:REQ', `${config.method?.toUpperCase()} ${config.url}`, {
+    debugLog("API:REQ", `${config.method?.toUpperCase()} ${config.url}`, {
       baseURL: config.baseURL,
       isAuthenticated,
       userRole: user?.role,
@@ -30,40 +31,98 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => {
-    debugLog('API:REQ', 'Request error', { message: error.message });
+    debugLog("API:REQ", "Request error", { message: error.message });
     return Promise.reject(error);
   }
 );
 
-// Response interceptor to handle errors
+// Response interceptor to handle errors with retry logic
+let retryCount = 0;
+const MAX_RETRIES = 2;
+
 apiClient.interceptors.response.use(
   (response) => {
-    debugLog('API:RES', `${response.config.method?.toUpperCase()} ${response.config.url}`, {
-      status: response.status,
-      ok: true,
-    });
+    // Reset retry count on success
+    retryCount = 0;
+    debugLog(
+      "API:RES",
+      `${response.config.method?.toUpperCase()} ${response.config.url}`,
+      {
+        status: response.status,
+        ok: true,
+      }
+    );
     return response;
   },
-  (error) => {
+  async (error) => {
     const { response, message, code, config } = error;
-    debugLog('API:RES', `Error for ${config?.method?.toUpperCase()} ${config?.url}`, {
-      status: response?.status,
-      code,
-      message,
-      data: response?.data,
-    });
 
+    // ========================================
+    // Handle Network Errors (Backend Down/CORS)
+    // ========================================
+    if (!response) {
+      console.error("❌ Network Error:", {
+        message: message || "Backend tidak merespon",
+        code,
+        url: config?.url,
+      });
+
+      // Retry logic untuk network errors
+      if (retryCount < MAX_RETRIES && config && !config._retry) {
+        retryCount++;
+        config._retry = true;
+
+        console.log(`🔄 Retrying request (${retryCount}/${MAX_RETRIES})...`);
+
+        // Exponential backoff: 1s, 2s
+        await new Promise((resolve) => setTimeout(resolve, 1000 * retryCount));
+
+        return apiClient(config);
+      }
+
+      // Tampilkan error yang user-friendly
+      debugLog("API:RES", `Network Error after ${retryCount} retries`, {
+        message:
+          "Tidak dapat terhubung ke server. Pastikan backend berjalan di http://localhost:5000",
+        url: config?.url,
+      });
+
+      return Promise.reject({
+        message: "Tidak dapat terhubung ke server. Silakan coba lagi.",
+        type: "NETWORK_ERROR",
+        originalError: error,
+      });
+    }
+
+    // Reset retry count jika dapat response
+    retryCount = 0;
+
+    debugLog(
+      "API:RES",
+      `Error for ${config?.method?.toUpperCase()} ${config?.url}`,
+      {
+        status: response?.status,
+        code,
+        message,
+        data: response?.data,
+      }
+    );
+
+    // ========================================
+    // Handle HTTP Status Errors
+    // ========================================
     if (response?.status === 401) {
+      console.warn("⚠️ Unauthorized: Token expired atau tidak valid");
       useAuthStore.getState().logout();
       // Hindari infinite redirect loop jika sudah di /login
-      if (window.location.pathname !== '/login') {
+      if (window.location.pathname !== "/login") {
         window.location.href = "/login";
       }
     } else if (response?.status === 403) {
-      console.error("Access denied: Insufficient permissions");
+      console.error("❌ Access denied: Insufficient permissions");
     } else if (response?.status >= 500) {
       console.error(
-        "Server error:",
+        "❌ Server error:",
         response?.data?.message || "Internal server error"
       );
     }

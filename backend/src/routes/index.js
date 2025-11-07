@@ -22,6 +22,10 @@ const publicRoutes = require("./public");
  * ROUTE REGISTRATION
  */
 
+// Health check - /api/health (no auth required)
+const healthRoutes = require("./health");
+router.use("/health", healthRoutes);
+
 // Admin routes - /api/admin/*
 router.use("/admin", adminRoutes);
 

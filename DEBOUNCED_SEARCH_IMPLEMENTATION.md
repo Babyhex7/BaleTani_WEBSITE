@@ -1,6 +1,7 @@
 # ✅ Debounced Search Implementation
 
 ## 📋 Overview
+
 Implemented debounced search across all pages (customer & admin) to optimize API calls and improve user experience. Users can type freely without triggering excessive network requests.
 
 ---
@@ -8,9 +9,10 @@ Implemented debounced search across all pages (customer & admin) to optimize API
 ## 🎯 Implementation Pattern
 
 ### **Core Hook: `useDebounce`**
+
 ```javascript
 // Location: frontend/src/hooks/useDebounce.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 const useDebounce = (value, delay = 500) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -32,12 +34,13 @@ export default useDebounce;
 ```
 
 ### **Usage Pattern**
+
 ```javascript
 // 1. Import hook
-import useDebounce from '../../hooks/useDebounce';
+import useDebounce from "../../hooks/useDebounce";
 
 // 2. Keep searchInput state (for UI)
-const [searchInput, setSearchInput] = useState('');
+const [searchInput, setSearchInput] = useState("");
 
 // 3. Create debounced version
 const debouncedSearch = useDebounce(searchInput, 500);
@@ -49,10 +52,7 @@ useEffect(() => {
 }, [debouncedSearch]);
 
 // 5. Bind input to searchInput state
-<input
-  value={searchInput}
-  onChange={(e) => setSearchInput(e.target.value)}
-/>
+<input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />;
 ```
 
 ---
@@ -60,19 +60,21 @@ useEffect(() => {
 ## 📦 Files Updated
 
 ### **Customer Pages (3)**
-| File | Search Type | Changes |
-|------|-------------|---------|
-| `frontend/src/pages/customer/ProductPage.jsx` | API call via `useProducts` hook | ✅ Added `useDebounce`, auto-search on `debouncedSearch` |
-| `frontend/src/pages/customer/PromoPage.jsx` | Client-side filtering | ✅ Added `useDebounce`, filter on `debouncedSearch` |
-| `frontend/src/pages/customer/CategoryPage.jsx` | Client-side filtering | ✅ Added `useDebounce`, filter on `debouncedSearch` |
+
+| File                                           | Search Type                     | Changes                                                  |
+| ---------------------------------------------- | ------------------------------- | -------------------------------------------------------- |
+| `frontend/src/pages/customer/ProductPage.jsx`  | API call via `useProducts` hook | ✅ Added `useDebounce`, auto-search on `debouncedSearch` |
+| `frontend/src/pages/customer/PromoPage.jsx`    | Client-side filtering           | ✅ Added `useDebounce`, filter on `debouncedSearch`      |
+| `frontend/src/pages/customer/CategoryPage.jsx` | Client-side filtering           | ✅ Added `useDebounce`, filter on `debouncedSearch`      |
 
 ### **Admin Pages (6)**
-| File | Search Type | Changes |
-|------|-------------|---------|
-| `frontend/src/pages/admin/ProductListNew.jsx` | API call via `inventoryService` | ✅ Added `useDebounce`, API params use `debouncedSearch` |
-| `frontend/src/pages/admin/UserManagement.jsx` | Mock data filtering | ✅ Added `useDebounce`, filter on `debouncedSearch` |
-| `frontend/src/pages/admin/OrderManagement.jsx` | Mock/API data filtering | ✅ Added `useDebounce`, filter on `debouncedSearch` |
-| `frontend/src/pages/admin/CustomerManagement.jsx` | API call via `customerService` | ✅ Added `useDebounce`, API params use `debouncedSearch` |
+
+| File                                              | Search Type                     | Changes                                                  |
+| ------------------------------------------------- | ------------------------------- | -------------------------------------------------------- |
+| `frontend/src/pages/admin/ProductListNew.jsx`     | API call via `inventoryService` | ✅ Added `useDebounce`, API params use `debouncedSearch` |
+| `frontend/src/pages/admin/UserManagement.jsx`     | Mock data filtering             | ✅ Added `useDebounce`, filter on `debouncedSearch`      |
+| `frontend/src/pages/admin/OrderManagement.jsx`    | Mock/API data filtering         | ✅ Added `useDebounce`, filter on `debouncedSearch`      |
+| `frontend/src/pages/admin/CustomerManagement.jsx` | API call via `customerService`  | ✅ Added `useDebounce`, API params use `debouncedSearch` |
 | `frontend/src/pages/admin/DiscountManagement.jsx` | API call via `inventoryService` | ✅ Added `useDebounce`, API params use `debouncedSearch` |
 | `frontend/src/pages/admin/CategoryManagement.jsx` | API call via `inventoryService` | ✅ Added `useDebounce`, API params use `debouncedSearch` |
 
@@ -81,8 +83,9 @@ useEffect(() => {
 ## 🔍 Technical Details
 
 ### **Before (No Debounce)**
+
 ```javascript
-const [searchQuery, setSearchQuery] = useState('');
+const [searchQuery, setSearchQuery] = useState("");
 
 useEffect(() => {
   fetchData(); // ❌ Triggers on EVERY keystroke
@@ -90,14 +93,16 @@ useEffect(() => {
 ```
 
 **Problems:**
+
 - 10 keystrokes = 10 API calls
 - Server overload
 - Wasted bandwidth
 - Poor UX (too many loading states)
 
 ### **After (With Debounce)**
+
 ```javascript
-const [searchQuery, setSearchQuery] = useState('');
+const [searchQuery, setSearchQuery] = useState("");
 const debouncedSearch = useDebounce(searchQuery, 500);
 
 useEffect(() => {
@@ -106,6 +111,7 @@ useEffect(() => {
 ```
 
 **Benefits:**
+
 - 10 keystrokes → 1 API call (after 500ms pause)
 - Reduced server load
 - Better performance
@@ -116,12 +122,14 @@ useEffect(() => {
 ## 🎨 User Experience
 
 ### **Behavior**
+
 1. User types "tomato" in search bar
 2. Input updates instantly (no delay)
 3. After user stops typing for 500ms → API call triggered
 4. Results appear smoothly
 
 ### **Example Timeline**
+
 ```
 0ms:    User types "t"
 100ms:  User types "o"
@@ -137,6 +145,7 @@ useEffect(() => {
 ## 🧪 Testing Checklist
 
 ### **Customer Pages**
+
 - [ ] Product search works with debounce
 - [ ] Promo search works with debounce
 - [ ] Category search works with debounce
@@ -144,6 +153,7 @@ useEffect(() => {
 - [ ] Results update after 500ms pause
 
 ### **Admin Pages**
+
 - [ ] Product management search works
 - [ ] User management search works
 - [ ] Order management search works
@@ -153,6 +163,7 @@ useEffect(() => {
 - [ ] All searches respect 500ms debounce delay
 
 ### **Edge Cases**
+
 - [ ] Empty search clears results
 - [ ] Fast typing doesn't spam API
 - [ ] Slow typing respects debounce
@@ -163,14 +174,16 @@ useEffect(() => {
 ## 📊 Performance Impact
 
 ### **Metrics**
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| API calls per search | 10-15 | 1-2 | **85-90% reduction** |
-| Network bandwidth | High | Low | **Significant savings** |
-| Server load | Heavy | Light | **Much better** |
-| User experience | Jarring | Smooth | **Professional** |
+
+| Metric               | Before  | After  | Improvement             |
+| -------------------- | ------- | ------ | ----------------------- |
+| API calls per search | 10-15   | 1-2    | **85-90% reduction**    |
+| Network bandwidth    | High    | Low    | **Significant savings** |
+| Server load          | Heavy   | Light  | **Much better**         |
+| User experience      | Jarring | Smooth | **Professional**        |
 
 ### **Estimated Savings**
+
 - **Average search query**: 8 characters
 - **Without debounce**: 8 API calls
 - **With debounce**: 1 API call
@@ -181,9 +194,11 @@ useEffect(() => {
 ## 🔧 Configuration
 
 ### **Default Delay: 500ms**
+
 Optimal balance between responsiveness and performance.
 
 ### **Adjusting Delay**
+
 ```javascript
 // Faster (300ms) - more responsive, more API calls
 const debouncedSearch = useDebounce(searchInput, 300);
@@ -193,6 +208,7 @@ const debouncedSearch = useDebounce(searchInput, 1000);
 ```
 
 ### **Recommended Delays by Use Case**
+
 - **Autocomplete**: 200-300ms (fast feedback needed)
 - **General search**: 500ms (balanced)
 - **Heavy operations**: 800-1000ms (reduce load)
@@ -202,12 +218,14 @@ const debouncedSearch = useDebounce(searchInput, 1000);
 ## 🚀 Best Practices
 
 ### **✅ DO**
+
 - Use debounce for all search inputs
 - Keep delay at 500ms unless specific requirement
 - Maintain searchInput state for instant UI updates
 - Use debouncedSearch for API calls/filtering
 
 ### **❌ DON'T**
+
 - Don't debounce the input onChange (UI lag)
 - Don't set delay too high (feels unresponsive)
 - Don't forget cleanup in useEffect
@@ -218,17 +236,18 @@ const debouncedSearch = useDebounce(searchInput, 1000);
 ## 📝 Example Implementation
 
 ### **Complete Example**
+
 ```javascript
-import { useState, useEffect } from 'react';
-import useDebounce from '../../hooks/useDebounce';
+import { useState, useEffect } from "react";
+import useDebounce from "../../hooks/useDebounce";
 
 const MySearchPage = () => {
   // State for immediate UI feedback
-  const [searchInput, setSearchInput] = useState('');
-  
+  const [searchInput, setSearchInput] = useState("");
+
   // Debounced value for API calls
   const debouncedSearch = useDebounce(searchInput, 500);
-  
+
   // Results state
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -246,7 +265,7 @@ const MySearchPage = () => {
         const response = await api.search(debouncedSearch);
         setResults(response.data);
       } catch (error) {
-        console.error('Search error:', error);
+        console.error("Search error:", error);
       } finally {
         setLoading(false);
       }
@@ -263,11 +282,11 @@ const MySearchPage = () => {
         value={searchInput}
         onChange={(e) => setSearchInput(e.target.value)}
       />
-      
+
       {loading && <p>Loading...</p>}
-      
+
       <div>
-        {results.map(item => (
+        {results.map((item) => (
           <div key={item.id}>{item.name}</div>
         ))}
       </div>
