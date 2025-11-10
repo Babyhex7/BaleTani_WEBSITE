@@ -4,31 +4,30 @@
  * Hanya untuk development/debugging
  */
 
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const cacheService = require('../cache/cacheService');
-const cache = require('../cache/nodeCacheClient');
+const cacheService = require("../cache/cacheService");
+const cache = require("../cache/nodeCacheClient");
 
 /**
  * GET /api/cache/stats
  * Mendapatkan statistik cache
  */
-router.get('/stats', (req, res) => {
+router.get("/stats", (req, res) => {
   try {
     const stats = cacheService.getStats();
-    
+
     // Hitung hit ratio
     const totalRequests = stats.hits + stats.misses;
-    const hitRatio = totalRequests > 0 
-      ? ((stats.hits / totalRequests) * 100).toFixed(2) 
-      : 0;
-    
+    const hitRatio =
+      totalRequests > 0 ? ((stats.hits / totalRequests) * 100).toFixed(2) : 0;
+
     // Get all cache keys
     const keys = cache.keys();
-    
+
     res.json({
       success: true,
-      message: 'Cache statistics',
+      message: "Cache statistics",
       data: {
         summary: {
           totalKeys: stats.keys,
@@ -53,10 +52,10 @@ router.get('/stats', (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error getting cache stats:', error);
+    console.error("Error getting cache stats:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get cache stats',
+      message: "Failed to get cache stats",
       error: error.message,
     });
   }
@@ -66,35 +65,39 @@ router.get('/stats', (req, res) => {
  * GET /api/cache/keys
  * Mendapatkan semua cache keys yang aktif
  */
-router.get('/keys', (req, res) => {
+router.get("/keys", (req, res) => {
   try {
     const keys = cache.keys();
-    
+
     // Get TTL untuk setiap key
-    const keysWithTTL = keys.map(key => {
+    const keysWithTTL = keys.map((key) => {
       const ttl = cache.getTtl(key);
-      const remainingSeconds = ttl ? Math.floor((ttl - Date.now()) / 1000) : null;
-      
+      const remainingSeconds = ttl
+        ? Math.floor((ttl - Date.now()) / 1000)
+        : null;
+
       return {
         key,
-        ttl: remainingSeconds ? `${remainingSeconds}s (${Math.floor(remainingSeconds / 60)} menit)` : 'No TTL',
-        expiresAt: ttl ? new Date(ttl).toLocaleString('id-ID') : null,
+        ttl: remainingSeconds
+          ? `${remainingSeconds}s (${Math.floor(remainingSeconds / 60)} menit)`
+          : "No TTL",
+        expiresAt: ttl ? new Date(ttl).toLocaleString("id-ID") : null,
       };
     });
-    
+
     res.json({
       success: true,
-      message: 'Cache keys retrieved',
+      message: "Cache keys retrieved",
       data: {
         totalKeys: keys.length,
         keys: keysWithTTL,
       },
     });
   } catch (error) {
-    console.error('Error getting cache keys:', error);
+    console.error("Error getting cache keys:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get cache keys',
+      message: "Failed to get cache keys",
       error: error.message,
     });
   }
@@ -104,24 +107,24 @@ router.get('/keys', (req, res) => {
  * DELETE /api/cache/flush
  * Hapus semua cache (HATI-HATI!)
  */
-router.delete('/flush', (req, res) => {
+router.delete("/flush", (req, res) => {
   try {
     const keysBefore = cache.keys().length;
-    
+
     cacheService.flush();
-    
+
     res.json({
       success: true,
-      message: 'All cache flushed successfully',
+      message: "All cache flushed successfully",
       data: {
         keysDeleted: keysBefore,
       },
     });
   } catch (error) {
-    console.error('Error flushing cache:', error);
+    console.error("Error flushing cache:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to flush cache',
+      message: "Failed to flush cache",
       error: error.message,
     });
   }
@@ -131,12 +134,12 @@ router.delete('/flush', (req, res) => {
  * DELETE /api/cache/key/:key
  * Hapus cache tertentu
  */
-router.delete('/key/:key', (req, res) => {
+router.delete("/key/:key", (req, res) => {
   try {
     const { key } = req.params;
-    
+
     const deleted = cacheService.del(key);
-    
+
     if (deleted > 0) {
       res.json({
         success: true,
@@ -150,10 +153,10 @@ router.delete('/key/:key', (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Error deleting cache key:', error);
+    console.error("Error deleting cache key:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to delete cache key',
+      message: "Failed to delete cache key",
       error: error.message,
     });
   }
@@ -164,19 +167,19 @@ router.delete('/key/:key', (req, res) => {
  * Hapus cache dengan pattern tertentu
  * Body: { pattern: "customer:products:" }
  */
-router.delete('/pattern', (req, res) => {
+router.delete("/pattern", (req, res) => {
   try {
     const { pattern } = req.body;
-    
+
     if (!pattern) {
       return res.status(400).json({
         success: false,
-        message: 'Pattern is required',
+        message: "Pattern is required",
       });
     }
-    
+
     const deleted = cacheService.delPattern(pattern);
-    
+
     res.json({
       success: true,
       message: `${deleted} cache keys deleted with pattern "${pattern}"`,
@@ -186,10 +189,10 @@ router.delete('/pattern', (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error deleting cache pattern:', error);
+    console.error("Error deleting cache pattern:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to delete cache pattern',
+      message: "Failed to delete cache pattern",
       error: error.message,
     });
   }
