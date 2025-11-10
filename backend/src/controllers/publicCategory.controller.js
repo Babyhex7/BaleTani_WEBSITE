@@ -1,6 +1,11 @@
 /**
  * Public Category Controller
  * Handle category operations for public/customer access
+ *
+ * CACHING STRATEGY:
+ * - Categories list: Cache 1 jam (3600 detik) - Karena jarang berubah
+ * - Category detail: Cache 1 jam (3600 detik)
+ * - Cache invalidation: Saat admin CRUD category
  */
 
 const { Op } = require("sequelize");
@@ -12,9 +17,18 @@ const {
   Discount,
 } = require("../models");
 
+// Import cache service dan cache keys
+const cacheService = require("../cache/cacheService");
+const { CUSTOMER } = require("../cache/cacheKeys");
+
 /**
  * GET /api/public/categories
  * Get all active categories with product count
+ *
+ * CACHING:
+ * - Cache key: customer:categories:list
+ * - TTL: 3600 detik (1 jam) - Categories jarang berubah
+ * - Invalidation: Saat admin CRUD category
  */
 const getAllCategories = async (req, res) => {
   try {
@@ -23,6 +37,31 @@ const getAllCategories = async (req, res) => {
       sort_by = "category_name",
       sort_order = "ASC",
     } = req.query;
+
+    // ========================================
+    // STEP 1: Check Cache
+    // ========================================
+    // Skip cache jika ada search (karena terlalu banyak kombinasi)
+    const useCache = !search;
+
+    if (useCache) {
+      const cacheKey = CUSTOMER.CATEGORIES;
+      const cachedData = cacheService.get(cacheKey);
+
+      if (cachedData) {
+        return res.json({
+          success: true,
+          message: "Kategori berhasil diambil dari cache",
+          data: cachedData,
+          cached: true, // Flag untuk debugging
+        });
+      }
+    }
+
+    // ========================================
+    // STEP 2: Cache MISS - Query Database
+    // ========================================
+    console.log("[DB QUERY] Categories - Cache miss, querying database...");
 
     // Build where clause
     const whereClause = {
@@ -59,10 +98,23 @@ const getAllCategories = async (req, res) => {
       created_at: category.created_at,
     }));
 
+    // ========================================
+    // STEP 3: Save to Cache (jika tidak ada search)
+    // ========================================
+    if (useCache) {
+      const cacheKey = CUSTOMER.CATEGORIES;
+      // TTL: 3600 detik (1 jam) - Categories jarang berubah
+      cacheService.set(cacheKey, formattedCategories, 3600);
+    }
+
+    // ========================================
+    // STEP 4: Return Response
+    // ========================================
     res.status(200).json({
       success: true,
       message: "Kategori berhasil diambil",
       data: formattedCategories,
+      cached: false, // Flag untuk debugging
     });
   } catch (error) {
     console.error("Error getting categories:", error);

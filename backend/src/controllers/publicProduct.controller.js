@@ -2,6 +2,11 @@
  * PUBLIC PRODUCT CONTROLLER
  * Handles product display for customers (no authentication required)
  * Includes search, filter, pagination, and promo products
+ *
+ * CACHING STRATEGY:
+ * - Products list: Cache 10 menit (600 detik)
+ * - Product detail: Cache 15 menit (900 detik)
+ * - Cache invalidation: Saat admin CRUD product
  */
 
 const {
@@ -14,9 +19,18 @@ const {
 const { Op } = require("sequelize");
 const { sequelize } = require("../config/database");
 
+// Import cache service dan cache keys
+const cacheService = require("../cache/cacheService");
+const { CUSTOMER, PATTERNS } = require("../cache/cacheKeys");
+
 /**
  * Get all products with search, filter, and pagination
  * @route GET /api/public/products
+ *
+ * CACHING:
+ * - Cache key: customer:products:{category}:page:{page}
+ * - TTL: 600 detik (10 menit)
+ * - Invalidation: Saat admin create/update/delete product
  */
 exports.getAllProducts = async (req, res) => {
   try {
@@ -29,6 +43,33 @@ exports.getAllProducts = async (req, res) => {
       maxPrice = 999999999,
       sortBy = "newest", // newest, name_asc, name_desc, price_asc, price_desc
     } = req.query;
+
+    // ========================================
+    // STEP 1: Check Cache
+    // ========================================
+    // Generate cache key berdasarkan filter
+    // Kalau ada search/filter harga, skip cache (karena terlalu banyak kombinasi)
+    const useCache = !search && minPrice == 0 && maxPrice == 999999999;
+
+    if (useCache) {
+      const cacheKey = CUSTOMER.PRODUCTS_LIST(category || "all", page);
+      const cachedData = cacheService.get(cacheKey);
+
+      // Jika cache ada, langsung return (skip query database)
+      if (cachedData) {
+        return res.json({
+          success: true,
+          message: "Products retrieved from cache",
+          data: cachedData, // cachedData sudah berisi { products, pagination, filters }
+          cached: true, // Flag untuk debugging
+        });
+      }
+    }
+
+    // ========================================
+    // STEP 2: Cache MISS - Query Database
+    // ========================================
+    console.log("[DB QUERY] Products - Cache miss, querying database...");
 
     // Pagination
     const offset = (parseInt(page) - 1) * parseInt(limit);
@@ -187,33 +228,49 @@ exports.getAllProducts = async (req, res) => {
     // Calculate pagination info
     const totalPages = Math.ceil(count / pageLimit);
 
+    // Prepare response data
+    const responseData = {
+      products: formattedProducts,
+      pagination: {
+        current_page: parseInt(page),
+        total_pages: totalPages,
+        total_items: count,
+        items_per_page: pageLimit,
+        has_next_page: parseInt(page) < totalPages,
+        has_prev_page: parseInt(page) > 1,
+      },
+      filters: {
+        categories: categories.map((cat) => ({
+          id: cat.id,
+          name: cat.category_name,
+        })),
+        appliedFilters: {
+          search,
+          category,
+          minPrice,
+          maxPrice,
+          sortBy,
+        },
+      },
+    };
+
+    // ========================================
+    // STEP 3: Save to Cache (jika tidak ada search/filter)
+    // ========================================
+    if (useCache) {
+      const cacheKey = CUSTOMER.PRODUCTS_LIST(category || "all", page);
+      // TTL: 600 detik (10 menit)
+      cacheService.set(cacheKey, responseData, 600);
+    }
+
+    // ========================================
+    // STEP 4: Return Response
+    // ========================================
     res.status(200).json({
       success: true,
       message: "Products fetched successfully",
-      data: {
-        products: formattedProducts,
-        pagination: {
-          current_page: parseInt(page),
-          total_pages: totalPages,
-          total_items: count,
-          items_per_page: pageLimit,
-          has_next_page: parseInt(page) < totalPages,
-          has_prev_page: parseInt(page) > 1,
-        },
-        filters: {
-          categories: categories.map((cat) => ({
-            id: cat.id,
-            name: cat.category_name,
-          })),
-          appliedFilters: {
-            search,
-            category,
-            minPrice,
-            maxPrice,
-            sortBy,
-          },
-        },
-      },
+      data: responseData,
+      cached: false, // Flag untuk debugging
     });
   } catch (error) {
     console.error("❌ Error fetching products:", error);
@@ -228,10 +285,37 @@ exports.getAllProducts = async (req, res) => {
 /**
  * Get product detail by ID
  * @route GET /api/public/products/:id
+ *
+ * CACHING:
+ * - Cache key: customer:product:{id}
+ * - TTL: 900 detik (15 menit)
+ * - Invalidation: Saat admin update/delete product
  */
 exports.getProductDetail = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // ========================================
+    // STEP 1: Check Cache
+    // ========================================
+    const cacheKey = CUSTOMER.PRODUCT_DETAIL(id);
+    const cachedData = cacheService.get(cacheKey);
+
+    if (cachedData) {
+      return res.json({
+        success: true,
+        message: "Product detail retrieved from cache",
+        data: cachedData,
+        cached: true, // Flag untuk debugging
+      });
+    }
+
+    // ========================================
+    // STEP 2: Cache MISS - Query Database
+    // ========================================
+    console.log(
+      `[DB QUERY] Product Detail (ID: ${id}) - Cache miss, querying database...`
+    );
 
     const product = await Product.findOne({
       where: {
@@ -340,10 +424,20 @@ exports.getProductDetail = async (req, res) => {
       createdAt: productData.created_at,
     };
 
+    // ========================================
+    // STEP 3: Save to Cache
+    // ========================================
+    // TTL: 900 detik (15 menit) - Karena stock bisa berubah cepat
+    cacheService.set(cacheKey, formattedProduct, 900);
+
+    // ========================================
+    // STEP 4: Return Response
+    // ========================================
     res.status(200).json({
       success: true,
       message: "Product detail fetched successfully",
       data: formattedProduct,
+      cached: false, // Flag untuk debugging
     });
   } catch (error) {
     console.error("Error fetching product detail:", error);

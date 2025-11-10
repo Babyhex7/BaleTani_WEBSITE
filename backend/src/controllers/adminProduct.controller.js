@@ -9,6 +9,10 @@ const {
   OrderItem,
 } = require("../models");
 
+// Import cache service dan cache keys untuk invalidation
+const cacheService = require("../cache/cacheService");
+const { PATTERNS } = require("../cache/cacheKeys");
+
 /**
  * GET /admin/products
  * Get all products with filtering, search, and pagination
@@ -375,6 +379,25 @@ const create = async (req, res) => {
       ],
     });
 
+    // ========================================
+    // CACHE INVALIDATION: Hapus cache customer & admin
+    // ========================================
+    // Saat product baru dibuat, semua cache products harus di-clear
+    // agar customer & admin lihat data terbaru
+    console.log(
+      "[CACHE INVALIDATION] Product created - Clearing all products cache"
+    );
+
+    // 1. Hapus semua cache customer products
+    cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
+
+    // 2. Hapus semua cache admin products
+    cacheService.delPattern(PATTERNS.ADMIN_PRODUCTS);
+
+    // 3. Hapus cache categories (karena product_count berubah)
+    cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
+    cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
+
     return res.status(201).json({
       success: true,
       message: "Produk berhasil ditambahkan",
@@ -507,6 +530,23 @@ const update = async (req, res) => {
       ],
     });
 
+    // ========================================
+    // CACHE INVALIDATION: Hapus cache yang terpengaruh
+    // ========================================
+    console.log(
+      `[CACHE INVALIDATION] Product updated (ID: ${id}) - Clearing cache`
+    );
+
+    // 1. Hapus semua cache customer products (list & detail)
+    cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
+
+    // 2. Hapus semua cache admin products
+    cacheService.delPattern(PATTERNS.ADMIN_PRODUCTS);
+
+    // 3. Hapus cache categories (kalau category_id berubah, product_count berubah)
+    cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
+    cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
+
     return res.status(200).json({
       success: true,
       message: "Produk berhasil diperbarui",
@@ -556,6 +596,23 @@ const deleteProduct = async (req, res) => {
 
     // Hard delete product
     await product.destroy();
+
+    // ========================================
+    // CACHE INVALIDATION: Hapus cache setelah delete
+    // ========================================
+    console.log(
+      `[CACHE INVALIDATION] Product deleted (ID: ${id}) - Clearing cache`
+    );
+
+    // 1. Hapus semua cache customer products
+    cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
+
+    // 2. Hapus semua cache admin products
+    cacheService.delPattern(PATTERNS.ADMIN_PRODUCTS);
+
+    // 3. Hapus cache categories (product_count berkurang)
+    cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
+    cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
 
     return res.status(200).json({
       success: true,

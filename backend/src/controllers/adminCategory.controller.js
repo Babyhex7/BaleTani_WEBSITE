@@ -1,10 +1,17 @@
 /**
  * Admin Category Controller
  * Mengelola CRUD kategori produk untuk admin
+ *
+ * CACHE INVALIDATION:
+ * - Setiap CRUD category → Clear cache categories & products
  */
 
 const { Op } = require("sequelize");
 const { Category, Product } = require("../models");
+
+// Import cache service dan cache keys untuk invalidation
+const cacheService = require("../cache/cacheService");
+const { PATTERNS } = require("../cache/cacheKeys");
 
 /**
  * GET /api/admin/categories
@@ -189,6 +196,17 @@ const createCategory = async (req, res) => {
       is_active,
     });
 
+    // ========================================
+    // CACHE INVALIDATION: Hapus cache categories
+    // ========================================
+    console.log(
+      "[CACHE INVALIDATION] Category created - Clearing categories cache"
+    );
+
+    // Hapus cache categories (customer & admin)
+    cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
+    cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
+
     res.status(201).json({
       success: true,
       message: "Kategori berhasil dibuat",
@@ -251,6 +269,21 @@ const updateCategory = async (req, res) => {
 
     await category.update(updateData);
 
+    // ========================================
+    // CACHE INVALIDATION: Hapus cache categories & products
+    // ========================================
+    console.log(
+      `[CACHE INVALIDATION] Category updated (ID: ${id}) - Clearing cache`
+    );
+
+    // 1. Hapus cache categories
+    cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
+    cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
+
+    // 2. Hapus cache products (karena category_name mungkin berubah)
+    cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
+    cacheService.delPattern(PATTERNS.ADMIN_PRODUCTS);
+
     res.status(200).json({
       success: true,
       message: "Kategori berhasil diupdate",
@@ -304,6 +337,17 @@ const deleteCategory = async (req, res) => {
 
     // Hard delete
     await category.destroy();
+
+    // ========================================
+    // CACHE INVALIDATION: Hapus cache categories
+    // ========================================
+    console.log(
+      `[CACHE INVALIDATION] Category deleted (ID: ${id}) - Clearing cache`
+    );
+
+    // Hapus cache categories (customer & admin)
+    cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
+    cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
 
     res.status(200).json({
       success: true,
