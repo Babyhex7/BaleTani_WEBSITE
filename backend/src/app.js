@@ -110,6 +110,13 @@ app.use(
 // ============================================
 app.use("/api", routes);
 
+// Cache monitoring routes (only for development/debugging)
+if (process.env.NODE_ENV !== "production") {
+  const cacheStatsRoutes = require("./routes/cacheStats");
+  app.use("/api/cache", cacheStatsRoutes);
+  console.log("🔍 Cache monitoring endpoints enabled at /api/cache");
+}
+
 // Catch browser extension logs (to prevent CORS errors)
 app.post("/api/log", (req, res) => {
   // Silently ignore browser extension logs
