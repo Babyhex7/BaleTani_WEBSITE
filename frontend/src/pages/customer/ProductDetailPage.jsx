@@ -14,6 +14,7 @@ import Button from '../../components/ui/Button';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
 import productService from '../../services/services_customer/productService';
+import { getImageUrl as getImageUrlUtil } from '../../utils/imageUtils';
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -57,18 +58,6 @@ const ProductDetailPage = () => {
       currency: 'IDR',
       minimumFractionDigits: 0
     }).format(price);
-  };
-
-  // Get image URL with backend URL
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return 'https://via.placeholder.com/500x500?text=No+Image';
-    
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return imagePath;
-    }
-    
-    const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
-    return `${backendUrl}/${imagePath}`;
   };
 
   // Handle quantity change
@@ -181,10 +170,11 @@ const ProductDetailPage = () => {
                 {/* Main Image with Navigation Arrows */}
                 <div className="relative bg-gray-100 rounded-xl overflow-hidden mb-4 aspect-square group">
                   <img
-                    src={getImageUrl(product.images[selectedImage])}
+                    src={getImageUrlUtil(product.images[selectedImage], 'large')}
                     alt={product.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
+                      e.target.onerror = null;
                       e.target.src = 'https://via.placeholder.com/500x500?text=No+Image';
                     }}
                   />
@@ -232,10 +222,11 @@ const ProductDetailPage = () => {
                         }`}
                       >
                         <img
-                          src={getImageUrl(image)}
+                          src={getImageUrlUtil(image, 'thumbnail')}
                           alt={`${product.name} ${index + 1}`}
                           className="w-full h-full object-cover"
                           onError={(e) => {
+                            e.target.onerror = null;
                             e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
                           }}
                         />

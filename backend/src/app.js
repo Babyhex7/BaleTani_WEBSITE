@@ -100,10 +100,13 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Static file serving for uploads
 const path = require("path");
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "../../public/uploads"))
-);
+app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));
+
+// Log static file requests for debugging
+app.use("/uploads", (req, res, next) => {
+  console.log(`📁 [STATIC] Requesting: ${req.url}`);
+  next();
+});
 
 // ============================================
 // ROUTES - All routes under /api
