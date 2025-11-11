@@ -779,22 +779,19 @@ const createOfflineOrder = async (req, res) => {
     const order = await Order.create(
       {
         order_number: orderNumber,
-        order_type: "offline", // Kolom baru di DB
-        transaction_type: "offline", // Use transaction_type field
-        customer_id: customer.id, // customer_id is required
+        order_type: "offline",
+        transaction_type: "offline",
+        customer_id: customer.id,
         customer_name,
         customer_phone,
         delivery_address: delivery_address || null,
         delivery_notes: delivery_notes || null,
-        shipping_method: delivery_method === "delivery" ? "delivery" : "pickup", // Duplikasi untuk compatibility
-        shipping_address: delivery_address || null, // Duplikasi untuk compatibility
-        shipping_cost: parseFloat(delivery_fee), // Duplikasi untuk compatibility
-        customer_notes: delivery_notes || null, // Duplikasi untuk compatibility
+        customer_notes: delivery_notes || null,
         payment_method,
         delivery_method,
         order_status: orderStatus,
         payment_status: paymentStatus,
-        item_subtotal: subtotal, // Use item_subtotal field (database field name)
+        item_subtotal: subtotal,
         delivery_fee: parseFloat(delivery_fee),
         discount_amount: parseFloat(discount_amount),
         service_fee: 0,

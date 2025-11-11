@@ -172,7 +172,7 @@ const OrderDetailModal = ({ orderId, useDummyData, onClose, onUpdateStatus }) =>
                 <div>
                   <p className="text-sm text-gray-600">Address</p>
                   <p className="font-medium">
-                    {order.delivery_address || order.shipping_address || order.customer?.address || "-"}
+                    {order.delivery_address || order.customer?.address || "-"}
                   </p>
                 </div>
                 {(order.delivery_notes || order.customer_notes) && (

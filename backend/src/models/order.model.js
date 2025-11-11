@@ -78,18 +78,6 @@ const Order = sequelize.define(
       type: DataTypes.DECIMAL(15, 2),
       allowNull: false,
     },
-    shipping_method: {
-      type: DataTypes.ENUM("delivery", "pickup"),
-      allowNull: true,
-    },
-    shipping_address: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    shipping_cost: {
-      type: DataTypes.DECIMAL(10, 2),
-      defaultValue: 0,
-    },
     admin_notes: {
       type: DataTypes.TEXT,
       allowNull: true,

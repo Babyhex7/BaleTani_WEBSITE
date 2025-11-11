@@ -169,7 +169,7 @@ const createOrder = async (req, res) => {
     const order = await Order.create(
       {
         order_number: orderNumber,
-        order_type: "online", // Kolom baru di DB
+        order_type: "online",
         transaction_type: "online",
         customer_id: customerId,
         customer_name,
@@ -179,10 +179,7 @@ const createOrder = async (req, res) => {
         delivery_method,
         delivery_address: delivery_address || null,
         delivery_notes: delivery_notes || null,
-        shipping_method: delivery_method === "delivery" ? "delivery" : "pickup", // Duplikasi untuk compatibility
-        shipping_address: delivery_address || null, // Duplikasi untuk compatibility
-        shipping_cost: deliveryFee, // Duplikasi untuk compatibility
-        customer_notes: delivery_notes || null, // Duplikasi untuk compatibility
+        customer_notes: delivery_notes || null,
         item_subtotal: itemSubtotal,
         delivery_fee: deliveryFee,
         discount_amount: discountAmount,
