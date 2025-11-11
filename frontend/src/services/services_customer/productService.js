@@ -68,20 +68,10 @@ const productService = {
   },
 
   /**
-   * Get featured/promo products
-   * @param {number} limit - Number of products to fetch
+   * ❌ DEPRECATED - getFeaturedProducts dihapus
+   * ✅ Sekarang pakai: discountService.getAllDiscounts()
+   * Alasan: Endpoint /api/public/discounts lebih spesifik untuk promo
    */
-  getFeaturedProducts: async (limit = 8) => {
-    try {
-      const response = await apiClient.get(
-        `/public/products/featured/promo?limit=${limit}`
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching featured products:", error);
-      throw error.response?.data || error;
-    }
-  },
 
   /**
    * Get all categories

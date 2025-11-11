@@ -71,18 +71,80 @@ exports.getAllDiscounts = async (req, res) => {
           model: Product,
           as: "products",
           through: {
-            attributes: [],
+            attributes: [], // Hide junction table
           },
-          attributes: ["id"],
-          required: false,
+          where: {
+            is_active: true,
+            total_stock: { [Op.gt]: 0 },
+          },
+          attributes: [
+            "id",
+            "name",
+            "description",
+            "selling_price",
+            "total_stock",
+            "category_id",
+          ],
+          required: false, // LEFT JOIN (discount tanpa produk tetap muncul)
+          include: [
+            {
+              model: Category,
+              as: "category",
+              attributes: ["id", "category_name"],
+              required: false,
+            },
+            {
+              model: ProductImage,
+              as: "images",
+              attributes: ["id", "image_url", "display_order"],
+              required: false,
+              separate: true,
+              order: [["display_order", "ASC"]],
+            },
+          ],
         },
       ],
       order: [["created_at", "DESC"]],
     });
 
-    // Format response
+    // Format response dengan full product details
     const formattedDiscounts = discounts.map((discount) => {
       const discountData = discount.toJSON();
+
+      // Format products untuk setiap discount
+      const products =
+        discountData.products?.map((product) => {
+          const primaryImage = product.images?.[0];
+
+          // Calculate discounted price
+          let discountedPrice = parseFloat(product.selling_price);
+          if (discountData.discount_type === "percentage") {
+            const discountAmount =
+              (parseFloat(product.selling_price) *
+                parseFloat(discountData.value)) /
+              100;
+            discountedPrice = Math.max(
+              0,
+              parseFloat(product.selling_price) - discountAmount
+            );
+          } else if (discountData.discount_type === "fixed_amount") {
+            discountedPrice = Math.max(
+              0,
+              parseFloat(product.selling_price) - parseFloat(discountData.value)
+            );
+          }
+
+          return {
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            price: parseFloat(product.selling_price),
+            discountedPrice: discountedPrice,
+            stock: product.total_stock,
+            category: product.category?.category_name || null,
+            image: primaryImage?.image_url || "/placeholder-product.jpg",
+          };
+        }) || [];
 
       return {
         id: discountData.id,
@@ -94,7 +156,8 @@ exports.getAllDiscounts = async (req, res) => {
           : null,
         startDate: discountData.start_date,
         endDate: discountData.end_date,
-        productsCount: discountData.products?.length || 0,
+        productsCount: products.length,
+        products: products, // ✅ Include full product details
       };
     });
 

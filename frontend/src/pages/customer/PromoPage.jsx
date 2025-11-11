@@ -7,8 +7,7 @@ import { useState, useEffect } from 'react';
 import { Tag, Clock, Search, Filter, X, SlidersHorizontal, MessageCircle } from 'lucide-react';
 import ProductCard from '../../components/ui/ProductCard';
 import Button from '../../components/ui/Button';
-import productService from '../../services/services_customer/productService';
-import discountService from '../../services/services_customer/discountService'; // ← Import discount service
+import discountService from '../../services/services_customer/discountService';
 import useDebounce from '../../hooks/useDebounce';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
@@ -45,29 +44,52 @@ const PromoPage = () => {
         setLoading(true);
         setError(null);
         
-        console.log('🎁 Frontend: Fetching featured products with discounts...');
+        console.log('🎁 [PROMO PAGE] Fetching discounts from /api/public/discounts...');
         
-        // ✅ Pakai endpoint featured products (sudah ada cache!)
-        const response = await productService.getFeaturedProducts(50);
+        // ✅ PAKAI DISCOUNT ENDPOINT BARU (dengan cache 30 menit!)
+        const response = await discountService.getAllDiscounts();
         
         if (response.success) {
-          console.log('✅ Frontend: Received', response.data.length, 'promo products');
+          console.log('✅ [PROMO PAGE] Received', response.data.length, 'discounts');
           console.log('📦 Cache status:', response.cached ? 'HIT (from cache)' : 'MISS (from DB)');
           
-          // Response dari getFeaturedProducts sudah berisi produk dengan discount
-          setPromoProducts(response.data);
-          setFilteredProducts(response.data);
+          // Response.data sudah berisi array of discounts dengan products di dalamnya
+          // Transform ke flat array of products untuk ditampilkan
+          const productsWithDiscounts = response.data.flatMap(discount => 
+            discount.products.map(product => ({
+              id: product.id,
+              name: product.name,
+              description: product.description,
+              price: product.price,
+              stock: product.stock,
+              category: product.category,
+              image: product.image,
+              discount: {
+                id: discount.id,
+                name: discount.name,
+                type: discount.type,
+                value: discount.value,
+                finalPrice: product.discountedPrice,
+                validUntil: discount.endDate,
+              }
+            }))
+          );
+          
+          console.log('📦 [PROMO PAGE] Total products with discounts:', productsWithDiscounts.length);
+          
+          setPromoProducts(productsWithDiscounts);
+          setFilteredProducts(productsWithDiscounts);
           
           // Extract unique categories
           const uniqueCategories = [...new Set(
-            response.data
+            productsWithDiscounts
               .map(p => p.category)
               .filter(Boolean)
           )];
           setCategories(uniqueCategories);
         }
       } catch (err) {
-        console.error('❌ Error fetching promo products:', err);
+        console.error('❌ [PROMO PAGE] Error fetching discounts:', err);
         setError(err.message || 'Gagal memuat produk promo');
       } finally {
         setLoading(false);

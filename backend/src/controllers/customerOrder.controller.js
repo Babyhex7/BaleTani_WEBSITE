@@ -315,6 +315,88 @@ const createOrder = async (req, res) => {
       };
     }
 
+    // ========================================
+    // GENERATE WHATSAPP MESSAGE
+    // ========================================
+    const formatRupiah = (amount) => {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+      }).format(amount);
+    };
+
+    const formatDate = (date) => {
+      return new Intl.DateTimeFormat("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Asia/Jakarta",
+      }).format(new Date(date));
+    };
+
+    // Build WhatsApp message
+    let waMessage = `🛒 *KONFIRMASI PESANAN BALETANI*\n\n`;
+    waMessage += `📋 *Detail Pesanan*\n`;
+    waMessage += `No. Order: ${responseData.order_number}\n`;
+    waMessage += `Tanggal: ${formatDate(responseData.created_at)}\n`;
+    waMessage += `Nama: ${responseData.customer_name}\n`;
+    waMessage += `No. HP: ${responseData.customer_phone}\n\n`;
+
+    waMessage += `📦 *Produk yang Dipesan:*\n`;
+    responseData.items.forEach((item, index) => {
+      waMessage += `${index + 1}. ${item.product_name}\n`;
+      waMessage += `   Qty: ${item.quantity} × ${formatRupiah(
+        item.final_price
+      )} = ${formatRupiah(item.subtotal)}\n`;
+    });
+
+    waMessage += `\n💰 *Rincian Pembayaran:*\n`;
+    waMessage += `Subtotal: ${formatRupiah(responseData.item_subtotal)}\n`;
+    waMessage += `Ongkir: ${formatRupiah(responseData.delivery_fee)}\n`;
+    waMessage += `─────────────────\n`;
+    waMessage += `*TOTAL: ${formatRupiah(responseData.total_amount)}*\n\n`;
+
+    waMessage += `🚚 *Metode Pengiriman:*\n`;
+    waMessage += `${
+      delivery_method === "delivery"
+        ? "🏠 Delivery/Antar"
+        : "🏪 Ambil Sendiri (Self Pickup)"
+    }\n`;
+    if (delivery_method === "delivery") {
+      waMessage += `Alamat: ${delivery_address || "-"}\n`;
+    }
+    waMessage += `\n`;
+
+    waMessage += `💳 *Metode Pembayaran:*\n`;
+    if (payment_method === "transfer" && createdOrder.payment) {
+      waMessage += `🏦 Transfer Bank ${createdOrder.payment.bank_name}\n\n`;
+      waMessage += `*SILAKAN TRANSFER KE:*\n`;
+      waMessage += `Bank: ${createdOrder.payment.bank_name}\n`;
+      waMessage += `No. Rek: ${createdOrder.payment.virtual_account}\n`;
+      waMessage += `a/n: ${createdOrder.payment.account_name}\n`;
+      waMessage += `Jumlah: ${formatRupiah(responseData.total_amount)}\n\n`;
+      waMessage += `⏰ Batas Waktu: ${formatDate(
+        createdOrder.payment.expired_at
+      )}\n\n`;
+      waMessage += `📸 *Setelah transfer, mohon kirim bukti transfer ke nomor ini*\n\n`;
+    } else if (payment_method === "cash") {
+      waMessage += `💵 Cash (Bayar di Tempat)\n`;
+      waMessage += `Pembayaran dilakukan saat pengambilan/pengiriman barang\n\n`;
+    }
+
+    waMessage += `Terima kasih sudah berbelanja di *BaleTani Fresh Market*! 🌿✨\n`;
+    waMessage += `\n_Pesan otomatis dari sistem BaleTani_`;
+
+    // Add WhatsApp message to response
+    responseData.whatsapp = {
+      phone: "6285885725027", // Nomor WA tujuan (format internasional tanpa +)
+      message: waMessage,
+      url: `https://wa.me/6285885725027?text=${encodeURIComponent(waMessage)}`,
+    };
+
     return res.status(201).json({
       success: true,
       message: "Order berhasil dibuat",

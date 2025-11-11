@@ -116,12 +116,28 @@ const CheckoutPage = () => {
         clearCart();
         
         // Show success message
-        toast.success('Pesanan berhasil dibuat!');
+        toast.success('Pesanan berhasil dibuat! Mengarahkan ke WhatsApp...');
 
-        // Redirect to success page with order data
-        navigate('/order-success', {
-          state: { orderData: response.data },
-        });
+        // ========================================
+        // AUTO REDIRECT TO WHATSAPP
+        // ========================================
+        if (response.data.whatsapp?.url) {
+          // Tunggu 1 detik biar user liat toast
+          setTimeout(() => {
+            // Buka WhatsApp di tab baru
+            window.open(response.data.whatsapp.url, '_blank');
+            
+            // Redirect ke success page
+            navigate('/order-success', {
+              state: { orderData: response.data },
+            });
+          }, 1000);
+        } else {
+          // Fallback jika gak ada WA URL
+          navigate('/order-success', {
+            state: { orderData: response.data },
+          });
+        }
       } else {
         toast.error(response.message || 'Gagal membuat pesanan');
       }

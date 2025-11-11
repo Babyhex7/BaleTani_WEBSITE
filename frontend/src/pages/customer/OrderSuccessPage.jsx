@@ -98,39 +98,47 @@ const OrderSuccessPage = () => {
 
   // WhatsApp message
   const sendWhatsApp = () => {
-    const adminPhone = '6281234567890'; // Ganti dengan nomor WA admin
-    
-    let message = `*KONFIRMASI PESANAN BALETANI*\n\n`;
-    message += `Order Number: *${orderData.order_number}*\n`;
-    message += `Nama: ${orderData.customer_name}\n`;
-    message += `Telepon: ${orderData.customer_phone}\n\n`;
-    
-    message += `*Detail Pesanan:*\n`;
-    orderData.items.forEach((item, index) => {
-      message += `${index + 1}. ${item.product_name}\n`;
-      message += `   ${item.quantity} ${item.unit} x ${formatCurrency(item.final_price)} = ${formatCurrency(item.subtotal)}\n`;
-    });
-    
-    message += `\n*Ringkasan:*\n`;
-    message += `Subtotal: ${formatCurrency(orderData.item_subtotal)}\n`;
-    message += `Ongkir: ${formatCurrency(orderData.delivery_fee)}\n`;
-    message += `*TOTAL: ${formatCurrency(orderData.total_amount)}*\n\n`;
-    
-    message += `Metode Pengiriman: ${orderData.delivery_method === 'delivery' ? 'Delivery' : 'Ambil di Toko'}\n`;
-    if (orderData.delivery_address) {
-      message += `Alamat: ${orderData.delivery_address}\n`;
-    }
-    
-    message += `Metode Pembayaran: ${paymentInfo.title}\n\n`;
-    
-    if (orderData.payment_method !== 'cash') {
-      message += `Saya akan segera melakukan pembayaran.\n`;
-    }
-    
-    message += `Terima kasih! 🌾`;
+    // ========================================
+    // GUNAKAN WA MESSAGE DARI BACKEND
+    // ========================================
+    if (orderData.whatsapp?.url) {
+      window.open(orderData.whatsapp.url, '_blank');
+    } else {
+      // Fallback ke message lama
+      const adminPhone = '6285885725027'; // Nomor dari .env
+      
+      let message = `*KONFIRMASI PESANAN BALETANI*\n\n`;
+      message += `Order Number: *${orderData.order_number}*\n`;
+      message += `Nama: ${orderData.customer_name}\n`;
+      message += `Telepon: ${orderData.customer_phone}\n\n`;
+      
+      message += `*Detail Pesanan:*\n`;
+      orderData.items.forEach((item, index) => {
+        message += `${index + 1}. ${item.product_name}\n`;
+        message += `   ${item.quantity} x ${formatCurrency(item.final_price)} = ${formatCurrency(item.subtotal)}\n`;
+      });
+      
+      message += `\n*Ringkasan:*\n`;
+      message += `Subtotal: ${formatCurrency(orderData.item_subtotal)}\n`;
+      message += `Ongkir: ${formatCurrency(orderData.delivery_fee)}\n`;
+      message += `*TOTAL: ${formatCurrency(orderData.total_amount)}*\n\n`;
+      
+      message += `Metode Pengiriman: ${orderData.delivery_method === 'delivery' ? 'Delivery' : 'Ambil di Toko'}\n`;
+      if (orderData.delivery_address) {
+        message += `Alamat: ${orderData.delivery_address}\n`;
+      }
+      
+      message += `Metode Pembayaran: ${paymentInfo.title}\n\n`;
+      
+      if (orderData.payment_method !== 'cash') {
+        message += `Saya akan segera melakukan pembayaran.\n`;
+      }
+      
+      message += `Terima kasih! 🌾`;
 
-    const whatsappUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+      const whatsappUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+    }
   };
 
   return (

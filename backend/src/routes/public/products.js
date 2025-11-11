@@ -26,12 +26,10 @@ const publicProductController = require("../../controllers/publicProduct.control
 router.get("/", publicProductController.getAllProducts);
 
 /**
- * @route   GET /api/public/products/featured/promo
- * @desc    Get featured/promo products (products with active discount)
- * @access  Public
- * @query   {number} limit - Number of items (default: 8)
+ * ❌ DEPRECATED - Route featured/promo dihapus
+ * ✅ Sekarang pakai: GET /api/public/discounts (dengan cache 30 menit)
+ * Alasan: Lebih spesifik untuk discount/promo, cache terpisah
  */
-router.get("/featured/promo", publicProductController.getFeaturedProducts);
 
 /**
  * @route   GET /api/public/products/:id

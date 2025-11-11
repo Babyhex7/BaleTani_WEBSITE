@@ -12,10 +12,10 @@ const discountService = {
    */
   getAllDiscounts: async () => {
     try {
-      const response = await apiClient.get('/public/discounts');
+      const response = await apiClient.get("/public/discounts");
       return response.data;
     } catch (error) {
-      console.error('Error fetching discounts:', error);
+      console.error("Error fetching discounts:", error);
       throw error.response?.data || error;
     }
   },
@@ -29,7 +29,7 @@ const discountService = {
       const response = await apiClient.get(`/public/discounts/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching discount detail:', error);
+      console.error("Error fetching discount detail:", error);
       throw error.response?.data || error;
     }
   },
@@ -41,11 +41,11 @@ const discountService = {
   getDiscountProducts: async (id, page = 1, limit = 12) => {
     try {
       const response = await apiClient.get(`/public/discounts/${id}/products`, {
-        params: { page, limit }
+        params: { page, limit },
       });
       return response.data;
     } catch (error) {
-      console.error('Error fetching discount products:', error);
+      console.error("Error fetching discount products:", error);
       throw error.response?.data || error;
     }
   },
