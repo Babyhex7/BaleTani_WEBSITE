@@ -171,12 +171,14 @@ const OrderDetailModal = ({ orderId, useDummyData, onClose, onUpdateStatus }) =>
               <div className="space-y-2">
                 <div>
                   <p className="text-sm text-gray-600">Address</p>
-                  <p className="font-medium">{order.delivery_address || order.customer?.address || "-"}</p>
+                  <p className="font-medium">
+                    {order.delivery_address || order.shipping_address || order.customer?.address || "-"}
+                  </p>
                 </div>
-                {order.delivery_notes && (
+                {(order.delivery_notes || order.customer_notes) && (
                   <div>
                     <p className="text-sm text-gray-600">Notes</p>
-                    <p className="font-medium">{order.delivery_notes}</p>
+                    <p className="font-medium">{order.delivery_notes || order.customer_notes}</p>
                   </div>
                 )}
               </div>

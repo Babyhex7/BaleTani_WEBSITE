@@ -14,6 +14,10 @@ const Order = sequelize.define(
       allowNull: false,
       unique: true
     },
+    order_type: {
+      type: DataTypes.ENUM("online", "offline"),
+      allowNull: false
+    },
     customer_id: {
       type: DataTypes.UUID,
       allowNull: false
@@ -62,9 +66,29 @@ const Order = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       defaultValue: 0
     },
+    service_fee: {
+      type: DataTypes.DECIMAL(10, 2),
+      defaultValue: 0
+    },
+    customer_notes: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
     total_amount: {
       type: DataTypes.DECIMAL(15, 2),
       allowNull: false
+    },
+    shipping_method: {
+      type: DataTypes.ENUM("delivery", "pickup"),
+      allowNull: true
+    },
+    shipping_address: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    shipping_cost: {
+      type: DataTypes.DECIMAL(10, 2),
+      defaultValue: 0
     },
     admin_notes: {
       type: DataTypes.TEXT,
@@ -108,6 +132,10 @@ const Order = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true
     },
+    completed_at: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     created_by: {
       type: DataTypes.UUID,
       allowNull: true
@@ -125,6 +153,14 @@ const Order = sequelize.define(
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
       allowNull: false
+    },
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    deleted_by: {
+      type: DataTypes.UUID,
+      allowNull: true
     }
     },
   {

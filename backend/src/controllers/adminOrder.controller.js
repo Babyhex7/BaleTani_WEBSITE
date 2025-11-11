@@ -142,16 +142,18 @@ const getAllOrders = async (req, res) => {
     const formattedOrders = orders.map((order) => ({
       id: order.id,
       order_number: order.order_number,
-      order_type: order.transaction_type, // Use transaction_type from database
+      order_type: order.order_type || order.transaction_type, // Gunakan order_type terlebih dahulu
       customer_name: order.customer_name || order.customer?.full_name || "-",
       customer_phone:
         order.customer_phone || order.customer?.phone_number || "-",
       payment_method: order.payment_method,
       delivery_method: order.delivery_method,
+      delivery_address: order.delivery_address || order.shipping_address || order.customer?.address || null,
+      delivery_notes: order.delivery_notes || order.customer_notes || null,
       order_status: order.order_status,
       payment_status: order.payment_status,
       subtotal: parseFloat(order.item_subtotal || 0), // Rename to subtotal for frontend
-      delivery_fee: parseFloat(order.delivery_fee || 0),
+      delivery_fee: parseFloat(order.delivery_fee || order.shipping_cost || 0),
       discount_amount: parseFloat(order.discount_amount || 0),
       total_amount: parseFloat(order.total_amount || 0),
       items_count: order.orderItems ? order.orderItems.length : 0,
@@ -773,12 +775,17 @@ const createOfflineOrder = async (req, res) => {
     const order = await Order.create(
       {
         order_number: orderNumber,
+        order_type: "offline", // Kolom baru di DB
         transaction_type: "offline", // Use transaction_type field
         customer_id: customer.id, // customer_id is required
         customer_name,
         customer_phone,
         delivery_address: delivery_address || null,
         delivery_notes: delivery_notes || null,
+        shipping_method: delivery_method === "delivery" ? "delivery" : "pickup", // Duplikasi untuk compatibility
+        shipping_address: delivery_address || null, // Duplikasi untuk compatibility
+        shipping_cost: parseFloat(delivery_fee), // Duplikasi untuk compatibility
+        customer_notes: delivery_notes || null, // Duplikasi untuk compatibility
         payment_method,
         delivery_method,
         order_status: orderStatus,
@@ -786,6 +793,7 @@ const createOfflineOrder = async (req, res) => {
         item_subtotal: subtotal, // Use item_subtotal field (database field name)
         delivery_fee: parseFloat(delivery_fee),
         discount_amount: parseFloat(discount_amount),
+        service_fee: 0,
         total_amount: totalAmount,
         admin_notes: admin_notes || null,
         created_by: adminId,
