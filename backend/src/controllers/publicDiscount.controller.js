@@ -1,14 +1,20 @@
 /**
  * PUBLIC DISCOUNT CONTROLLER
  * Handles discount/promo display untuk customers (no authentication required)
- * 
+ *
  * CACHING STRATEGY:
  * - Discounts list: Cache 30 menit (1800 detik)
  * - Discount detail: Cache 30 menit (1800 detik)
  * - Cache invalidation: Saat admin CRUD discount
  */
 
-const { Discount, Product, ProductDiscount, ProductImage, Category } = require("../models");
+const {
+  Discount,
+  Product,
+  ProductDiscount,
+  ProductImage,
+  Category,
+} = require("../models");
 const { Op } = require("sequelize");
 
 // Import cache service dan cache keys
@@ -18,7 +24,7 @@ const { CUSTOMER } = require("../cache/cacheKeys");
 /**
  * Get all active discounts untuk customer
  * @route GET /api/public/discounts
- * 
+ *
  * CACHING:
  * - Cache key: customer:discounts:list
  * - TTL: 1800 detik (30 menit)
@@ -53,7 +59,7 @@ exports.getAllDiscounts = async (req, res) => {
 
     // Get active discounts only
     const currentDate = new Date();
-    
+
     const discounts = await Discount.findAll({
       where: {
         is_active: true,
@@ -77,13 +83,15 @@ exports.getAllDiscounts = async (req, res) => {
     // Format response
     const formattedDiscounts = discounts.map((discount) => {
       const discountData = discount.toJSON();
-      
+
       return {
         id: discountData.id,
         name: discountData.discount_name,
         type: discountData.discount_type,
         value: parseFloat(discountData.value),
-        maxDiscount: discountData.max_discount ? parseFloat(discountData.max_discount) : null,
+        maxDiscount: discountData.max_discount
+          ? parseFloat(discountData.max_discount)
+          : null,
         startDate: discountData.start_date,
         endDate: discountData.end_date,
         productsCount: discountData.products?.length || 0,
@@ -115,7 +123,7 @@ exports.getAllDiscounts = async (req, res) => {
 /**
  * Get discount detail by ID untuk customer
  * @route GET /api/public/discounts/:id
- * 
+ *
  * CACHING:
  * - Cache key: customer:discount:{id}
  * - TTL: 1800 detik (30 menit)
@@ -146,10 +154,12 @@ exports.getDiscountById = async (req, res) => {
     // STEP 2: Cache MISS - Query Database
     // ========================================
     console.log(`[CACHE MISS] ❌ Key: ${cacheKey} - Data tidak ada di cache`);
-    console.log(`[DB QUERY] Discount Detail (ID: ${id}) - Cache miss, querying database...`);
+    console.log(
+      `[DB QUERY] Discount Detail (ID: ${id}) - Cache miss, querying database...`
+    );
 
     const currentDate = new Date();
-    
+
     const discount = await Discount.findOne({
       where: {
         id,
@@ -195,28 +205,31 @@ exports.getDiscountById = async (req, res) => {
 
     // Format response
     const discountData = discount.toJSON();
-    
-    const formattedProducts = discountData.products?.map((product) => {
-      const primaryImage = product.images?.[0];
-      
-      return {
-        id: product.id,
-        name: product.name,
-        price: parseFloat(product.selling_price),
-        originalPrice: parseFloat(product.ProductDiscount.original_price),
-        discountedPrice: parseFloat(product.ProductDiscount.discounted_price),
-        stock: product.total_stock,
-        category: product.category?.category_name,
-        image: primaryImage?.image_url || "/placeholder-product.jpg",
-      };
-    }) || [];
+
+    const formattedProducts =
+      discountData.products?.map((product) => {
+        const primaryImage = product.images?.[0];
+
+        return {
+          id: product.id,
+          name: product.name,
+          price: parseFloat(product.selling_price),
+          originalPrice: parseFloat(product.ProductDiscount.original_price),
+          discountedPrice: parseFloat(product.ProductDiscount.discounted_price),
+          stock: product.total_stock,
+          category: product.category?.category_name,
+          image: primaryImage?.image_url || "/placeholder-product.jpg",
+        };
+      }) || [];
 
     const formattedDiscount = {
       id: discountData.id,
       name: discountData.discount_name,
       type: discountData.discount_type,
       value: parseFloat(discountData.value),
-      maxDiscount: discountData.max_discount ? parseFloat(discountData.max_discount) : null,
+      maxDiscount: discountData.max_discount
+        ? parseFloat(discountData.max_discount)
+        : null,
       startDate: discountData.start_date,
       endDate: discountData.end_date,
       products: formattedProducts,
@@ -248,7 +261,7 @@ exports.getDiscountById = async (req, res) => {
 /**
  * Get products by discount ID untuk customer
  * @route GET /api/public/discounts/:id/products
- * 
+ *
  * CACHING:
  * - Cache key: customer:discount:{id}:products:page:{page}
  * - TTL: 1800 detik (30 menit)
@@ -258,7 +271,9 @@ exports.getDiscountProducts = async (req, res) => {
   try {
     const { id } = req.params;
     const { page = 1, limit = 12 } = req.query;
-    console.log(`🎁 [PUBLIC DISCOUNT PRODUCTS] Request for discount ID: ${id}, page: ${page}`); // Debug log
+    console.log(
+      `🎁 [PUBLIC DISCOUNT PRODUCTS] Request for discount ID: ${id}, page: ${page}`
+    ); // Debug log
 
     // ========================================
     // STEP 1: Check Cache
@@ -280,12 +295,14 @@ exports.getDiscountProducts = async (req, res) => {
     // STEP 2: Cache MISS - Query Database
     // ========================================
     console.log(`[CACHE MISS] ❌ Key: ${cacheKey} - Data tidak ada di cache`);
-    console.log(`[DB QUERY] Discount Products (ID: ${id}) - Cache miss, querying database...`);
+    console.log(
+      `[DB QUERY] Discount Products (ID: ${id}) - Cache miss, querying database...`
+    );
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const pageLimit = parseInt(limit);
     const currentDate = new Date();
-    
+
     const discount = await Discount.findOne({
       where: {
         id,
@@ -346,8 +363,12 @@ exports.getDiscountProducts = async (req, res) => {
         id: productData.id,
         name: productData.name,
         price: parseFloat(productData.selling_price),
-        originalPrice: productDiscount ? parseFloat(productDiscount.original_price) : parseFloat(productData.selling_price),
-        discountedPrice: productDiscount ? parseFloat(productDiscount.discounted_price) : parseFloat(productData.selling_price),
+        originalPrice: productDiscount
+          ? parseFloat(productDiscount.original_price)
+          : parseFloat(productData.selling_price),
+        discountedPrice: productDiscount
+          ? parseFloat(productDiscount.discounted_price)
+          : parseFloat(productData.selling_price),
         stock: productData.total_stock,
         category: productData.category?.category_name,
         image: primaryImage?.image_url || "/placeholder-product.jpg",

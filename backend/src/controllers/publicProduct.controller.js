@@ -452,7 +452,7 @@ exports.getProductDetail = async (req, res) => {
 /**
  * Get featured/promo products
  * @route GET /api/public/products/featured/promo
- * 
+ *
  * CACHING:
  * - Cache key: customer:featured:products
  * - TTL: 900 detik (15 menit)
@@ -462,7 +462,7 @@ exports.getFeaturedProducts = async (req, res) => {
   try {
     const { limit = 8 } = req.query;
 
-    console.log('🎁 [FEATURED PRODUCTS] Request received'); // Debug log
+    console.log("🎁 [FEATURED PRODUCTS] Request received"); // Debug log
 
     // ========================================
     // STEP 1: Check Cache

@@ -336,7 +336,9 @@ const createDiscount = async (req, res) => {
     cacheService.delPattern(PATTERNS.CUSTOMER_FEATURED);
     cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
     cacheService.delPattern(PATTERNS.CUSTOMER_DISCOUNTS);
-    console.log("[CACHE CLEAR] 🗑️ Featured, Products & Discounts cache - Discount created");
+    console.log(
+      "[CACHE CLEAR] 🗑️ Featured, Products & Discounts cache - Discount created"
+    );
 
     res.status(201).json({
       success: true,
@@ -500,7 +502,9 @@ const updateDiscount = async (req, res) => {
     cacheService.delPattern(PATTERNS.CUSTOMER_FEATURED);
     cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
     cacheService.delPattern(PATTERNS.CUSTOMER_DISCOUNTS);
-    console.log("[CACHE CLEAR] 🗑️ Featured, Products & Discounts cache - Discount updated");
+    console.log(
+      "[CACHE CLEAR] 🗑️ Featured, Products & Discounts cache - Discount updated"
+    );
 
     res.status(200).json({
       success: true,
@@ -554,7 +558,9 @@ const deleteDiscount = async (req, res) => {
     cacheService.delPattern(PATTERNS.CUSTOMER_FEATURED);
     cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
     cacheService.delPattern(PATTERNS.CUSTOMER_DISCOUNTS);
-    console.log("[CACHE CLEAR] 🗑️ Featured, Products & Discounts cache - Discount deleted");
+    console.log(
+      "[CACHE CLEAR] 🗑️ Featured, Products & Discounts cache - Discount deleted"
+    );
 
     res.status(200).json({
       success: true,
@@ -608,7 +614,9 @@ const toggleDiscountStatus = async (req, res) => {
     cacheService.delPattern(PATTERNS.CUSTOMER_FEATURED);
     cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
     cacheService.delPattern(PATTERNS.CUSTOMER_DISCOUNTS);
-    console.log("[CACHE CLEAR] 🗑️ Featured, Products & Discounts cache - Discount status toggled");
+    console.log(
+      "[CACHE CLEAR] 🗑️ Featured, Products & Discounts cache - Discount status toggled"
+    );
 
     res.status(200).json({
       success: true,
