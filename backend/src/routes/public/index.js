@@ -13,6 +13,7 @@ const router = express.Router();
 // Import public sub-routes
 const productRoutes = require("./products");
 const categoryRoutes = require("./categories");
+const discountRoutes = require("./discounts");
 
 /**
  * PUBLIC ROUTES (No authentication required)
@@ -24,5 +25,8 @@ router.use("/products", productRoutes); // /api/public/products/*
 
 // View categories (public access - no auth)
 router.use("/categories", categoryRoutes); // /api/public/categories/*
+
+// View discounts/promos (public access - no auth)
+router.use("/discounts", discountRoutes); // /api/public/discounts/*
 
 module.exports = router;

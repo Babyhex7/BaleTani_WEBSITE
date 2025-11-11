@@ -327,6 +327,17 @@ const createDiscount = async (req, res) => {
       ],
     });
 
+    // ========================================
+    // CACHE INVALIDATION
+    // ========================================
+    // Hapus cache featured products (karena ada discount baru)
+    // Hapus cache products (karena harga produk berubah dengan discount)
+    // Hapus cache discounts (karena ada discount baru di list)
+    cacheService.delPattern(PATTERNS.CUSTOMER_FEATURED);
+    cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
+    cacheService.delPattern(PATTERNS.CUSTOMER_DISCOUNTS);
+    console.log("[CACHE CLEAR] 🗑️ Featured, Products & Discounts cache - Discount created");
+
     res.status(201).json({
       success: true,
       message: "Diskon berhasil dibuat",
@@ -482,6 +493,15 @@ const updateDiscount = async (req, res) => {
       ],
     });
 
+    // ========================================
+    // CACHE INVALIDATION
+    // ========================================
+    // Hapus cache featured products, products, dan discounts (karena discount berubah)
+    cacheService.delPattern(PATTERNS.CUSTOMER_FEATURED);
+    cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
+    cacheService.delPattern(PATTERNS.CUSTOMER_DISCOUNTS);
+    console.log("[CACHE CLEAR] 🗑️ Featured, Products & Discounts cache - Discount updated");
+
     res.status(200).json({
       success: true,
       message: "Diskon berhasil diupdate",
@@ -527,6 +547,15 @@ const deleteDiscount = async (req, res) => {
     // Hard delete discount
     await discount.destroy();
 
+    // ========================================
+    // CACHE INVALIDATION
+    // ========================================
+    // Hapus cache featured products, products, dan discounts (karena discount dihapus)
+    cacheService.delPattern(PATTERNS.CUSTOMER_FEATURED);
+    cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
+    cacheService.delPattern(PATTERNS.CUSTOMER_DISCOUNTS);
+    console.log("[CACHE CLEAR] 🗑️ Featured, Products & Discounts cache - Discount deleted");
+
     res.status(200).json({
       success: true,
       message: "Diskon berhasil dihapus",
@@ -571,6 +600,15 @@ const toggleDiscountStatus = async (req, res) => {
       is_active: !discount.is_active,
       updated_at: new Date(),
     });
+
+    // ========================================
+    // CACHE INVALIDATION
+    // ========================================
+    // Hapus cache featured products, products, dan discounts (karena status discount berubah)
+    cacheService.delPattern(PATTERNS.CUSTOMER_FEATURED);
+    cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
+    cacheService.delPattern(PATTERNS.CUSTOMER_DISCOUNTS);
+    console.log("[CACHE CLEAR] 🗑️ Featured, Products & Discounts cache - Discount status toggled");
 
     res.status(200).json({
       success: true,

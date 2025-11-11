@@ -77,6 +77,50 @@ module.exports = {
      * @returns {string} Cache key
      */
     CATEGORY_DETAIL: (categoryId) => `customer:category:${categoryId}`,
+
+    /**
+     * Featured/Promo Products (Products dengan Discount Aktif)
+     *
+     * Usage:
+     * - CUSTOMER.FEATURED_PRODUCTS → customer:featured:products
+     *
+     * @returns {string} Cache key
+     */
+    FEATURED_PRODUCTS: "customer:featured:products",
+
+    /**
+     * Discounts List (Semua Promo Aktif)
+     *
+     * Usage:
+     * - CUSTOMER.DISCOUNTS_LIST → customer:discounts:list
+     *
+     * @returns {string} Cache key
+     */
+    DISCOUNTS_LIST: "customer:discounts:list",
+
+    /**
+     * Discount Detail (Single Discount dengan Products)
+     *
+     * Usage:
+     * - CUSTOMER.DISCOUNT_DETAIL(123) → customer:discount:123
+     *
+     * @param {number|string} discountId - ID discount
+     * @returns {string} Cache key
+     */
+    DISCOUNT_DETAIL: (discountId) => `customer:discount:${discountId}`,
+
+    /**
+     * Discount Products (Products dalam Discount Tertentu)
+     *
+     * Usage:
+     * - CUSTOMER.DISCOUNT_PRODUCTS(123, 1) → customer:discount:123:products:page:1
+     *
+     * @param {number|string} discountId - ID discount
+     * @param {number} page - Nomor halaman
+     * @returns {string} Cache key
+     */
+    DISCOUNT_PRODUCTS: (discountId, page = 1) =>
+      `customer:discount:${discountId}:products:page:${page}`,
   },
 
   /**
@@ -162,6 +206,8 @@ module.exports = {
     // Customer patterns
     CUSTOMER_PRODUCTS: "customer:products:",
     CUSTOMER_CATEGORIES: "customer:categories:",
+    CUSTOMER_FEATURED: "customer:featured:",
+    CUSTOMER_DISCOUNTS: "customer:discount", // Akan match: customer:discounts:list, customer:discount:123, customer:discount:123:products:page:1
 
     // Admin patterns
     ADMIN_PRODUCTS: "admin:products:",

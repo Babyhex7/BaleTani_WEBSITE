@@ -115,22 +115,36 @@ Next customer request → Cache MISS → Fresh data
 
   - `getAllProducts()` → Cache 10 menit
   - `getProductDetail()` → Cache 15 menit
+  - `getFeaturedProducts()` → Cache 15 menit (NEW!)
 
 - `backend/src/controllers/publicCategory.controller.js`
+
   - `getAllCategories()` → Cache 1 jam
+
+- `backend/src/controllers/publicDiscount.controller.js` **(NEW!)**
+  - `getAllDiscounts()` → Cache 30 menit
+  - `getDiscountById()` → Cache 30 menit
+  - `getDiscountProducts()` → Cache 30 menit
 
 ### ✅ Admin Side (dengan cache invalidation):
 
 - `backend/src/controllers/adminProduct.controller.js`
 
-  - `create()` → Clear all products & categories cache
-  - `update()` → Clear all products & categories cache
-  - `deleteProduct()` → Clear all products & categories cache
+  - `create()` → Clear products, categories & featured cache
+  - `update()` → Clear products, categories & featured cache
+  - `deleteProduct()` → Clear products, categories & featured cache
 
 - `backend/src/controllers/adminCategory.controller.js`
+
   - `createCategory()` → Clear all categories cache
   - `updateCategory()` → Clear categories & products cache
   - `deleteCategory()` → Clear all categories cache
+
+- `backend/src/controllers/adminDiscount.controller.js` **(NEW!)**
+  - `createDiscount()` → Clear featured, products & discounts cache
+  - `updateDiscount()` → Clear featured, products & discounts cache
+  - `deleteDiscount()` → Clear featured, products & discounts cache
+  - `toggleDiscountStatus()` → Clear featured, products & discounts cache
 
 ---
 

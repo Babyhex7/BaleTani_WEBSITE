@@ -8,6 +8,7 @@ import { Tag, Clock, Search, Filter, X, SlidersHorizontal, MessageCircle } from 
 import ProductCard from '../../components/ui/ProductCard';
 import Button from '../../components/ui/Button';
 import productService from '../../services/services_customer/productService';
+import discountService from '../../services/services_customer/discountService'; // ← Import discount service
 import useDebounce from '../../hooks/useDebounce';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
@@ -44,24 +45,29 @@ const PromoPage = () => {
         setLoading(true);
         setError(null);
         
+        console.log('🎁 Frontend: Fetching featured products with discounts...');
+        
+        // ✅ Pakai endpoint featured products (sudah ada cache!)
         const response = await productService.getFeaturedProducts(50);
         
         if (response.success) {
-          // Filter only products with discount
-          const productsWithDiscount = response.data.filter(p => p.discount && p.discount.finalPrice < p.price);
-          setPromoProducts(productsWithDiscount);
-          setFilteredProducts(productsWithDiscount);
+          console.log('✅ Frontend: Received', response.data.length, 'promo products');
+          console.log('📦 Cache status:', response.cached ? 'HIT (from cache)' : 'MISS (from DB)');
+          
+          // Response dari getFeaturedProducts sudah berisi produk dengan discount
+          setPromoProducts(response.data);
+          setFilteredProducts(response.data);
           
           // Extract unique categories
           const uniqueCategories = [...new Set(
-            productsWithDiscount
+            response.data
               .map(p => p.category)
               .filter(Boolean)
           )];
           setCategories(uniqueCategories);
         }
       } catch (err) {
-        console.error('Error fetching promo products:', err);
+        console.error('❌ Error fetching promo products:', err);
         setError(err.message || 'Gagal memuat produk promo');
       } finally {
         setLoading(false);

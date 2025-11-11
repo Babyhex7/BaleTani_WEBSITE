@@ -452,10 +452,39 @@ exports.getProductDetail = async (req, res) => {
 /**
  * Get featured/promo products
  * @route GET /api/public/products/featured/promo
+ * 
+ * CACHING:
+ * - Cache key: customer:featured:products
+ * - TTL: 900 detik (15 menit)
+ * - Invalidation: Saat admin create/update/delete product atau discount
  */
 exports.getFeaturedProducts = async (req, res) => {
   try {
     const { limit = 8 } = req.query;
+
+    console.log('🎁 [FEATURED PRODUCTS] Request received'); // Debug log
+
+    // ========================================
+    // STEP 1: Check Cache
+    // ========================================
+    const cacheKey = CUSTOMER.FEATURED_PRODUCTS;
+    const cachedData = cacheService.get(cacheKey);
+
+    // Jika cache ada, langsung return
+    if (cachedData) {
+      console.log(`[CACHE HIT] ✅ Key: ${cacheKey}`);
+      return res.status(200).json({
+        success: true,
+        message: "Featured products retrieved from cache",
+        data: cachedData,
+        cached: true, // Flag untuk debugging
+      });
+    }
+
+    // ========================================
+    // STEP 2: Cache MISS - Query Database
+    // ========================================
+    console.log(`[CACHE MISS] ❌ Key: ${cacheKey} - Querying database...`);
 
     // First, get products with active discounts
     const products = await Product.findAll({
@@ -553,10 +582,17 @@ exports.getFeaturedProducts = async (req, res) => {
       };
     });
 
+    // ========================================
+    // STEP 3: Save to Cache
+    // ========================================
+    console.log(`[CACHE SET] 💾 Key: ${cacheKey} - TTL: 900s (15 min)`);
+    cacheService.set(cacheKey, formattedProducts);
+
     res.status(200).json({
       success: true,
       message: "Featured products fetched successfully",
       data: formattedProducts,
+      cached: false, // Flag untuk debugging
     });
   } catch (error) {
     console.error("Error fetching featured products:", error);
