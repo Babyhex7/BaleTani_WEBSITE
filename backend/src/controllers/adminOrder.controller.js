@@ -148,7 +148,11 @@ const getAllOrders = async (req, res) => {
         order.customer_phone || order.customer?.phone_number || "-",
       payment_method: order.payment_method,
       delivery_method: order.delivery_method,
-      delivery_address: order.delivery_address || order.shipping_address || order.customer?.address || null,
+      delivery_address:
+        order.delivery_address ||
+        order.shipping_address ||
+        order.customer?.address ||
+        null,
       delivery_notes: order.delivery_notes || order.customer_notes || null,
       order_status: order.order_status,
       payment_status: order.payment_status,
