@@ -40,7 +40,7 @@ const ProductDetailPage = () => {
         }
       } catch (error) {
         console.error('Error fetching product detail:', error);
-        toast.error('Gagal memuat detail produk', { duration: 3000 });
+        toast.error('Gagal memuat detail produk');
       } finally {
         setLoading(false);
       }
@@ -76,14 +76,12 @@ const ProductDetailPage = () => {
     }
 
     if (product.stock === 0) {
-      toast.error('Maaf, produk ini sedang habis stok', { duration: 3000 });
+      toast.error('Maaf, produk ini sedang habis stok');
       return;
     }
 
     addItem(product, quantity);
-    toast.success(`${quantity} ${product.name} berhasil ditambahkan ke keranjang!`, { 
-      duration: 3000 
-    });
+    toast.success(`${quantity} ${product.name} berhasil ditambahkan ke keranjang!`);
     setQuantity(1);
   };
 
@@ -95,7 +93,7 @@ const ProductDetailPage = () => {
     }
 
     if (product.stock === 0) {
-      toast.error('Maaf, produk ini sedang habis stok', { duration: 3000 });
+      toast.error('Maaf, produk ini sedang habis stok');
       return;
     }
 

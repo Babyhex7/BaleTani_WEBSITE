@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Loader, PackageX } from 'lucide-react';
+import toast from 'react-hot-toast';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import OrderStats from '../../components/ui_customer/OrderStats';
@@ -7,7 +8,6 @@ import OrderFilters from '../../components/ui_customer/OrderFilters';
 import OrderCard from '../../components/ui_customer/OrderCard';
 import OrderDetailModal from '../../components/ui_customer/OrderDetailModal';
 import Pagination from '../../components/ui/Pagination';
-import Toast from '../../components/ui/Toast';
 import { getOrders, getOrderDetail, reorderItems, cancelOrder } from '../../services/services_customer/orderHistoryService';
 import { useDebounce } from '../../hooks/useDebounce';
 
@@ -41,9 +41,6 @@ const PurchaseHistory = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
-
-  // Toast
-  const [toast, setToast] = useState({ show: false, type: '', message: '' });
 
   // Reset to page 1 when search/filter changes
   useEffect(() => {
@@ -80,7 +77,7 @@ const PurchaseHistory = () => {
     } catch (err) {
       console.error('Error fetching orders:', err);
       setError(err.message || 'Gagal memuat riwayat pesanan');
-      showToast('error', 'Gagal memuat data pesanan');
+      toast.error('Gagal memuat data pesanan');
     } finally {
       setLoading(false);
     }
@@ -99,7 +96,7 @@ const PurchaseHistory = () => {
       }
     } catch (err) {
       console.error('Error fetching order detail:', err);
-      showToast('error', 'Gagal memuat detail pesanan');
+      toast.error('Gagal memuat detail pesanan');
       setShowDetailModal(false);
     } finally {
       setDetailLoading(false);
@@ -118,18 +115,18 @@ const PurchaseHistory = () => {
       const response = await reorderItems(order.id);
       
       if (response.success) {
-        showToast('success', response.message);
+        toast.success(response.message);
         
         // Show out of stock items if any
         if (response.data.out_of_stock?.length > 0) {
           setTimeout(() => {
-            showToast('warning', `Beberapa produk tidak tersedia: ${response.data.out_of_stock.join(', ')}`);
+            toast.error(`Beberapa produk tidak tersedia: ${response.data.out_of_stock.join(', ')}`);
           }, 2000);
         }
       }
     } catch (err) {
       console.error('Error reordering:', err);
-      showToast('error', err.message || 'Gagal menambahkan produk ke keranjang');
+      toast.error(err.message || 'Gagal menambahkan produk ke keranjang');
     }
   };
 
@@ -142,13 +139,13 @@ const PurchaseHistory = () => {
       const response = await cancelOrder(order.id, reason);
       
       if (response.success) {
-        showToast('success', 'Pesanan berhasil dibatalkan');
+        toast.success('Pesanan berhasil dibatalkan');
         setShowDetailModal(false);
         fetchOrders(); // Refresh list
       }
     } catch (err) {
       console.error('Error cancelling order:', err);
-      showToast('error', err.message || 'Gagal membatalkan pesanan');
+      toast.error(err.message || 'Gagal membatalkan pesanan');
     }
   };
 
@@ -159,14 +156,6 @@ const PurchaseHistory = () => {
     setDateRange('');
     setSortBy('newest');
     setCurrentPage(1);
-  };
-
-  // Show toast notification
-  const showToast = (type, message) => {
-    setToast({ show: true, type, message });
-    setTimeout(() => {
-      setToast({ show: false, type: '', message: '' });
-    }, 3000);
   };
 
   return (
@@ -298,15 +287,6 @@ const PurchaseHistory = () => {
               />
             )}
           </>
-        )}
-
-        {/* Toast Notification */}
-        {toast.show && (
-          <Toast
-            type={toast.type}
-            message={toast.message}
-            onClose={() => setToast({ show: false, type: '', message: '' })}
-          />
         )}
         </div>
       </div>

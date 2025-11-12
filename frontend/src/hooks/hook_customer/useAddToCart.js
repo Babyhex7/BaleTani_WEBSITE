@@ -207,7 +207,9 @@ const useAddToCart = () => {
         // ========================================
         console.error("❌ Error adding to cart:", error);
 
-        toast.error("Gagal menambahkan produk ke keranjang. Silakan coba lagi.");
+        toast.error(
+          "Gagal menambahkan produk ke keranjang. Silakan coba lagi."
+        );
       } finally {
         // Reset loading state
         setIsProcessing(false);
