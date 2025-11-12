@@ -3,14 +3,12 @@
  * Handle customer order creation and management
  */
 
-const { Op } = require("sequelize");
 const { sequelize } = require("../config/database");
 const { getWIBDate } = require("../utils/dateHelper");
 const {
   Order,
   OrderItem,
   Product,
-  Customer,
   OrderStatusHistory,
   Cart,
   PaymentDetail,
@@ -394,10 +392,15 @@ const createOrder = async (req, res) => {
     waMessage += `\n_Pesan otomatis dari sistem BaleTani_`;
 
     // Add WhatsApp message to response
+    const adminWhatsAppPhone =
+      process.env.WHATSAPP_ADMIN_PHONE || "6285885725027";
+
     responseData.whatsapp = {
-      phone: "6285885725027", // Nomor WA tujuan (format internasional tanpa +)
+      phone: adminWhatsAppPhone,
       message: waMessage,
-      url: `https://wa.me/6285885725027?text=${encodeURIComponent(waMessage)}`,
+      url: `https://wa.me/${adminWhatsAppPhone}?text=${encodeURIComponent(
+        waMessage
+      )}`,
     };
 
     return res.status(201).json({
@@ -529,9 +532,14 @@ const getOrderDetail = async (req, res) => {
           as: "orderItems",
         },
         {
+          model: PaymentDetail,
+          as: "payment",
+          required: false,
+        },
+        {
           model: OrderStatusHistory,
           as: "statusHistory",
-          // ordering of included association should be specified in top-level 'order'
+          required: false,
         },
       ],
       order: [

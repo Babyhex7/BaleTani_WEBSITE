@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { X, Package, User, MapPin, CreditCard, Clock, FileText } from "lucide-react";
-import orderService from "../../services/orderService";
+import orderService from "../../services/services_admin/orderService";
 import { dummyOrderDetail } from "../../data/dummyOrders";
 
 const OrderDetailModal = ({ orderId, useDummyData, onClose, onUpdateStatus }) => {

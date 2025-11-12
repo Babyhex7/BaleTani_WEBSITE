@@ -20,7 +20,7 @@ import {
 import toast from "react-hot-toast";
 import AdminSidebarNew from "../../components/layout_admin/AdminSidebarNew";
 import AdminHeaderNew from "../../components/layout_admin/AdminHeaderNew";
-import orderService from "../../services/orderService";
+import orderService from "../../services/services_admin/orderService";
 import { dummyOrders, dummyStatistics } from "../../data/dummyOrders";
 import OrderTable from "../../components/ui_admin/OrderTable";
 import OrderDetailModal from "../../components/ui_admin/OrderDetailModal";
