@@ -75,7 +75,7 @@ exports.getAllDiscounts = async (req, res) => {
           },
           where: {
             is_active: true,
-            product_type: 'online', // Only show online products to customers
+            product_type: "online", // Only show online products to customers
             total_stock: { [Op.gt]: 0 },
           },
           attributes: [
@@ -240,7 +240,7 @@ exports.getDiscountById = async (req, res) => {
           },
           where: {
             is_active: true,
-            product_type: 'online', // Only show online products to customers
+            product_type: "online", // Only show online products to customers
             total_stock: { [Op.gt]: 0 },
           },
           attributes: ["id", "name", "selling_price", "total_stock"],
