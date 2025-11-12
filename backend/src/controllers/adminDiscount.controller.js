@@ -6,6 +6,10 @@
 const { Op } = require("sequelize");
 const { Discount, Product, ProductDiscount } = require("../models");
 
+// Import cache service dan cache keys untuk invalidation
+const cacheService = require("../cache/cacheService");
+const { PATTERNS } = require("../cache/cacheKeys");
+
 /**
  * GET /api/admin/discounts
  * Get all discounts with filters and pagination

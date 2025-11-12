@@ -3,7 +3,7 @@
  * Handle semua API calls untuk order management
  */
 
-import api from "./services_admin/adminApiClient";
+import api from "./adminApiClient";
 
 const orderService = {
   /**

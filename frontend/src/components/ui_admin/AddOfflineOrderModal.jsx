@@ -20,7 +20,7 @@ import {
   BanknotesIcon
 } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
-import orderService from "../../services/orderService";
+import orderService from "../../services/services_admin/orderService";
 import adminApiClient from "../../services/services_admin/adminApiClient";
 
 const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {

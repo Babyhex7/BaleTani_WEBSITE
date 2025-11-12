@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { X, AlertCircle } from "lucide-react";
-import orderService from "../../services/orderService";
+import orderService from "../../services/services_admin/orderService";
 
 const UpdateStatusModal = ({ order, useDummyData, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
