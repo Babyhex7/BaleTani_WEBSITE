@@ -3,7 +3,7 @@
  * Displays all products in a specific category
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   CubeIcon,
@@ -23,24 +23,8 @@ import Footer from '../../components/layout/Footer';
 import ProductCard from '../../components/ui/ProductCard';
 import Pagination from '../../components/ui/Pagination';
 import SearchBar from '../../components/ui/SearchBar';
-import axios from 'axios';
-
-// Custom debounce hook
-const useDebounce = (value, delay) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
+import categoryService from '../../services/services_customer/categoryService';
+import useDebounce from '../../hooks/useDebounce';
 
 // Icon mapping untuk kategori
 const getCategoryIcon = (categoryName) => {
@@ -89,31 +73,25 @@ const CategoryDetailPage = () => {
     const fetchCategoryDetail = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/public/categories/${id}`, {
-          params: {
-            page: pagination.currentPage,
-            limit: 12,
-            search: debouncedSearch,
-            sort_by: sortBy === 'newest' ? 'created_at' : sortBy === 'price-low' ? 'selling_price' : 'selling_price',
-            sort_order: sortBy === 'newest' ? 'DESC' : sortBy === 'price-low' ? 'ASC' : 'DESC',
-          }
+        setError(null);
+
+        const response = await categoryService.getCategoryDetail(id, {
+          page: pagination.currentPage,
+          limit: 12,
+          search: debouncedSearch,
+          sort_by: sortBy === 'newest' ? 'created_at' : 'selling_price',
+          sort_order: sortBy === 'newest' ? 'DESC' : sortBy === 'price-low' ? 'ASC' : 'DESC',
         });
         
-        if (response.data.success) {
-          setCategory(response.data.data.category);
-          setProducts(response.data.data.products);
-          setFilteredProducts(response.data.data.products);
-          // Map snake_case to camelCase for internal use
-          setPagination({
-            currentPage: response.data.data.pagination.current_page || 1,
-            totalPages: response.data.data.pagination.total_pages || 1,
-            totalItems: response.data.data.pagination.total_items || 0,
-            itemsPerPage: response.data.data.pagination.items_per_page || 12,
-          });
+        if (response.success) {
+          setCategory(response.data.category);
+          setProducts(response.data.products);
+          setFilteredProducts(response.data.products);
+          setPagination(response.data.pagination);
         }
       } catch (err) {
         console.error('Error fetching category detail:', err);
-        setError('Gagal memuat kategori. Silakan coba lagi.');
+        setError(err.message || 'Gagal memuat kategori. Silakan coba lagi.');
       } finally {
         setLoading(false);
       }

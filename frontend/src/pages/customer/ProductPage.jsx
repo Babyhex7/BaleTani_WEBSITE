@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { X, ChevronDown, ChevronRight, Star } from 'lucide-react';
+import { X, ChevronDown, ChevronRight, Star, Search } from 'lucide-react';
 import ProductCard from '../../components/ui/ProductCard';
 import SearchBar from '../../components/ui/SearchBar';
 import Button from '../../components/ui/Button';

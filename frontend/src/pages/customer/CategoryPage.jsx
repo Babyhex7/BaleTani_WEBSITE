@@ -37,7 +37,7 @@ import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import SearchBar from '../../components/ui/SearchBar';
 import useDebounce from '../../hooks/useDebounce';
-import axios from 'axios';
+import categoryService from '../../services/services_customer/categoryService';
 
 // Icon mapping untuk kategori berdasarkan nama
 const getCategoryIcon = (categoryName) => {
@@ -69,15 +69,17 @@ const CategoryPage = () => {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/public/categories');
+        setError(null);
         
-        if (response.data.success) {
-          setCategories(response.data.data);
-          setFilteredCategories(response.data.data);
+        const response = await categoryService.getAllCategories();
+        
+        if (response.success) {
+          setCategories(response.data);
+          setFilteredCategories(response.data);
         }
       } catch (err) {
         console.error('Error fetching categories:', err);
-        setError('Gagal memuat kategori. Silakan coba lagi.');
+        setError(err.message || 'Gagal memuat kategori. Silakan coba lagi.');
       } finally {
         setLoading(false);
       }

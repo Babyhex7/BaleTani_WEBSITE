@@ -124,11 +124,7 @@ const useAddToCart = () => {
       if (!product || typeof product !== "object") {
         console.error("❌ Invalid product object:", product);
 
-        toast.error("Produk tidak valid", {
-          duration: 2000,
-          position: "top-center",
-          icon: "❌",
-        });
+        toast.error("Produk tidak valid");
 
         return; // Stop execution
       }
@@ -143,11 +139,7 @@ const useAddToCart = () => {
       ) {
         console.log("⚠️ Product out of stock:", product.name);
 
-        toast.error(`Maaf, ${product.name} sedang habis stok`, {
-          duration: 3000,
-          position: "top-center",
-          icon: "❌",
-        });
+        toast.error(`Maaf, ${product.name} sedang habis stok`);
 
         return; // Stop execution
       }
@@ -163,11 +155,7 @@ const useAddToCart = () => {
           product.stock
         );
 
-        toast.error(`Stok tidak mencukupi. Tersedia: ${product.stock} unit`, {
-          duration: 3000,
-          position: "top-center",
-          icon: "⚠️",
-        });
+        toast.error(`Stok tidak mencukupi. Tersedia: ${product.stock} unit`);
 
         return; // Stop execution
       }
@@ -176,11 +164,7 @@ const useAddToCart = () => {
       if (quantity < 1) {
         console.log("⚠️ Invalid quantity:", quantity);
 
-        toast.error("Jumlah minimal pembelian adalah 1", {
-          duration: 2000,
-          position: "top-center",
-          icon: "⚠️",
-        });
+        toast.error("Jumlah minimal pembelian adalah 1");
 
         return; // Stop execution
       }
@@ -214,15 +198,7 @@ const useAddToCart = () => {
             ? `${product.name} ditambahkan ke keranjang!`
             : `${product.name} (${quantity}x) ditambahkan ke keranjang!`;
 
-        toast.success(message, {
-          duration: 3000,
-          position: "top-center",
-          icon: "🛒",
-          style: {
-            background: "#10b981",
-            color: "#fff",
-          },
-        });
+        toast.success(message);
 
         console.log("✅ Successfully added to cart");
       } catch (error) {
@@ -231,14 +207,7 @@ const useAddToCart = () => {
         // ========================================
         console.error("❌ Error adding to cart:", error);
 
-        toast.error(
-          "Gagal menambahkan produk ke keranjang. Silakan coba lagi.",
-          {
-            duration: 3000,
-            position: "top-center",
-            icon: "❌",
-          }
-        );
+        toast.error("Gagal menambahkan produk ke keranjang. Silakan coba lagi.");
       } finally {
         // Reset loading state
         setIsProcessing(false);
