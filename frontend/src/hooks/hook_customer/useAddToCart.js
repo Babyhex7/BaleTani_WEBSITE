@@ -4,48 +4,48 @@
  * ============================================
  * Handle logic untuk menambahkan produk ke keranjang
  * Termasuk validasi auth, stok, dan notifikasi
- * 
+ *
  * Reusable di berbagai komponen:
  * - ProductCard
  * - ProductDetail
  * - QuickView Modal
  * - Related Products
  * - Featured Products
- * 
+ *
  * @module useAddToCart
  * @requires react
  * @requires react-hot-toast
  * @requires store/store_customer/useAuthStore
  * @requires store/store_customer/useCartStore
- * 
+ *
  * @author BaleTani Development Team
  * @created 2025-11-12
  */
 
-import { useState } from 'react';
-import toast from 'react-hot-toast';
-import useAuthStore from '../../store/store_customer/useAuthStore';
-import useCartStore from '../../store/store_customer/useCartStore';
+import { useState } from "react";
+import toast from "react-hot-toast";
+import useAuthStore from "../../store/store_customer/useAuthStore";
+import useCartStore from "../../store/store_customer/useCartStore";
 
 /**
  * Custom hook untuk handle add to cart functionality
- * 
+ *
  * @function useAddToCart
  * @returns {Object} Hook utilities
  * @returns {Function} returns.handleAddToCart - Function untuk add to cart dengan validasi lengkap
  * @returns {Boolean} returns.showLoginModal - State untuk kontrol login modal
  * @returns {Function} returns.setShowLoginModal - Setter untuk login modal state
  * @returns {Boolean} returns.isProcessing - State untuk loading saat add to cart
- * 
+ *
  * @example
  * const { handleAddToCart, showLoginModal, setShowLoginModal } = useAddToCart();
- * 
+ *
  * // Basic usage
  * <button onClick={handleAddToCart(product, 1)}>Add to Cart</button>
- * 
+ *
  * // Custom quantity
  * <button onClick={handleAddToCart(product, 5)}>Add 5 to Cart</button>
- * 
+ *
  * // With login modal
  * <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
  */
@@ -53,27 +53,27 @@ const useAddToCart = () => {
   // ========================================
   // STATE MANAGEMENT
   // ========================================
-  
+
   // State untuk kontrol login modal visibility
   const [showLoginModal, setShowLoginModal] = useState(false);
-  
+
   // State untuk tracking proses add to cart (loading state)
   const [isProcessing, setIsProcessing] = useState(false);
 
   // ========================================
   // ZUSTAND STORES
   // ========================================
-  
+
   // Get authentication state dari Auth Store
   const { isAuthenticated } = useAuthStore();
-  
+
   // Get addItem function dari Cart Store
   const addItem = useCartStore((state) => state.addItem);
 
   /**
    * Handler untuk add to cart dengan berbagai validasi
    * Returns event handler function untuk button onClick
-   * 
+   *
    * @function handleAddToCart
    * @param {Object} product - Product object yang akan ditambahkan
    * @param {String} product.id - Product ID
@@ -83,9 +83,9 @@ const useAddToCart = () => {
    * @param {String} product.image - Product image URL
    * @param {Number} quantity - Jumlah produk yang ingin ditambahkan (default: 1)
    * @param {Boolean} stopPropagation - Stop event bubbling ke parent (default: true)
-   * 
+   *
    * @returns {Function} Event handler function
-   * 
+   *
    * Flow:
    * 1. Validasi authentication
    * 2. Validasi product object
@@ -110,41 +110,45 @@ const useAddToCart = () => {
       // STEP 1: VALIDASI AUTHENTICATION
       // ========================================
       if (!isAuthenticated) {
-        console.log('🔒 User not authenticated, showing login modal');
-        
+        console.log("🔒 User not authenticated, showing login modal");
+
         // Tampilkan login modal (TIDAK PAKAI TOAST, modal saja sudah cukup)
         setShowLoginModal(true);
-        
+
         return; // Stop execution
       }
 
       // ========================================
       // STEP 2: VALIDASI PRODUCT OBJECT
       // ========================================
-      if (!product || typeof product !== 'object') {
-        console.error('❌ Invalid product object:', product);
-        
-        toast.error('Produk tidak valid', {
+      if (!product || typeof product !== "object") {
+        console.error("❌ Invalid product object:", product);
+
+        toast.error("Produk tidak valid", {
           duration: 2000,
-          position: 'top-center',
-          icon: '❌',
+          position: "top-center",
+          icon: "❌",
         });
-        
+
         return; // Stop execution
       }
 
       // ========================================
       // STEP 3: VALIDASI STOCK AVAILABILITY
       // ========================================
-      if (product.stock === undefined || product.stock === null || product.stock === 0) {
-        console.log('⚠️ Product out of stock:', product.name);
-        
+      if (
+        product.stock === undefined ||
+        product.stock === null ||
+        product.stock === 0
+      ) {
+        console.log("⚠️ Product out of stock:", product.name);
+
         toast.error(`Maaf, ${product.name} sedang habis stok`, {
           duration: 3000,
-          position: 'top-center',
-          icon: '❌',
+          position: "top-center",
+          icon: "❌",
         });
-        
+
         return; // Stop execution
       }
 
@@ -152,30 +156,32 @@ const useAddToCart = () => {
       // STEP 4: VALIDASI QUANTITY VS STOCK
       // ========================================
       if (quantity > product.stock) {
-        console.log('⚠️ Insufficient stock. Requested:', quantity, 'Available:', product.stock);
-        
-        toast.error(
-          `Stok tidak mencukupi. Tersedia: ${product.stock} unit`, 
-          {
-            duration: 3000,
-            position: 'top-center',
-            icon: '⚠️',
-          }
+        console.log(
+          "⚠️ Insufficient stock. Requested:",
+          quantity,
+          "Available:",
+          product.stock
         );
-        
+
+        toast.error(`Stok tidak mencukupi. Tersedia: ${product.stock} unit`, {
+          duration: 3000,
+          position: "top-center",
+          icon: "⚠️",
+        });
+
         return; // Stop execution
       }
 
       // Validasi quantity minimal
       if (quantity < 1) {
-        console.log('⚠️ Invalid quantity:', quantity);
-        
-        toast.error('Jumlah minimal pembelian adalah 1', {
+        console.log("⚠️ Invalid quantity:", quantity);
+
+        toast.error("Jumlah minimal pembelian adalah 1", {
           duration: 2000,
-          position: 'top-center',
-          icon: '⚠️',
+          position: "top-center",
+          icon: "⚠️",
         });
-        
+
         return; // Stop execution
       }
 
@@ -185,8 +191,8 @@ const useAddToCart = () => {
       try {
         // Set loading state
         setIsProcessing(true);
-        
-        console.log('🛒 Adding to cart:', {
+
+        console.log("🛒 Adding to cart:", {
           product: product.name,
           quantity,
           stock: product.stock,
@@ -198,38 +204,41 @@ const useAddToCart = () => {
         // - Simpan ke localStorage
         // - Update total items & price
         addItem(product, quantity);
-        
+
         // ========================================
         // SUCCESS NOTIFICATION
         // ========================================
         // Format pesan sesuai quantity
-        const message = quantity === 1 
-          ? `${product.name} ditambahkan ke keranjang!`
-          : `${product.name} (${quantity}x) ditambahkan ke keranjang!`;
-        
+        const message =
+          quantity === 1
+            ? `${product.name} ditambahkan ke keranjang!`
+            : `${product.name} (${quantity}x) ditambahkan ke keranjang!`;
+
         toast.success(message, {
           duration: 3000,
-          position: 'top-center',
-          icon: '🛒',
+          position: "top-center",
+          icon: "🛒",
           style: {
-            background: '#10b981',
-            color: '#fff',
+            background: "#10b981",
+            color: "#fff",
           },
         });
 
-        console.log('✅ Successfully added to cart');
-
+        console.log("✅ Successfully added to cart");
       } catch (error) {
         // ========================================
         // ERROR HANDLING
         // ========================================
-        console.error('❌ Error adding to cart:', error);
-        
-        toast.error('Gagal menambahkan produk ke keranjang. Silakan coba lagi.', {
-          duration: 3000,
-          position: 'top-center',
-          icon: '❌',
-        });
+        console.error("❌ Error adding to cart:", error);
+
+        toast.error(
+          "Gagal menambahkan produk ke keranjang. Silakan coba lagi.",
+          {
+            duration: 3000,
+            position: "top-center",
+            icon: "❌",
+          }
+        );
       } finally {
         // Reset loading state
         setIsProcessing(false);
@@ -241,10 +250,10 @@ const useAddToCart = () => {
   // RETURN HOOK UTILITIES
   // ========================================
   return {
-    handleAddToCart,      // Function untuk add to cart
-    showLoginModal,       // State login modal
-    setShowLoginModal,    // Setter login modal
-    isProcessing,         // Loading state
+    handleAddToCart, // Function untuk add to cart
+    showLoginModal, // State login modal
+    setShowLoginModal, // Setter login modal
+    isProcessing, // Loading state
   };
 };
 
