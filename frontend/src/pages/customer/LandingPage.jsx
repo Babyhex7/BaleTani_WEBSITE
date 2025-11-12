@@ -1,98 +1,128 @@
-import { ArrowRight, MessageCircle, Truck, Shield, Clock, Users, Award, CheckCircle, Leaf, Heart, Zap, Star } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { 
+  ArrowRight, MessageCircle, Truck, Shield, Clock, Users, Award, CheckCircle, 
+  Leaf, Heart, Zap, Star, ChevronLeft, ChevronRight, 
+  Salad, Apple, Beef, Fish, Soup, Milk, ShoppingBag, Carrot 
+} from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import Button from '../../components/ui/Button';
 import ProductCard from '../../components/ui/ProductCard';
+import productService from '../../services/services_customer/productService';
+import categoryService from '../../services/services_customer/categoryService';
 // Navbar & Footer disediakan oleh CustomerLayout pada routing level
 
 /**
  * Komponen Landing Page untuk BaleTani Fresh Market
  * Menampilkan hero section, produk unggulan, kategori, dan informasi bisnis
+ * Dengan animasi Framer Motion dan data dari API
  */
 const LandingPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
+  const { scrollYProgress } = useScroll();
+  
+  // State untuk data dari API
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  // Refs untuk infinite carousel
+  const carouselRef = useRef(null);
+  const autoPlayRef = useRef(null);
 
-  // Data produk unggulan untuk ditampilkan di landing page
-  const featuredProducts = [
-    {
-      id: 1,
-      name: 'Udang Sedang Fresh',
-      price: 65000,
-      originalPrice: 70000,
-      image: '/api/placeholder/300/300',
-      category: 'Seafood',
-      stock: 50,
-      discount: 7,
-      unit: 'kg'
-    },
-    {
-      id: 7,
-      name: 'Ayam Filet Premium',
-      price: 43000,
-      originalPrice: 48000,
-      image: '/api/placeholder/300/300',
-      category: 'Daging & Unggas',
-      stock: 30,
-      discount: 10,
-      unit: 'kg'
-    },
-    {
-      id: 24,
-      name: 'Apel Segar',
-      price: 30000,
-      originalPrice: 35000,
-      image: '/api/placeholder/300/300',
-      category: 'Buah',
-      stock: 25,
-      discount: 14,
-      unit: 'kg'
-    },
-    {
-      id: 19,
-      name: 'Tomat Segar',
-      price: 10000,
-      originalPrice: 12000,
-      image: '/api/placeholder/300/300',
-      category: 'Sayuran',
-      stock: 40,
-      discount: 17,
-      unit: 'kg'
-    }
-  ];
+  // Fetch data dari API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch products dan categories secara parallel
+        const [productsResponse, categoriesResponse] = await Promise.all([
+          productService.getAllProducts({ limit: 12, sortBy: 'newest' }),
+          categoryService.getAllCategories()
+        ]);
+        
+        if (productsResponse.success) {
+          setProducts(productsResponse.data.products || []);
+        }
+        
+        if (categoriesResponse.success) {
+          setCategories(categoriesResponse.data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching landing page data:', error);
+        toast.error('Gagal memuat data produk');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Data kategori produk
-  const categories = [
-    {
-      name: 'Sayuran Segar',
-      description: 'Sayuran organik langsung dari kebun',
-      image: '/api/placeholder/250/200',
-      itemCount: 15,
-      href: '/products?category=sayuran'
-    },
-    {
-      name: 'Buah-buahan',
-      description: 'Buah segar dan manis pilihan terbaik',
-      image: '/api/placeholder/250/200',
-      itemCount: 8,
-      href: '/products?category=buah'
-    },
-    {
-      name: 'Daging & Unggas',
-      description: 'Daging dan unggas segar berkualitas premium',
-      image: '/api/placeholder/250/200',
-      itemCount: 6,
-      href: '/products?category=daging'
-    },
-    {
-      name: 'Seafood',
-      description: 'Ikan dan seafood langsung dari laut',
-      image: '/api/placeholder/250/200',
-      itemCount: 5,
-      href: '/products?category=seafood'
+    fetchData();
+  }, []);
+
+  // Auto play carousel
+  useEffect(() => {
+    if (products.length > 0) {
+      autoPlayRef.current = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % products.length);
+      }, 5000); // Change slide every 5 seconds
+
+      return () => {
+        if (autoPlayRef.current) {
+          clearInterval(autoPlayRef.current);
+        }
+      };
     }
-  ];
+  }, [products.length]);
+
+  // Navigate carousel
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % products.length);
+    resetAutoPlay();
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + products.length) % products.length);
+    resetAutoPlay();
+  };
+
+  const resetAutoPlay = () => {
+    if (autoPlayRef.current) {
+      clearInterval(autoPlayRef.current);
+      autoPlayRef.current = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % products.length);
+      }, 5000);
+    }
+  };
+
+  // Get visible slides (3 at a time in desktop, 1 in mobile)
+  const getVisibleProducts = () => {
+    if (products.length === 0) return [];
+    
+    const result = [];
+    for (let i = 0; i < 3; i++) {
+      const index = (currentSlide + i) % products.length;
+      result.push(products[index]);
+    }
+    return result;
+  };
+
+  // Helper function untuk icon kategori - returns Icon Component
+  const getCategoryIcon = (categoryName) => {
+    const name = categoryName?.toLowerCase() || '';
+    if (name.includes('sayur')) return Salad;
+    if (name.includes('buah')) return Apple;
+    if (name.includes('daging') || name.includes('unggas') || name.includes('ayam')) return Beef;
+    if (name.includes('seafood') || name.includes('ikan') || name.includes('udang')) return Fish;
+    if (name.includes('bumbu') || name.includes('rempah')) return Soup;
+    if (name.includes('susu') || name.includes('dairy')) return Milk;
+    if (name.includes('wortel') || name.includes('carrot')) return Carrot;
+    return ShoppingBag;
+  };
 
   // Data statistik dan pencapaian
   const achievements = [
@@ -202,51 +232,122 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative bg-white py-16 lg:py-18">
+      {/* Hero Section dengan Parallax Effect */}
+      <section className="relative bg-white py-16 lg:py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-white to-blue-50 opacity-40"></div>
+        
+        {/* Floating shapes animation */}
+        <motion.div
+          animate={{ 
+            y: [0, -20, 0],
+            rotate: [0, 5, 0]
+          }}
+          transition={{ 
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-20 right-20 w-32 h-32 bg-green-200 rounded-full opacity-20 blur-2xl"
+        />
+        <motion.div
+          animate={{ 
+            y: [0, 20, 0],
+            rotate: [0, -5, 0]
+          }}
+          transition={{ 
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute bottom-20 left-20 w-40 h-40 bg-blue-200 rounded-full opacity-20 blur-2xl"
+        />
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="space-y-8"
+            >
               <div className="space-y-6">
-                <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3, type: "spring" }}
+                  className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium"
+                >
+                  <Leaf className="w-4 h-4 mr-2" />
                   Segar Langsung dari Kebun
-                </div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                </motion.div>
+                <motion.h1 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.6 }}
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight"
+                >
                   Belanja Segar & Hemat,{' '}
-                  <span className="text-green-600">Langsung dari Kebun</span>
-                </h1>
-                <p className="text-lg text-gray-600 leading-relaxed">
+                  <motion.span 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="text-green-600 inline-block"
+                  >
+                    Langsung dari Kebun
+                  </motion.span>
+                </motion.h1>
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.9, duration: 0.6 }}
+                  className="text-lg text-gray-600 leading-relaxed"
+                >
                   Nikmati produk segar berkualitas premium dengan pengiriman cepat. 
                   Pesan mudah via WhatsApp, dari kebun ke meja makan Anda.
-                </p>
+                </motion.p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  size="small" 
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                  onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
-                >
-                  Belanja Sekarang
-                  <ArrowRight className="ml-2" size={20} />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="small" 
-                  className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                  onClick={() => handleWhatsAppOrder('Konsultasi Produk', 0, 'gratis')}
-                >
-                  <MessageCircle className="mr-2" size={20} />
-                  Chat WhatsApp
-                </Button>
-              </div>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1, duration: 0.6 }}
+                className="flex flex-col sm:flex-row gap-4"
+              >
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button 
+                    size="small" 
+                    className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+                    onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Belanja Sekarang
+                    <ArrowRight className="ml-2" size={20} />
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button 
+                    variant="outline" 
+                    size="small" 
+                    className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white w-full sm:w-auto"
+                    onClick={() => handleWhatsAppOrder('Konsultasi Produk', 0, 'gratis')}
+                  >
+                    <MessageCircle className="mr-2" size={20} />
+                    Chat WhatsApp
+                  </Button>
+                </motion.div>
+              </motion.div>
+            </motion.div>
 
-             
-            </div>
-
-            <div className="relative">
-              <div className="relative z-10">
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
+            >
+              <motion.div 
+                whileHover={{ scale: 1.02, rotate: 1 }}
+                transition={{ duration: 0.3 }}
+                className="relative z-10"
+              >
                 <div className="bg-white p-6 rounded-2xl shadow-lg">
                   <img 
                     src="/api/placeholder/600/500" 
@@ -254,181 +355,514 @@ const LandingPage = () => {
                     className="rounded-xl w-full h-auto"
                   />
                 </div>
-              </div>
-              {/* Decorative elements */}
-              <div className="absolute -top-4 -right-4 w-16 h-16 bg-green-200 rounded-full opacity-60"></div>
-              <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-blue-200 rounded-full opacity-60"></div>
-            </div>
+              </motion.div>
+              {/* Decorative animated elements */}
+              <motion.div 
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  opacity: [0.6, 0.8, 0.6]
+                }}
+                transition={{ 
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="absolute -top-4 -right-4 w-16 h-16 bg-green-200 rounded-full"
+              />
+              <motion.div 
+                animate={{ 
+                  scale: [1, 1.3, 1],
+                  opacity: [0.5, 0.7, 0.5]
+                }}
+                transition={{ 
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.5
+                }}
+                className="absolute -bottom-4 -left-4 w-12 h-12 bg-blue-200 rounded-full"
+              />
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Statistics Section */}
+      {/* Statistics Section dengan Counter Animation */}
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {achievements.map((achievement, index) => {
               const IconComponent = achievement.icon;
               return (
-                <div key={index} className="text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <motion.div 
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  whileHover={{ 
+                    y: -5,
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)"
+                  }}
+                  className="text-center p-6 bg-white rounded-xl shadow-sm transition-shadow duration-300"
+                >
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 + 0.2, type: "spring", stiffness: 200 }}
+                    className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3"
+                  >
                     <IconComponent className="text-green-600" size={24} />
-                  </div>
-                  <div className="text-2xl font-bold text-gray-900 mb-1">{achievement.number}</div>
+                  </motion.div>
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 + 0.3 }}
+                    className="text-2xl font-bold text-gray-900 mb-1"
+                  >
+                    {achievement.number}
+                  </motion.div>
                   <div className="text-gray-600 text-sm font-medium">{achievement.label}</div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* Special Offer Banner */}
-      <section className="py-8 bg-green-600">
-        <div className="container mx-auto px-4">
-          <div className="text-center space-y-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-white">Promo Spesial Hari Ini!</h2>
-            <p className="text-lg text-green-100">Diskon hingga 25% untuk pembelian pertama</p>
-            <Button 
-              variant="secondary" 
-              size="md"
-              className="bg-white text-green-600 hover:bg-gray-100"
-              onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
+      {/* Special Offer Banner dengan Pulse Animation */}
+      <section className="py-8 bg-gradient-to-r from-green-600 to-green-700 relative overflow-hidden">
+        {/* Animated background shapes */}
+        <motion.div
+          animate={{ 
+            x: [0, 100, 0],
+            scale: [1, 1.2, 1]
+          }}
+          transition={{ 
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full"
+        />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center space-y-4"
+          >
+            <motion.h2 
+              initial={{ y: -20 }}
+              whileInView={{ y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-2xl md:text-3xl font-bold text-white"
             >
-              Belanja Sekarang
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Products */}
-      <section id="products" className="py-16 bg-white">
-        <div className="container w-full mx-auto px-2 max-w-screen-xl">
-          <div className="text-center space-y-4 mb-12">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium mb-4">
-              Produk Terlaris
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-              Produk Unggulan Hari Ini
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Pilihan terbaik produk segar dengan kualitas premium dan harga terjangkau untuk keluarga Indonesia
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {featuredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onWhatsAppOrder={handleWhatsAppOrder}
-                onAddToCart={handleAddToCart}
-                formatPrice={formatPrice}
-              />
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Link to="/products">
+              🎉 Promo Spesial Hari Ini!
+            </motion.h2>
+            <motion.p 
+              initial={{ y: 20 }}
+              whileInView={{ y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="text-lg text-green-100"
+            >
+              Diskon hingga 25% untuk pembelian pertama
+            </motion.p>
+            <motion.div
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <Button 
-                size="lg"
-                className="bg-green-600 hover:bg-green-700 text-white"
+                variant="secondary" 
+                size="md"
+                className="bg-white text-green-600 hover:bg-gray-100"
+                onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
               >
-                Lihat Semua Produk
-                <ArrowRight className="ml-2" size={20} />
+                Belanja Sekarang
               </Button>
-            </Link>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-16 bg-white">
+      {/* Featured Products - Unlimited Carousel dengan Framer Motion */}
+      <section id="products" className="py-16 bg-white overflow-hidden">
+        <div className="container w-full mx-auto px-4 max-w-screen-xl">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center space-y-4 mb-12"
+          >
+            <motion.div 
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium mb-4"
+            >
+              <Star className="w-4 h-4 mr-2" />
+              Produk Terlaris
+            </motion.div>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="text-3xl md:text-4xl font-bold text-gray-900"
+            >
+              Produk Unggulan Hari Ini
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
+            >
+              Pilihan terbaik produk segar dengan kualitas premium dan harga terjangkau untuk keluarga Indonesia
+            </motion.p>
+          </motion.div>
+
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-600 border-t-transparent"></div>
+            </div>
+          ) : products.length > 0 ? (
+            <>
+              {/* Carousel Container */}
+              <div className="relative mb-12">
+                {/* Navigation Buttons */}
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110"
+                  aria-label="Previous"
+                >
+                  <ChevronLeft className="w-6 h-6 text-gray-800" />
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110"
+                  aria-label="Next"
+                >
+                  <ChevronRight className="w-6 h-6 text-gray-800" />
+                </button>
+
+                {/* Carousel Content */}
+                <div className="overflow-hidden px-12">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentSlide}
+                      initial={{ opacity: 0, x: 100 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -100 }}
+                      transition={{ duration: 0.5 }}
+                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                    >
+                      {getVisibleProducts().map((product, index) => (
+                        <motion.div
+                          key={`${product.id}-${currentSlide}`}
+                          initial={{ opacity: 0, y: 50 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1, duration: 0.5 }}
+                        >
+                          <ProductCard
+                            product={product}
+                            onWhatsAppOrder={handleWhatsAppOrder}
+                            onAddToCart={handleAddToCart}
+                            formatPrice={formatPrice}
+                          />
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Carousel Indicators */}
+                <div className="flex justify-center gap-2 mt-8">
+                  {products.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setCurrentSlide(index);
+                        resetAutoPlay();
+                      }}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        index === currentSlide 
+                          ? 'w-8 bg-green-600' 
+                          : 'w-2 bg-gray-300 hover:bg-gray-400'
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 }}
+                className="text-center"
+              >
+                <Link to="/products">
+                  <Button 
+                    size="lg"
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    Lihat Semua {products.length} Produk
+                    <ArrowRight className="ml-2" size={20} />
+                  </Button>
+                </Link>
+              </motion.div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600">Belum ada produk tersedia</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Benefits Section dengan Scroll Animation */}
+      <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto px-4">
-          <div className="text-center space-y-4 mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center space-y-4 mb-12"
+          >
+            <motion.h2 
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-3xl md:text-4xl font-bold text-gray-900"
+            >
               Mengapa Pilih BaleTani?
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
+            >
               Kami berkomitmen memberikan pengalaman belanja terbaik dengan jaminan kualitas dan layanan premium
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((benefit, index) => {
               const IconComponent = benefit.icon;
               return (
-                <div key={index} className="p-6 bg-white rounded-xl border border-gray-100 hover:border-green-200 hover:shadow-lg transition-all duration-300 group">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-200 transition-colors duration-300">
+                <motion.div 
+                  key={index}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  whileHover={{ 
+                    y: -10,
+                    transition: { duration: 0.2 }
+                  }}
+                  className="p-6 bg-white rounded-xl border border-gray-100 hover:border-green-200 hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                >
+                  <motion.div 
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    transition={{ type: "spring", stiffness: 400 }}
+                    className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-200 transition-colors duration-300"
+                  >
                     <IconComponent className="text-green-600" size={24} />
-                  </div>
+                  </motion.div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3">{benefit.title}</h3>
                   <p className="text-gray-600 leading-relaxed text-sm">{benefit.description}</p>
-                </div>
+                </motion.div>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
+      {/* Categories Section dengan Data dari API */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="text-center space-y-4 mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center space-y-4 mb-12"
+          >
+            <motion.h2 
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-3xl md:text-4xl font-bold text-gray-900"
+            >
               Kategori Produk Pilihan
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
+            >
               Jelajahi koleksi lengkap produk segar berkualitas premium dari berbagai kategori terbaik
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.map((category) => (
-              <Link 
-                key={category.name} 
-                to={category.href}
-                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-200"
-              >
-                <div className="relative overflow-hidden">
-                  <img 
-                    src={category.image} 
-                    alt={category.name}
-                    className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
-                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-                    <span className="text-xs font-semibold text-gray-800">{category.itemCount} produk</span>
-                  </div>
-                </div>
-                <div className="p-5">
-                  <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-green-600 transition-colors duration-300">{category.name}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{category.description}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center items-center h-48">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent"></div>
+            </div>
+          ) : categories.length > 0 ? (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {categories.slice(0, 8).map((category, index) => {
+                  const IconComponent = getCategoryIcon(category.category_name);
+                  return (
+                    <motion.div
+                      key={category.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.05, duration: 0.5 }}
+                      whileHover={{ scale: 1.05, y: -5 }}
+                    >
+                      <Link 
+                        to={`/categories/${category.id}`}
+                        className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-green-200 block h-full"
+                      >
+                        <div className="relative overflow-hidden h-32 bg-gradient-to-br from-green-50 via-green-100 to-emerald-100">
+                          <motion.div 
+                            whileHover={{ scale: 1.15, rotate: 5 }}
+                            transition={{ duration: 0.3 }}
+                            className="absolute inset-0 flex items-center justify-center"
+                          >
+                            <div className="w-16 h-16 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg group-hover:bg-green-600 transition-colors duration-300">
+                              <IconComponent className="w-10 h-10 text-green-600 group-hover:text-white transition-colors duration-300" />
+                            </div>
+                          </motion.div>
+                          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm">
+                            <span className="text-xs font-bold text-gray-800">
+                              {category.product_count}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <h3 className="font-bold text-base text-gray-900 mb-1 group-hover:text-green-600 transition-colors duration-300 line-clamp-1">
+                            {category.category_name}
+                          </h3>
+                          <p className="text-gray-600 text-xs leading-relaxed line-clamp-2">
+                            {category.description || 'Produk segar berkualitas premium'}
+                          </p>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Show more button if there are more than 8 categories */}
+              {categories.length > 8 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5 }}
+                  className="text-center mt-8"
+                >
+                  <Link to="/categories">
+                    <Button 
+                      size="lg"
+                      variant="outline"
+                      className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                    >
+                      Lihat Semua Kategori ({categories.length})
+                      <ArrowRight className="ml-2" size={20} />
+                    </Button>
+                  </Link>
+                </motion.div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600">Belum ada kategori tersedia</p>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Testimonials dengan Stagger Animation */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center space-y-4 mb-12">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center space-y-4 mb-12"
+          >
+            <motion.div 
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, type: "spring" }}
+              className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-4"
+            >
+              <Star className="w-4 h-4 mr-2" />
               Kata Mereka
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+            </motion.div>
+            <motion.h2 
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="text-3xl md:text-4xl font-bold text-gray-900"
+            >
               Testimoni Pelanggan Setia
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
+            >
               Ribuan pelanggan telah merasakan pengalaman berbelanja terbaik bersama BaleTani
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+            {testimonials.map((testimonial, index) => (
+              <motion.div 
+                key={testimonial.id}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                whileHover={{ 
+                  y: -10,
+                  boxShadow: "0 20px 30px rgba(0,0,0,0.1)"
+                }}
+                className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 transition-all duration-300"
+              >
                 <div className="space-y-4">
                   <div className="flex items-center space-x-1 mb-3">
                     {[...Array(testimonial.rating)].map((_, i) => (
@@ -450,118 +884,234 @@ const LandingPage = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* About Section */}
-      <section className="py-16 bg-gray-50">
+      {/* About Section dengan Parallax Effect */}
+      <section className="py-16 bg-gray-50 overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="space-y-6"
+            >
               <div className="space-y-4">
-                <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium">
+                <motion.div 
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2, type: "spring" }}
+                  className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium"
+                >
+                  <Leaf className="w-4 h-4 mr-2" />
                   Tentang Kami
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+                </motion.div>
+                <motion.h2 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="text-3xl md:text-4xl font-bold text-gray-900"
+                >
                   BaleTani Fresh Market
-                </h2>
-                <p className="text-lg text-gray-600 leading-relaxed">
+                </motion.h2>
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                  className="text-lg text-gray-600 leading-relaxed"
+                >
                   Kami berkomitmen menyediakan produk segar berkualitas tinggi langsung dari kebun ke rumah Anda. 
                   Dengan visi menjadi brand yang jujur dan terpercaya, kami memastikan setiap produk yang sampai 
                   ke tangan Anda adalah yang terbaik.
-                </p>
+                </motion.p>
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg shadow-sm">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="text-green-600" size={20} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900 mb-1">Produk Segar Berkualitas</h3>
-                    <p className="text-gray-600 text-sm">Langsung dari kebun pilihan dengan standar kualitas tinggi dan proses seleksi ketat</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg shadow-sm">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="text-blue-600" size={20} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900 mb-1">Pengiriman Cepat & Aman</h3>
-                    <p className="text-gray-600 text-sm">Sistem pengiriman terpercaya dengan cold chain untuk menjaga kesegaran produk</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4 p-4 bg-white rounded-lg shadow-sm">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="text-purple-600" size={20} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900 mb-1">Harga Terjangkau</h3>
-                    <p className="text-gray-600 text-sm">Harga bersahabat langsung dari petani tanpa mengurangi kualitas produk</p>
-                  </div>
-                </div>
+                {[
+                  {
+                    icon: CheckCircle,
+                    color: 'green',
+                    title: 'Produk Segar Berkualitas',
+                    desc: 'Langsung dari kebun pilihan dengan standar kualitas tinggi dan proses seleksi ketat'
+                  },
+                  {
+                    icon: CheckCircle,
+                    color: 'blue',
+                    title: 'Pengiriman Cepat & Aman',
+                    desc: 'Sistem pengiriman terpercaya dengan cold chain untuk menjaga kesegaran produk'
+                  },
+                  {
+                    icon: CheckCircle,
+                    color: 'purple',
+                    title: 'Harga Terjangkau',
+                    desc: 'Harga bersahabat langsung dari petani tanpa mengurangi kualitas produk'
+                  }
+                ].map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
+                    whileHover={{ x: 10, boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}
+                    className="flex items-start space-x-4 p-4 bg-white rounded-lg shadow-sm"
+                  >
+                    <div className={`w-10 h-10 bg-${item.color}-100 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                      <item.icon className={`text-${item.color}-600`} size={20} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 mb-1">{item.title}</h3>
+                      <p className="text-gray-600 text-sm">{item.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
 
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl border border-green-200">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.8 }}
+                className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl border border-green-200"
+              >
                 <p className="text-green-800 font-bold text-lg text-center leading-relaxed">
                   "Dari kebun ke Balé, dari Balé ke rumahmu"
                 </p>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
-            <div className="relative">
-              <div className="bg-white p-4 rounded-2xl shadow-lg">
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative"
+            >
+              <motion.div 
+                whileHover={{ scale: 1.03, rotate: 2 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white p-4 rounded-2xl shadow-lg"
+              >
                 <img 
                   src="/api/placeholder/500/400" 
                   alt="About BaleTani" 
                   className="rounded-xl w-full h-auto"
                 />
-              </div>
-              <div className="absolute -top-4 -right-4 w-12 h-12 bg-green-200 rounded-full opacity-60"></div>
-              <div className="absolute -bottom-4 -left-4 w-10 h-10 bg-blue-200 rounded-full opacity-60"></div>
-            </div>
+              </motion.div>
+              <motion.div 
+                animate={{ scale: [1, 1.2, 1], opacity: [0.6, 0.8, 0.6] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="absolute -top-4 -right-4 w-12 h-12 bg-green-200 rounded-full"
+              />
+              <motion.div 
+                animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.7, 0.5] }}
+                transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
+                className="absolute -bottom-4 -left-4 w-10 h-10 bg-blue-200 rounded-full"
+              />
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-green-600">
-        <div className="container mx-auto px-4 text-center space-y-6">
-          <div className="space-y-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-white">
-              Siap Belanja Produk Segar Hari Ini?
-            </h2>
-            <p className="text-lg text-green-100 max-w-2xl mx-auto leading-relaxed">
+      {/* CTA Section dengan Magnetic Effect */}
+      <section className="py-16 bg-gradient-to-r from-green-600 to-green-700 relative overflow-hidden">
+        {/* Animated background shapes */}
+        <motion.div
+          animate={{ 
+            x: [-100, 100, -100],
+            y: [-50, 50, -50],
+            scale: [1, 1.2, 1],
+            rotate: [0, 180, 360]
+          }}
+          transition={{ 
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute top-0 left-0 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{ 
+            x: [100, -100, 100],
+            y: [50, -50, 50],
+            scale: [1.2, 1, 1.2],
+            rotate: [360, 180, 0]
+          }}
+          transition={{ 
+            duration: 15,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute bottom-0 right-0 w-80 h-80 bg-white opacity-5 rounded-full blur-3xl"
+        />
+
+        <div className="container mx-auto px-4 text-center space-y-6 relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="space-y-4"
+          >
+            <motion.h2 
+              initial={{ y: -30, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-3xl md:text-4xl font-bold text-white"
+            >
+              🌟 Siap Belanja Produk Segar Hari Ini?
+            </motion.h2>
+            <motion.p 
+              initial={{ y: 30, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="text-lg text-green-100 max-w-2xl mx-auto leading-relaxed"
+            >
               Bergabunglah dengan ribuan pelanggan yang telah merasakan pengalaman berbelanja terbaik. 
               Pesan sekarang dan nikmati kesegaran langsung dari kebun!
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              className="bg-white text-green-600 hover:bg-gray-100"
-              onClick={() => handleWhatsAppOrder('Konsultasi Pemesanan', 0, 'gratis')}
-            >
-              <MessageCircle className="mr-2" size={20} />
-              Pesan via WhatsApp
-            </Button>
-            <Link to="/products">
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="border-white text-white hover:bg-white hover:text-green-600"
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="lg"
+                className="bg-white text-green-600 hover:bg-gray-100 w-full sm:w-auto"
+                onClick={() => handleWhatsAppOrder('Konsultasi Pemesanan', 0, 'gratis')}
               >
-                Lihat Katalog Produk
-                <ArrowRight className="ml-2" size={20} />
+                <MessageCircle className="mr-2" size={20} />
+                Pesan via WhatsApp
               </Button>
+            </motion.div>
+            <Link to="/products">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="border-white text-white hover:bg-white hover:text-green-600 w-full sm:w-auto"
+                >
+                  Lihat Katalog Produk
+                  <ArrowRight className="ml-2" size={20} />
+                </Button>
+              </motion.div>
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 
