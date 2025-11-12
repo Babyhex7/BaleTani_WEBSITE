@@ -4,8 +4,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Search, X, ChevronDown, ChevronRight, Star } from 'lucide-react';
+import { X, ChevronDown, ChevronRight, Star } from 'lucide-react';
 import ProductCard from '../../components/ui/ProductCard';
+import SearchBar from '../../components/ui/SearchBar';
 import Button from '../../components/ui/Button';
 import Pagination from '../../components/ui/Pagination';
 import useProducts from '../../hooks/hook_customer/useProducts';
@@ -106,30 +107,17 @@ const ProductPage = () => {
               <p className="text-green-100 text-sm md:text-base mt-1">Produk segar langsung dari petani lokal</p>
             </div>
             
-            {/* Search Bar */}
+            {/* Search Bar - Reusable Component */}
             <div className="lg:flex-1 lg:max-w-2xl">
-              <form onSubmit={handleSearch} className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Cari produk segar..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="w-full pl-12 pr-12 py-3 rounded-full text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-300 shadow-md transition-all"
-                />
-                {searchInput && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchInput('');
-                      searchProducts('');
-                    }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    <X size={20} />
-                  </button>
-                )}
-              </form>
+              <SearchBar 
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onClear={() => {
+                  setSearchInput('');
+                  searchProducts('');
+                }}
+                placeholder="Cari produk segar..."
+              />
             </div>
           </div>
         </div>

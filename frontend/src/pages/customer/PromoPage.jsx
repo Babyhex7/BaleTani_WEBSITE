@@ -1,62 +1,108 @@
 /**
+ * ============================================
  * PROMO PAGE - CUSTOMER SIDE
+ * ============================================
  * Displays all products with active discounts/promotions
+ * Style: Tokopedia-inspired dengan sidebar filter
+ * 
+ * FEATURES:
+ * - Filter by discount name (nama promo)
+ * - Filter by category
+ * - Sort by discount percentage, price, name
+ * - Search products
+ * - Reuse ProductCard component
+ * - Responsive layout
+ * 
+ * @module PromoPage
+ * @requires components/ui/ProductCard
+ * @requires services/services_customer/discountService
+ * @requires hooks/useDebounce
+ * 
+ * @author BaleTani Development Team
+ * @created 2025-11-12
  */
 
 import { useState, useEffect } from 'react';
-import { Tag, Clock, Search, Filter, X, SlidersHorizontal, MessageCircle } from 'lucide-react';
+import { X, ChevronDown, ChevronRight, Percent, SlidersHorizontal } from 'lucide-react';
 import ProductCard from '../../components/ui/ProductCard';
-import Button from '../../components/ui/Button';
+import SearchBar from '../../components/ui/SearchBar';
 import discountService from '../../services/services_customer/discountService';
 import useDebounce from '../../hooks/useDebounce';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 
 const PromoPage = () => {
+  // ========================================
+  // STATE MANAGEMENT
+  // ========================================
   const [promoProducts, setPromoProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Search & Filter states
   const [searchInput, setSearchInput] = useState('');
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedDiscount, setSelectedDiscount] = useState(''); // Filter by discount name
+  const [sortBy, setSortBy] = useState('discount_desc'); // Default: diskon terbesar
+  
+  // UI states
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    discount: true,
+    category: true,
+  });
+  
+  // Available filters
+  const [categories, setCategories] = useState([]);
+  const [discounts, setDiscounts] = useState([]); // List of discount names
   
   // Debounce search input
   const debouncedSearch = useDebounce(searchInput, 500);
-  
-  // Filter states
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [sortBy, setSortBy] = useState('newest');
-  const [showFilters, setShowFilters] = useState(false);
-  const [categories, setCategories] = useState([]);
 
-  // Format price to Rupiah
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-    }).format(price);
+  // ========================================
+  // UTILITY FUNCTIONS
+  // ========================================
+  
+  /**
+   * Toggle section expand/collapse
+   */
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
   };
 
-  // Fetch promo products
+  /**
+   * Handle reset all filters
+   */
+  const handleResetFilters = () => {
+    setSearchInput('');
+    setSelectedCategory('');
+    setSelectedDiscount('');
+    setSortBy('discount_desc');
+  };
+
+  // ========================================
+  // FETCH PROMO PRODUCTS
+  // ========================================
   useEffect(() => {
     const fetchPromoProducts = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        console.log('🎁 [PROMO PAGE] Fetching discounts from /api/public/discounts...');
+        console.log('🎁 [PROMO PAGE] Fetching discounts...');
         
-        // ✅ PAKAI DISCOUNT ENDPOINT BARU (dengan cache 30 menit!)
         const response = await discountService.getAllDiscounts();
         
         if (response.success) {
           console.log('✅ [PROMO PAGE] Received', response.data.length, 'discounts');
-          console.log('📦 Cache status:', response.cached ? 'HIT (from cache)' : 'MISS (from DB)');
           
-          // Response.data sudah berisi array of discounts dengan products di dalamnya
-          // Transform ke flat array of products untuk ditampilkan
+          // Transform ke flat array of products
           const productsWithDiscounts = response.data.flatMap(discount => 
-            discount.products.map(product => ({
+            (discount.products || []).map(product => ({
               id: product.id,
               name: product.name,
               description: product.description,
@@ -75,21 +121,30 @@ const PromoPage = () => {
             }))
           );
           
-          console.log('📦 [PROMO PAGE] Total products with discounts:', productsWithDiscounts.length);
+          console.log('📦 [PROMO PAGE] Total products:', productsWithDiscounts.length);
           
           setPromoProducts(productsWithDiscounts);
           setFilteredProducts(productsWithDiscounts);
           
-          // Extract unique categories
+          // Extract unique categories (filter out null/undefined)
           const uniqueCategories = [...new Set(
             productsWithDiscounts
               .map(p => p.category)
-              .filter(Boolean)
+              .filter(cat => cat !== null && cat !== undefined && cat !== '')
           )];
           setCategories(uniqueCategories);
+          
+          // Extract unique discount names
+          const uniqueDiscounts = [...new Set(
+            response.data
+              .map(d => d.name)
+              .filter(name => name !== null && name !== undefined)
+          )];
+          setDiscounts(uniqueDiscounts);
+          
         }
       } catch (err) {
-        console.error('❌ [PROMO PAGE] Error fetching discounts:', err);
+        console.error('❌ [PROMO PAGE] Error:', err);
         setError(err.message || 'Gagal memuat produk promo');
       } finally {
         setLoading(false);
@@ -115,335 +170,484 @@ const PromoPage = () => {
     return acc;
   }, {});
 
-  // Apply filters (with debounced search)
+  // ========================================
+  // FILTER & SORT LOGIC
+  // ========================================
   useEffect(() => {
-    let filtered = [...promoProducts];
+    let result = [...promoProducts];
 
-    // Search filter (using debounced value)
+    // 1. Filter by search (debounced)
     if (debouncedSearch) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+      const searchLower = debouncedSearch.toLowerCase();
+      result = result.filter(product =>
+        product.name.toLowerCase().includes(searchLower) ||
+        product.description?.toLowerCase().includes(searchLower) ||
+        product.discount?.name?.toLowerCase().includes(searchLower)
       );
     }
 
-    // Category filter
+    // 2. Filter by category
     if (selectedCategory) {
-      filtered = filtered.filter(product => product.category === selectedCategory);
+      result = result.filter(product => product.category === selectedCategory);
     }
 
-    // Sorting
+    // 3. Filter by discount name
+    if (selectedDiscount) {
+      result = result.filter(product => product.discount?.name === selectedDiscount);
+    }
+
+    // 4. Sort
     switch (sortBy) {
-      case 'price-asc':
-        filtered.sort((a, b) => 
-          (a.discount?.finalPrice || a.price) - (b.discount?.finalPrice || b.price)
-        );
-        break;
-      case 'price-desc':
-        filtered.sort((a, b) => 
-          (b.discount?.finalPrice || b.price) - (a.discount?.finalPrice || a.price)
-        );
-        break;
-      case 'discount':
-        filtered.sort((a, b) => {
-          const discountA = a.discount ? ((a.price - a.discount.finalPrice) / a.price) * 100 : 0;
-          const discountB = b.discount ? ((b.price - b.discount.finalPrice) / b.price) * 100 : 0;
+      case 'discount_desc':
+        result.sort((a, b) => {
+          const discountA = ((a.price - a.discount.finalPrice) / a.price) * 100;
+          const discountB = ((b.price - b.discount.finalPrice) / b.price) * 100;
           return discountB - discountA;
         });
         break;
-      case 'newest':
+      case 'discount_asc':
+        result.sort((a, b) => {
+          const discountA = ((a.price - a.discount.finalPrice) / a.price) * 100;
+          const discountB = ((b.price - b.discount.finalPrice) / b.price) * 100;
+          return discountA - discountB;
+        });
+        break;
+      case 'price_asc':
+        result.sort((a, b) => a.discount.finalPrice - b.discount.finalPrice);
+        break;
+      case 'price_desc':
+        result.sort((a, b) => b.discount.finalPrice - a.discount.finalPrice);
+        break;
+      case 'name_asc':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name_desc':
+        result.sort((a, b) => b.name.localeCompare(a.name));
+        break;
       default:
-        // Already sorted by newest from backend
         break;
     }
 
-    setFilteredProducts(filtered);
-  }, [debouncedSearch, selectedCategory, sortBy, promoProducts]);
+    setFilteredProducts(result);
+    console.log('🔍 [PROMO FILTER] Results:', result.length, 'products');
+  }, [promoProducts, debouncedSearch, selectedCategory, selectedDiscount, sortBy]);
 
-  // Clear filters
-  const clearFilters = () => {
-    setSearchInput('');
-    setSelectedCategory('');
-    setSortBy('newest');
-  };
+  // ========================================
+  // COMPUTED VALUES
+  // ========================================
+  
+  /**
+   * Count active filters
+   */
+  const activeFiltersCount = [
+    selectedCategory,
+    selectedDiscount,
+    debouncedSearch
+  ].filter(Boolean).length;
 
-  // Handle search submit
-  const handleSearch = (e) => {
-    e.preventDefault();
-    // Search is already handled by useEffect
-  };
+  /**
+   * Check if any filter is active
+   */
+  const hasActiveFilters = activeFiltersCount > 0 || sortBy !== 'discount_desc';
 
-  // Handle WhatsApp order
-  const handleWhatsAppOrder = (productName, price, unit) => {
-    const message = `Halo, saya ingin memesan produk promo:\n\nProduk: ${productName}\nHarga Promo: ${formatPrice(price)}\n\nMohon informasi lebih lanjut.`;
-    const whatsappUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-  };
-
-  // Handle add to cart
-  const handleAddToCart = (product) => {
-    // TODO: Implement cart functionality
-    console.log('Add to cart:', product);
-    alert(`${product.name} ditambahkan ke keranjang!`);
-  };
-
-  // Calculate time remaining for a discount
-  const getTimeRemaining = (validUntil) => {
-    const now = new Date();
-    const end = new Date(validUntil);
-    const diff = end - now;
-    
-    if (diff <= 0) return 'Berakhir';
-    
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    
-    if (days > 0) return `${days} hari lagi`;
-    return `${hours} jam lagi`;
-  };
-
-  // Calculate total savings
-  const calculateTotalSavings = () => {
-    return promoProducts.reduce((total, product) => {
-      if (product.discount) {
-        return total + (product.price - product.discount.finalPrice);
-      }
-      return total;
-    }, 0);
-  };
-
+  // ========================================
+  // RENDER
+  // ========================================
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      {/* Hero Section with Flash Sale Banner */}
-      <div className="bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white py-12">
+      {/* ============================================
+          HEADER WITH SEARCH BAR - SAMA SEPERTI PRODUCT PAGE
+          ============================================ */}
+      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white py-6 shadow-md">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            {/* Flash Sale Badge */}
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <Tag size={32} className="animate-bounce" />
-              <h1 className="text-4xl md:text-5xl font-bold">
-                Promo Spesial
-              </h1>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            
+            {/* Title Section */}
+            <div className="flex-shrink-0">
+              <h1 className="text-2xl md:text-3xl font-bold">Produk Promo</h1>
+              <p className="text-green-100 text-sm md:text-base mt-1">Dapatkan penawaran terbaik untuk produk segar</p>
             </div>
             
-            <p className="text-center text-lg text-red-100 mb-8">
-              Jangan lewatkan penawaran terbaik untuk produk segar berkualitas tinggi
-            </p>
-
-            {/* Countdown Timer */}
-            <div className="bg-white/20 backdrop-blur-md rounded-2xl p-6 mb-6 border-2 border-white/30">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <Clock size={24} className="animate-spin" style={{ animationDuration: '3s' }} />
-                <span className="text-xl font-bold">Flash Sale Hari Ini</span>
-              </div>
-              <p className="text-center text-sm text-red-100">
-                Diskon hingga 50% - Terbatas!
-              </p>
-            </div>
-
-            {/* Search Bar */}
-            <form onSubmit={handleSearch} className="relative">
-              <input
-                type="text"
-                placeholder="Cari produk promo..."
+            {/* Search Bar - Reusable Component */}
+            <div className="lg:flex-1 lg:max-w-2xl">
+              <SearchBar 
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full px-6 py-4 pr-32 rounded-full text-gray-900 placeholder-gray-400 shadow-lg focus:outline-none focus:ring-4 focus:ring-red-200 hover:shadow-xl transition-all"
+                onClear={() => {
+                  setSearchInput('');
+                }}
+                placeholder="Cari produk promo..."
               />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-medium transition-colors duration-200 flex items-center gap-2 shadow-md hover:shadow-lg"
-              >
-                <Search size={20} />
-                Cari
-              </button>
-            </form>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        {/* Filters Bar - Mirip ProductPage */}
-        {!loading && !error && promoProducts.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border border-gray-100">
-            <div className="flex flex-wrap items-center gap-4">
-              {/* Filter Toggle Button (Mobile) */}
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-              >
-                <SlidersHorizontal size={20} />
-                Filter
-              </button>
+      {/* ============================================
+          MAIN CONTENT - TOKOPEDIA LAYOUT
+          ============================================ */}
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex gap-6">
+          
+          {/* ============================================
+              SIDEBAR FILTER (Desktop) - SAMA SEPERTI PRODUCT PAGE
+              ============================================ */}
+          
+          {/* Desktop Sidebar */}
+          <aside className="hidden lg:block w-64 flex-shrink-0">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-24">
+              
+              {/* Filter Header */}
+              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                <h2 className="font-bold text-lg">Filter</h2>
+                {hasActiveFilters && (
+                  <button
+                    onClick={handleResetFilters}
+                    className="text-sm text-green-600 hover:text-green-700 font-medium"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+
+              {/* Discount Name Filter */}
+              <div className="border-b border-gray-200">
+                <button
+                  onClick={() => toggleSection('discount')}
+                  className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                >
+                  <span className="font-semibold text-gray-900">Nama Promo</span>
+                  {expandedSections.discount ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                </button>
+
+                {expandedSections.discount && (
+                  <div className="px-4 pb-4 space-y-2">
+                    <label className="flex items-center gap-3 py-2 cursor-pointer hover:bg-gray-50 rounded px-2 -mx-2">
+                      <input
+                        type="radio"
+                        name="discount"
+                        checked={selectedDiscount === ''}
+                        onChange={() => setSelectedDiscount('')}
+                        className="w-4 h-4 text-green-600 focus:ring-green-500"
+                      />
+                      <span className={`flex-1 text-sm ${selectedDiscount === '' ? 'font-semibold text-green-600' : 'text-gray-700'}`}>
+                        Semua Promo
+                      </span>
+                    </label>
+                    {discounts.map((discount) => (
+                      <label key={discount} className="flex items-center gap-3 py-2 cursor-pointer hover:bg-gray-50 rounded px-2 -mx-2">
+                        <input
+                          type="radio"
+                          name="discount"
+                          checked={selectedDiscount === discount}
+                          onChange={() => setSelectedDiscount(discount)}
+                          className="w-4 h-4 text-green-600 focus:ring-green-500"
+                        />
+                        <span className={`flex-1 text-sm ${selectedDiscount === discount ? 'font-semibold text-green-600' : 'text-gray-700'}`}>
+                          {discount}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Category Filter */}
-              <div className={`${showFilters ? 'flex' : 'hidden'} lg:flex items-center gap-2 flex-1`}>
-                <Filter size={20} className="text-gray-500" />
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="">Semua Kategori</option>
-                  {categories.map((category, index) => (
-                    <option key={index} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Sort Filter */}
-              <div className={`${showFilters ? 'flex' : 'hidden'} lg:flex items-center gap-2`}>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="newest">Terbaru</option>
-                  <option value="price-asc">Harga Terendah</option>
-                  <option value="price-desc">Harga Tertinggi</option>
-                  <option value="discount">Diskon Terbesar</option>
-                </select>
-              </div>
-
-              {/* Reset Button */}
-              {(selectedCategory || sortBy !== 'newest' || searchInput) && (
+              <div className="border-b border-gray-200">
                 <button
-                  onClick={clearFilters}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                  onClick={() => toggleSection('category')}
+                  className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                 >
-                  <X size={20} />
-                  Reset
+                  <span className="font-semibold text-gray-900">Kategori</span>
+                  {expandedSections.category ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                 </button>
-              )}
 
-              {/* Results Count */}
-              <div className="text-sm text-gray-600 font-medium ml-auto">
-                {filteredProducts.length} produk ditemukan
+                {expandedSections.category && (
+                  <div className="px-4 pb-4 space-y-2">
+                    <label className="flex items-center gap-3 py-2 cursor-pointer hover:bg-gray-50 rounded px-2 -mx-2">
+                      <input
+                        type="radio"
+                        name="category"
+                        checked={selectedCategory === ''}
+                        onChange={() => setSelectedCategory('')}
+                        className="w-4 h-4 text-green-600 focus:ring-green-500"
+                      />
+                      <span className={`flex-1 text-sm ${selectedCategory === '' ? 'font-semibold text-green-600' : 'text-gray-700'}`}>
+                        Semua Kategori
+                      </span>
+                    </label>
+                    {categories.map((category) => (
+                      <label key={category} className="flex items-center gap-3 py-2 cursor-pointer hover:bg-gray-50 rounded px-2 -mx-2">
+                        <input
+                          type="radio"
+                          name="category"
+                          checked={selectedCategory === category}
+                          onChange={() => setSelectedCategory(category)}
+                          className="w-4 h-4 text-green-600 focus:ring-green-500"
+                        />
+                        <span className={`flex-1 text-sm ${selectedCategory === category ? 'font-semibold text-green-600' : 'text-gray-700'}`}>
+                          {category}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        )}
-        {/* Loading State */}
-        {loading && (
-          <div className="text-center py-20">
-            <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-red-600 border-t-transparent"></div>
-            <p className="mt-4 text-gray-600 font-medium">Memuat produk promo...</p>
-          </div>
-        )}
+          </aside>
 
-        {/* Error State */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-            <p className="text-red-600 font-medium">{error}</p>
-            <Button onClick={() => window.location.reload()} className="mt-4">
-              Coba Lagi
-            </Button>
-          </div>
-        )}
+          {/* Mobile Filter Modal */}
+          {isMobileFilterOpen && (
+            <div className="fixed inset-0 bg-black/50 z-50 lg:hidden" onClick={() => setIsMobileFilterOpen(false)}>
+              <div className="absolute right-0 top-0 h-full w-full max-w-sm bg-white shadow-xl overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                
+                {/* Modal Header */}
+                <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
+                  <h2 className="font-bold text-lg">Filter</h2>
+                  <button
+                    onClick={() => setIsMobileFilterOpen(false)}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
 
-        {/* Products Grid - Grouped by Promo */}
-        {!loading && !error && (
-          <>
-            {Object.keys(groupedByPromo).length > 0 ? (
-              <div className="space-y-12">
-                {Object.values(groupedByPromo).map((promo, index) => (
-                  <div key={index} className="space-y-6">
-                    {/* Promo Header Section */}
-                    <div className="bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 border-l-4 border-red-500 rounded-lg p-6 shadow-sm">
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0">
-                          <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center">
-                            <Tag className="text-white" size={24} />
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-                            🎉 {promo.name}
-                          </h3>
-                          {promo.description && (
-                            <p className="text-gray-700 leading-relaxed">
-                              {promo.description}
-                            </p>
-                          )}
-                          <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
-                            <span className="bg-white px-3 py-1 rounded-full border border-gray-200 font-semibold">
-                              {promo.products.length} Produk Tersedia
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Products Grid for this Promo */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                      {promo.products.map((product) => (
-                        <div key={product.id} className="relative">
-                          {/* Timer Badge on Card */}
-                          {product.discount?.validUntil && (
-                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
-                              <Clock size={12} />
-                              {getTimeRemaining(product.discount.validUntil)}
-                            </div>
-                          )}
-                          
-                          <ProductCard
-                            product={product}
-                      
-                            formatPrice={formatPrice}
-                            onAddToCart={handleAddToCart}
-                            className="mt-3"
+                {/* Modal Content */}
+                <div className="p-4">
+                  {/* Discount Filter */}
+                  <div className="mb-6">
+                    <h3 className="font-semibold text-gray-900 mb-3">Nama Promo</h3>
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-3 py-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="discount-mobile"
+                          checked={selectedDiscount === ''}
+                          onChange={() => setSelectedDiscount('')}
+                          className="w-4 h-4 text-green-600 focus:ring-green-500"
+                        />
+                        <span className="text-sm text-gray-700">Semua Promo</span>
+                      </label>
+                      {discounts.map((discount) => (
+                        <label key={discount} className="flex items-center gap-3 py-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="discount-mobile"
+                            checked={selectedDiscount === discount}
+                            onChange={() => setSelectedDiscount(discount)}
+                            className="w-4 h-4 text-green-600 focus:ring-green-500"
                           />
-                        </div>
+                          <span className="text-sm text-gray-700">{discount}</span>
+                        </label>
                       ))}
                     </div>
                   </div>
-                ))}
+
+                  {/* Category Filter */}
+                  <div className="mb-6">
+                    <h3 className="font-semibold text-gray-900 mb-3">Kategori</h3>
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-3 py-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="category-mobile"
+                          checked={selectedCategory === ''}
+                          onChange={() => setSelectedCategory('')}
+                          className="w-4 h-4 text-green-600 focus:ring-green-500"
+                        />
+                        <span className="text-sm text-gray-700">Semua Kategori</span>
+                      </label>
+                      {categories.map((category) => (
+                        <label key={category} className="flex items-center gap-3 py-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="category-mobile"
+                            checked={selectedCategory === category}
+                            onChange={() => setSelectedCategory(category)}
+                            className="w-4 h-4 text-green-600 focus:ring-green-500"
+                          />
+                          <span className="text-sm text-gray-700">{category}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 space-y-2">
+                  {hasActiveFilters && (
+                    <button
+                      onClick={() => {
+                        handleResetFilters();
+                        setIsMobileFilterOpen(false);
+                      }}
+                      className="w-full py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                    >
+                      Reset Filter
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setIsMobileFilterOpen(false)}
+                    className="w-full py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors"
+                  >
+                    Tampilkan {filteredProducts.length} Produk
+                  </button>
+                </div>
               </div>
-            ) : (
+            </div>
+          )}
+
+          {/* ============================================
+              MAIN CONTENT (Sort + Products Grid)
+              ============================================ */}
+          <div className="flex-1">
+            
+            {/* Mobile Filter Button */}
+            <button
+              onClick={() => setIsMobileFilterOpen(true)}
+              className="lg:hidden w-full flex items-center justify-center gap-2 bg-white border border-gray-200 
+                       rounded-lg px-4 py-3 hover:bg-gray-50 transition-colors shadow-sm mb-4"
+            >
+              <SlidersHorizontal size={20} />
+              <span className="font-medium">Filter</span>
+              {activeFiltersCount > 0 && (
+                <span className="bg-green-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </button>
+
+            {/* Sort Bar & Active Filters */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+              
+              {/* Sort Dropdown & Results */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                <div className="text-sm text-gray-600">
+                  Menampilkan <span className="font-semibold text-gray-900">{filteredProducts.length}</span> produk
+                  {promoProducts.length !== filteredProducts.length && (
+                    <span className="text-gray-500"> dari {promoProducts.length} total</span>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">Urutkan:</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm bg-white"
+                  >
+                    <option value="discount_desc">Diskon Terbesar</option>
+                    <option value="discount_asc">Diskon Terkecil</option>
+                    <option value="price_asc">Harga Terendah</option>
+                    <option value="price_desc">Harga Tertinggi</option>
+                    <option value="name_asc">Nama A-Z</option>
+                    <option value="name_desc">Nama Z-A</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Active Filters Tags */}
+              {(selectedCategory || selectedDiscount || debouncedSearch) && (
+                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100">
+                  {selectedCategory && (
+                    <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm">
+                      <span className="font-medium">{selectedCategory}</span>
+                      <button 
+                        onClick={() => setSelectedCategory('')} 
+                        className="hover:bg-green-200 rounded-full p-0.5 transition-colors"
+                        aria-label="Hapus filter kategori"
+                      >
+                        <X size={14} />
+                      </button>
+                    </span>
+                  )}
+                  {selectedDiscount && (
+                    <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm">
+                      <span className="font-medium">{selectedDiscount}</span>
+                      <button 
+                        onClick={() => setSelectedDiscount('')} 
+                        className="hover:bg-green-200 rounded-full p-0.5 transition-colors"
+                        aria-label="Hapus filter promo"
+                      >
+                        <X size={14} />
+                      </button>
+                    </span>
+                  )}
+                  {debouncedSearch && (
+                    <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm">
+                      <span className="font-medium">"{debouncedSearch}"</span>
+                      <button 
+                        onClick={() => setSearchInput('')} 
+                        className="hover:bg-green-200 rounded-full p-0.5 transition-colors"
+                        aria-label="Hapus pencarian"
+                      >
+                        <X size={14} />
+                      </button>
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Loading State */}
+            {loading && (
               <div className="text-center py-20">
-                <Tag size={64} className="mx-auto text-gray-300 mb-4" />
-                <h3 className="text-2xl font-bold text-gray-700 mb-2">
-                  {searchInput || selectedCategory
-                    ? 'Produk Promo Tidak Ditemukan' 
-                    : 'Belum Ada Promo'}
-                </h3>
-                <p className="text-gray-500 mb-6">
-                  {searchInput || selectedCategory
-                    ? 'Coba ubah filter atau kata kunci pencarian' 
-                    : 'Promo spesial akan segera hadir. Pantau terus!'}
-                </p>
-                {(searchInput || selectedCategory) && (
-                  <Button onClick={clearFilters}>
-                    Lihat Semua Promo
-                  </Button>
-                )}
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent"></div>
+                <p className="mt-4 text-gray-600">Memuat produk promo...</p>
               </div>
             )}
-          </>
-        )}
 
-        {/* Call to Action */}
-        {!loading && !error && promoProducts.length > 0 && (
-          <div className="mt-12 bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-8 text-center text-white">
-            <h3 className="text-2xl font-bold mb-3">
-              Ingin Mendapatkan Promo Eksklusif?
-            </h3>
-            <p className="text-green-100 mb-6">
-              Daftarkan WhatsApp Anda dan dapatkan notifikasi promo terbaru langsung!
-            </p>
-            <Button 
-              className="bg-white text-green-600 hover:bg-green-50 flex items-center gap-2 mx-auto"
-              onClick={() => window.open('https://wa.me/6281234567890?text=Halo, saya ingin mendapatkan notifikasi promo!', '_blank')}
-            >
-              <MessageCircle size={20} />
-              Hubungi via WhatsApp
-            </Button>
+            {/* Error State */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                <Percent size={48} className="mx-auto text-red-400 mb-3" />
+                <p className="text-red-600 font-medium mb-3">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  Coba Lagi
+                </button>
+              </div>
+            )}
+
+            {/* Products Grid */}
+            {!loading && !error && (
+              <>
+                {filteredProducts.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                    {filteredProducts.map((product) => (
+                      <ProductCard 
+                        key={`${product.id}-${product.discount?.id || 'no'}`}
+                        product={product} 
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-20">
+                    <Percent size={64} className="mx-auto text-gray-300 mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                      Tidak ada produk ditemukan
+                    </h3>
+                    <p className="text-gray-500 mb-4">
+                      Coba ubah filter atau kata kunci pencarian
+                    </p>
+                    {hasActiveFilters && (
+                      <button
+                        onClick={handleResetFilters}
+                        className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                      >
+                        Reset Filter
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       <Footer />

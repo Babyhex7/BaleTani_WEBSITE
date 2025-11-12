@@ -27,6 +27,20 @@
  * @created 2025-11-12
  */
 
+// Default currency formatter (IDR)
+const defaultFormatPrice = (price) => {
+  try {
+    const value = typeof price === 'number' ? price : parseFloat(price || 0);
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(isNaN(value) ? 0 : value);
+  } catch {
+    return `Rp ${price ?? 0}`;
+  }
+};
+
 /**
  * ProductPrice Component
  * 
@@ -92,6 +106,8 @@ const ProductPrice = ({
   layout = 'vertical',
   className = ''
 }) => {
+  // Use provided formatter or fallback to default
+  const format = typeof formatPrice === 'function' ? formatPrice : defaultFormatPrice;
   // ========================================
   // SIZE VARIANTS
   // Responsive text sizes untuk berbagai device
@@ -143,9 +159,9 @@ const ProductPrice = ({
         <span 
           className={`${currentSize.final} font-bold text-gray-900`}
           role="text"
-          aria-label={`Harga: ${formatPrice(finalPrice)}`}
+          aria-label={`Harga: ${format(finalPrice)}`}
         >
-          {formatPrice(finalPrice)}
+          {format(finalPrice)}
         </span>
       </div>
       
@@ -167,9 +183,9 @@ const ProductPrice = ({
           <span 
             className={`${currentSize.original} text-gray-400 line-through`}
             role="text"
-            aria-label={`Harga asli: ${formatPrice(originalPrice)}`}
+            aria-label={`Harga asli: ${format(originalPrice)}`}
           >
-            {formatPrice(originalPrice)}
+            {format(originalPrice)}
           </span>
 
           {/* ========================================
