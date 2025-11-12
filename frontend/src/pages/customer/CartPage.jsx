@@ -14,6 +14,13 @@ import OrderSummary from '../../components/layout/OrderSummary';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
 
+/*************  ✨ Windsurf Command 🌟  *************/
+/**
+ * CART PAGE
+ * Shopping cart management page
+ * 
+ * @returns {React.Component} Cart page component
+ */
 const CartPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
@@ -26,6 +33,9 @@ const CartPage = () => {
   const totalItems = getTotalItems();
   const totalPrice = getTotalPrice();
 
+  /**
+   * Redirect to login page if not authenticated
+   */
   // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
@@ -33,6 +43,11 @@ const CartPage = () => {
     }
   }, [isAuthenticated, navigate]);
 
+  /**
+   * Handle quantity update
+   * @param {number} itemId - Product ID
+   * @param {number} newQuantity - New quantity
+   */
   // Handle quantity update
   const handleUpdateQuantity = (itemId, newQuantity) => {
     try {
@@ -43,6 +58,10 @@ const CartPage = () => {
     }
   };
 
+  /**
+   * Handle remove item
+   * @param {number} itemId - Product ID
+   */
   // Handle remove item
   const handleRemoveItem = (itemId) => {
     try {
@@ -53,6 +72,9 @@ const CartPage = () => {
     }
   };
 
+  /**
+   * Handle clear cart
+   */
   // Handle clear cart
   const handleClearCart = () => {
     try {
@@ -64,6 +86,9 @@ const CartPage = () => {
     }
   };
 
+  /**
+   * Handle checkout
+   */
   // Handle checkout
   const handleCheckout = () => {
     if (items.length === 0) {
@@ -253,5 +278,6 @@ const CartPage = () => {
     </>
   );
 };
+/*******  67bf3df0-e737-485d-9064-4617f27f08a6  *******/
 
 export default CartPage;

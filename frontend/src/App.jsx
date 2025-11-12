@@ -43,7 +43,7 @@ function App() {
         reverseOrder={false}
         toastOptions={{
           // Default options
-          duration: 3000,
+          duration: 1000,
           style: {
             background: '#0b1220',
             color: '#e6f4ea',
@@ -54,7 +54,7 @@ function App() {
           },
           // Success
           success: {
-            duration: 3000,
+            duration: 1000,
             iconTheme: {
               primary: '#10b981',
               secondary: '#0b1220',
@@ -67,7 +67,7 @@ function App() {
           },
           // Error
           error: {
-            duration: 4000,
+            duration: 2500,
             iconTheme: {
               primary: '#ef4444',
               secondary: '#0b1220',
