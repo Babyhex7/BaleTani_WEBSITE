@@ -26,6 +26,7 @@ import { useState, useEffect } from 'react';
 import { X, ChevronDown, ChevronRight, Percent, SlidersHorizontal } from 'lucide-react';
 import ProductCard from '../../components/ui/ProductCard';
 import SearchBar from '../../components/ui/SearchBar';
+import Pagination from '../../components/ui/Pagination';
 import discountService from '../../services/services_customer/discountService';
 import useDebounce from '../../hooks/useDebounce';
 import Navbar from '../../components/layout/Navbar';
@@ -59,6 +60,9 @@ const PromoPage = () => {
   
   // Debounce search input
   const debouncedSearch = useDebounce(searchInput, 500);
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20; // show more products per page on promo
 
   // ========================================
   // UTILITY FUNCTIONS
@@ -230,7 +234,13 @@ const PromoPage = () => {
 
     setFilteredProducts(result);
     console.log('🔍 [PROMO FILTER] Results:', result.length, 'products');
-  }, [promoProducts, debouncedSearch, selectedCategory, selectedDiscount, sortBy]);
+    // reset pagination when filters change
+    setCurrentPage(1);
+    
+    // Debug pagination
+    const totalPages = Math.ceil(result.length / itemsPerPage);
+    console.log('📄 [PROMO PAGE] Total products:', result.length, '| Pages:', totalPages, '| Items per page:', itemsPerPage);
+  }, [promoProducts, debouncedSearch, selectedCategory, selectedDiscount, sortBy, itemsPerPage]);
 
   // ========================================
   // COMPUTED VALUES
@@ -617,14 +627,30 @@ const PromoPage = () => {
             {!loading && !error && (
               <>
                 {filteredProducts.length > 0 ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                    {filteredProducts.map((product) => (
-                      <ProductCard 
-                        key={`${product.id}-${product.discount?.id || 'no'}`}
-                        product={product} 
+                  <>
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                      {filteredProducts
+                        .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                        .map((product) => (
+                          <ProductCard 
+                            key={`${product.id}-${product.discount?.id || 'no'}`}
+                            product={product} 
+                          />
+                        ))}
+                    </div>
+
+                    {/* Pagination for promo products (client-side) */}
+                    <div className="mt-6">
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={Math.max(1, Math.ceil(filteredProducts.length / itemsPerPage))}
+                        totalItems={filteredProducts.length}
+                        itemsPerPage={itemsPerPage}
+                        onPageChange={(p) => setCurrentPage(Math.max(1, Math.min(p, Math.ceil(filteredProducts.length / itemsPerPage))))}
+                        alwaysShow
                       />
-                    ))}
-                  </div>
+                    </div>
+                  </>
                 ) : (
                   <div className="text-center py-20">
                     <Percent size={64} className="mx-auto text-gray-300 mb-4" />

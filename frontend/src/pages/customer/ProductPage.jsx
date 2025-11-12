@@ -288,17 +288,16 @@ const ProductPage = () => {
                     </div>
 
                     {/* Pagination */}
-                    {pagination.totalPages > 1 && (
-                      <div className="mt-8">
-                        <Pagination
-                          currentPage={pagination.currentPage}
-                          totalPages={pagination.totalPages}
-                          totalItems={pagination.totalItems}
-                          itemsPerPage={pagination.limit || 12}
-                          onPageChange={changePage}
-                        />
-                      </div>
-                    )}
+                    <div className="mt-8">
+                      <Pagination
+                        currentPage={pagination.currentPage}
+                        totalPages={pagination.totalPages}
+                        totalItems={pagination.totalItems}
+                        itemsPerPage={pagination.limit || 12}
+                        onPageChange={changePage}
+                        alwaysShow
+                      />
+                    </div>
                   </>
                 ) : (
                   <div className="bg-white rounded-lg p-12 text-center">

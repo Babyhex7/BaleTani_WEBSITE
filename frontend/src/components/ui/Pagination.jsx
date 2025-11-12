@@ -15,6 +15,7 @@ const Pagination = ({
   className = '',
   showInfo = true,
   compact = false,
+  alwaysShow = false,
 }) => {
   const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
@@ -45,7 +46,7 @@ const Pagination = ({
     return pages;
   };
 
-  if (totalPages <= 1) return null;
+  if (!alwaysShow && totalPages <= 1) return null;
 
   return (
     <div className={`flex flex-col sm:flex-row items-center justify-between gap-4 py-6 ${className}`}>

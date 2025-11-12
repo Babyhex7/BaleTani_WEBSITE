@@ -36,6 +36,7 @@ import {
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import SearchBar from '../../components/ui/SearchBar';
+import Pagination from '../../components/ui/Pagination';
 import useDebounce from '../../hooks/useDebounce';
 import categoryService from '../../services/services_customer/categoryService';
 
@@ -60,6 +61,9 @@ const CategoryPage = () => {
   const [error, setError] = useState(null);
   const [searchInput, setSearchInput] = useState('');
   const [sortBy, setSortBy] = useState('name');
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
   // Debounce search input
   const debouncedSearch = useDebounce(searchInput, 500);
@@ -112,7 +116,13 @@ const CategoryPage = () => {
     }
 
     setFilteredCategories(result);
-  }, [debouncedSearch, sortBy, categories]);
+    // Reset to first page whenever filters/sort change
+    setCurrentPage(1);
+    
+    // Debug pagination
+    const totalPages = Math.ceil(result.length / itemsPerPage);
+    console.log('📄 [CATEGORY PAGE] Total categories:', result.length, '| Pages:', totalPages, '| Items per page:', itemsPerPage);
+  }, [debouncedSearch, sortBy, categories, itemsPerPage]);
 
   // Handle category click
   const handleCategoryClick = (categoryId) => {
@@ -195,8 +205,11 @@ const CategoryPage = () => {
 
         {/* Categories Grid */}
         {!loading && !error && filteredCategories.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredCategories.map((category) => {
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredCategories
+                .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                .map((category) => {
               const IconComponent = getCategoryIcon(category.category_name);
               
               return (
@@ -236,8 +249,19 @@ const CategoryPage = () => {
                   <div className="h-1 bg-gradient-to-r from-green-500 to-green-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                 </div>
               );
-            })}
-          </div>
+              })}
+            </div>
+
+            {/* Pagination */}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.max(1, Math.ceil(filteredCategories.length / itemsPerPage))}
+              totalItems={filteredCategories.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={(p) => setCurrentPage(Math.max(1, Math.min(p, Math.ceil(filteredCategories.length / itemsPerPage))))}
+              alwaysShow
+            />
+          </>
         )}
 
         {/* Empty State */}

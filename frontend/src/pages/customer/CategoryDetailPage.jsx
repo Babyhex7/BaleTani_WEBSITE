@@ -263,15 +263,14 @@ const CategoryDetailPage = () => {
             </div>
 
             {/* Pagination */}
-            {pagination.totalPages > 1 && (
-              <Pagination
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                totalItems={pagination.totalItems}
-                itemsPerPage={pagination.itemsPerPage || 12}
-                onPageChange={handlePageChange}
-              />
-            )}
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalItems={pagination.totalItems}
+              itemsPerPage={pagination.itemsPerPage || 12}
+              onPageChange={handlePageChange}
+              alwaysShow
+            />
           </>
         ) : (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm text-center py-16 px-4">
