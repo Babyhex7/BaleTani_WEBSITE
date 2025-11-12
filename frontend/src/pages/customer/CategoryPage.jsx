@@ -1,12 +1,27 @@
 /**
+ * ============================================
  * CATEGORY PAGE - CUSTOMER SIDE
- * Displays all categories with search and filter using Heroicons
+ * ============================================
+ * Displays all categories with Tokopedia-style layout
+ * 
+ * FEATURES:
+ * - Search categories
+ * - Sort by name/product count
+ * - Grid layout responsive
+ * - Category cards with icons
+ * - Reusable SearchBar component
+ * 
+ * @module CategoryPage
+ * @requires components/ui/SearchBar
+ * @requires hooks/useDebounce
+ * 
+ * @author BaleTani Development Team
+ * @created 2025-11-12
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  MagnifyingGlassIcon,
   CubeIcon,
   ChevronRightIcon,
   SparklesIcon,
@@ -20,6 +35,7 @@ import {
 } from '@heroicons/react/24/solid';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
+import SearchBar from '../../components/ui/SearchBar';
 import useDebounce from '../../hooks/useDebounce';
 import axios from 'axios';
 
@@ -87,7 +103,7 @@ const CategoryPage = () => {
         result.sort((a, b) => a.category_name.localeCompare(b.category_name));
         break;
       case 'products':
-        result.sort((a, b) => b.product_count - a.product_count);
+        result.sort((a, b) => (b.product_count || 0) - (a.product_count || 0));
         break;
       default:
         break;
@@ -95,11 +111,6 @@ const CategoryPage = () => {
 
     setFilteredCategories(result);
   }, [debouncedSearch, sortBy, categories]);
-
-  // Handle search
-  const handleSearch = (e) => {
-    e.preventDefault();
-  };
 
   // Handle category click
   const handleCategoryClick = (categoryId) => {
@@ -110,57 +121,57 @@ const CategoryPage = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white py-16">
+      {/* ============================================
+          HEADER WITH SEARCH BAR - GREEN GRADIENT
+          ============================================ */}
+      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white py-6 shadow-md">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Kategori <span className="text-green-200">Produk</span>
-            </h1>
-            <p className="text-lg text-green-100 mb-8">
-              Jelajahi berbagai kategori produk segar pilihan dari BaleTani
-            </p>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             
-            {/* Search Bar */}
-            <form onSubmit={handleSearch} className="relative">
-              <input
-                type="text"
-                placeholder="Cari kategori..."
+            {/* Title Section */}
+            <div className="flex-shrink-0">
+              <h1 className="text-2xl md:text-3xl font-bold">Kategori Produk</h1>
+              <p className="text-green-100 text-sm md:text-base mt-1">Jelajahi berbagai kategori produk segar pilihan</p>
+            </div>
+            
+            {/* Search Bar - Reusable Component */}
+            <div className="lg:flex-1 lg:max-w-2xl">
+              <SearchBar 
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full px-6 py-4 pr-32 rounded-full text-gray-900 placeholder-gray-400 shadow-lg focus:outline-none focus:ring-4 focus:ring-green-300"
+                onClear={() => setSearchInput('')}
+                placeholder="Cari kategori..."
               />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full font-medium transition-colors duration-200 flex items-center gap-2"
-              >
-                <MagnifyingGlassIcon className="w-5 h-5" />
-                Cari
-              </button>
-            </form>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        {/* Filter Bar */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      {/* ============================================
+          MAIN CONTENT
+          ============================================ */}
+      <div className="container mx-auto px-4 py-6">
+        
+        {/* Sort Bar & Results Count */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="text-sm text-gray-600">
+              Menampilkan <span className="font-semibold text-gray-900">{filteredCategories.length}</span> kategori
+              {categories.length !== filteredCategories.length && (
+                <span className="text-gray-500"> dari {categories.length} total</span>
+              )}
+            </div>
+            
             <div className="flex items-center gap-2">
-              <span className="text-gray-600 font-medium">Urutkan:</span>
+              <span className="text-sm text-gray-600">Urutkan:</span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm bg-white"
               >
                 <option value="name">Nama A-Z</option>
                 <option value="products">Jumlah Produk</option>
               </select>
-            </div>
-            
-            <div className="text-gray-600">
-              Ditemukan <span className="font-semibold text-green-600">{filteredCategories.length}</span> kategori
             </div>
           </div>
         </div>
@@ -175,8 +186,8 @@ const CategoryPage = () => {
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-            <p className="text-red-600">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <p className="text-red-600 font-medium">{error}</p>
           </div>
         )}
 
@@ -190,7 +201,7 @@ const CategoryPage = () => {
                 <div
                   key={category.id}
                   onClick={() => handleCategoryClick(category.id)}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden"
+                  className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden border border-gray-200 hover:border-green-500"
                 >
                   <div className="p-6">
                     {/* Icon */}
@@ -213,7 +224,7 @@ const CategoryPage = () => {
                     {/* Product Count */}
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                       <span className="text-sm text-gray-500">
-                        {category.product_count} produk
+                        {category.product_count || 0} produk
                       </span>
                       <ChevronRightIcon className="w-5 h-5 text-green-600 group-hover:translate-x-1 transition-transform duration-200" />
                     </div>
@@ -231,10 +242,10 @@ const CategoryPage = () => {
         {!loading && !error && filteredCategories.length === 0 && (
           <div className="text-center py-20">
             <CubeIcon className="w-24 h-24 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
               Kategori tidak ditemukan
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-500 mb-4">
               {searchInput 
                 ? `Tidak ada kategori yang sesuai dengan pencarian "${searchInput}"`
                 : 'Belum ada kategori yang tersedia'
@@ -243,7 +254,7 @@ const CategoryPage = () => {
             {searchInput && (
               <button
                 onClick={() => setSearchInput('')}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full font-medium transition-colors duration-200"
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 Lihat Semua Kategori
               </button>

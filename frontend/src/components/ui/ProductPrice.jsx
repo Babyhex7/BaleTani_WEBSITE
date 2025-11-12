@@ -148,14 +148,14 @@ const ProductPrice = ({
   const currentLayout = layoutClasses[layout] || layoutClasses.vertical;
 
   return (
-    <div className={`flex ${currentLayout} ${className}`}>
+    <div className={`flex flex-col ${className}`}>
       {/* ========================================
           FINAL PRICE - Harga yang dibayar customer
           - Bold font untuk emphasis
           - Dark gray color untuk readability
           - Responsive sizing
           ======================================== */}
-      <div className="flex items-baseline gap-1">
+      <div className="flex items-center gap-2 flex-wrap">
         <span 
           className={`${currentSize.final} font-bold text-gray-900`}
           role="text"
@@ -163,53 +163,54 @@ const ProductPrice = ({
         >
           {format(finalPrice)}
         </span>
-      </div>
-      
-      {/* ========================================
-          DISCOUNT INFO
-          Hanya muncul jika hasDiscount = true
-          Menampilkan:
-          1. Harga asli (dicoret)
-          2. Badge persentase diskon
-          ======================================== */}
-      {hasDiscount && (
-        <div className="flex items-center gap-1 mt-0.5">
-          {/* ========================================
-              ORIGINAL PRICE - Harga sebelum diskon
-              - Dicoret (line-through) untuk menunjukkan harga lama
-              - Gray color untuk de-emphasize
-              - Smaller font size
-              ======================================== */}
-          <span 
-            className={`${currentSize.original} text-gray-400 line-through`}
-            role="text"
-            aria-label={`Harga asli: ${format(originalPrice)}`}
-          >
-            {format(originalPrice)}
-          </span>
+        
+        {/* ========================================
+            DISCOUNT INFO - Di samping harga final
+            Hanya muncul jika hasDiscount = true
+            Menampilkan:
+            1. Harga asli (dicoret)
+            2. Badge persentase diskon
+            ======================================== */}
+        {hasDiscount && (
+          <>
+            {/* ========================================
+                ORIGINAL PRICE - Harga sebelum diskon
+                - Dicoret (line-through) untuk menunjukkan harga lama
+                - Gray color untuk de-emphasize
+                - Smaller font size
+                ======================================== */}
+            <span 
+              className={`${currentSize.original} text-gray-400 line-through`}
+              role="text"
+              aria-label={`Harga asli: ${format(originalPrice)}`}
+            >
+              {format(originalPrice)}
+            </span>
 
-          {/* ========================================
-              DISCOUNT BADGE - Persentase diskon
-              - Red color untuk highlight savings
-              - Light red background
-              - Rounded corners
-              - Semibold font untuk emphasis
-              ======================================== */}
-          <span 
-            className={`
-              ${currentSize.badge}
-              text-red-500 
-              font-semibold 
-              bg-red-50 
-              rounded
-            `}
-            role="status"
-            aria-label={`Hemat ${discountPercentage} persen`}
-          >
-            -{discountPercentage}%
-          </span>
-        </div>
-      )}
+            {/* ========================================
+                DISCOUNT BADGE - Persentase diskon
+                - Red color untuk highlight savings
+                - Light red background
+                - Rounded corners
+                - Semibold font untuk emphasis
+                - "Hemat" text untuk emphasize savings
+                ======================================== */}
+            <span 
+              className={`
+                ${currentSize.badge}
+                text-red-500 
+                font-semibold 
+                bg-red-50 
+                rounded
+              `}
+              role="status"
+              aria-label={`Hemat ${discountPercentage} persen`}
+            >
+              Hemat {discountPercentage}%
+            </span>
+          </>
+        )}
+      </div>
     </div>
   );
 };

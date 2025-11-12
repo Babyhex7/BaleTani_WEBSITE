@@ -258,16 +258,16 @@ const PromoPage = () => {
       <Navbar />
       
       {/* ============================================
-          HEADER WITH SEARCH BAR - SAMA SEPERTI PRODUCT PAGE
+          HEADER WITH SEARCH BAR - RED GRADIENT (PROMO STYLE)
           ============================================ */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white py-6 shadow-md">
+      <div className="bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white py-6 shadow-md">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             
             {/* Title Section */}
             <div className="flex-shrink-0">
-              <h1 className="text-2xl md:text-3xl font-bold">Produk Promo</h1>
-              <p className="text-green-100 text-sm md:text-base mt-1">Dapatkan penawaran terbaik untuk produk segar</p>
+              <h1 className="text-2xl md:text-3xl font-bold">🎉 Promo Spesial</h1>
+              <p className="text-red-100 text-sm md:text-base mt-1">Jangan lewatkan penawaran terbaik untuk produk segar</p>
             </div>
             
             {/* Search Bar - Reusable Component */}
