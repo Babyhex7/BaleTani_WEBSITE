@@ -79,6 +79,7 @@ exports.getAllProducts = async (req, res) => {
     // Build where conditions
     const whereConditions = {
       is_active: true,
+      product_type: 'online', // Only show online products to customers
       total_stock: { [Op.gt]: 0 }, // Only products with stock
       selling_price: {
         [Op.between]: [parseFloat(minPrice), parseFloat(maxPrice)],
@@ -322,6 +323,7 @@ exports.getProductDetail = async (req, res) => {
       where: {
         id,
         is_active: true,
+        product_type: 'online', // Only show online products to customers
       },
       include: [
         {

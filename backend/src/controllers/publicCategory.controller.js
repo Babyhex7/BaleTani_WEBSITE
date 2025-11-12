@@ -81,7 +81,10 @@ const getAllCategories = async (req, res) => {
           model: Product,
           as: "products",
           attributes: ["id"],
-          where: { is_active: true },
+          where: { 
+            is_active: true,
+            product_type: 'online', // Only count online products
+          },
           required: false,
         },
       ],
@@ -158,6 +161,7 @@ const getCategoryById = async (req, res) => {
     const productWhereClause = {
       category_id: id,
       is_active: true,
+      product_type: 'online', // Only show online products to customers
     };
 
     // Search products
