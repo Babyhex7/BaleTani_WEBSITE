@@ -114,23 +114,29 @@ const ProductPrice = ({
   // Pattern: text-[mobile] md:text-[desktop]
   // ========================================
   const sizeClasses = {
+    // Extra Small - untuk grid 2 kolom mobile (Shopee/Tokped style)
+    xs: {
+      final: 'text-[11px] xs:text-xs sm:text-sm md:text-base',
+      original: 'text-[9px] xs:text-[10px] sm:text-xs',
+      badge: 'text-[8px] xs:text-[9px] sm:text-[10px] px-0.5 sm:px-1 py-0.5'
+    },
     // Small - untuk cart items, compact views
     sm: {
-      final: 'text-sm md:text-base',
-      original: 'text-[10px] md:text-xs',
-      badge: 'text-[9px] md:text-[10px] px-1 py-0.5'
+      final: 'text-xs sm:text-sm md:text-base',
+      original: 'text-[9px] sm:text-[10px] md:text-xs',
+      badge: 'text-[9px] sm:text-[10px] px-1 py-0.5'
     },
     // Medium - untuk product cards (default)
     md: {
-      final: 'text-base md:text-lg',
-      original: 'text-[10px] md:text-xs',
-      badge: 'text-[10px] md:text-xs px-1 py-0.5'
+      final: 'text-sm sm:text-base md:text-lg',
+      original: 'text-[10px] sm:text-xs',
+      badge: 'text-[10px] sm:text-xs px-1 py-0.5'
     },
     // Large - untuk detail page, checkout
     lg: {
-      final: 'text-lg md:text-2xl',
-      original: 'text-xs md:text-sm',
-      badge: 'text-xs md:text-sm px-2 py-1'
+      final: 'text-base sm:text-lg md:text-2xl',
+      original: 'text-xs sm:text-sm',
+      badge: 'text-xs sm:text-sm px-2 py-1'
     }
   };
 

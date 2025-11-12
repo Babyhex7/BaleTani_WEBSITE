@@ -99,12 +99,15 @@ const LandingPage = () => {
     }
   };
 
-  // Get visible slides (3 at a time in desktop, 1 in mobile)
+  // Get visible slides - responsive: 4 mobile, 6 tablet, 10 desktop
   const getVisibleProducts = () => {
     if (products.length === 0) return [];
     
+    // Show 10 products at a time (2x5 grid on mobile, 2x3 on tablet, 2x5 on desktop)
     const result = [];
-    for (let i = 0; i < 3; i++) {
+    const itemsToShow = 10;
+    
+    for (let i = 0; i < Math.min(itemsToShow, products.length); i++) {
       const index = (currentSlide + i) % products.length;
       result.push(products[index]);
     }
@@ -233,7 +236,7 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section dengan Parallax Effect */}
-      <section className="relative bg-white py-16 lg:py-20 overflow-hidden">
+      <section className="relative bg-white section-py overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-white to-blue-50 opacity-40"></div>
         
         {/* Floating shapes animation */}
@@ -262,8 +265,8 @@ const LandingPage = () => {
           className="absolute bottom-20 left-20 w-40 h-40 bg-blue-200 rounded-full opacity-20 blur-2xl"
         />
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="container-app relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-responsive items-center">
             <motion.div 
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -284,7 +287,7 @@ const LandingPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.6 }}
-                  className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight"
+                  className="heading-hero text-gray-900"
                 >
                   Belanja Segar & Hemat,{' '}
                   <motion.span 
@@ -300,7 +303,7 @@ const LandingPage = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.9, duration: 0.6 }}
-                  className="text-lg text-gray-600 leading-relaxed"
+                  className="text-body text-gray-600"
                 >
                   Nikmati produk segar berkualitas premium dengan pengiriman cepat. 
                   Pesan mudah via WhatsApp, dari kebun ke meja makan Anda.
@@ -311,12 +314,12 @@ const LandingPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1, duration: 0.6 }}
-                className="flex flex-col sm:flex-row gap-4"
+                className="stack-mobile gap-4"
               >
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button 
                     size="small" 
-                    className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+                    className="bg-green-600 hover:bg-green-700 text-white full-mobile"
                     onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
                   >
                     Belanja Sekarang
@@ -327,7 +330,7 @@ const LandingPage = () => {
                   <Button 
                     variant="outline" 
                     size="small" 
-                    className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white w-full sm:w-auto"
+                    className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white full-mobile"
                     onClick={() => handleWhatsAppOrder('Konsultasi Produk', 0, 'gratis')}
                   >
                     <MessageCircle className="mr-2" size={20} />
@@ -388,9 +391,9 @@ const LandingPage = () => {
       </section>
 
       {/* Statistics Section dengan Counter Animation */}
-      <section className="py-12 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <section className="section-padding-responsive bg-gray-50">
+        <div className="container-app">
+          <div className="grid-features">
             {achievements.map((achievement, index) => {
               const IconComponent = achievement.icon;
               return (
@@ -420,11 +423,11 @@ const LandingPage = () => {
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 + 0.3 }}
-                    className="text-2xl font-bold text-gray-900 mb-1"
+                    className="heading-card text-gray-900 mb-1"
                   >
                     {achievement.number}
                   </motion.div>
-                  <div className="text-gray-600 text-sm font-medium">{achievement.label}</div>
+                  <div className="text-caption text-gray-600 font-medium">{achievement.label}</div>
                 </motion.div>
               );
             })}
@@ -496,8 +499,8 @@ const LandingPage = () => {
       </section>
 
       {/* Featured Products - Unlimited Carousel dengan Framer Motion */}
-      <section id="products" className="py-16 bg-white overflow-hidden">
-        <div className="container w-full mx-auto px-4 max-w-screen-xl">
+      <section id="products" className="section-py bg-white overflow-hidden">
+        <div className="container mx-auto px-2 sm:px-4 md:px-6 max-w-screen-xl">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -520,7 +523,7 @@ const LandingPage = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="text-3xl md:text-4xl font-bold text-gray-900"
+              className="heading-section text-gray-900"
             >
               Produk Unggulan Hari Ini
             </motion.h2>
@@ -529,7 +532,7 @@ const LandingPage = () => {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.4 }}
-              className="text-lg text-gray-600 max-w-2xl mx-auto"
+              className="text-body text-gray-600 max-w-2xl mx-auto"
             >
               Pilihan terbaik produk segar dengan kualitas premium dan harga terjangkau untuk keluarga Indonesia
             </motion.p>
@@ -543,24 +546,24 @@ const LandingPage = () => {
             <>
               {/* Carousel Container */}
               <div className="relative mb-12">
-                {/* Navigation Buttons */}
+                {/* Navigation Buttons - Hidden on mobile */}
                 <button
                   onClick={prevSlide}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110"
+                  className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-2 md:p-3 transition-all duration-300 hover:scale-110 items-center justify-center"
                   aria-label="Previous"
                 >
-                  <ChevronLeft className="w-6 h-6 text-gray-800" />
+                  <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
                 </button>
                 <button
                   onClick={nextSlide}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110"
+                  className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-2 md:p-3 transition-all duration-300 hover:scale-110 items-center justify-center"
                   aria-label="Next"
                 >
-                  <ChevronRight className="w-6 h-6 text-gray-800" />
+                  <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
                 </button>
 
                 {/* Carousel Content */}
-                <div className="overflow-hidden px-12">
+                <div className="overflow-hidden px-2 sm:px-8 md:px-12">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={currentSlide}
@@ -568,7 +571,7 @@ const LandingPage = () => {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -100 }}
                       transition={{ duration: 0.5 }}
-                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                      className="flex overflow-x-auto gap-3 snap-x snap-mandatory touch-pan-x -mx-2 px-2 md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-4"
                     >
                       {getVisibleProducts().map((product, index) => (
                         <motion.div
@@ -576,12 +579,14 @@ const LandingPage = () => {
                           initial={{ opacity: 0, y: 50 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.1, duration: 0.5 }}
+                          className="snap-start min-w-[46%] sm:min-w-[42%] md:min-w-0"
                         >
                           <ProductCard
                             product={product}
                             onWhatsAppOrder={handleWhatsAppOrder}
                             onAddToCart={handleAddToCart}
                             formatPrice={formatPrice}
+                            className="mx-2"
                           />
                         </motion.div>
                       ))}
@@ -590,22 +595,25 @@ const LandingPage = () => {
                 </div>
 
                 {/* Carousel Indicators */}
-                <div className="flex justify-center gap-2 mt-8">
-                  {products.map((_, index) => (
+                <div className="flex justify-center gap-1.5 md:gap-2 mt-6 md:mt-8 px-4">
+                  {products.slice(0, 6).map((_, index) => (
                     <button
                       key={index}
                       onClick={() => {
                         setCurrentSlide(index);
                         resetAutoPlay();
                       }}
-                      className={`h-2 rounded-full transition-all duration-300 ${
+                      className={`h-1.5 md:h-2 rounded-full transition-all duration-300 ${
                         index === currentSlide 
-                          ? 'w-8 bg-green-600' 
-                          : 'w-2 bg-gray-300 hover:bg-gray-400'
+                          ? 'w-6 md:w-8 bg-green-600' 
+                          : 'w-1.5 md:w-2 bg-gray-300 hover:bg-gray-400'
                       }`}
                       aria-label={`Go to slide ${index + 1}`}
                     />
                   ))}
+                  {products.length > 6 && (
+                    <span className="text-xs text-gray-400 ml-1">+{products.length - 6}</span>
+                  )}
                 </div>
               </div>
 
@@ -698,8 +706,8 @@ const LandingPage = () => {
       </section>
 
       {/* Categories Section dengan Data dari API */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
+      <section className="section-py bg-gray-50">
+        <div className="container-app">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -712,7 +720,7 @@ const LandingPage = () => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-3xl md:text-4xl font-bold text-gray-900"
+              className="heading-section text-gray-900"
             >
               Kategori Produk Pilihan
             </motion.h2>
@@ -721,7 +729,7 @@ const LandingPage = () => {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="text-lg text-gray-600 max-w-2xl mx-auto"
+              className="text-body text-gray-600 max-w-2xl mx-auto"
             >
               Jelajahi koleksi lengkap produk segar berkualitas premium dari berbagai kategori terbaik
             </motion.p>
@@ -733,7 +741,7 @@ const LandingPage = () => {
             </div>
           ) : categories.length > 0 ? (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid-categories">
                 {categories.slice(0, 8).map((category, index) => {
                   const IconComponent = getCategoryIcon(category.category_name);
                   return (
@@ -810,8 +818,8 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials dengan Stagger Animation */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
+      <section className="section-py bg-white">
+        <div className="container-app">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -834,7 +842,7 @@ const LandingPage = () => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="text-3xl md:text-4xl font-bold text-gray-900"
+              className="heading-section text-gray-900"
             >
               Testimoni Pelanggan Setia
             </motion.h2>
@@ -843,13 +851,13 @@ const LandingPage = () => {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.4 }}
-              className="text-lg text-gray-600 max-w-2xl mx-auto"
+              className="text-body text-gray-600 max-w-2xl mx-auto"
             >
               Ribuan pelanggan telah merasakan pengalaman berbelanja terbaik bersama BaleTani
             </motion.p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="flex overflow-x-auto gap-4 md:gap-6 snap-x snap-mandatory touch-pan-x -mx-4 px-4 md:grid md:grid-cols-3 lg:grid-cols-3">
             {testimonials.map((testimonial, index) => (
               <motion.div 
                 key={testimonial.id}
@@ -861,7 +869,7 @@ const LandingPage = () => {
                   y: -10,
                   boxShadow: "0 20px 30px rgba(0,0,0,0.1)"
                 }}
-                className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 transition-all duration-300"
+                className="bg-white p-5 sm:p-6 rounded-xl shadow-sm border border-gray-100 transition-all duration-300 snap-start min-w-[78%] sm:min-w-[60%] md:min-w-0"
               >
                 <div className="space-y-4">
                   <div className="flex items-center space-x-1 mb-3">
@@ -891,8 +899,8 @@ const LandingPage = () => {
       </section>
 
       {/* About Section dengan Parallax Effect */}
-      <section className="py-16 bg-gray-50 overflow-hidden">
-        <div className="container mx-auto px-4">
+      <section className="section-py bg-gray-50 overflow-hidden">
+        <div className="container-app">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div 
               initial={{ opacity: 0, x: -50 }}
@@ -917,7 +925,7 @@ const LandingPage = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.3 }}
-                  className="text-3xl md:text-4xl font-bold text-gray-900"
+                  className="heading-section text-gray-900"
                 >
                   BaleTani Fresh Market
                 </motion.h2>
@@ -926,7 +934,7 @@ const LandingPage = () => {
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.4 }}
-                  className="text-lg text-gray-600 leading-relaxed"
+                  className="text-body text-gray-600 leading-relaxed"
                 >
                   Kami berkomitmen menyediakan produk segar berkualitas tinggi langsung dari kebun ke rumah Anda. 
                   Dengan visi menjadi brand yang jujur dan terpercaya, kami memastikan setiap produk yang sampai 
@@ -1022,7 +1030,7 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section dengan Magnetic Effect */}
-      <section className="py-16 bg-gradient-to-r from-green-600 to-green-700 relative overflow-hidden">
+      <section className="section-py bg-gradient-to-r from-green-600 to-green-700 relative overflow-hidden">
         {/* Animated background shapes */}
         <motion.div
           animate={{ 
@@ -1053,7 +1061,7 @@ const LandingPage = () => {
           className="absolute bottom-0 right-0 w-80 h-80 bg-white opacity-5 rounded-full blur-3xl"
         />
 
-        <div className="container mx-auto px-4 text-center space-y-6 relative z-10">
+        <div className="container-app text-center space-y-6 relative z-10">
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -1066,7 +1074,7 @@ const LandingPage = () => {
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-3xl md:text-4xl font-bold text-white"
+              className="heading-section text-white"
             >
               🌟 Siap Belanja Produk Segar Hari Ini?
             </motion.h2>
@@ -1075,7 +1083,7 @@ const LandingPage = () => {
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="text-lg text-green-100 max-w-2xl mx-auto leading-relaxed"
+              className="text-body text-green-100 max-w-2xl mx-auto leading-relaxed"
             >
               Bergabunglah dengan ribuan pelanggan yang telah merasakan pengalaman berbelanja terbaik. 
               Pesan sekarang dan nikmati kesegaran langsung dari kebun!

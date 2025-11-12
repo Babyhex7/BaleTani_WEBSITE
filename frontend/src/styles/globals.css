@@ -115,3 +115,263 @@
 .animate-pulse-slow {
   animation: pulse-slow 2s ease-in-out infinite;
 }
+
+/* ========================================
+   RESPONSIVE UTILITY CLASSES
+   Dibuat untuk konsistensi mobile-first design
+   Pattern: Mobile → Tablet → Desktop
+   ======================================== */
+
+@layer components {
+  
+  /* ===== SPACING SYSTEM (Padding & Margin) ===== */
+  
+  /* Padding untuk Section - Responsive di semua device */
+  .section-py {
+    @apply py-8 sm:py-12 lg:py-16;
+  }
+  
+  .section-px {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Kombinasi padding section (vertical + horizontal) */
+  .section-padding-responsive {
+    @apply py-8 px-4 sm:py-12 sm:px-6 lg:py-16 lg:px-8;
+  }
+  
+  /* Container dengan max-width & padding responsive */
+  .container-app {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
+  }
+  
+  /* Gap untuk Grid - Responsive spacing antar elemen */
+  .gap-responsive {
+    @apply gap-4 md:gap-6 lg:gap-8;
+  }
+  
+  
+  /* ===== TYPOGRAPHY SCALE - Mobile First ===== */
+  
+  /* Hero Heading - Extra Large untuk landing page */
+  .heading-hero {
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight;
+  }
+  
+  /* Section Heading - Large untuk section title */
+  .heading-section {
+    @apply text-2xl sm:text-3xl md:text-4xl font-bold leading-tight;
+  }
+  
+  /* Card/Component Heading - Medium */
+  .heading-card {
+    @apply text-xl sm:text-2xl font-bold leading-tight;
+  }
+  
+  /* Subheading */
+  .heading-sub {
+    @apply text-lg sm:text-xl font-semibold leading-tight;
+  }
+  
+  /* Body text - Readable di semua device */
+  .text-body {
+    @apply text-sm sm:text-base lg:text-lg leading-relaxed;
+  }
+  
+  /* Small text - Caption, metadata */
+  .text-caption {
+    @apply text-xs sm:text-sm leading-relaxed;
+  }
+  
+  
+  /* ===== GRID LAYOUTS - Responsive Columns ===== */
+  
+  /* Grid untuk Product Cards */
+  .grid-products {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6;
+  }
+  
+  /* Grid untuk Categories (lebih sedikit kolom) */
+  .grid-categories {
+    @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6;
+  }
+  
+  /* Grid 2 kolom mobile, 4 kolom desktop */
+  .grid-features {
+    @apply grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6;
+  }
+  
+  /* Grid untuk Testimonials */
+  .grid-testimonials {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+  
+  
+  /* ===== MOBILE TOUCH-FRIENDLY ELEMENTS ===== */
+  
+  /* Button dengan min height untuk mudah di-tap */
+  .btn-touch {
+    @apply min-h-12 px-4 flex items-center justify-center rounded-lg font-medium transition-all;
+  }
+  
+  /* Card yang clickable di mobile */
+  .card-touch {
+    @apply min-h-20 cursor-pointer active:scale-95 transition-transform;
+  }
+  
+  /* Input field dengan touch target yang besar */
+  .input-touch {
+    @apply min-h-12 px-4 py-3 rounded-lg border focus:ring-2 transition-all;
+  }
+  
+  
+  /* ===== CARD COMPONENTS - Responsive ===== */
+  
+  /* Card dengan padding responsive */
+  .card-responsive {
+    @apply bg-white rounded-lg p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow;
+  }
+  
+  /* Card untuk Product */
+  .card-product {
+    @apply bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100;
+  }
+  
+  /* Card untuk Category */
+  .card-category {
+    @apply bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all h-full border border-gray-100 hover:border-green-200;
+  }
+  
+  
+  /* ===== BUTTONS - Responsive Sizes ===== */
+  
+  /* Button Small - Untuk mobile */
+  .btn-sm {
+    @apply px-4 py-2 text-sm rounded-lg font-medium;
+  }
+  
+  /* Button Medium - Default */
+  .btn-md {
+    @apply px-6 py-3 text-base rounded-lg font-medium;
+  }
+  
+  /* Button Large - Untuk CTA */
+  .btn-lg {
+    @apply px-8 py-4 text-base md:text-lg rounded-lg font-semibold;
+  }
+  
+  
+  /* ===== IMAGES - Responsive Aspect Ratios ===== */
+  
+  /* Image container dengan aspect ratio 1:1 (square) */
+  .image-square {
+    @apply aspect-square w-full object-cover;
+  }
+  
+  /* Image container 4:3 untuk product */
+  .image-product {
+    @apply aspect-[4/3] w-full object-cover;
+  }
+  
+  /* Image container 16:9 untuk banner */
+  .image-banner {
+    @apply aspect-video w-full object-cover;
+  }
+  
+  
+  /* ===== MOBILE SPECIFIC UTILITIES ===== */
+  
+  /* Hide di mobile, show di desktop */
+  .hide-mobile {
+    @apply hidden lg:block;
+  }
+  
+  /* Show di mobile, hide di desktop */
+  .show-mobile {
+    @apply block lg:hidden;
+  }
+  
+  /* Full width di mobile, auto di desktop */
+  .full-mobile {
+    @apply w-full lg:w-auto;
+  }
+  
+  /* Stack vertical di mobile, horizontal di desktop */
+  .stack-mobile {
+    @apply flex flex-col lg:flex-row;
+  }
+  
+  
+  /* ===== NAVIGATION & MENU ===== */
+  
+  /* Mobile menu drawer (full screen) */
+  .mobile-menu {
+    @apply fixed inset-0 z-50 bg-white transform transition-transform duration-300;
+  }
+  
+  /* Mobile bottom navigation */
+  .mobile-nav-bottom {
+    @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 z-40;
+  }
+  
+  
+  /* ===== MODAL & OVERLAY ===== */
+  
+  /* Modal responsive - Full screen mobile, centered desktop */
+  .modal-responsive {
+    @apply fixed inset-0 lg:inset-auto lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 
+           bg-white w-full lg:w-auto lg:max-w-2xl lg:rounded-xl shadow-2xl z-50;
+  }
+  
+  /* Modal content padding */
+  .modal-content {
+    @apply p-4 sm:p-6 lg:p-8;
+  }
+  
+  
+  /* ===== SAFE AREA (untuk iPhone notch, dll) ===== */
+  
+  /* Padding bottom untuk safe area */
+  .safe-bottom {
+    @apply pb-safe;
+  }
+  
+  /* Padding top untuk safe area */
+  .safe-top {
+    @apply pt-safe;
+  }
+}
+
+/* ===== CUSTOM UTILITIES ===== */
+@layer utilities {
+  /* Line clamp untuk mobile (max lines) */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Safe area padding untuk notch devices */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
+  }
+  
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 1rem);
+  }
+}

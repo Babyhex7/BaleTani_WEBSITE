@@ -112,9 +112,11 @@ const AddToCartButton = ({
   // ========================================
   // SIZE VARIANTS
   // Responsive padding dan font size
+  // Extra compact untuk grid mobile 2 kolom
   // ========================================
   const sizeClasses = {
-    sm: 'text-xs py-1 px-2 rounded',
+    xs: 'text-[9px] xs:text-[10px] sm:text-xs py-1 sm:py-1.5 px-1.5 sm:px-2 rounded',
+    sm: 'text-[10px] sm:text-xs py-1 sm:py-1.5 px-2 rounded',
     md: 'text-xs md:text-sm py-1.5 md:py-2 px-3 rounded',
     lg: 'text-sm md:text-base py-2 md:py-3 px-4 rounded-lg'
   };

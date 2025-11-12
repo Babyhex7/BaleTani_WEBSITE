@@ -163,12 +163,15 @@ const ProductCard = ({
     <div 
       onClick={handleCardClick}
       className={`
+        min-w-[46%] sm:min-w-[42%] md:min-w-0
         group 
         bg-white 
-        rounded-lg 
+        rounded-md 
+        sm:rounded-lg 
         overflow-hidden 
         shadow-sm 
-        hover:shadow-lg 
+        hover:shadow-md
+        sm:hover:shadow-lg 
         transition-all 
         duration-200 
         border 
@@ -203,31 +206,40 @@ const ProductCard = ({
         discountPercentage={discountPercentage}
         category={categoryName}
         showBadges={true}
+        aspectRatio={"aspect-[4/5] sm:aspect-square"}
+        hoverEffect={"scale"}
       />
       
       {/* ========================================
           PRODUCT INFO SECTION
           Compact Tokopedia-style layout
-          Padding: p-2 (mobile) → p-3 (desktop)
+          Padding: p-1.5 (mobile) → p-2.5 (tablet) → p-3 (desktop)
           ======================================== */}
-      <div className="p-2 md:p-3">
+      <div className="p-1.5 sm:p-2 md:p-2.5 lg:p-3">
         
         {/* ========================================
             PRODUCT NAME
             - Max 2 lines dengan ellipsis (line-clamp-2)
             - Min height untuk konsistensi card height
             - Title attribute untuk full name on hover
+            - Extra compact di mobile untuk grid 2 kolom
             ======================================== */}
         <h3 
           className="
-            text-xs 
+            text-[10px] 
+            xs:text-[11px]
+            sm:text-xs 
             md:text-sm 
             text-gray-900 
             line-clamp-2 
-            mb-2 
+            mb-1 
+            sm:mb-1.5
+            md:mb-2 
             leading-tight 
-            min-h-[2.5rem] 
-            md:min-h-[2.8rem]
+            min-h-[2rem] 
+            sm:min-h-[2.3rem]
+            md:min-h-[2.5rem]
+            lg:min-h-[2.8rem]
           "
           title={product.name}
         >
@@ -243,8 +255,8 @@ const ProductCard = ({
             - discountPercentage: Persentase diskon
             - hasDiscount: Flag diskon
             - formatPrice: Function formatter
-            - size: 'md' untuk card
-            - className: Spacing bottom
+            - size: 'sm' untuk mobile, 'md' untuk desktop
+            - className: Spacing bottom - compact di mobile
             ======================================== */}
         <ProductPrice 
           finalPrice={finalPrice}
@@ -252,8 +264,8 @@ const ProductCard = ({
           discountPercentage={discountPercentage}
           hasDiscount={hasDiscount}
           formatPrice={formatPrice}
-          size="md"
-          className="mb-3"
+          size="sm"
+          className="mb-1.5 sm:mb-2 md:mb-3"
         />
 
         {/* ========================================
@@ -263,7 +275,7 @@ const ProductCard = ({
             - onClick: Handler dari useAddToCart hook
             - stock: Jumlah stok tersedia
             - loading: State processing dari hook
-            - size: 'md' untuk card
+            - size: 'xs' untuk mobile grid 2 kolom, 'sm' tablet, 'md' desktop
             - variant: 'primary' (green)
             - fullWidth: true untuk full width
             ======================================== */}
@@ -271,7 +283,7 @@ const ProductCard = ({
           onClick={handleAddToCart(product, 1)}
           stock={product.stock}
           loading={isProcessing}
-          size="md"
+          size="xs"
           variant="primary"
           fullWidth={true}
         />
