@@ -1,150 +1,287 @@
-import { ShoppingCart } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
-import Button from './Button';
-import LoginModal from './LoginModal';
-import useAuthStore from '../../store/store_customer/useAuthStore';
-import useCartStore from '../../store/store_customer/useCartStore';
-import { getImageUrl as getImageUrlUtil, handleImageError } from '../../utils/imageUtils';
+/**
+ * ============================================
+ * PRODUCT CARD COMPONENT - MAIN
+ * ============================================
+ * Komponen utama untuk menampilkan kartu produk
+ * Style: Tokopedia-inspired compact design
+ * Architecture: Modular & Reusable
+ * 
+ * MODULAR STRUCTURE:
+ * - Uses ProductImage component (reusable)
+ * - Uses ProductPrice component (reusable)
+ * - Uses AddToCartButton component (reusable)
+ * - Uses useAddToCart hook (reusable logic)
+ * - Uses productUtils (helper functions)
+ * 
+ * FEATURES:
+ * - Click to navigate to detail
+ * - Add to cart with validation
+ * - Login modal for unauthenticated users
+ * - Discount badge & category badge
+ * - Responsive design
+ * - Keyboard accessible
+ * 
+ * USE CASES:
+ * - Product List Page (/products)
+ * - Category Page (/category/:id)
+ * - Search Results (/search?q=...)
+ * - Home Page (Featured/New Products)
+ * - Related Products section
+ * - Admin Product Preview
+ * 
+ * @module ProductCard
+ * @requires react-router-dom
+ * @requires components/ui/LoginModal
+ * @requires components/ui/ProductImage
+ * @requires components/ui/ProductPrice
+ * @requires components/ui/AddToCartButton
+ * @requires hooks/hook_customer/useAddToCart
+ * @requires utils/productUtils
+ * 
+ * @author BaleTani Development Team
+ * @created 2025-11-12
+ */
 
+import { useNavigate } from 'react-router-dom';
+import LoginModal from './LoginModal';
+import ProductImage from './ProductImage';
+import ProductPrice from './ProductPrice';
+import AddToCartButton from './AddToCartButton';
+import useAddToCart from '../../hooks/hook_customer/useAddToCart';
+import { calculateDiscount, getCategoryName } from '../../utils/productUtils';
+
+/**
+ * ProductCard Component
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object} props.product - Product data object dari API
+ * @param {String} props.product.id - Product ID (UUID)
+ * @param {String} props.product.name - Product name
+ * @param {Number} props.product.price - Original price
+ * @param {Number} props.product.stock - Available stock
+ * @param {String} props.product.image - Image URL
+ * @param {Object} props.product.category - Category object/string
+ * @param {Object} props.product.discount - Discount object (optional)
+ * @param {Function} props.formatPrice - Function untuk format harga (Rp 50.000)
+ * @param {String} [props.className=''] - Additional CSS classes untuk customization
+ * @param {Boolean} [props.showCategory=true] - Tampilkan category badge
+ * @param {Function} [props.onCardClick] - Custom handler saat card diklik (override default)
+ * 
+ * @example
+ * // Basic usage
+ * <ProductCard 
+ *   product={productData}
+ *   formatPrice={formatCurrency}
+ * />
+ * 
+ * @example
+ * // Without category badge
+ * <ProductCard 
+ *   product={productData}
+ *   formatPrice={formatCurrency}
+ *   showCategory={false}
+ * />
+ * 
+ * @example
+ * // Custom card click handler
+ * <ProductCard 
+ *   product={productData}
+ *   formatPrice={formatCurrency}
+ *   onCardClick={(product) => console.log('Clicked:', product)}
+ * />
+ */
 const ProductCard = ({ 
   product, 
   formatPrice,
-  className = ''
+  className = '',
+  showCategory = true,
+  onCardClick
 }) => {
+  // ========================================
+  // HOOKS
+  // ========================================
+  
+  // React Router navigation
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthStore();
-  const addItem = useCartStore((state) => state.addItem);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-
-  // Calculate discount display
-  const hasDiscount = product.discount && product.discount.finalPrice < product.price;
-  const discountPercentage = hasDiscount 
-    ? Math.round(((product.price - product.discount.finalPrice) / product.price) * 100)
-    : 0;
   
-  const finalPrice = hasDiscount ? product.discount.finalPrice : product.price;
+  // Custom hook untuk add to cart logic
+  // Returns: handleAddToCart, showLoginModal, setShowLoginModal, isProcessing
+  const { 
+    handleAddToCart, 
+    showLoginModal, 
+    setShowLoginModal,
+    isProcessing 
+  } = useAddToCart();
+
+  // ========================================
+  // COMPUTED VALUES
+  // Menggunakan utility functions dari productUtils.js
+  // ========================================
   
-  // Get promo name
-  const promoName = hasDiscount && product.discount?.name ? product.discount.name : null;
+  /**
+   * Hitung diskon dan harga final
+   * Returns: { hasDiscount, discountPercentage, finalPrice, originalPrice, savingsAmount }
+   */
+  const { 
+    hasDiscount, 
+    discountPercentage, 
+    finalPrice, 
+    originalPrice 
+  } = calculateDiscount(product);
+  
+  /**
+   * Get category name
+   * Handle format object atau string
+   */
+  const categoryName = showCategory ? getCategoryName(product.category) : '';
 
-  // Handle add to cart with auth check
-  const handleAddToCart = (e) => {
-    e.stopPropagation(); // Prevent card click
-
-    // Check authentication - show modal instead of redirect
-    if (!isAuthenticated) {
-      setShowLoginModal(true);
-      return;
+  // ========================================
+  // EVENT HANDLERS
+  // ========================================
+  
+  /**
+   * Handle card click - Navigate ke product detail
+   * Bisa di-override dengan onCardClick prop untuk custom behavior
+   * 
+   * @param {Event} e - Click event (optional, for keyboard support)
+   */
+  const handleCardClick = (e) => {
+    // Jika ada custom handler, gunakan itu
+    if (onCardClick) {
+      onCardClick(product);
+    } else {
+      // Default: Navigate ke detail page
+      navigate(`/products/${product.id}`);
     }
-
-    // Check stock
-    if (product.stock === 0) {
-      toast.error('Maaf, produk ini sedang habis stok', {
-        duration: 3000,
-      });
-      return;
-    }
-
-    // Add to cart
-    addItem(product, 1);
-    toast.success(`${product.name} berhasil ditambahkan ke keranjang!`, {
-      duration: 3000,
-    });
-  };
-
-  // Navigate to product detail
-  const handleCardClick = () => {
-    navigate(`/products/${product.id}`);
   };
   
+  // ========================================
+  // RENDER COMPONENT
+  // ========================================
   return (
     <div 
       onClick={handleCardClick}
-      className={`group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-green-300 cursor-pointer ${className}`}
+      className={`
+        group 
+        bg-white 
+        rounded-lg 
+        overflow-hidden 
+        shadow-sm 
+        hover:shadow-lg 
+        transition-all 
+        duration-200 
+        border 
+        border-gray-200 
+        hover:border-green-500 
+        cursor-pointer
+        ${className}
+      `}
+      role="button"
+      tabIndex={0}
+      aria-label={`Lihat detail ${product.name}`}
+      onKeyPress={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCardClick();
+        }
+      }}
     >
-      {/* Product Image */}
-      <div className="relative overflow-hidden bg-gray-100">
-        <img 
-          src={getImageUrlUtil(product.image, 'product')} 
-          alt={product.name}
-          className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
-          onError={(e) => handleImageError(e, 'product')}
-        />
-        
-        {/* Discount Badge - Kanan Atas */}
-        {hasDiscount && (
-          <div className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse z-10">
-            -{discountPercentage}%
-          </div>
-        )}
-        
-        {/* Category Badge - Kiri Atas (sejajar dengan diskon) */}
-        {product.category && (
-          <div className="absolute top-3 left-3 bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md max-w-[50%] truncate">
-            {typeof product.category === 'string' ? product.category : product.category.name}
-          </div>
-        )}
-      </div>
+      {/* ========================================
+          PRODUCT IMAGE SECTION
+          Menggunakan ProductImage component (reusable)
+          Props:
+          - src: URL gambar produk
+          - alt: Nama produk untuk SEO
+          - discountPercentage: Badge diskon (0 jika tidak ada)
+          - category: Badge kategori
+          - showBadges: Toggle badges
+          ======================================== */}
+      <ProductImage 
+        src={product.image}
+        alt={product.name}
+        discountPercentage={discountPercentage}
+        category={categoryName}
+        showBadges={true}
+      />
       
-      {/* Product Info */}
-      <div className="p-5 space-y-3">
-        {/* Product Name */}
-        <div>
-          <h3 className="font-bold text-lg text-gray-900 group-hover:text-green-600 transition-colors duration-300 line-clamp-2">
-            {product.name}
-          </h3>
-        </div>
+      {/* ========================================
+          PRODUCT INFO SECTION
+          Compact Tokopedia-style layout
+          Padding: p-2 (mobile) → p-3 (desktop)
+          ======================================== */}
+      <div className="p-2 md:p-3">
+        
+        {/* ========================================
+            PRODUCT NAME
+            - Max 2 lines dengan ellipsis (line-clamp-2)
+            - Min height untuk konsistensi card height
+            - Title attribute untuk full name on hover
+            ======================================== */}
+        <h3 
+          className="
+            text-xs 
+            md:text-sm 
+            text-gray-900 
+            line-clamp-2 
+            mb-2 
+            leading-tight 
+            min-h-[2.5rem] 
+            md:min-h-[2.8rem]
+          "
+          title={product.name}
+        >
+          {product.name}
+        </h3>
+        
+        {/* ========================================
+            PRICE SECTION
+            Menggunakan ProductPrice component (reusable)
+            Props:
+            - finalPrice: Harga setelah diskon
+            - originalPrice: Harga asli
+            - discountPercentage: Persentase diskon
+            - hasDiscount: Flag diskon
+            - formatPrice: Function formatter
+            - size: 'md' untuk card
+            - className: Spacing bottom
+            ======================================== */}
+        <ProductPrice 
+          finalPrice={finalPrice}
+          originalPrice={originalPrice}
+          discountPercentage={discountPercentage}
+          hasDiscount={hasDiscount}
+          formatPrice={formatPrice}
+          size="md"
+          className="mb-3"
+        />
 
-        {/* Description - No Icon */}
-        {product.description && (
-          <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
-            {product.description}
-          </p>
-        )}
-        
-        {/* Price Section - Shopee Style: Horizontal */}
-        <div>
-          <div className="flex items-center gap-3">
-            {/* Current Price - Kiri */}
-            <span className="text-2xl font-bold text-green-600">
-              {formatPrice(finalPrice)}
-            </span>
-            
-            {/* Original Price - Kanan (if discount) */}
-            {hasDiscount && (
-              <span className="text-sm text-gray-400 line-through">
-                {formatPrice(product.price)}
-              </span>
-            )}
-          </div>
-          
-          {/* Badge Hemat - Rata Kiri */}
-          {hasDiscount && (
-            <div className="mt-1">
-              <span className="text-xs text-red-600 font-semibold bg-red-50 px-2 py-1 rounded">
-                Hemat {formatPrice(product.price - finalPrice)}
-              </span>
-            </div>
-          )}
-        </div>
-        
-        {/* Action Button - Tambah ke Keranjang */}
-        <div className="pt-2">
-          <Button 
-            size="md"
-            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-md hover:shadow-lg transition-all duration-300 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed"
-            onClick={handleAddToCart}
-            disabled={product.stock === 0}
-          >
-            <ShoppingCart className="mr-2" size={16} />
-            {product.stock === 0 ? 'Stok Habis' : 'Tambah ke Keranjang'}
-          </Button>
-        </div>
+        {/* ========================================
+            ADD TO CART BUTTON
+            Menggunakan AddToCartButton component (reusable)
+            Props:
+            - onClick: Handler dari useAddToCart hook
+            - stock: Jumlah stok tersedia
+            - loading: State processing dari hook
+            - size: 'md' untuk card
+            - variant: 'primary' (green)
+            - fullWidth: true untuk full width
+            ======================================== */}
+        <AddToCartButton 
+          onClick={handleAddToCart(product, 1)}
+          stock={product.stock}
+          loading={isProcessing}
+          size="md"
+          variant="primary"
+          fullWidth={true}
+        />
       </div>
 
-      {/* Login Modal */}
+      {/* ========================================
+          LOGIN MODAL
+          Muncul saat user belum login dan klik add to cart
+          State dihandle oleh useAddToCart hook
+          ======================================== */}
       <LoginModal 
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}

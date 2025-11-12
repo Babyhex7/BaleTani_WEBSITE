@@ -48,8 +48,8 @@ exports.getAllProducts = async (req, res) => {
     // STEP 1: Check Cache
     // ========================================
     // Generate cache key berdasarkan filter
-    // Kalau ada search/filter harga, skip cache (karena terlalu banyak kombinasi)
-    const useCache = !search && minPrice == 0 && maxPrice == 999999999;
+    // Kalau ada search/filter harga/sort, skip cache (karena terlalu banyak kombinasi)
+    const useCache = !search && minPrice == 0 && maxPrice == 999999999 && sortBy === 'newest';
 
     if (useCache) {
       const cacheKey = CUSTOMER.PRODUCTS_LIST(category || "all", page);

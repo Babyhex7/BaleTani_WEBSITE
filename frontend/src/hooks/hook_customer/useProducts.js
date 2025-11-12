@@ -38,6 +38,8 @@ const useProducts = (initialFilters = {}) => {
       setLoading(true);
       setError(null);
 
+      console.log('🔍 Fetching products with filters:', filters);
+
       const response = await productService.getAllProducts(filters);
 
       if (response.success) {
