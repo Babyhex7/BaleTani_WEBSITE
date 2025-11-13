@@ -46,7 +46,10 @@ const useCartStore = create(
               {
                 id: product.id,
                 name: product.name,
-                image: product.image,
+                // Handle both single image and array of images
+                image: Array.isArray(product.images) && product.images.length > 0
+                  ? product.images[0]
+                  : product.image || null,
                 price: product.price,
                 finalPrice: product.discount?.finalPrice || product.price,
                 discount: product.discount,

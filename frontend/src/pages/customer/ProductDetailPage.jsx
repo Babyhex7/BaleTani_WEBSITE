@@ -106,9 +106,9 @@ const ProductDetailPage = () => {
       <>
         <Navbar />
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Memuat detail produk...</p>
+          <div className="text-center py-12 sm:py-16 md:py-20">
+            <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-4 border-green-600 border-t-transparent"></div>
+            <p className="mt-4 text-body text-gray-600">Memuat detail produk...</p>
           </div>
         </div>
         <Footer />
@@ -121,13 +121,13 @@ const ProductDetailPage = () => {
       <>
         <Navbar />
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Tag className="w-12 h-12 text-gray-400" />
+          <div className="text-center py-12 sm:py-16 md:py-20 px-4">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Tag className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-gray-400" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Produk Tidak Ditemukan</h2>
-            <p className="text-gray-600 mb-6">Maaf, produk yang Anda cari tidak tersedia.</p>
-            <Button onClick={() => navigate('/products')}>
+            <h2 className="heading-sub text-gray-900 mb-2">Produk Tidak Ditemukan</h2>
+            <p className="text-body text-gray-600 mb-6">Maaf, produk yang Anda cari tidak tersedia.</p>
+            <Button onClick={() => navigate('/products')} className="btn-touch">
               <ArrowLeft className="mr-2" size={16} />
               Kembali ke Daftar Produk
             </Button>
@@ -148,25 +148,25 @@ const ProductDetailPage = () => {
     <>
       <Navbar />
       
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4 max-w-7xl">
+      <div className="min-h-screen bg-gray-50 section-py">
+        <div className="container-app">
           {/* Back Button */}
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center text-gray-600 hover:text-green-600 mb-6 transition-colors"
+            className="btn-touch flex items-center text-gray-600 hover:text-green-600 mb-4 sm:mb-6 transition-colors"
           >
-            <ArrowLeft size={20} className="mr-2" />
-            Kembali
+            <ArrowLeft size={18} className="mr-2 sm:w-5 sm:h-5" />
+            <span className="text-sm sm:text-base">Kembali</span>
           </button>
 
           {/* Product Detail Grid */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 lg:p-8">
+          <div className="card-responsive overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 p-4 sm:p-6 lg:p-8">
               
               {/* Left: Images */}
               <div>
                 {/* Main Image with Navigation Arrows */}
-                <div className="relative bg-gray-100 rounded-xl overflow-hidden mb-4 aspect-square group">
+                <div className="relative bg-gray-100 rounded-lg sm:rounded-xl overflow-hidden mb-3 sm:mb-4 aspect-square group">
                   <img
                     src={getImageUrlUtil(product.images[selectedImage], 'large')}
                     alt={product.name}
@@ -183,23 +183,23 @@ const ProductDetailPage = () => {
                       {/* Previous Button */}
                       <button
                         onClick={() => setSelectedImage(prev => prev > 0 ? prev - 1 : product.images.length - 1)}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
+                        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
                         aria-label="Previous image"
                       >
-                        <ChevronLeft className="text-gray-700" size={24} />
+                        <ChevronLeft className="text-gray-700" size={20} />
                       </button>
                       
                       {/* Next Button */}
                       <button
                         onClick={() => setSelectedImage(prev => prev < product.images.length - 1 ? prev + 1 : 0)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
+                        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
                         aria-label="Next image"
                       >
-                        <ChevronRight className="text-gray-700" size={24} />
+                        <ChevronRight className="text-gray-700" size={20} />
                       </button>
                       
                       {/* Image Counter */}
-                      <div className="absolute bottom-4 right-4 px-3 py-1 bg-black/60 text-white text-sm rounded-full font-medium">
+                      <div className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4 px-2 sm:px-3 py-1 bg-black/60 text-white text-xs sm:text-sm rounded-full font-medium">
                         {selectedImage + 1} / {product.images.length}
                       </div>
                     </>
@@ -208,12 +208,12 @@ const ProductDetailPage = () => {
 
                 {/* Thumbnail Images */}
                 {product.images.length > 1 && (
-                  <div className="grid grid-cols-5 gap-2">
+                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
                     {product.images.map((image, index) => (
                       <button
                         key={index}
                         onClick={() => setSelectedImage(index)}
-                        className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                        className={`btn-touch aspect-square rounded-md sm:rounded-lg overflow-hidden border-2 transition-all ${
                           selectedImage === index
                             ? 'border-green-600 ring-2 ring-green-200'
                             : 'border-gray-200 hover:border-green-300'
@@ -239,37 +239,37 @@ const ProductDetailPage = () => {
                 {/* Category Badge */}
                 {product.category && (
                   <div className="mb-3">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                      <Tag size={14} className="mr-1" />
+                    <span className="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800">
+                      <Tag size={12} className="mr-1 sm:w-3.5 sm:h-3.5" />
                       {product.category.name}
                     </span>
                   </div>
                 )}
 
                 {/* Product Name */}
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
                   {product.name}
                 </h1>
 
                 {/* Price Section */}
-                <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-3xl font-bold text-green-600">
+                <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                    <span className="text-2xl sm:text-3xl font-bold text-green-600">
                       {formatPrice(finalPrice)}
                     </span>
                     {hasDiscount && (
                       <>
-                        <span className="text-lg text-gray-400 line-through">
+                        <span className="text-base sm:text-lg text-gray-400 line-through">
                           {formatPrice(product.price)}
                         </span>
-                        <span className="px-2 py-1 bg-red-500 text-white text-sm font-bold rounded">
+                        <span className="px-2 py-1 bg-red-500 text-white text-xs sm:text-sm font-bold rounded">
                           -{discountPercentage}%
                         </span>
                       </>
                     )}
                   </div>
                   {hasDiscount && (
-                    <p className="text-sm text-red-600 font-medium">
+                    <p className="text-xs sm:text-sm text-red-600 font-medium">
                       Hemat {formatPrice(product.price - finalPrice)}
                     </p>
                   )}
@@ -277,17 +277,17 @@ const ProductDetailPage = () => {
 
                 {/* Description */}
                 {product.description && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Deskripsi</h3>
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  <div className="mb-4 sm:mb-6">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Deskripsi</h3>
+                    <p className="text-caption sm:text-body text-gray-700 leading-relaxed whitespace-pre-line">
                       {product.description}
                     </p>
                   </div>
                 )}
 
                 {/* Stock Info */}
-                <div className="mb-6">
-                  <span className="text-gray-700">
+                <div className="mb-4 sm:mb-6">
+                  <span className="text-caption sm:text-sm text-gray-700">
                     Stok: <span className={`font-semibold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {product.stock > 0 ? `${product.stock}` : 'Habis'}
                     </span>
@@ -296,29 +296,29 @@ const ProductDetailPage = () => {
 
                 {/* Quantity Selector */}
                 {product.stock > 0 && (
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="mb-4 sm:mb-6">
+                    <label className="block text-caption sm:text-sm font-medium text-gray-700 mb-2">
                       Jumlah
                     </label>
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => handleQuantityChange(-1)}
                         disabled={quantity <= 1}
-                        className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="btn-touch w-10 h-10 sm:w-12 sm:h-12 rounded-lg border border-gray-300 flex items-center justify-center text-lg font-semibold hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         -
                       </button>
-                      <span className="w-16 text-center text-lg font-semibold">
+                      <span className="w-12 sm:w-16 text-center text-base sm:text-lg font-semibold">
                         {quantity}
                       </span>
                       <button
                         onClick={() => handleQuantityChange(1)}
                         disabled={quantity >= product.stock}
-                        className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="btn-touch w-10 h-10 sm:w-12 sm:h-12 rounded-lg border border-gray-300 flex items-center justify-center text-lg font-semibold hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         +
                       </button>
-                      <span className="text-sm text-gray-500 ml-2">
+                      <span className="text-xs sm:text-sm text-gray-500 ml-2">
                         Maks. {product.stock} 
                       </span>
                     </div>
@@ -326,19 +326,20 @@ const ProductDetailPage = () => {
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex gap-3 mt-auto">
+                <div className="flex flex-col sm:flex-row gap-3 mt-auto pt-4 border-t border-gray-100">
                   <button
                     onClick={handleAddToCart}
                     disabled={product.stock === 0}
-                    className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="btn-touch flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-lg bg-green-600 text-white text-sm sm:text-base font-semibold hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    <ShoppingCart size={18} />
-                    Tambah ke Keranjang
+                    <ShoppingCart size={16} className="sm:w-5 sm:h-5" />
+                    <span className="hidden sm:inline">Tambah ke Keranjang</span>
+                    <span className="sm:hidden">+ Keranjang</span>
                   </button>
                   <button
                     onClick={handleBuyNow}
                     disabled={product.stock === 0}
-                    className="flex-1 flex items-center justify-center px-6 py-3 rounded-lg bg-white border-2 border-green-600 text-green-600 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn-touch flex-1 flex items-center justify-center px-4 sm:px-6 py-3 rounded-lg bg-white border-2 border-green-600 text-green-600 text-sm sm:text-base font-semibold hover:bg-green-50 active:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Beli Sekarang
                   </button>

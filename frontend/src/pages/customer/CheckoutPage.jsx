@@ -12,6 +12,7 @@ import Footer from '../../components/layout/Footer';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
 import customerOrderService from '../../services/services_customer/customerOrderService';
+import { getImageUrl } from '../../utils/imageUtils';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -51,18 +52,6 @@ const CheckoutPage = () => {
       currency: 'IDR',
       minimumFractionDigits: 0
     }).format(price);
-  };
-
-  // Get image URL
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return 'https://via.placeholder.com/100x100?text=No+Image';
-    
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return imagePath;
-    }
-    
-    const backendUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
-    return `${backendUrl}${imagePath}`;
   };
 
   // Handle create order
@@ -155,63 +144,64 @@ const CheckoutPage = () => {
     <>
       <Navbar />
       
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4 max-w-7xl">
-          {/* Header */}
-          <div className="mb-8">
+      <div className="min-h-screen bg-gray-50 section-py pb-20 lg:pb-8">
+        <div className="container-app">
+          {/* Header - Responsive */}
+          <div className="mb-4 sm:mb-6 lg:mb-8">
             <button
               onClick={() => navigate('/cart')}
-              className="flex items-center text-gray-600 hover:text-green-600 mb-4 transition-colors"
+              className="btn-touch mb-3 sm:mb-4 px-0 text-gray-600 hover:text-green-600 transition-colors"
             >
-              <ArrowLeft size={20} className="mr-2" />
-              Kembali ke Keranjang
+              <ArrowLeft size={18} className="sm:w-5 sm:h-5 mr-2" />
+              <span className="text-sm sm:text-base">Kembali ke Keranjang</span>
             </button>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <ShoppingCart size={32} />
-              Checkout Pesanan
+            <h1 className="heading-card sm:heading-section flex items-center gap-2 sm:gap-3">
+              <ShoppingCart size={24} className="sm:w-7 sm:h-7 md:w-8 md:h-8" />
+              <span className="hidden sm:inline">Checkout Pesanan</span>
+              <span className="sm:hidden">Checkout</span>
             </h1>
           </div>
 
-          {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content - Responsive Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
             {/* Left: Products & Methods */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-3 sm:space-y-4">
               
               {/* Products List */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <ShoppingCart size={20} className="text-green-600" />
+              <div className="card-responsive">
+                <h2 className="heading-sub sm:text-xl mb-3 sm:mb-4 flex items-center gap-2">
+                  <ShoppingCart size={18} className="sm:w-5 sm:h-5 text-green-600" />
                   Produk yang Dibeli
                 </h2>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {items.map((item) => (
-                    <div key={item.id} className="flex gap-4 p-3 bg-gray-50 rounded-lg">
-                      {/* Image */}
+                    <div key={item.id} className="flex gap-3 sm:gap-4 p-2.5 sm:p-3 lg:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      {/* Image - Responsive */}
                       <img
                         src={getImageUrl(item.image)}
                         alt={item.name}
-                        className="w-16 h-16 object-cover rounded-lg"
+                        className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-cover rounded-lg flex-shrink-0"
                         onError={(e) => {
                           e.target.src = 'https://via.placeholder.com/64x64?text=No+Image';
                         }}
                       />
                       
                       {/* Info */}
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                        <p className="text-sm text-gray-600">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base lg:text-lg line-clamp-2 mb-1">{item.name}</h3>
+                        <p className="text-xs sm:text-sm lg:text-base text-gray-600">
                           {formatPrice(item.finalPrice)}
                         </p>
                       </div>
 
                       {/* Quantity & Subtotal */}
-                      <div className="text-right">
-                        <p className="text-sm text-gray-600">x {item.quantity}</p>
-                        <p className="font-semibold text-gray-900">
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-xs sm:text-sm text-gray-600 mb-1">x {item.quantity}</p>
+                        <p className="font-semibold text-gray-900 text-sm sm:text-base lg:text-lg">
                           {formatPrice(item.finalPrice * item.quantity)}
                         </p>
                         {item.discount && (
-                          <span className="inline-block mt-1 px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded">
+                          <span className="inline-block mt-1 px-1.5 sm:px-2 py-0.5 bg-red-100 text-red-600 text-xs font-medium rounded">
                             Hemat
                           </span>
                         )}
@@ -222,16 +212,16 @@ const CheckoutPage = () => {
               </div>
 
               {/* Pickup Method */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Truck size={20} className="text-green-600" />
+              <div className="card-responsive">
+                <h2 className="heading-sub sm:text-xl mb-3 sm:mb-4 flex items-center gap-2">
+                  <Truck size={18} className="sm:w-5 sm:h-5 text-green-600" />
                   Metode Pengambilan
                 </h2>
-                <div className="space-y-3">
+                <div className="space-y-2.5 sm:space-y-3 lg:space-y-3">
                   {/* Ambil Sendiri */}
-                  <label className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  <label className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 rounded-lg border-2 cursor-pointer transition-all ${
                     pickupMethod === 'self_pickup' 
-                      ? 'border-green-600' 
+                      ? 'border-green-600 bg-green-50' 
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
@@ -240,25 +230,25 @@ const CheckoutPage = () => {
                       value="self_pickup"
                       checked={pickupMethod === 'self_pickup'}
                       onChange={(e) => setPickupMethod(e.target.value)}
-                      className="mt-1"
+                      className="mt-0.5 sm:mt-1"
                     />
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <Package size={18} className="text-green-600" />
-                        <span className="font-semibold text-gray-900">Ambil Sendiri</span>
+                        <Package size={16} className="sm:w-[18px] sm:h-[18px] lg:w-5 lg:h-5 text-green-600 flex-shrink-0" />
+                        <span className="font-semibold text-gray-900 text-sm sm:text-base lg:text-lg">Ambil Sendiri</span>
                         {pickupMethod === 'self_pickup' && (
-                          <Check size={16} className="text-green-600 ml-auto" />
+                          <Check size={14} className="sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-green-600 ml-auto" />
                         )}
                       </div>
-                      <p className="text-sm text-gray-600">Ambil di Toko BaleTani</p>
-                      <p className="text-sm font-semibold text-green-600">GRATIS</p>
+                      <p className="text-xs sm:text-sm lg:text-base text-gray-600">Ambil di Toko BaleTani</p>
+                      <p className="text-xs sm:text-sm lg:text-base font-semibold text-green-600 mt-0.5">GRATIS</p>
                     </div>
                   </label>
 
                   {/* Delivery */}
-                  <label className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  <label className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 rounded-lg border-2 cursor-pointer transition-all ${
                     pickupMethod === 'delivery' 
-                      ? 'border-green-600' 
+                      ? 'border-green-600 bg-green-50' 
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
@@ -267,47 +257,47 @@ const CheckoutPage = () => {
                       value="delivery"
                       checked={pickupMethod === 'delivery'}
                       onChange={(e) => setPickupMethod(e.target.value)}
-                      className="mt-1"
+                      className="mt-0.5 sm:mt-1"
                     />
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <Truck size={18} className="text-blue-600" />
-                        <span className="font-semibold text-gray-900">Pengantaran</span>
+                        <Truck size={16} className="sm:w-[18px] sm:h-[18px] lg:w-5 lg:h-5 text-blue-600 flex-shrink-0" />
+                        <span className="font-semibold text-gray-900 text-sm sm:text-base lg:text-lg">Pengantaran</span>
                         {pickupMethod === 'delivery' && (
-                          <Check size={16} className="text-green-600 ml-auto" />
+                          <Check size={14} className="sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-green-600 ml-auto" />
                         )}
                       </div>
-                      <p className="text-sm text-gray-600">Dikirim ke alamat Anda</p>
-                      <p className="text-sm font-semibold text-gray-900">Rp 10.000</p>
+                      <p className="text-xs sm:text-sm lg:text-base text-gray-600">Dikirim ke alamat Anda</p>
+                      <p className="text-xs sm:text-sm lg:text-base font-semibold text-gray-900 mt-0.5">Rp 10.000</p>
                     </div>
                   </label>
                 </div>
 
                 {/* Delivery Address (show only if delivery selected) */}
                 {pickupMethod === 'delivery' && (
-                  <div className="mt-4 space-y-3">
+                  <div className="mt-3 sm:mt-4 space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                         Alamat Pengiriman <span className="text-red-500">*</span>
                       </label>
                       <textarea
                         value={deliveryAddress}
                         onChange={(e) => setDeliveryAddress(e.target.value)}
                         rows={3}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="input-touch w-full text-sm sm:text-base"
                         placeholder="Jalan, No. Rumah, RT/RW, Kelurahan, Kecamatan, Kota"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                         Catatan Pengiriman (Opsional)
                       </label>
                       <textarea
                         value={deliveryNotes}
                         onChange={(e) => setDeliveryNotes(e.target.value)}
                         rows={2}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="input-touch w-full text-sm sm:text-base"
                         placeholder="Catatan untuk kurir (misal: warna pagar, patokan)"
                       />
                     </div>
@@ -316,16 +306,16 @@ const CheckoutPage = () => {
               </div>
 
               {/* Payment Method */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <CreditCard size={20} className="text-green-600" />
+              <div className="card-responsive">
+                <h2 className="heading-sub sm:text-xl mb-3 sm:mb-4 flex items-center gap-2">
+                  <CreditCard size={18} className="sm:w-5 sm:h-5 text-green-600" />
                   Metode Pembayaran
                 </h2>
-                <div className="space-y-3">
+                <div className="space-y-2.5 sm:space-y-3 lg:space-y-3">
                   {/* QRIS */}
-                  <label className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  <label className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 rounded-lg border-2 cursor-pointer transition-all ${
                     paymentMethod === 'qris' 
-                      ? 'border-green-600' 
+                      ? 'border-green-600 bg-green-50' 
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
@@ -334,27 +324,27 @@ const CheckoutPage = () => {
                       value="qris"
                       checked={paymentMethod === 'qris'}
                       onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mt-1"
+                      className="mt-0.5 sm:mt-1"
                     />
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <CreditCard size={18} className="text-purple-600" />
-                        <span className="font-semibold text-gray-900">QRIS</span>
+                        <CreditCard size={16} className="sm:w-[18px] sm:h-[18px] lg:w-5 lg:h-5 text-purple-600 flex-shrink-0" />
+                        <span className="font-semibold text-gray-900 text-sm sm:text-base lg:text-lg">QRIS</span>
                         {paymentMethod === 'qris' && (
-                          <Check size={16} className="text-green-600 ml-auto" />
+                          <Check size={14} className="sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-green-600 ml-auto" />
                         )}
                       </div>
-                      <p className="text-sm text-gray-600">Scan & bayar dengan e-wallet</p>
+                      <p className="text-xs sm:text-sm lg:text-base text-gray-600">Scan & bayar dengan e-wallet</p>
                     </div>
                   </label>
 
                   {/* Transfer Bank */}
                   <div className={`rounded-lg border-2 transition-all ${
                     paymentMethod === 'transfer' 
-                      ? 'border-green-600' 
+                      ? 'border-green-600 bg-green-50' 
                       : 'border-gray-200'
                   }`}>
-                    <label className="flex items-start gap-4 p-4 cursor-pointer">
+                    <label className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 cursor-pointer">
                       <input
                         type="radio"
                         name="payment"
@@ -364,27 +354,27 @@ const CheckoutPage = () => {
                           setPaymentMethod(e.target.value);
                           setSelectedBank(''); // Reset bank selection
                         }}
-                        className="mt-1"
+                        className="mt-0.5 sm:mt-1"
                       />
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <CreditCard size={18} className="text-blue-600" />
-                          <span className="font-semibold text-gray-900">Transfer Bank (Virtual Account)</span>
+                          <CreditCard size={16} className="sm:w-[18px] sm:h-[18px] lg:w-5 lg:h-5 text-blue-600 flex-shrink-0" />
+                          <span className="font-semibold text-gray-900 text-sm sm:text-base lg:text-lg">Transfer Bank</span>
                           {paymentMethod === 'transfer' && (
-                            <Check size={16} className="text-green-600 ml-auto" />
+                            <Check size={14} className="sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-green-600 ml-auto" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-600">Bayar via ATM/Mobile Banking</p>
+                        <p className="text-xs sm:text-sm lg:text-base text-gray-600">Bayar via ATM/Mobile Banking</p>
                       </div>
                     </label>
 
                     {/* Bank Selection - tampil jika transfer dipilih */}
                     {paymentMethod === 'transfer' && (
-                      <div className="px-4 pb-4 pt-2 border-t border-gray-200">
-                        <p className="text-sm font-medium text-gray-700 mb-3">Pilih Bank:</p>
-                        <div className="grid grid-cols-3 gap-3">
+                      <div className="px-3 sm:px-4 lg:px-5 pb-3 sm:pb-4 lg:pb-5 pt-2 sm:pt-3 border-t border-gray-200">
+                        <p className="text-xs sm:text-sm lg:text-base font-medium text-gray-700 mb-2 sm:mb-3">Pilih Bank:</p>
+                        <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
                           {/* BRI */}
-                          <label className={`flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition ${
+                          <label className={`flex flex-col items-center p-2 sm:p-3 lg:p-4 border-2 rounded-lg cursor-pointer transition ${
                             selectedBank === 'BRI' 
                               ? 'border-blue-600 bg-blue-50' 
                               : 'border-gray-200 hover:border-gray-300'
@@ -398,13 +388,13 @@ const CheckoutPage = () => {
                               className="sr-only"
                             />
                             <div className="text-center">
-                              <p className="font-bold text-lg text-blue-600">BRI</p>
-                              <p className="text-xs text-gray-600 mt-1">Bank BRI</p>
+                              <p className="font-bold text-base sm:text-lg lg:text-xl text-blue-600">BRI</p>
+                              <p className="text-xs lg:text-sm text-gray-600 mt-0.5 sm:mt-1">Bank BRI</p>
                             </div>
                           </label>
 
                           {/* BCA */}
-                          <label className={`flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition ${
+                          <label className={`flex flex-col items-center p-2 sm:p-3 lg:p-4 border-2 rounded-lg cursor-pointer transition ${
                             selectedBank === 'BCA' 
                               ? 'border-blue-600 bg-blue-50' 
                               : 'border-gray-200 hover:border-gray-300'
@@ -418,13 +408,13 @@ const CheckoutPage = () => {
                               className="sr-only"
                             />
                             <div className="text-center">
-                              <p className="font-bold text-lg text-blue-700">BCA</p>
-                              <p className="text-xs text-gray-600 mt-1">Bank BCA</p>
+                              <p className="font-bold text-base sm:text-lg lg:text-xl text-blue-700">BCA</p>
+                              <p className="text-xs lg:text-sm text-gray-600 mt-0.5 sm:mt-1">Bank BCA</p>
                             </div>
                           </label>
 
                           {/* MANDIRI */}
-                          <label className={`flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition ${
+                          <label className={`flex flex-col items-center p-2 sm:p-3 lg:p-4 border-2 rounded-lg cursor-pointer transition ${
                             selectedBank === 'MANDIRI' 
                               ? 'border-blue-600 bg-blue-50' 
                               : 'border-gray-200 hover:border-gray-300'
@@ -438,8 +428,8 @@ const CheckoutPage = () => {
                               className="sr-only"
                             />
                             <div className="text-center">
-                              <p className="font-bold text-lg text-yellow-600">MANDIRI</p>
-                              <p className="text-xs text-gray-600 mt-1">Bank Mandiri</p>
+                              <p className="font-bold text-base sm:text-lg lg:text-xl text-yellow-600">MANDIRI</p>
+                              <p className="text-xs lg:text-sm text-gray-600 mt-0.5 sm:mt-1">Bank Mandiri</p>
                             </div>
                           </label>
                         </div>
@@ -448,9 +438,9 @@ const CheckoutPage = () => {
                   </div>
 
                   {/* Tunai */}
-                  <label className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  <label className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 rounded-lg border-2 cursor-pointer transition-all ${
                     paymentMethod === 'tunai' 
-                      ? 'border-green-600' 
+                      ? 'border-green-600 bg-green-50' 
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
@@ -459,25 +449,84 @@ const CheckoutPage = () => {
                       value="tunai"
                       checked={paymentMethod === 'tunai'}
                       onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mt-1"
+                      className="mt-0.5 sm:mt-1"
                     />
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <CreditCard size={18} className="text-green-600" />
-                        <span className="font-semibold text-gray-900">Tunai</span>
+                        <CreditCard size={16} className="sm:w-[18px] sm:h-[18px] lg:w-5 lg:h-5 text-green-600 flex-shrink-0" />
+                        <span className="font-semibold text-gray-900 text-sm sm:text-base lg:text-lg">Tunai</span>
                         {paymentMethod === 'tunai' && (
-                          <Check size={16} className="text-green-600 ml-auto" />
+                          <Check size={14} className="sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-green-600 ml-auto" />
                         )}
                       </div>
-                      <p className="text-sm text-gray-600">Bayar di toko</p>
+                      <p className="text-xs sm:text-sm lg:text-base text-gray-600">Bayar di toko</p>
                     </div>
                   </label>
                 </div>
               </div>
+
+              {/* Payment Summary - Mobile: Below methods, Desktop: Hide */}
+              <div className="lg:hidden">
+                <div className="card-responsive">
+                  <h2 className="heading-sub mb-3 sm:mb-4">Ringkasan Pembayaran</h2>
+
+                  {/* Summary */}
+                  <div className="space-y-3">
+                    {/* Subtotal */}
+                    <div className="flex justify-between items-center text-sm sm:text-base">
+                      <span className="text-gray-600">Subtotal Produk</span>
+                      <span className="font-semibold text-gray-900">{formatPrice(totalPrice)}</span>
+                    </div>
+
+                    {/* Shipping */}
+                    <div className="flex justify-between items-center text-sm sm:text-base">
+                      <span className="text-gray-600">Biaya Pengiriman</span>
+                      <span className="font-semibold text-green-600">
+                        {shippingCost === 0 ? 'GRATIS' : formatPrice(shippingCost)}
+                      </span>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="border-t border-gray-200 pt-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-base sm:text-lg font-semibold text-gray-900">Total Pembayaran</span>
+                        <span className="text-xl sm:text-2xl font-bold text-green-600">
+                          {formatPrice(totalPayment)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Selected Methods Info */}
+                  <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                      <Package size={14} className="sm:w-4 sm:h-4 text-gray-500" />
+                      <span className="text-gray-600">Pengambilan:</span>
+                      <span className="font-semibold text-gray-900">
+                        {pickupMethod === 'self_pickup' ? 'Ambil Sendiri' : 'Pengantaran'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                      <CreditCard size={14} className="sm:w-4 sm:h-4 text-gray-500" />
+                      <span className="text-gray-600">Pembayaran:</span>
+                      <span className="font-semibold text-gray-900">
+                        {paymentMethod === 'qris' ? 'QRIS' : paymentMethod === 'transfer' ? 'Transfer Bank' : 'Tunai'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                    <p className="text-xs text-blue-800">
+                      <strong>Info:</strong> Setelah pesanan dibuat, Anda akan diarahkan ke WhatsApp admin.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Right: Payment Summary */}
-            <div className="lg:col-span-1">
+            {/* Right: Payment Summary - Desktop Only */}
+            <div className="hidden lg:block lg:col-span-1">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-24">
                 {/* Header */}
                 <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
@@ -513,7 +562,7 @@ const CheckoutPage = () => {
                     <button
                       onClick={handleCreateOrder}
                       disabled={loading || items.length === 0}
-                      className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full py-3 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShoppingCart size={18} />
                       {loading ? 'Membuat Pesanan...' : 'Buat Pesanan'}
@@ -522,7 +571,7 @@ const CheckoutPage = () => {
                     {/* Info */}
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                       <p className="text-xs text-blue-800">
-                        <strong>Info:</strong> Setelah pesanan dibuat, Anda akan diarahkan ke halaman konfirmasi untuk mengirim detail pesanan ke WhatsApp admin.
+                        <strong>Info:</strong> Setelah pesanan dibuat, Anda akan diarahkan ke WhatsApp admin.
                       </p>
                     </div>
                   </div>
@@ -551,9 +600,23 @@ const CheckoutPage = () => {
         </div>
       </div>
 
+      {/* Mobile: Fixed Bottom Button */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-lg z-floating safe-bottom">
+        <div className="px-4 py-3">
+          <button
+            onClick={handleCreateOrder}
+            disabled={loading || items.length === 0}
+            className="btn-touch w-full bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ShoppingCart size={18} />
+            <span>{loading ? 'Membuat Pesanan...' : 'Buat Pesanan'}</span>
+          </button>
+        </div>
+      </div>
+
       {/* Toast Notification */}
       {toast.show && (
-        <div className="fixed top-20 right-4 z-50 animate-slide-in-right">
+        <div className="fixed top-20 right-4 z-toast animate-slide-in-right">
           <div className={`flex items-center gap-3 p-4 rounded-lg shadow-lg ${
             toast.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' :
             toast.type === 'error' ? 'bg-red-50 text-red-800 border border-red-200' :
