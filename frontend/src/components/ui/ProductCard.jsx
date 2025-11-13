@@ -206,7 +206,7 @@ const ProductCard = ({
         discountPercentage={discountPercentage}
         category={categoryName}
         showBadges={true}
-        aspectRatio={"aspect-[4/5] sm:aspect-square"}
+        aspectRatio={"h-[180px] sm:h-[200px]"}
         hoverEffect={"scale"}
       />
       
@@ -236,10 +236,8 @@ const ProductCard = ({
             sm:mb-1.5
             md:mb-2 
             leading-tight 
-            min-h-[2rem] 
-            sm:min-h-[2.3rem]
-            md:min-h-[2.5rem]
-            lg:min-h-[2.8rem]
+            h-[40px]
+            overflow-hidden
           "
           title={product.name}
         >
@@ -258,15 +256,17 @@ const ProductCard = ({
             - size: 'sm' untuk mobile, 'md' untuk desktop
             - className: Spacing bottom - compact di mobile
             ======================================== */}
-        <ProductPrice 
-          finalPrice={finalPrice}
-          originalPrice={originalPrice}
-          discountPercentage={discountPercentage}
-          hasDiscount={hasDiscount}
-          formatPrice={formatPrice}
-          size="sm"
-          className="mb-1.5 sm:mb-2 md:mb-3"
-        />
+        <div className="min-h-[52px] sm:min-h-[56px] flex flex-col justify-start">
+          <ProductPrice 
+            finalPrice={finalPrice}
+            originalPrice={originalPrice}
+            discountPercentage={discountPercentage}
+            hasDiscount={hasDiscount}
+            formatPrice={formatPrice}
+            size="sm"
+            className="mb-1.5 sm:mb-2 md:mb-3"
+          />
+        </div>
 
         {/* ========================================
             ADD TO CART BUTTON

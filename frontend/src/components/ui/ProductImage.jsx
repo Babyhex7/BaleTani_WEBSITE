@@ -136,6 +136,8 @@ const ProductImage = ({
       {/* ========================================
           BADGES OVERLAY
           Conditional render berdasarkan showBadges prop
+          Fixed height reservation untuk badge area (36px)
+          Supaya card dengan/tanpa badge punya tinggi sama
           ======================================== */}
       {showBadges && (
         <>
@@ -144,65 +146,68 @@ const ProductImage = ({
               - Background: Red (#EF4444)
               - Position: Absolute top-left dengan padding
               - Z-index: 10 untuk tampil di atas gambar
+              - Fixed height: h-[28px] untuk konsistensi
               - Conditional: Hanya muncul jika discountPercentage > 0
               ======================================== */}
-          {discountPercentage > 0 && (
-            <div 
-              className="
-                absolute 
-                top-2 
-                left-2 
-                bg-red-500 
-                text-white 
-                text-xs 
-                font-bold 
-                px-2 
-                py-1 
-                rounded 
-                shadow-md 
-                z-10
-              "
-              role="status"
-              aria-label={`Diskon ${discountPercentage} persen`}
-            >
-              {discountPercentage}%
-            </div>
-          )}
+          <div className="absolute top-2 left-2 h-[28px] z-10">
+            {discountPercentage > 0 && (
+              <div 
+                className="
+                  bg-red-500 
+                  text-white 
+                  text-xs 
+                  font-bold 
+                  px-2 
+                  py-1 
+                  rounded 
+                  shadow-md 
+                  h-full
+                  flex
+                  items-center
+                "
+                role="status"
+                aria-label={`Diskon ${discountPercentage} persen`}
+              >
+                {discountPercentage}%
+              </div>
+            )}
+          </div>
 
           {/* ========================================
               CATEGORY BADGE - Top Right
               - Background: Green (#16A34A)
               - Position: Absolute top-right dengan padding
               - Z-index: 10 untuk tampil di atas gambar
+              - Fixed height: h-[28px] untuk konsistensi
               - Truncate: Potong teks jika terlalu panjang
               - Max-width: 50% dari container width
               - Conditional: Hanya muncul jika category tidak kosong
               ======================================== */}
-          {category && (
-            <div 
-              className="
-                absolute 
-                top-2 
-                right-2 
-                bg-green-600 
-                text-white 
-                text-xs 
-                font-semibold 
-                px-2 
-                py-1 
-                rounded 
-                shadow-md 
-                max-w-[50%] 
-                truncate 
-                z-10
-              "
-              role="status"
-              aria-label={`Kategori ${category}`}
-              title={category}
-            >
-              {category}
-            </div>
-          )}
+          <div className="absolute top-2 right-2 h-[28px] max-w-[50%] z-10">
+            {category && (
+              <div 
+                className="
+                  bg-green-600 
+                  text-white 
+                  text-xs 
+                  font-semibold 
+                  px-2 
+                  py-1 
+                  rounded 
+                  shadow-md 
+                  truncate 
+                  h-full
+                  flex
+                  items-center
+                "
+                role="status"
+                aria-label={`Kategori ${category}`}
+                title={category}
+              >
+                {category}
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>
