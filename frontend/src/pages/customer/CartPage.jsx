@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, Trash2, X } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Trash2, X, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';

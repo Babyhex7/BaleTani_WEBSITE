@@ -1,43 +1,25 @@
 /**
  * CATEGORY DETAIL PAGE - CUSTOMER SIDE
  * Displays all products in a specific category
+ * Mobile responsive with global CSS utilities
  */
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  CubeIcon,
-  ArrowLeftIcon,
-  XMarkIcon,
-  ChevronDownIcon,
-} from '@heroicons/react/24/outline';
-import {
-  BeakerIcon,
-  FireIcon,
-  ShoppingBagIcon,
-  CakeIcon,
-  SparklesIcon,
-} from '@heroicons/react/24/solid';
+  Package, 
+  ArrowLeft, 
+  X, 
+  ChevronDown,
+  Filter
+} from 'lucide-react';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import ProductCard from '../../components/ui/ProductCard';
-import Pagination from '../../components/ui/Pagination';
 import SearchBar from '../../components/ui/SearchBar';
+import Pagination from '../../components/ui/Pagination';
 import categoryService from '../../services/services_customer/categoryService';
 import useDebounce from '../../hooks/useDebounce';
-
-// Icon mapping untuk kategori
-const getCategoryIcon = (categoryName) => {
-  const name = categoryName.toLowerCase();
-  
-  if (name.includes('benih') || name.includes('seed')) return BeakerIcon;
-  if (name.includes('pupuk') || name.includes('fertilizer')) return FireIcon;
-  if (name.includes('sayur') || name.includes('vegetable')) return ShoppingBagIcon;
-  if (name.includes('buah') || name.includes('fruit')) return CakeIcon;
-  if (name.includes('bumbu') || name.includes('spice')) return SparklesIcon;
-  
-  return CubeIcon;
-};
 
 const CategoryDetailPage = () => {
   const { id } = useParams();
@@ -121,167 +103,184 @@ const CategoryDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <>
         <Navbar />
-        <div className="flex flex-col items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
-          <p className="text-gray-600">Memuat kategori...</p>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center py-12 sm:py-16">
+            <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-4 border-green-600 border-t-transparent"></div>
+            <p className="mt-4 text-body text-gray-600">Memuat kategori...</p>
+          </div>
         </div>
         <Footer />
-      </div>
+      </>
     );
   }
 
   if (error || !category) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <>
         <Navbar />
-        <div className="container mx-auto px-4 py-20">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-            <p className="text-red-600">{error || 'Kategori tidak ditemukan'}</p>
-            <button
-              onClick={() => navigate('/categories')}
-              className="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full font-medium transition-colors duration-200"
-            >
-              Kembali ke Kategori
-            </button>
+        <div className="min-h-screen bg-gray-50 section-py">
+          <div className="container-app">
+            <div className="card-responsive text-center py-12 sm:py-16">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <Package className="w-8 h-8 sm:w-10 sm:h-10 text-red-600" />
+              </div>
+              <h2 className="heading-sub sm:heading-card mb-2 text-red-600">
+                {error || 'Kategori tidak ditemukan'}
+              </h2>
+              <p className="text-body text-gray-600 mb-6">
+                Kategori yang Anda cari tidak tersedia atau telah dihapus.
+              </p>
+              <button
+                onClick={() => navigate('/categories')}
+                className="btn-touch px-6 sm:px-8 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold rounded-lg transition-colors"
+              >
+                Kembali ke Kategori
+              </button>
+            </div>
           </div>
         </div>
         <Footer />
-      </div>
+      </>
     );
   }
 
-  const IconComponent = getCategoryIcon(category.category_name);
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
       <Navbar />
       
-      {/* Header with Search */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white py-6 shadow-lg">
-        <div className="container mx-auto px-4">
+      {/* Header Section with Search - Same as CategoryPage */}
+      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-md">
+        <div className="container-app py-4 sm:py-6 lg:py-8">
           {/* Back Button */}
           <button
             onClick={() => navigate('/categories')}
-            className="flex items-center gap-2 text-green-100 hover:text-white mb-4 transition-colors duration-200"
+            className="btn-touch mb-3 sm:mb-4 px-0 flex items-center gap-2 text-green-100 hover:text-white transition-colors"
           >
-            <ArrowLeftIcon className="w-5 h-5" />
-            <span className="text-sm font-medium">Kembali ke Kategori</span>
+            <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+            <span className="text-sm sm:text-base font-medium">Kembali ke Kategori</span>
           </button>
 
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            {/* Title */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4 lg:gap-6">
+            {/* Title Section */}
             <div className="flex-shrink-0">
-              <h1 className="text-2xl md:text-3xl font-bold mb-1">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1">
                 {category.category_name}
               </h1>
-              <p className="text-green-100 text-sm md:text-base">
+              <p className="text-xs sm:text-sm text-green-100">
                 Produk segar langsung dari petani lokal
               </p>
             </div>
 
-            {/* Search Bar */}
-            <div className="w-full lg:max-w-2xl">
-              <SearchBar
+            {/* Search Bar - Reusable Component */}
+            <div className="lg:flex-1 lg:max-w-2xl">
+              <SearchBar 
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onClear={() => setSearchInput('')}
-                placeholder="Cari produk segar..."
+                placeholder="Cari produk dalam kategori ini..."
               />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-6">
-        {/* Sort Bar */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            {/* Results Count */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm text-gray-600">
-                Menampilkan <span className="font-semibold text-gray-900">{filteredProducts.length}</span> dari <span className="font-semibold text-gray-900">{pagination.totalItems || filteredProducts.length}</span> produk
-              </span>
-              {searchInput && (
-                <>
-                  <span className="text-sm text-gray-400">•</span>
-                  <div className="inline-flex items-center gap-1.5 bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
-                    <span>"{searchInput}"</span>
-                    <button
-                      onClick={() => setSearchInput('')}
-                      className="hover:bg-green-100 rounded-full p-0.5 transition-colors"
-                    >
-                      <XMarkIcon className="w-3 h-3" />
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+      {/* Main Content - Mobile Responsive */}
+      <div className="bg-gray-50 section-py">
+        <div className="container-app">
 
-            {/* Sort Dropdown */}
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-600">Urutkan:</span>
-              <div className="relative">
-                <select
-                  value={sortBy}
-                  onChange={(e) => handleSortChange(e.target.value)}
-                  className="appearance-none bg-white border border-gray-200 rounded-lg px-4 py-2 pr-10 text-sm font-medium text-gray-700 hover:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors cursor-pointer"
-                >
-                  <option value="newest">Terbaru</option>
-                  <option value="price-low">Harga Terendah</option>
-                  <option value="price-high">Harga Tertinggi</option>
-                </select>
-                <ChevronDownIcon className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          {/* Filter & Sort Bar - Mobile Friendly */}
+          <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 mb-4 sm:mb-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              {/* Results Count */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs sm:text-sm text-gray-600">
+                  Menampilkan <span className="font-semibold text-gray-900">{filteredProducts.length}</span> dari <span className="font-semibold text-gray-900">{pagination.totalItems || filteredProducts.length}</span> produk
+                </span>
+                {searchInput && (
+                  <>
+                    <span className="hidden sm:inline text-gray-400">•</span>
+                    <div className="inline-flex items-center gap-1.5 bg-green-50 text-green-700 px-2 sm:px-2.5 py-1 rounded-full text-xs font-medium">
+                      <span className="max-w-[120px] sm:max-w-[200px] truncate">"{searchInput}"</span>
+                      <button
+                        onClick={() => setSearchInput('')}
+                        className="hover:bg-green-100 rounded-full p-0.5 transition-colors flex-shrink-0"
+                        aria-label="Clear search filter"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Sort Dropdown - Touch Friendly */}
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                <span className="text-xs sm:text-sm text-gray-600 flex-shrink-0">Urutkan:</span>
+                <div className="relative flex-1 sm:flex-initial min-w-[140px] sm:min-w-[160px]">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => handleSortChange(e.target.value)}
+                    className="w-full appearance-none bg-white border border-gray-300 rounded-lg pl-3 pr-8 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer transition-colors"
+                  >
+                    <option value="newest">Terbaru</option>
+                    <option value="price-low">Harga Terendah</option>
+                    <option value="price-high">Harga Tertinggi</option>
+                  </select>
+                  <ChevronDown className="w-4 h-4 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Products Grid */}
-        {filteredProducts.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={{
-                    id: product.id,
-                    name: product.name,
-                    description: product.description,
-                    price: product.price,
-                    unit: product.unit,
-                    stock: product.stock,
-                    image: product.image,
-                    category: category.category_name,
-                    discount: product.discount,
-                  }}
-                  formatPrice={formatPrice}
-                />
-              ))}
-            </div>
-
-            {/* Pagination */}
-            <Pagination
-              currentPage={pagination.currentPage}
-              totalPages={pagination.totalPages}
-              totalItems={pagination.totalItems}
-              itemsPerPage={pagination.itemsPerPage || 12}
-              onPageChange={handlePageChange}
-              alwaysShow
-            />
-          </>
-        ) : (
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm text-center py-16 px-4">
-            <div className="max-w-md mx-auto">
-              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CubeIcon className="w-12 h-12 text-gray-400" />
+          {/* Products Grid - Same as other pages */}
+          {filteredProducts.length > 0 ? (
+            <>
+              {/* Grid layout: 1 col mobile, 2 cols tablet, 3 cols desktop, 4 cols xl */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={{
+                      id: product.id,
+                      name: product.name,
+                      description: product.description,
+                      price: product.price,
+                      unit: product.unit,
+                      stock: product.stock,
+                      images: product.images || [product.image], // Handle both array and single image
+                      category: category.category_name,
+                      discount: product.discount,
+                    }}
+                    formatPrice={formatPrice}
+                  />
+                ))}
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
+
+              {/* Pagination */}
+              {pagination.totalPages > 1 && (
+                <Pagination
+                  currentPage={pagination.currentPage}
+                  totalPages={pagination.totalPages}
+                  totalItems={pagination.totalItems}
+                  itemsPerPage={pagination.itemsPerPage || 12}
+                  onPageChange={handlePageChange}
+                  alwaysShow
+                />
+              )}
+            </>
+          ) : (
+            /* Empty State - Mobile Responsive */
+            <div className="card-responsive text-center py-12 sm:py-16">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <Package className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" />
+              </div>
+              <h3 className="heading-sub sm:heading-card mb-2">
                 Produk tidak ditemukan
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-body text-gray-600 mb-6 max-w-md mx-auto px-4">
                 {searchInput 
                   ? `Tidak ada produk yang sesuai dengan pencarian "${searchInput}" dalam kategori ini`
                   : 'Belum ada produk dalam kategori ini'
@@ -290,18 +289,18 @@ const CategoryDetailPage = () => {
               {searchInput && (
                 <button
                   onClick={() => setSearchInput('')}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full font-medium transition-all duration-200 shadow-md hover:shadow-lg"
+                  className="btn-touch px-6 sm:px-8 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold rounded-lg transition-colors"
                 >
                   Lihat Semua Produk
                 </button>
               )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <Footer />
-    </div>
+    </>
   );
 };
 
