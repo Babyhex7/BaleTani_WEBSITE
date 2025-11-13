@@ -48,30 +48,30 @@ const Navbar = () => {
       ];
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-40">
-      <div className="container-custom">
-        <div className="flex justify-between items-center h-16">
+    <nav className="bg-white shadow-md sticky top-0 z-50 safe-top">
+      <div className="container-app">
+        <div className="flex justify-between items-center btn-touch">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to={isAuthenticated ? '/home' : '/landing'} className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">B</span>
+            <Link to={isAuthenticated ? '/home' : '/landing'} className="flex items-center gap-2 sm:gap-2.5 py-2 sm:py-3">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                <span className="text-white font-bold text-lg sm:text-xl">B</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-lg text-gray-900">BaleTani</span>
-                <span className="text-xs text-gray-500 -mt-1">Fresh Market</span>
+                <span className="font-bold text-base sm:text-lg leading-tight text-gray-900">BaleTani</span>
+                <span className="text-[10px] sm:text-xs text-gray-500 leading-none">Fresh Market</span>
               </div>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="flex items-center space-x-8">
+          <div className="hidden md:flex items-center">
+            <div className="flex items-center gap-1 lg:gap-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="text-gray-600 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  className="text-gray-700 hover:text-primary-600 px-3 lg:px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-lg hover:bg-gray-50"
                 >
                   {link.name}
                 </Link>
@@ -80,16 +80,16 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Auth & Cart */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center gap-3 lg:gap-4">
             {/* Cart - Only show if authenticated */}
             {isAuthenticated && (
               <Link 
                 to="/cart"
-                className="relative p-2 text-gray-600 hover:text-primary-500 transition-colors"
+                className="relative p-2 lg:p-2.5 text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-lg transition-colors"
               >
-                <ShoppingCart size={24} />
+                <ShoppingCart className="w-5 h-5 lg:w-6 lg:h-6" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-accent-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                  <span className="absolute -top-1 -right-1 bg-accent-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                     {totalItems > 99 ? '99+' : totalItems}
                   </span>
                 )}
@@ -101,10 +101,10 @@ const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center space-x-2 text-gray-600 hover:text-primary-500 transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-lg transition-colors"
                 >
-                  <User size={20} />
-                  <span className="text-sm font-medium">{user?.full_name || user?.email}</span>
+                  <User className="w-5 h-5" />
+                  <span className="text-sm font-medium truncate max-w-[100px] lg:max-w-[140px]">{user?.full_name || user?.email}</span>
                 </button>
 
                 {/* User Dropdown */}
@@ -158,82 +158,87 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Mobile Actions: Cart + Menu */}
+          <div className="md:hidden flex items-center gap-2">
+            {/* Mobile Cart Icon */}
+            {isAuthenticated && (
+              <Link 
+                to="/cart"
+                className="relative p-2 text-gray-700 hover:text-primary-600 active:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-accent-500 text-white text-[9px] font-bold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-0.5">
+                    {totalItems > 99 ? '99+' : totalItems}
+                  </span>
+                )}
+              </Link>
+            )}
+            
+            {/* Mobile Menu Button */}
             <button
               onClick={toggleMenu}
-              className="text-gray-600 hover:text-primary-500 focus:outline-none focus:text-primary-500 transition-colors"
+              className="p-2 text-gray-700 hover:text-primary-600 active:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Toggle menu"
             >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-100">
+          <div className="md:hidden border-t border-gray-100">
+            <div className="py-3 space-y-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors"
+                  className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 active:bg-gray-100 rounded-lg mx-2 transition-colors"
                   onClick={closeMenu}
                 >
                   {link.name}
                 </Link>
               ))}
-              
-              {/* Mobile Cart */}
-              <div className="border-t border-gray-100 pt-3">
-                <button className="flex items-center justify-between w-full px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors">
-                  <div className="flex items-center space-x-2">
-                    <ShoppingCart size={20} />
-                    <span>Keranjang</span>
-                  </div>
-                  <span className="bg-accent-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    0
-                  </span>
-                </button>
-              </div>
 
               {/* Mobile Auth */}
-              <div className="border-t border-gray-100 pt-3">
+              <div className="border-t border-gray-100 mt-2 pt-3">
                 {isAuthenticated ? (
                   <div className="space-y-1">
-                    <div className="px-3 py-2 text-sm text-gray-500">
-                      Halo, {user?.fullName}
+                    <div className="px-4 py-2 text-xs font-medium text-gray-500">
+                      Halo, {user?.full_name || user?.email}
                     </div>
                     <Link
                       to="/profile"
-                      className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors"
+                      className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 active:bg-gray-100 rounded-lg mx-2 transition-colors"
                       onClick={closeMenu}
                     >
                       Profil Saya
                     </Link>
                     <Link
                       to="/purchase-history"
-                      className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors"
+                      className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 active:bg-gray-100 rounded-lg mx-2 transition-colors"
                       onClick={closeMenu}
                     >
                       Pesanan Saya
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                      className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg mx-2 transition-colors flex items-center gap-2"
                     >
-                      Keluar
+                      <LogOut size={16} />
+                      <span>Keluar</span>
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-2 px-2">
                     <Link to="/login" onClick={closeMenu}>
-                      <Button variant="ghost" size="sm" className="w-full">
+                      <Button variant="ghost" size="md" className="w-full">
                         Masuk
                       </Button>
                     </Link>
                     <Link to="/register" onClick={closeMenu}>
-                      <Button variant="primary" size="sm" className="w-full">
+                      <Button variant="primary" size="md" className="w-full">
                         Daftar
                       </Button>
                     </Link>

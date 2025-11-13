@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { X, ChevronDown, ChevronRight, Star, Search } from 'lucide-react';
+import { X, ChevronDown, ChevronRight, Star, Search, SlidersHorizontal } from 'lucide-react';
 import ProductCard from '../../components/ui/ProductCard';
 import SearchBar from '../../components/ui/SearchBar';
 import Button from '../../components/ui/Button';
@@ -93,18 +93,24 @@ const ProductPage = () => {
     }));
   };
 
+  // Count active filters for badge
+  const activeFiltersCount = [
+    selectedCategory,
+    filters.search
+  ].filter(Boolean).length;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
       {/* Header Section with Search - Katalog Produk */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white py-6 shadow-md">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white section-padding-responsive shadow-md">
+        <div className="container-app">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-responsive">
             {/* Title Section */}
             <div className="flex-shrink-0">
-              <h1 className="text-2xl md:text-3xl font-bold">Katalog Produk</h1>
-              <p className="text-green-100 text-sm md:text-base mt-1">Produk segar langsung dari petani lokal</p>
+              <h1 className="heading-section text-white">Katalog Produk</h1>
+              <p className="text-body text-green-100 mt-1">Produk segar langsung dari petani lokal</p>
             </div>
             
             {/* Search Bar - Reusable Component */}
@@ -124,20 +130,20 @@ const ProductPage = () => {
       </div>
 
       {/* Main Content - Tokopedia Layout */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex gap-6">
+      <div className="container-app section-py">
+        <div className="flex gap-4 lg:gap-6">
           
           {/* Sidebar Filter - Desktop */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-24">
+          <aside className="hidden lg:block w-56 xl:w-64 flex-shrink-0">
+            <div className="card-responsive sticky top-24">
               
               {/* Filter Header */}
-              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                <h2 className="font-bold text-lg">Filter</h2>
+              <div className="p-3 sm:p-4 border-b border-gray-200 flex items-center justify-between">
+                <h2 className="heading-sub">Filter</h2>
                 {(selectedCategory || selectedSort !== 'newest') && (
                   <button
                     onClick={handleResetFilters}
-                    className="text-sm text-green-600 hover:text-green-700 font-medium"
+                    className="text-caption sm:text-sm text-green-600 hover:text-green-700 font-medium"
                   >
                     Reset
                   </button>
@@ -148,15 +154,15 @@ const ProductPage = () => {
               <div className="border-b border-gray-200">
                 <button
                   onClick={() => toggleSection('category')}
-                  className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  className="w-full p-3 sm:p-4 flex items-center justify-between hover:bg-gray-50 active:bg-gray-100 transition-colors"
                 >
-                  <span className="font-semibold text-gray-900">Kategori</span>
-                  {expandedSections.category ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                  <span className="text-sm sm:text-base font-semibold text-gray-900">Kategori</span>
+                  {expandedSections.category ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                 </button>
                 
                 {expandedSections.category && (
-                  <div className="px-4 pb-4 space-y-2">
-                    <label className="flex items-center gap-3 py-2 cursor-pointer hover:bg-gray-50 rounded px-2 -mx-2">
+                  <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-1.5 sm:space-y-2">
+                    <label className="flex items-center gap-2.5 sm:gap-3 py-2 cursor-pointer hover:bg-gray-50 active:bg-gray-100 rounded px-2 -mx-2 btn-touch">
                       <input
                         type="radio"
                         name="category"
@@ -164,7 +170,7 @@ const ProductPage = () => {
                         onChange={() => handleCategoryChange('')}
                         className="w-4 h-4 text-green-600 focus:ring-green-500"
                       />
-                      <span className={`flex-1 text-sm ${selectedCategory === '' ? 'font-semibold text-green-600' : 'text-gray-700'}`}>
+                      <span className={`flex-1 text-caption sm:text-sm ${selectedCategory === '' ? 'font-semibold text-green-600' : 'text-gray-700'}`}>
                         Semua Kategori
                       </span>
                     </label>
@@ -172,7 +178,7 @@ const ProductPage = () => {
                     {categories.map((category) => (
                       <label 
                         key={category.id}
-                        className="flex items-center gap-3 py-2 cursor-pointer hover:bg-gray-50 rounded px-2 -mx-2"
+                        className="flex items-center gap-2.5 sm:gap-3 py-2 cursor-pointer hover:bg-gray-50 active:bg-gray-100 rounded px-2 -mx-2 btn-touch"
                       >
                         <input
                           type="radio"
@@ -181,7 +187,7 @@ const ProductPage = () => {
                           onChange={() => handleCategoryChange(category.id)}
                           className="w-4 h-4 text-green-600 focus:ring-green-500"
                         />
-                        <span className={`flex-1 text-sm ${selectedCategory === category.id ? 'font-semibold text-green-600' : 'text-gray-700'}`}>
+                        <span className={`flex-1 text-caption sm:text-sm ${selectedCategory === category.id ? 'font-semibold text-green-600' : 'text-gray-700'}`}>
                           {category.name}
                         </span>
                       </label>
@@ -197,20 +203,20 @@ const ProductPage = () => {
           <main className="flex-1 min-w-0">
             
             {/* Sort & Count Bar */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="card-responsive p-3 sm:p-4 mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 {/* Product Count */}
-                <div className="text-sm text-gray-600">
+                <div className="text-caption sm:text-sm text-gray-600">
                   Menampilkan <span className="font-semibold text-gray-900">{products.length}</span> dari <span className="font-semibold text-gray-900">{pagination.totalItems}</span> produk
                 </div>
 
                 {/* Sort Dropdown */}
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600 hidden sm:inline">Urutkan:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-caption sm:text-sm text-gray-600 hidden sm:inline">Urutkan:</span>
                   <select
                     value={selectedSort}
                     onChange={(e) => handleSortChange(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm bg-white cursor-pointer"
+                    className="input-touch px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-caption sm:text-sm bg-white flex-1 sm:flex-none"
                   >
                     <option value="newest">Terbaru</option>
                     <option value="name_asc">Nama A-Z</option>
@@ -223,32 +229,34 @@ const ProductPage = () => {
               
               {/* Active Filters Tags */}
               {(filters.search || filters.category) && (
-                <div className="mt-4 pt-4 border-t border-gray-200 flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100">
                   {filters.search && (
-                    <div className="bg-green-50 text-green-700 px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm">
                       <Search size={14} />
-                      "{filters.search}"
+                      <span className="font-medium">"{filters.search}"</span>
                       <button 
                         onClick={() => {
                           setSearchInput('');
                           searchProducts('');
                         }}
-                        className="hover:bg-green-100 rounded-full p-0.5"
+                        className="hover:bg-green-200 rounded-full p-0.5 transition-colors"
+                        aria-label="Hapus pencarian"
                       >
                         <X size={14} />
                       </button>
-                    </div>
+                    </span>
                   )}
                   {filters.category && (
-                    <div className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2">
-                      {categories.find(c => c.id === filters.category)?.name}
+                    <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm">
+                      <span className="font-medium">{categories.find(c => c.id === filters.category)?.name}</span>
                       <button 
                         onClick={() => handleCategoryChange('')}
-                        className="hover:bg-blue-100 rounded-full p-0.5"
+                        className="hover:bg-green-200 rounded-full p-0.5 transition-colors"
+                        aria-label="Hapus filter kategori"
                       >
                         <X size={14} />
                       </button>
-                    </div>
+                    </span>
                   )}
                 </div>
               )}
@@ -256,19 +264,22 @@ const ProductPage = () => {
 
             {/* Loading State */}
             {loading && (
-              <div className="text-center py-20">
-                <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-green-600 border-t-transparent"></div>
-                <p className="mt-4 text-gray-600 font-medium">Memuat produk...</p>
+              <div className="text-center py-12 sm:py-16 md:py-20">
+                <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-4 border-green-600 border-t-transparent"></div>
+                <p className="mt-4 text-body text-gray-600">Memuat produk...</p>
               </div>
             )}
 
             {/* Error State */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-                <p className="text-red-600 font-medium">{error}</p>
-                <Button onClick={() => window.location.reload()} className="mt-4">
+              <div className="card-responsive bg-red-50 border border-red-200 p-5 sm:p-6 text-center">
+                <p className="text-body text-red-600 font-medium mb-3">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="btn-touch px-4 sm:px-5 py-2 sm:py-2.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 active:bg-red-800"
+                >
                   Coba Lagi
-                </Button>
+                </button>
               </div>
             )}
 
@@ -277,7 +288,7 @@ const ProductPage = () => {
               <>
                 {products.length > 0 ? (
                   <>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-4 mb-6">
+                    <div className="grid-products-sidebar mb-6">
                       {products.map((product) => (
                         <ProductCard
                           key={product.id}
@@ -288,7 +299,7 @@ const ProductPage = () => {
                     </div>
 
                     {/* Pagination */}
-                    <div className="mt-8">
+                    <div className="mt-6 sm:mt-8">
                       <Pagination
                         currentPage={pagination.currentPage}
                         totalPages={pagination.totalPages}
@@ -300,17 +311,20 @@ const ProductPage = () => {
                     </div>
                   </>
                 ) : (
-                  <div className="bg-white rounded-lg p-12 text-center">
-                    <div className="text-6xl mb-4">🔍</div>
-                    <h3 className="text-xl font-bold text-gray-700 mb-2">
+                  <div className="text-center py-12 sm:py-16 md:py-20">
+                    <div className="text-5xl sm:text-6xl mb-4">🔍</div>
+                    <h3 className="heading-card text-gray-700 mb-2">
                       Produk Tidak Ditemukan
                     </h3>
-                    <p className="text-gray-500 mb-6">
+                    <p className="text-body text-gray-500 mb-4">
                       Coba ubah kata kunci pencarian atau filter Anda
                     </p>
-                    <Button onClick={handleResetFilters} variant="outline">
+                    <button
+                      onClick={handleResetFilters}
+                      className="btn-touch px-5 sm:px-6 py-2 sm:py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 text-sm font-medium transition-colors"
+                    >
                       Reset Filter
-                    </Button>
+                    </button>
                   </div>
                 )}
               </>
@@ -319,27 +333,32 @@ const ProductPage = () => {
         </div>
       </div>
 
-      <Footer />
-      
-      {/* Mobile Filter Button - Floating */}
+      {/* Floating Mobile Filter Button */}
       <button
         onClick={() => setShowMobileFilter(true)}
-        className="lg:hidden fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-lg z-50 flex items-center gap-2"
+        className="lg:hidden fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white p-4 rounded-full shadow-lg z-50 flex items-center gap-2 transition-colors"
       >
-        <ChevronRight size={20} />
-        Filter
+        <SlidersHorizontal size={20} />
+        <span className="text-sm font-medium">Filter</span>
+        {activeFiltersCount > 0 && (
+          <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+            {activeFiltersCount}
+          </span>
+        )}
       </button>
+
+      <Footer />
 
       {/* Mobile Filter Modal */}
       {showMobileFilter && (
-        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end">
-          <div className="bg-white w-full max-h-[80vh] rounded-t-2xl overflow-y-auto">
+        <div className="modal-bottom">
+          <div className="modal-bottom-content">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b p-4 flex items-center justify-between">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
               <h2 className="font-bold text-lg">Filter</h2>
               <button
                 onClick={() => setShowMobileFilter(false)}
-                className="p-2 hover:bg-gray-100 rounded-full"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <X size={20} />
               </button>
@@ -381,19 +400,18 @@ const ProductPage = () => {
 
             {/* Action Buttons */}
             <div className="sticky bottom-0 bg-white border-t p-4 flex gap-3">
-              <Button
+              <button
                 onClick={handleResetFilters}
-                variant="outline"
-                className="flex-1"
+                className="flex-1 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors"
               >
                 Reset
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={() => setShowMobileFilter(false)}
-                className="flex-1"
+                className="flex-1 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors"
               >
                 Terapkan
-              </Button>
+              </button>
             </div>
           </div>
         </div>

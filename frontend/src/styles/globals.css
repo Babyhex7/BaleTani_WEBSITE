@@ -186,9 +186,14 @@
   
   /* ===== GRID LAYOUTS - Responsive Columns ===== */
   
-  /* Grid untuk Product Cards */
+  /* Grid untuk Product Cards - Full Width (tanpa sidebar) */
   .grid-products {
     @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6;
+  }
+  
+  /* Grid untuk Product Cards - Dengan Sidebar (ProductPage, PromoPage) */
+  .grid-products-sidebar {
+    @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-4;
   }
   
   /* Grid untuk Categories (lebih sedikit kolom) */
@@ -321,6 +326,15 @@
   .modal-responsive {
     @apply fixed inset-0 lg:inset-auto lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 
            bg-white w-full lg:w-auto lg:max-w-2xl lg:rounded-xl shadow-2xl z-50;
+  }
+  
+  /* Modal Slide from Bottom - Untuk Mobile Filter (ProductPage style) */
+  .modal-bottom {
+    @apply lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end;
+  }
+  
+  .modal-bottom-content {
+    @apply bg-white w-full max-h-[80vh] rounded-t-2xl overflow-y-auto;
   }
   
   /* Modal content padding */

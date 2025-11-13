@@ -314,26 +314,26 @@ const LandingPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1, duration: 0.6 }}
-                className="stack-mobile gap-4"
+                className="stack-mobile gap-3 sm:gap-4"
               >
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button 
-                    size="small" 
+                    size="md" 
                     className="bg-green-600 hover:bg-green-700 text-white full-mobile"
                     onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
                   >
                     Belanja Sekarang
-                    <ArrowRight className="ml-2" size={20} />
+                    <ArrowRight className="ml-1.5 sm:ml-2" size={18} />
                   </Button>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button 
                     variant="outline" 
-                    size="small" 
+                    size="md" 
                     className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white full-mobile"
                     onClick={() => handleWhatsAppOrder('Konsultasi Produk', 0, 'gratis')}
                   >
-                    <MessageCircle className="mr-2" size={20} />
+                    <MessageCircle className="mr-1.5 sm:mr-2" size={18} />
                     Chat WhatsApp
                   </Button>
                 </motion.div>
@@ -626,11 +626,11 @@ const LandingPage = () => {
               >
                 <Link to="/products">
                   <Button 
-                    size="lg"
+                    size="md"
                     className="bg-green-600 hover:bg-green-700 text-white"
                   >
                     Lihat Semua {products.length} Produk
-                    <ArrowRight className="ml-2" size={20} />
+                    <ArrowRight className="ml-1.5 sm:ml-2" size={18} />
                   </Button>
                 </Link>
               </motion.div>
@@ -794,16 +794,16 @@ const LandingPage = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.5 }}
-                  className="text-center mt-8"
+                  className="text-center mt-6 sm:mt-8"
                 >
                   <Link to="/categories">
                     <Button 
-                      size="lg"
+                      size="md"
                       variant="outline"
                       className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
                     >
                       Lihat Semua Kategori ({categories.length})
-                      <ArrowRight className="ml-2" size={20} />
+                      <ArrowRight className="ml-1.5 sm:ml-2" size={18} />
                     </Button>
                   </Link>
                 </motion.div>
@@ -1095,15 +1095,15 @@ const LandingPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
-                size="lg"
+                size="md"
                 className="bg-white text-green-600 hover:bg-gray-100 w-full sm:w-auto"
                 onClick={() => handleWhatsAppOrder('Konsultasi Pemesanan', 0, 'gratis')}
               >
-                <MessageCircle className="mr-2" size={20} />
+                <MessageCircle className="mr-1.5 sm:mr-2" size={18} />
                 Pesan via WhatsApp
               </Button>
             </motion.div>
@@ -1111,11 +1111,11 @@ const LandingPage = () => {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button 
                   variant="outline" 
-                  size="lg" 
+                  size="md" 
                   className="border-white text-white hover:bg-white hover:text-green-600 w-full sm:w-auto"
                 >
                   Lihat Katalog Produk
-                  <ArrowRight className="ml-2" size={20} />
+                  <ArrowRight className="ml-1.5 sm:ml-2" size={18} />
                 </Button>
               </motion.div>
             </Link>
