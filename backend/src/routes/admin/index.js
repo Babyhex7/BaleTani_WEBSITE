@@ -18,6 +18,7 @@ const discountRoutes = require("./discounts");
 const userRoutes = require("./users");
 const orderRoutes = require("./orders");
 const customerRoutes = require("./customers");
+const procurementRoutes = require("./procurements");
 
 /**
  * PUBLIC ADMIN ROUTES (No auth required)
@@ -50,5 +51,8 @@ router.use("/users", userRoutes); // /api/admin/users/*
 
 // Customer Management
 router.use("/customers", customerRoutes); // /api/admin/customers/*
+
+// Procurement Management
+router.use("/procurements", procurementRoutes); // /api/admin/procurements/*
 
 module.exports = router;

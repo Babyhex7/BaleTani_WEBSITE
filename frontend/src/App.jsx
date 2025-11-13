@@ -30,6 +30,7 @@ import ProductListNew from './pages/admin/ProductListNew';
 import CategoryManagement from './pages/admin/CategoryManagement';
 import DiscountManagement from './pages/admin/DiscountManagement';
 import CustomerManagement from './pages/admin/CustomerManagement';
+import ProcurementList from './pages/admin/ProcurementList';
 
 /**
  * Komponen utama aplikasi yang mengatur routing
@@ -226,6 +227,13 @@ function App() {
       <Route path="/admin/products" element={
         <ProtectedRoute requiredRole="admin">
           <ProductListNew />
+        </ProtectedRoute>
+      } />
+
+      {/* Procurement List */}
+      <Route path="/admin/procurement" element={
+        <ProtectedRoute requiredRole="admin">
+          <ProcurementList />
         </ProtectedRoute>
       } />
 

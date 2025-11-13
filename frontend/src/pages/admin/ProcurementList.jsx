@@ -1,0 +1,451 @@
+import React, { useEffect, useState } from 'react';
+import AdminSidebarNew from '../../components/layout_admin/AdminSidebarNew';
+import AdminHeaderNew from '../../components/layout_admin/AdminHeaderNew';
+import Pagination from '../../components/ui/Pagination';
+import { toast } from 'react-hot-toast';
+import adminApiClient from '../../services/services_admin/adminApiClient';
+import inventoryService from '../../services/services_admin/inventoryService';
+import {
+  PlusIcon,
+  TruckIcon,
+  CubeIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  MagnifyingGlassIcon,
+  EyeIcon,
+  PencilIcon,
+  TrashIcon
+} from '@heroicons/react/24/outline';
+
+const ProcurementList = () => {
+  const [procurements, setProcurements] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // stats
+  const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, totalItems: 0 });
+
+  // filters & pagination
+  const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState(''); // online | offline | ''
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // products for selection when creating procurement
+  const [products, setProducts] = useState([]);
+
+  // create modal
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState({
+    procurement_date: new Date().toISOString().slice(0, 10),
+    procurement_type: 'online',
+    supplier_name: '',
+    items: [
+      { product_id: '', product_name: '', quantity: 1, unit_price: 0, expiry_date: '' }
+    ]
+  });
+
+  useEffect(() => {
+    fetchProcurements();
+    fetchProductsForSelect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, itemsPerPage, searchQuery, typeFilter, startDate, endDate]);
+
+  const fetchProductsForSelect = async () => {
+    try {
+      const data = await inventoryService.getProducts({ limit: 1000 });
+      if (data && data.success) {
+        const list = data.data?.products || data.data || [];
+        setProducts(Array.isArray(list) ? list : []);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch products for procurement select', err);
+    }
+  };
+
+  const fetchProcurements = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        q: searchQuery || undefined,
+        type: typeFilter || undefined,
+        start_date: startDate || undefined,
+        end_date: endDate || undefined,
+      };
+
+      const qs = new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined))).toString();
+      const response = await adminApiClient.get(`/admin/procurements?${qs}`);
+      const data = response.data;
+
+      const items = data?.data?.items || [];
+      const pagination = data?.data?.pagination || {};
+
+      setProcurements(items);
+      setTotalItems(pagination.total_items || items.length);
+      setTotalPages(pagination.total_pages || 1);
+      setCurrentPage(pagination.current_page || currentPage);
+
+      const total = pagination.total_items || items.length;
+      const pending = items.filter(i => i.status === 'pending').length;
+      const approved = items.filter(i => i.status === 'approved').length;
+      const totalIt = items.reduce((s, it) => s + ((it.items && it.items.length) || 0), 0);
+      setStats({ total, pending, approved, totalItems: totalIt });
+    } catch (err) {
+      console.error(err);
+      setError(err?.message || 'Gagal mengambil data pengadaan');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- Create / Form handlers ---
+  const addItemRow = () => {
+    setForm(prev => ({ ...prev, items: [...prev.items, { product_id: '', product_name: '', quantity: 1, unit_price: 0, expiry_date: '' }] }));
+  };
+
+  const removeItemRow = (idx) => {
+    setForm(prev => ({ ...prev, items: prev.items.filter((_, i) => i !== idx) }));
+  };
+
+  const updateItem = (idx, key, value) => {
+    setForm(prev => {
+      const items = [...prev.items];
+      items[idx] = { ...items[idx], [key]: value };
+      return { ...prev, items };
+    });
+  };
+
+  const handleProductSelect = (idx, productId) => {
+    const p = products.find(x => x.id === productId || x.product_id === productId) || {};
+    updateItem(idx, 'product_id', productId);
+    updateItem(idx, 'product_name', p.name || p.product_name || '');
+  };
+
+  const handleSubmitCreate = async () => {
+    if (!form.items || form.items.length === 0) {
+      toast.error('Tambahkan minimal 1 item untuk pengadaan');
+      return;
+    }
+
+    for (const it of form.items) {
+      if (!it.product_id) { toast.error('Pilih produk untuk setiap baris'); return; }
+      if (!it.quantity || Number(it.quantity) <= 0) { toast.error('Jumlah harus lebih dari 0'); return; }
+      if (it.unit_price === '' || Number(it.unit_price) < 0) { toast.error('Harga satuan tidak valid'); return; }
+    }
+
+    setCreating(true);
+    try {
+      const payload = {
+        procurement_date: form.procurement_date,
+        procurement_type: form.procurement_type,
+        supplier_name: form.supplier_name || null,
+        items: form.items.map(i => ({
+          product_id: i.product_id,
+          quantity: Number(i.quantity),
+          unit_price: Number(i.unit_price),
+          expiry_date: i.expiry_date || null
+        }))
+      };
+
+      await adminApiClient.post('/admin/procurements', payload);
+      toast.success('Pengadaan berhasil dibuat');
+      setShowCreateModal(false);
+      setForm({ procurement_date: new Date().toISOString().slice(0, 10), procurement_type: 'online', supplier_name: '', items: [{ product_id: '', product_name: '', quantity: 1, unit_price: 0, expiry_date: '' }] });
+      fetchProcurements();
+    } catch (err) {
+      console.error('Create procurement error', err);
+      toast.error(err?.response?.data?.message || 'Gagal membuat pengadaan');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value || 0);
+  };
+
+  const getStatusBadge = (status) => {
+    if (!status) return <span className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">-</span>;
+    if (status === 'approved') {
+      return <span className="px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full"></span>Disetujui</span>;
+    }
+    if (status === 'rejected') {
+      return <span className="px-3 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">Ditolak</span>;
+    }
+    return <span className="px-3 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full">Menunggu</span>;
+  };
+
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      <AdminSidebarNew />
+      <div className="flex-1">
+        <AdminHeaderNew title="Procurement" subtitle="Kelola pengadaan barang" />
+
+        <div className="p-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Total Pengadaan</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                </div>
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <CubeIcon className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Menunggu</p>
+                  <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+                </div>
+                <div className="p-3 bg-yellow-100 rounded-lg">
+                  <ExclamationCircleIcon className="w-6 h-6 text-yellow-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Disetujui</p>
+                  <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
+                </div>
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <CheckCircleIcon className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Total Item</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalItems}</p>
+                </div>
+                <div className="p-3 bg-purple-100 rounded-lg">
+                  <TruckIcon className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Card */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <h2 className="text-xl font-bold text-gray-900">Daftar Pengadaan</h2>
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  <PlusIcon className="w-5 h-5" />
+                  Buat Pengadaan
+                </button>
+              </div>
+            </div>
+
+            {/* Filters */}
+            <div className="p-6 border-b border-gray-200 bg-gray-50">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-2">
+                  <div className="relative">
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Cari supplier atau produk..."
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <select
+                    value={typeFilter}
+                    onChange={(e) => {
+                      setTypeFilter(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Semua Tipe</option>
+                    <option value="online">Online</option>
+                    <option value="offline">Offline</option>
+                  </select>
+                </div>
+
+                <div>
+                  <div className="flex gap-2">
+                    <input type="date" value={startDate} onChange={(e) => { setStartDate(e.target.value); setCurrentPage(1); }} className="w-full px-3 py-2 border rounded-lg" />
+                    <input type="date" value={endDate} onChange={(e) => { setEndDate(e.target.value); setCurrentPage(1); }} className="w-full px-3 py-2 border rounded-lg" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              {loading ? (
+                <div className="p-8 text-center text-gray-600">Memuat pengadaan...</div>
+              ) : error ? (
+                <div className="p-8 text-center text-red-600">{error}</div>
+              ) : procurements.length === 0 ? (
+                <div className="p-8 text-center text-gray-600">Belum ada data pengadaan</div>
+              ) : (
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipe</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Biaya</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {procurements.map((p) => {
+                      const totalCost = (p.items || []).reduce((s, it) => s + (Number(it.unit_price || 0) * Number(it.quantity || 0)), 0);
+                      return (
+                        <tr key={p.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{p.procurement_date?.slice(0,10) || p.created_at?.slice(0,10)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{p.procurement_type}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{p.supplier_name || '-'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{(p.items || []).length} item</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{formatCurrency(totalCost)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{getStatusBadge(p.status)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div className="flex items-center justify-end gap-2">
+                              <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="View">
+                                <EyeIcon className="w-5 h-5" />
+                              </button>
+                              <button className="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Edit">
+                                <PencilIcon className="w-5 h-5" />
+                              </button>
+                              <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
+                                <TrashIcon className="w-5 h-5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {!loading && !error && procurements.length > 0 && (
+              <Pagination currentPage={currentPage} totalPages={totalPages} totalItems={totalItems} itemsPerPage={itemsPerPage} onPageChange={(p) => setCurrentPage(p)} />
+            )}
+          </div>
+        </div>
+
+      {/* Create Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white w-full max-w-3xl rounded-lg shadow-lg border">
+            <div className="p-4 border-b flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <TruckIcon className="w-6 h-6 text-green-600" />
+                <h4 className="font-semibold">Buat Pengadaan Baru</h4>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setShowCreateModal(false)} className="text-gray-500 hover:text-gray-700">Tutup</button>
+              </div>
+            </div>
+
+            <div className="p-4 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-sm text-gray-600">Tanggal</label>
+                  <input type="date" value={form.procurement_date} onChange={(e) => setForm(prev => ({ ...prev, procurement_date: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">Tipe</label>
+                  <select value={form.procurement_type} onChange={(e) => setForm(prev => ({ ...prev, procurement_type: e.target.value }))} className="w-full px-3 py-2 border rounded-lg">
+                    <option value="online">Online</option>
+                    <option value="offline">Offline</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">Supplier (opsional)</label>
+                  <input type="text" value={form.supplier_name} onChange={(e) => setForm(prev => ({ ...prev, supplier_name: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h5 className="font-medium">Items</h5>
+                  <button onClick={addItemRow} className="text-sm text-green-600">+ Tambah Baris</button>
+                </div>
+
+                <div className="space-y-2">
+                  {form.items.map((it, idx) => (
+                    <div key={idx} className="grid grid-cols-1 md:grid-cols-6 gap-2 items-end bg-gray-50 p-3 rounded-md border">
+                      <div className="md:col-span-2">
+                        <label className="text-xs text-gray-500">Produk</label>
+                        <select value={it.product_id} onChange={(e) => handleProductSelect(idx, e.target.value)} className="w-full px-2 py-2 border rounded-lg">
+                          <option value="">-- Pilih produk --</option>
+                          {products.map(p => (
+                            <option key={p.id || p.product_id} value={p.id || p.product_id}>{p.name || p.product_name}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-xs text-gray-500">Jumlah</label>
+                        <input type="number" min="0" value={it.quantity} onChange={(e) => updateItem(idx, 'quantity', e.target.value)} className="w-full px-2 py-2 border rounded-lg" />
+                      </div>
+
+                      <div>
+                        <label className="text-xs text-gray-500">Harga / satuan</label>
+                        <input type="number" min="0" value={it.unit_price} onChange={(e) => updateItem(idx, 'unit_price', e.target.value)} className="w-full px-2 py-2 border rounded-lg" />
+                      </div>
+
+                      <div>
+                        <label className="text-xs text-gray-500">Expiry (opsional)</label>
+                        <input type="date" value={it.expiry_date} onChange={(e) => updateItem(idx, 'expiry_date', e.target.value)} className="w-full px-2 py-2 border rounded-lg" />
+                      </div>
+
+                      <div className="md:col-span-1 text-right">
+                        <button onClick={() => removeItemRow(idx)} className="text-sm text-red-600">Hapus</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600">Total: <span className="font-semibold">{formatCurrency(form.items.reduce((s, it) => s + (Number(it.unit_price) * Number(it.quantity || 0)), 0))}</span></div>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setShowCreateModal(false)} className="px-4 py-2 border rounded-lg">Batal</button>
+                  <button onClick={handleSubmitCreate} disabled={creating} className="px-4 py-2 bg-green-600 text-white rounded-lg">{creating ? 'Menyimpan...' : 'Simpan Pengadaan'}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+    </div>
+  );
+};
+
+export default ProcurementList;
