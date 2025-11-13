@@ -319,7 +319,7 @@ const LandingPage = () => {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button 
                     size="md" 
-                    className="bg-green-600 hover:bg-green-700 text-white full-mobile"
+                    className="bg-green-600 hover:bg-green-700 text-white full-mobile btn-touch"
                     onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
                   >
                     Belanja Sekarang
@@ -330,7 +330,7 @@ const LandingPage = () => {
                   <Button 
                     variant="outline" 
                     size="md" 
-                    className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white full-mobile"
+                    className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white full-mobile btn-touch"
                     onClick={() => handleWhatsAppOrder('Konsultasi Produk', 0, 'gratis')}
                   >
                     <MessageCircle className="mr-1.5 sm:mr-2" size={18} />
@@ -500,7 +500,7 @@ const LandingPage = () => {
 
       {/* Featured Products - Unlimited Carousel dengan Framer Motion */}
       <section id="products" className="section-py bg-white overflow-hidden">
-        <div className="container mx-auto px-2 sm:px-4 md:px-6 max-w-screen-xl">
+        <div className="container-app">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -627,7 +627,7 @@ const LandingPage = () => {
                 <Link to="/products">
                   <Button 
                     size="md"
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    className="bg-green-600 hover:bg-green-700 text-white btn-touch"
                   >
                     Lihat Semua {products.length} Produk
                     <ArrowRight className="ml-1.5 sm:ml-2" size={18} />
@@ -644,8 +644,8 @@ const LandingPage = () => {
       </section>
 
       {/* Benefits Section dengan Scroll Animation */}
-      <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
-        <div className="container mx-auto px-4">
+      <section className="section-py bg-gradient-to-br from-gray-50 to-white">
+        <div className="container-app">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -658,7 +658,7 @@ const LandingPage = () => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-3xl md:text-4xl font-bold text-gray-900"
+              className="heading-section text-gray-900"
             >
               Mengapa Pilih BaleTani?
             </motion.h2>
@@ -667,13 +667,13 @@ const LandingPage = () => {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="text-lg text-gray-600 max-w-2xl mx-auto"
+              className="text-body text-gray-600 max-w-2xl mx-auto"
             >
               Kami berkomitmen memberikan pengalaman belanja terbaik dengan jaminan kualitas dan layanan premium
             </motion.p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {benefits.map((benefit, index) => {
               const IconComponent = benefit.icon;
               return (
@@ -696,8 +696,8 @@ const LandingPage = () => {
                   >
                     <IconComponent className="text-green-600" size={24} />
                   </motion.div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">{benefit.title}</h3>
-                  <p className="text-gray-600 leading-relaxed text-sm">{benefit.description}</p>
+                  <h3 className="heading-card text-gray-900 mb-3">{benefit.title}</h3>
+                  <p className="text-caption sm:text-body text-gray-600 leading-relaxed">{benefit.description}</p>
                 </motion.div>
               );
             })}
@@ -774,10 +774,10 @@ const LandingPage = () => {
                           </div>
                         </div>
                         <div className="p-4">
-                          <h3 className="font-bold text-base text-gray-900 mb-1 group-hover:text-green-600 transition-colors duration-300 line-clamp-1">
+                          <h3 className="heading-card text-gray-900 mb-1 group-hover:text-green-600 transition-colors duration-300 line-clamp-1">
                             {category.category_name}
                           </h3>
-                          <p className="text-gray-600 text-xs leading-relaxed line-clamp-2">
+                          <p className="text-caption sm:text-body text-gray-600 leading-relaxed line-clamp-2">
                             {category.description || 'Produk segar berkualitas premium'}
                           </p>
                         </div>
@@ -800,7 +800,7 @@ const LandingPage = () => {
                     <Button 
                       size="md"
                       variant="outline"
-                      className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                      className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white btn-touch"
                     >
                       Lihat Semua Kategori ({categories.length})
                       <ArrowRight className="ml-1.5 sm:ml-2" size={18} />
