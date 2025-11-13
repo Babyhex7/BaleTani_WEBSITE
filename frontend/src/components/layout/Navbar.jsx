@@ -48,7 +48,7 @@ const Navbar = () => {
       ];
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50 safe-top">
+    <nav className="bg-white shadow-md sticky top-0 z-navbar safe-top">
       <div className="container-app">
         <div className="flex justify-between items-center btn-touch">
           {/* Logo */}
@@ -109,7 +109,7 @@ const Navbar = () => {
 
                 {/* User Dropdown */}
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-dropdown">
                     <Link
                       to="/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"

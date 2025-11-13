@@ -336,7 +336,7 @@ const ProductPage = () => {
       {/* Floating Mobile Filter Button */}
       <button
         onClick={() => setShowMobileFilter(true)}
-        className="lg:hidden fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white p-4 rounded-full shadow-lg z-50 flex items-center gap-2 transition-colors"
+        className="floating-button bg-green-600 hover:bg-green-700 active:bg-green-800 text-white"
       >
         <SlidersHorizontal size={20} />
         <span className="text-sm font-medium">Filter</span>
@@ -351,8 +351,8 @@ const ProductPage = () => {
 
       {/* Mobile Filter Modal */}
       {showMobileFilter && (
-        <div className="modal-bottom">
-          <div className="modal-bottom-content">
+        <div className="modal-bottom animate-fade-in-fast" onClick={() => setShowMobileFilter(false)}>
+          <div className="modal-bottom-content animate-slide-up-modal" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
               <h2 className="font-bold text-lg">Filter</h2>

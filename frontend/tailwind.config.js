@@ -90,10 +90,24 @@ export default {
         18: "4.5rem",
         88: "22rem",
         128: "32rem",
+        // Safe area insets for iOS notch and home indicator
+        "safe-top": "env(safe-area-inset-top)",
+        "safe-bottom": "env(safe-area-inset-bottom)",
+        "safe-left": "env(safe-area-inset-left)",
+        "safe-right": "env(safe-area-inset-right)",
+      },
+      zIndex: {
+        60: "60",
+        70: "70",
+        80: "80",
+        90: "90",
+        100: "100",
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",
         "slide-up": "slideUp 0.3s ease-out",
+        "slide-up-modal": "slideUpModal 0.3s ease-out",
+        "fade-in-fast": "fadeIn 0.2s ease-in-out",
         "bounce-slow": "bounce 2s infinite",
       },
       keyframes: {
@@ -104,6 +118,10 @@ export default {
         slideUp: {
           "0%": { transform: "translateY(10px)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        slideUpModal: {
+          "0%": { transform: "translateY(100%)" },
+          "100%": { transform: "translateY(0)" },
         },
       },
     },

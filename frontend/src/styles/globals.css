@@ -56,23 +56,9 @@
     @apply bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent;
   }
   
-  /* Section Styles */
-  .section-padding {
-    @apply py-16 px-4 sm:px-6 lg:px-8;
-  }
-  
-  .container-custom {
-    @apply max-w-7xl mx-auto;
-  }
-  
   /* Hero gradient background */
   .hero-gradient {
     @apply bg-gradient-to-br from-primary-50 via-white to-secondary-50;
-  }
-  
-  /* Product grid */
-  .product-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
   }
   
   /* Promo badge */
@@ -148,6 +134,11 @@
   /* Gap untuk Grid - Responsive spacing antar elemen */
   .gap-responsive {
     @apply gap-4 md:gap-6 lg:gap-8;
+  }
+  
+  /* Gap untuk Product Grid dengan Sidebar (lebih tight) */
+  .gap-products {
+    @apply gap-3 sm:gap-4;
   }
   
   
@@ -311,12 +302,17 @@
   
   /* Mobile menu drawer (full screen) */
   .mobile-menu {
-    @apply fixed inset-0 z-50 bg-white transform transition-transform duration-300;
+    @apply fixed inset-0 bg-white transform transition-transform duration-300;
   }
   
   /* Mobile bottom navigation */
   .mobile-nav-bottom {
-    @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 z-40;
+    @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4;
+  }
+  
+  /* Floating action button (filter, cart, etc) */
+  .floating-button {
+    @apply lg:hidden fixed bottom-6 right-6 p-4 rounded-full shadow-lg flex items-center gap-2 transition-colors z-floating;
   }
   
   
@@ -325,16 +321,18 @@
   /* Modal responsive - Full screen mobile, centered desktop */
   .modal-responsive {
     @apply fixed inset-0 lg:inset-auto lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 
-           bg-white w-full lg:w-auto lg:max-w-2xl lg:rounded-xl shadow-2xl z-50;
+           bg-white w-full lg:w-auto lg:max-w-2xl lg:rounded-xl shadow-2xl;
   }
   
   /* Modal Slide from Bottom - Untuk Mobile Filter (ProductPage style) */
   .modal-bottom {
-    @apply lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end;
+    @apply lg:hidden fixed inset-0 bg-black bg-opacity-50 flex items-end z-overlay;
+    /* Note: Add 'animate-fade-in-fast' directly in component HTML */
   }
   
   .modal-bottom-content {
-    @apply bg-white w-full max-h-[80vh] rounded-t-2xl overflow-y-auto;
+    @apply bg-white w-full max-h-[80vh] rounded-t-2xl overflow-y-auto z-modal;
+    /* Note: Add 'animate-slide-up-modal' directly in component HTML */
   }
   
   /* Modal content padding */
@@ -347,12 +345,45 @@
   
   /* Padding bottom untuk safe area */
   .safe-bottom {
-    @apply pb-safe;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   }
   
   /* Padding top untuk safe area */
   .safe-top {
-    @apply pt-safe;
+    padding-top: calc(1rem + env(safe-area-inset-top));
+  }
+  
+  
+  /* ===== Z-INDEX HIERARCHY ===== */
+  /* Consistent z-index values across all components */
+  /* Order: Sticky(10) < Navbar(20) < Dropdown(30) < Floating Button(40) < Modal Overlay(50) < Modal Content(60) < Toast(70) */
+  
+  .z-sticky {
+    @apply z-10; /* Sticky elements like sidebar/header in modal */
+  }
+  
+  .z-navbar {
+    @apply z-20; /* Navigation bar - below modal */
+  }
+  
+  .z-dropdown {
+    @apply z-30; /* Dropdowns from navbar - above navbar */
+  }
+  
+  .z-floating {
+    @apply z-40; /* Floating action buttons - below modal */
+  }
+  
+  .z-overlay {
+    @apply z-50; /* Modal backdrops - covers everything below */
+  }
+  
+  .z-modal {
+    @apply z-60; /* Modal content - above overlay */
+  }
+  
+  .z-toast {
+    @apply z-70; /* Toast notifications - always on top */
   }
 }
 

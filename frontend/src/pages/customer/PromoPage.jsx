@@ -410,8 +410,8 @@ const PromoPage = () => {
 
           {/* Mobile Filter Modal - Slide from Bottom like ProductPage */}
           {isMobileFilterOpen && (
-            <div className="modal-bottom" onClick={() => setIsMobileFilterOpen(false)}>
-              <div className="modal-bottom-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-bottom animate-fade-in-fast" onClick={() => setIsMobileFilterOpen(false)}>
+              <div className="modal-bottom-content animate-slide-up-modal" onClick={(e) => e.stopPropagation()}>
                 
                 {/* Modal Header */}
                 <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
@@ -670,7 +670,7 @@ const PromoPage = () => {
       {/* Floating Mobile Filter Button - Like ProductPage */}
       <button
         onClick={() => setIsMobileFilterOpen(true)}
-        className="lg:hidden fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white p-4 rounded-full shadow-lg z-50 flex items-center gap-2 transition-colors"
+        className="floating-button bg-green-600 hover:bg-green-700 active:bg-green-800 text-white"
       >
         <SlidersHorizontal size={20} />
         <span className="text-sm font-medium">Filter</span>
