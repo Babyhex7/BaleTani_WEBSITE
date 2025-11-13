@@ -182,7 +182,7 @@
     @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6;
   }
   
-  /* Grid untuk Product Cards - Dengan Sidebar (ProductPage, PromoPage) */
+  /* Grid untuk Product Cards - Dengan Sidebar (ProductPage, PromoPage, CategoryPage) */
   .grid-products-sidebar {
     @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-4;
   }
@@ -190,6 +190,11 @@
   /* Grid untuk Categories (lebih sedikit kolom) */
   .grid-categories {
     @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6;
+  }
+  
+  /* Layout Container - Sidebar + Main Content (2 columns) */
+  .layout-with-sidebar {
+    @apply grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6;
   }
   
   /* Grid 2 kolom mobile, 4 kolom desktop */
