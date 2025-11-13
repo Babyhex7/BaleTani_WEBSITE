@@ -60,13 +60,13 @@ const ProfilePage = () => {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen bg-gray-50 py-8">
-          <div className="max-w-5xl mx-auto px-4">
-            <div className="animate-pulse space-y-6">
-              <div className="h-12 bg-gray-200 rounded w-1/3"></div>
-              <div className="bg-white rounded-xl p-6 space-y-4">
-                <div className="h-32 bg-gray-200 rounded"></div>
-                <div className="h-64 bg-gray-200 rounded"></div>
+        <div className="min-h-screen bg-gray-50 section-py">
+          <div className="container-app">
+            <div className="animate-pulse space-y-4 sm:space-y-6">
+              <div className="h-8 sm:h-12 bg-gray-200 rounded w-2/3 sm:w-1/3"></div>
+              <div className="card-responsive space-y-4">
+                <div className="h-24 sm:h-32 bg-gray-200 rounded"></div>
+                <div className="h-48 sm:h-64 bg-gray-200 rounded"></div>
               </div>
             </div>
           </div>
@@ -79,24 +79,24 @@ const ProfilePage = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-5xl mx-auto px-4">
+      <div className="min-h-screen bg-gray-50 section-py">
+        <div className="container-app">
           {/* Page Title */}
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Profile Saya</h1>
-          <p className="text-gray-600 mb-8">Kelola informasi profile dan preferensi Anda</p>
+          <h1 className="heading-section text-gray-900 mb-3 sm:mb-6">Profile Saya</h1>
+          <p className="text-body text-gray-600 mb-6 sm:mb-8">Kelola informasi profile dan preferensi Anda</p>
 
           {/* Tab Navigation */}
-          <div className="flex gap-4 mb-6 border-b border-gray-200">
+          <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-6 border-b border-gray-200">
             <button
               onClick={() => setActiveTab("profile")}
-              className={`flex items-center gap-2 px-6 py-3 font-semibold transition-all ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-all btn-touch ${
                 activeTab === "profile"
                   ? "text-green-600 border-b-2 border-green-600"
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              <UserCircleIcon className="w-5 h-5" />
-              Profile
+              <UserCircleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-sm sm:text-base">Profile</span>
             </button>
           </div>
 
@@ -104,32 +104,32 @@ const ProfilePage = () => {
           {activeTab === "profile" && (
             <div className="space-y-6">
               {/* Profile Header Card */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center gap-6">
+              <div className="card-responsive">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                   {/* Avatar */}
-                  <div className="relative">
-                    <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
+                  <div className="relative flex-shrink-0">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white text-2xl sm:text-3xl font-bold">
                       {profile?.full_name?.charAt(0).toUpperCase() || "U"}
                     </div>
-                    <div className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                    <div className="absolute bottom-0 right-0 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
                       <span className="text-white text-xs">✓</span>
                     </div>
                   </div>
 
                   {/* User Info */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h2 className="text-2xl font-bold text-gray-900">
+                  <div className="flex-1 text-center sm:text-left">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-center gap-2 mb-1">
+                      <h2 className="heading-card sm:heading-sub text-gray-900">
                         {profile?.full_name || "User"}
                       </h2>
                       <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded">
                         Terverifikasi
                       </span>
                     </div>
-                    <p className="text-gray-600 mb-2">
+                    <p className="text-body text-gray-600 mb-2">
                       {profile?.phone_number || "-"}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-caption sm:text-sm text-gray-500">
                       Bergabung {formatDate(profile?.member_since)}
                     </p>
                   </div>
@@ -137,40 +137,40 @@ const ProfilePage = () => {
               </div>
 
               {/* Profile Information Card */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-900">Informasi Profile</h3>
+              <div className="card-responsive">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 pb-4 sm:pb-6 border-b border-gray-200">
+                  <h3 className="heading-card text-gray-900">Informasi Profile</h3>
                   <button
                     onClick={() => setShowEditModal(true)}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-sm"
+                    className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-sm btn-touch"
                   >
                     Edit Profile
                   </button>
                 </div>
 
-                <div className="p-6 space-y-6">
+                <div className="pt-4 sm:pt-6 space-y-4 sm:space-y-6">
                   {/* Name Field */}
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-sm font-medium text-gray-600">Nama Lengkap</div>
-                    <div className="col-span-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+                    <div className="text-caption sm:text-sm font-medium text-gray-600">Nama Lengkap</div>
+                    <div className="sm:col-span-2">
                       <input
                         type="text"
                         value={profile?.full_name || "-"}
                         disabled
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 input-touch text-caption sm:text-sm"
                       />
                     </div>
                   </div>
 
                   {/* Phone Field */}
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-sm font-medium text-gray-600">Nomor Telepon</div>
-                    <div className="col-span-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+                    <div className="text-caption sm:text-sm font-medium text-gray-600">Nomor Telepon</div>
+                    <div className="sm:col-span-2">
                       <input
                         type="text"
                         value={profile?.phone_number || "-"}
                         disabled
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 input-touch text-caption sm:text-sm"
                       />
                     </div>
                   </div>
@@ -179,7 +179,7 @@ const ProfilePage = () => {
                   <div className="pt-4 border-t border-gray-200">
                     <button
                       onClick={() => setShowPasswordModal(true)}
-                      className="text-green-600 hover:text-green-700 font-semibold text-sm"
+                      className="text-green-600 hover:text-green-700 font-semibold text-caption sm:text-sm btn-touch"
                     >
                       Ganti Password →
                     </button>
@@ -188,19 +188,19 @@ const ProfilePage = () => {
               </div>
 
               {/* Statistics Cards */}
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+                <div className="card-responsive text-center">
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-600 mb-1 sm:mb-2">
                     {profile?.statistics?.total_orders || 0}
                   </div>
-                  <div className="text-sm text-gray-600">Total Pesanan</div>
+                  <div className="text-caption sm:text-sm text-gray-600">Total Pesanan</div>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-                  <div className="text-2xl font-bold text-blue-600 mb-2">
+                <div className="card-responsive text-center">
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600 mb-1 sm:mb-2 break-words">
                     {formatCurrency(profile?.statistics?.total_spending || 0)}
                   </div>
-                  <div className="text-sm text-gray-600">Total Belanja</div>
+                  <div className="text-caption sm:text-sm text-gray-600">Total Belanja</div>
                 </div>
               </div>
             </div>
