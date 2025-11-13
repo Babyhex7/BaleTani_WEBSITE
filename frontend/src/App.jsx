@@ -31,6 +31,7 @@ import CategoryManagement from './pages/admin/CategoryManagement';
 import DiscountManagement from './pages/admin/DiscountManagement';
 import CustomerManagement from './pages/admin/CustomerManagement';
 import ProcurementList from './pages/admin/ProcurementList';
+import ReportsPage from './pages/admin/ReportsPage';
 
 /**
  * Komponen utama aplikasi yang mengatur routing
@@ -275,6 +276,13 @@ function App() {
       <Route path="/admin/orders" element={
         <ProtectedRoute requiredRole="admin">
           <OrderManagement />
+        </ProtectedRoute>
+      } />
+
+      {/* Reports & Analytics */}
+      <Route path="/admin/reports" element={
+        <ProtectedRoute requiredRole="admin">
+          <ReportsPage />
         </ProtectedRoute>
       } />
 

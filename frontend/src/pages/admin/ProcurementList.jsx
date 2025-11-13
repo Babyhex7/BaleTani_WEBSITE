@@ -5,6 +5,9 @@ import Pagination from '../../components/ui/Pagination';
 import { toast } from 'react-hot-toast';
 import adminApiClient from '../../services/services_admin/adminApiClient';
 import inventoryService from '../../services/services_admin/inventoryService';
+import useAdminStore from '../../store/store_admin/useAdminStore';
+import ProcurementDetailModal from '../../components/ui_admin/ProcurementDetailModal';
+import ProcurementFormModal from '../../components/ui_admin/ProcurementFormModal';
 import {
   PlusIcon,
   TruckIcon,
@@ -14,10 +17,14 @@ import {
   MagnifyingGlassIcon,
   EyeIcon,
   PencilIcon,
-  TrashIcon
+  TrashIcon,
+  FunnelIcon,
 } from '@heroicons/react/24/outline';
 
 const ProcurementList = () => {
+  const { admin } = useAdminStore();
+  const userRole = admin?.role?.role_name;
+
   const [procurements, setProcurements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,7 +34,8 @@ const ProcurementList = () => {
 
   // filters & pagination
   const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState(''); // online | offline | ''
+  const [statusFilter, setStatusFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,26 +43,21 @@ const ProcurementList = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // products for selection when creating procurement
+  // products for selection
   const [products, setProducts] = useState([]);
 
-  // create modal
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({
-    procurement_date: new Date().toISOString().slice(0, 10),
-    procurement_type: 'online',
-    supplier_name: '',
-    items: [
-      { product_id: '', product_name: '', quantity: 1, unit_price: 0, expiry_date: '' }
-    ]
-  });
+  // modals
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [selectedProcurement, setSelectedProcurement] = useState(null);
+  const [editData, setEditData] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchProcurements();
     fetchProductsForSelect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, itemsPerPage, searchQuery, typeFilter, startDate, endDate]);
+  }, [currentPage, itemsPerPage, searchQuery, statusFilter, typeFilter, startDate, endDate]);
 
   const fetchProductsForSelect = async () => {
     try {
@@ -76,12 +79,16 @@ const ProcurementList = () => {
         page: currentPage,
         limit: itemsPerPage,
         q: searchQuery || undefined,
+        status: statusFilter || undefined,
         type: typeFilter || undefined,
-        start_date: startDate || undefined,
-        end_date: endDate || undefined,
+        date_from: startDate || undefined,
+        date_to: endDate || undefined,
       };
 
-      const qs = new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined))).toString();
+      const qs = new URLSearchParams(
+        Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined))
+      ).toString();
+      
       const response = await adminApiClient.get(`/admin/procurements?${qs}`);
       const data = response.data;
 
@@ -94,8 +101,8 @@ const ProcurementList = () => {
       setCurrentPage(pagination.current_page || currentPage);
 
       const total = pagination.total_items || items.length;
-      const pending = items.filter(i => i.status === 'pending').length;
-      const approved = items.filter(i => i.status === 'approved').length;
+      const pending = items.filter((i) => i.status === 'pending').length;
+      const approved = items.filter((i) => i.status === 'approved').length;
       const totalIt = items.reduce((s, it) => s + ((it.items && it.items.length) || 0), 0);
       setStats({ total, pending, approved, totalItems: totalIt });
     } catch (err) {
@@ -106,88 +113,173 @@ const ProcurementList = () => {
     }
   };
 
-  // --- Create / Form handlers ---
-  const addItemRow = () => {
-    setForm(prev => ({ ...prev, items: [...prev.items, { product_id: '', product_name: '', quantity: 1, unit_price: 0, expiry_date: '' }] }));
-  };
-
-  const removeItemRow = (idx) => {
-    setForm(prev => ({ ...prev, items: prev.items.filter((_, i) => i !== idx) }));
-  };
-
-  const updateItem = (idx, key, value) => {
-    setForm(prev => {
-      const items = [...prev.items];
-      items[idx] = { ...items[idx], [key]: value };
-      return { ...prev, items };
-    });
-  };
-
-  const handleProductSelect = (idx, productId) => {
-    const p = products.find(x => x.id === productId || x.product_id === productId) || {};
-    updateItem(idx, 'product_id', productId);
-    updateItem(idx, 'product_name', p.name || p.product_name || '');
-  };
-
-  const handleSubmitCreate = async () => {
-    if (!form.items || form.items.length === 0) {
-      toast.error('Tambahkan minimal 1 item untuk pengadaan');
-      return;
-    }
-
-    for (const it of form.items) {
-      if (!it.product_id) { toast.error('Pilih produk untuk setiap baris'); return; }
-      if (!it.quantity || Number(it.quantity) <= 0) { toast.error('Jumlah harus lebih dari 0'); return; }
-      if (it.unit_price === '' || Number(it.unit_price) < 0) { toast.error('Harga satuan tidak valid'); return; }
-    }
-
-    setCreating(true);
+  const handleViewDetail = async (procurementId) => {
     try {
-      const payload = {
-        procurement_date: form.procurement_date,
-        procurement_type: form.procurement_type,
-        supplier_name: form.supplier_name || null,
-        items: form.items.map(i => ({
-          product_id: i.product_id,
-          quantity: Number(i.quantity),
-          unit_price: Number(i.unit_price),
-          expiry_date: i.expiry_date || null
-        }))
-      };
+      const response = await adminApiClient.get(`/admin/procurements/${procurementId}`);
+      if (response.data.success) {
+        setSelectedProcurement(response.data.data);
+        setShowDetailModal(true);
+      }
+    } catch (err) {
+      console.error('Error fetching procurement detail:', err);
+      toast.error('Gagal mengambil detail pengadaan');
+    }
+  };
 
-      await adminApiClient.post('/admin/procurements', payload);
-      toast.success('Pengadaan berhasil dibuat');
-      setShowCreateModal(false);
-      setForm({ procurement_date: new Date().toISOString().slice(0, 10), procurement_type: 'online', supplier_name: '', items: [{ product_id: '', product_name: '', quantity: 1, unit_price: 0, expiry_date: '' }] });
+  const handleCreate = () => {
+    setEditData(null);
+    setShowFormModal(true);
+  };
+
+  const handleEdit = (procurement) => {
+    setEditData(procurement);
+    setShowFormModal(true);
+    setShowDetailModal(false);
+  };
+
+  const handleSubmitForm = async (payload) => {
+    setIsSubmitting(true);
+    try {
+      if (editData) {
+        // Update
+        await adminApiClient.put(`/admin/procurements/${editData.id}`, payload);
+        toast.success('Pengadaan berhasil diupdate');
+      } else {
+        // Create
+        await adminApiClient.post('/admin/procurements', payload);
+        toast.success('Pengadaan berhasil dibuat');
+      }
+      setShowFormModal(false);
+      setEditData(null);
       fetchProcurements();
     } catch (err) {
-      console.error('Create procurement error', err);
-      toast.error(err?.response?.data?.message || 'Gagal membuat pengadaan');
+      console.error('Submit procurement error', err);
+      toast.error(err?.response?.data?.message || 'Gagal menyimpan pengadaan');
     } finally {
-      setCreating(false);
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleApprove = async (procurementId) => {
+    if (!window.confirm('Apakah Anda yakin ingin menyetujui pengadaan ini?')) return;
+
+    try {
+      await adminApiClient.put(`/admin/procurements/${procurementId}/approve`);
+      toast.success('Pengadaan berhasil disetujui');
+      setShowDetailModal(false);
+      fetchProcurements();
+    } catch (err) {
+      console.error('Approve error', err);
+      toast.error(err?.response?.data?.message || 'Gagal menyetujui pengadaan');
+    }
+  };
+
+  const handleReject = async (procurementId) => {
+    const reason = window.prompt('Masukkan alasan penolakan:');
+    if (!reason) return;
+
+    try {
+      await adminApiClient.put(`/admin/procurements/${procurementId}/reject`, {
+        rejection_reason: reason,
+      });
+      toast.success('Pengadaan berhasil ditolak');
+      setShowDetailModal(false);
+      fetchProcurements();
+    } catch (err) {
+      console.error('Reject error', err);
+      toast.error(err?.response?.data?.message || 'Gagal menolak pengadaan');
+    }
+  };
+
+  const handleDelete = async (procurementId) => {
+    const reason = window.prompt('Masukkan alasan penghapusan (opsional):');
+    if (reason === null) return; // User cancelled
+
+    try {
+      await adminApiClient.delete(`/admin/procurements/${procurementId}`, {
+        data: { reason: reason || 'Dihapus oleh admin' },
+      });
+      toast.success('Pengadaan berhasil dihapus');
+      setShowDetailModal(false);
+      fetchProcurements();
+    } catch (err) {
+      console.error('Delete error', err);
+      toast.error(err?.response?.data?.message || 'Gagal menghapus pengadaan');
+    }
+  };
+
+  const handleRestore = async (procurementId) => {
+    if (!window.confirm('Apakah Anda yakin ingin memulihkan pengadaan ini?')) return;
+
+    try {
+      await adminApiClient.post(`/admin/procurements/${procurementId}/restore`);
+      toast.success('Pengadaan berhasil dipulihkan');
+      setShowDetailModal(false);
+      fetchProcurements();
+    } catch (err) {
+      console.error('Restore error', err);
+      toast.error(err?.response?.data?.message || 'Gagal memulihkan pengadaan');
     }
   };
 
   const formatCurrency = (value) => {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value || 0);
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(value || 0);
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '-';
+    return new Date(dateStr).toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
   };
 
   const getStatusBadge = (status) => {
-    if (!status) return <span className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">-</span>;
+    if (!status)
+      return (
+        <span className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">-</span>
+      );
     if (status === 'approved') {
-      return <span className="px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full"></span>Disetujui</span>;
+      return (
+        <span className="px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full flex items-center gap-1">
+          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+          Disetujui
+        </span>
+      );
     }
     if (status === 'rejected') {
-      return <span className="px-3 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">Ditolak</span>;
+      return (
+        <span className="px-3 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full flex items-center gap-1">
+          <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+          Ditolak
+        </span>
+      );
     }
-    return <span className="px-3 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full">Menunggu</span>;
+    return (
+      <span className="px-3 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full flex items-center gap-1">
+        <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+        Menunggu
+      </span>
+    );
+  };
+
+  const getTypeBadge = (type) => {
+    if (type === 'online') {
+      return <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded">Online</span>;
+    }
+    return <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded">Offline</span>;
   };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       <AdminSidebarNew />
       <div className="flex-1">
-        <AdminHeaderNew title="Procurement" subtitle="Kelola pengadaan barang" />
+        <AdminHeaderNew title="Procurement Management" subtitle="Kelola pengadaan barang" />
 
         <div className="p-6">
           {/* Stats Cards */}
@@ -207,7 +299,7 @@ const ProcurementList = () => {
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Menunggu</p>
+                  <p className="text-sm text-gray-600 mb-1">Menunggu Approval</p>
                   <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
                 </div>
                 <div className="p-3 bg-yellow-100 rounded-lg">
@@ -247,7 +339,7 @@ const ProcurementList = () => {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <h2 className="text-xl font-bold text-gray-900">Daftar Pengadaan</h2>
                 <button
-                  onClick={() => setShowCreateModal(true)}
+                  onClick={handleCreate}
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
                 >
                   <PlusIcon className="w-5 h-5" />
@@ -258,13 +350,13 @@ const ProcurementList = () => {
 
             {/* Filters */}
             <div className="p-6 border-b border-gray-200 bg-gray-50">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div className="md:col-span-2">
                   <div className="relative">
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
-                      placeholder="Cari supplier atau produk..."
+                      placeholder="Cari kode, supplier..."
                       value={searchQuery}
                       onChange={(e) => {
                         setSearchQuery(e.target.value);
@@ -273,6 +365,22 @@ const ProcurementList = () => {
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => {
+                      setStatusFilter(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Semua Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
                 </div>
 
                 <div>
@@ -290,11 +398,27 @@ const ProcurementList = () => {
                   </select>
                 </div>
 
-                <div>
-                  <div className="flex gap-2">
-                    <input type="date" value={startDate} onChange={(e) => { setStartDate(e.target.value); setCurrentPage(1); }} className="w-full px-3 py-2 border rounded-lg" />
-                    <input type="date" value={endDate} onChange={(e) => { setEndDate(e.target.value); setCurrentPage(1); }} className="w-full px-3 py-2 border rounded-lg" />
-                  </div>
+                <div className="flex gap-2">
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => {
+                      setStartDate(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    placeholder="Dari tanggal"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  />
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => {
+                      setEndDate(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    placeholder="Sampai tanggal"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  />
                 </div>
               </div>
             </div>
@@ -305,145 +429,144 @@ const ProcurementList = () => {
               ) : error ? (
                 <div className="p-8 text-center text-red-600">{error}</div>
               ) : procurements.length === 0 ? (
-                <div className="p-8 text-center text-gray-600">Belum ada data pengadaan</div>
+                <div className="p-8 text-center text-gray-600">
+                  <CubeIcon className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                  <p>Belum ada data pengadaan</p>
+                </div>
               ) : (
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipe</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Biaya</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Kode Procurement
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Tanggal
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Jenis
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Supplier
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Total Nilai
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Dibuat Oleh
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                        Aksi
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {procurements.map((p) => {
-                      const totalCost = (p.items || []).reduce((s, it) => s + (Number(it.unit_price || 0) * Number(it.quantity || 0)), 0);
-                      return (
-                        <tr key={p.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{p.procurement_date?.slice(0,10) || p.created_at?.slice(0,10)}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{p.procurement_type}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{p.supplier_name || '-'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{(p.items || []).length} item</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{formatCurrency(totalCost)}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{getStatusBadge(p.status)}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div className="flex items-center justify-end gap-2">
-                              <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="View">
-                                <EyeIcon className="w-5 h-5" />
-                              </button>
-                              <button className="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Edit">
-                                <PencilIcon className="w-5 h-5" />
-                              </button>
-                              <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
-                                <TrashIcon className="w-5 h-5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {procurements.map((p) => (
+                      <tr key={p.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {p.procurement_number}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          {formatDate(p.procurement_date)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          {getTypeBadge(p.procurement_type)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          {p.supplier_name || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {formatCurrency(p.total_amount)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          {getStatusBadge(p.status)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          {p.creator?.full_name || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleViewDetail(p.id)}
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              title="Lihat Detail"
+                            >
+                              <EyeIcon className="w-5 h-5" />
+                            </button>
+                            {p.status === 'pending' && !p.deleted_at && (
+                              <>
+                                <button
+                                  onClick={() => handleEdit(p)}
+                                  className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                  title="Edit"
+                                >
+                                  <PencilIcon className="w-5 h-5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(p.id)}
+                                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                  title="Hapus"
+                                >
+                                  <TrashIcon className="w-5 h-5" />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               )}
             </div>
 
             {!loading && !error && procurements.length > 0 && (
-              <Pagination currentPage={currentPage} totalPages={totalPages} totalItems={totalItems} itemsPerPage={itemsPerPage} onPageChange={(p) => setCurrentPage(p)} />
+              <div className="p-4 border-t border-gray-200">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={(p) => setCurrentPage(p)}
+                />
+              </div>
             )}
           </div>
         </div>
+      </div>
 
-      {/* Create Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white w-full max-w-3xl rounded-lg shadow-lg border">
-            <div className="p-4 border-b flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <TruckIcon className="w-6 h-6 text-green-600" />
-                <h4 className="font-semibold">Buat Pengadaan Baru</h4>
-              </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => setShowCreateModal(false)} className="text-gray-500 hover:text-gray-700">Tutup</button>
-              </div>
-            </div>
-
-            <div className="p-4 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                  <label className="text-sm text-gray-600">Tanggal</label>
-                  <input type="date" value={form.procurement_date} onChange={(e) => setForm(prev => ({ ...prev, procurement_date: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Tipe</label>
-                  <select value={form.procurement_type} onChange={(e) => setForm(prev => ({ ...prev, procurement_type: e.target.value }))} className="w-full px-3 py-2 border rounded-lg">
-                    <option value="online">Online</option>
-                    <option value="offline">Offline</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600">Supplier (opsional)</label>
-                  <input type="text" value={form.supplier_name} onChange={(e) => setForm(prev => ({ ...prev, supplier_name: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <h5 className="font-medium">Items</h5>
-                  <button onClick={addItemRow} className="text-sm text-green-600">+ Tambah Baris</button>
-                </div>
-
-                <div className="space-y-2">
-                  {form.items.map((it, idx) => (
-                    <div key={idx} className="grid grid-cols-1 md:grid-cols-6 gap-2 items-end bg-gray-50 p-3 rounded-md border">
-                      <div className="md:col-span-2">
-                        <label className="text-xs text-gray-500">Produk</label>
-                        <select value={it.product_id} onChange={(e) => handleProductSelect(idx, e.target.value)} className="w-full px-2 py-2 border rounded-lg">
-                          <option value="">-- Pilih produk --</option>
-                          {products.map(p => (
-                            <option key={p.id || p.product_id} value={p.id || p.product_id}>{p.name || p.product_name}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="text-xs text-gray-500">Jumlah</label>
-                        <input type="number" min="0" value={it.quantity} onChange={(e) => updateItem(idx, 'quantity', e.target.value)} className="w-full px-2 py-2 border rounded-lg" />
-                      </div>
-
-                      <div>
-                        <label className="text-xs text-gray-500">Harga / satuan</label>
-                        <input type="number" min="0" value={it.unit_price} onChange={(e) => updateItem(idx, 'unit_price', e.target.value)} className="w-full px-2 py-2 border rounded-lg" />
-                      </div>
-
-                      <div>
-                        <label className="text-xs text-gray-500">Expiry (opsional)</label>
-                        <input type="date" value={it.expiry_date} onChange={(e) => updateItem(idx, 'expiry_date', e.target.value)} className="w-full px-2 py-2 border rounded-lg" />
-                      </div>
-
-                      <div className="md:col-span-1 text-right">
-                        <button onClick={() => removeItemRow(idx)} className="text-sm text-red-600">Hapus</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-600">Total: <span className="font-semibold">{formatCurrency(form.items.reduce((s, it) => s + (Number(it.unit_price) * Number(it.quantity || 0)), 0))}</span></div>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => setShowCreateModal(false)} className="px-4 py-2 border rounded-lg">Batal</button>
-                  <button onClick={handleSubmitCreate} disabled={creating} className="px-4 py-2 bg-green-600 text-white rounded-lg">{creating ? 'Menyimpan...' : 'Simpan Pengadaan'}</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Detail Modal */}
+      {showDetailModal && selectedProcurement && (
+        <ProcurementDetailModal
+          procurement={selectedProcurement}
+          onClose={() => {
+            setShowDetailModal(false);
+            setSelectedProcurement(null);
+          }}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onRestore={handleRestore}
+          userRole={userRole}
+        />
       )}
-    </div>
+
+      {/* Form Modal */}
+      <ProcurementFormModal
+        isOpen={showFormModal}
+        onClose={() => {
+          setShowFormModal(false);
+          setEditData(null);
+        }}
+        onSubmit={handleSubmitForm}
+        products={products}
+        editData={editData}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 };

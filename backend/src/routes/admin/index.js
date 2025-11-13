@@ -19,6 +19,7 @@ const userRoutes = require("./users");
 const orderRoutes = require("./orders");
 const customerRoutes = require("./customers");
 const procurementRoutes = require("./procurements");
+const reportRoutes = require("./reports");
 
 /**
  * PUBLIC ADMIN ROUTES (No auth required)
@@ -54,5 +55,8 @@ router.use("/customers", customerRoutes); // /api/admin/customers/*
 
 // Procurement Management
 router.use("/procurements", procurementRoutes); // /api/admin/procurements/*
+
+// Reports & Analytics
+router.use("/reports", reportRoutes); // /api/admin/reports/*
 
 module.exports = router;

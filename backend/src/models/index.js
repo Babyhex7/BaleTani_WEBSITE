@@ -1,3 +1,4 @@
+const { sequelize } = require("../config/database");
 const Admin = require("./admin.model");
 const Role = require("./role.model");
 const Permission = require("./permission.model");
@@ -16,6 +17,7 @@ const OrderItem = require("./orderItem.model");
 const OrderStatusHistory = require("./orderStatusHistory.model");
 const PaymentDetail = require("./paymentDetail.model");
 const StockMovement = require("./stockMovement.model");
+const SoftDeleteLog = require("./softDeleteLog.model");
 
 // =============================
 // ONE-TO-MANY RELATIONSHIPS
@@ -209,7 +211,7 @@ Admin.hasMany(Procurement, {
 });
 Procurement.belongsTo(Admin, {
   foreignKey: "rejected_by",
-  as: "rejecter",
+  as: "rejector",
 });
 
 // User → Orders (created_by, updated_by)
@@ -321,7 +323,18 @@ Product.hasMany(Cart, {
   as: "carts",
 });
 
+// SoftDeleteLog → Admin (deleted_by)
+SoftDeleteLog.belongsTo(Admin, {
+  foreignKey: "deleted_by",
+  as: "deleter",
+});
+Admin.hasMany(SoftDeleteLog, {
+  foreignKey: "deleted_by",
+  as: "deletedRecords",
+});
+
 module.exports = {
+  sequelize,
   Admin,
   Role,
   Permission,
@@ -340,6 +353,7 @@ module.exports = {
   OrderStatusHistory,
   PaymentDetail,
   StockMovement,
+  SoftDeleteLog,
   // Legacy exports for backward compatibility
   User: Admin,
 };

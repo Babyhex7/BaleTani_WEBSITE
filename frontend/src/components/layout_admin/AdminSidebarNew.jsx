@@ -68,13 +68,9 @@ const AdminSidebarNew = () => {
       ]
     },
     {
-      name: 'Reports & Insights',
-      icon: ChartBarIcon,
-      key: 'reports',
-      submenu: [
-        { name: 'Sales Report', path: '/admin/reports/sales' },
-        { name: 'Inventory Report', path: '/admin/reports/inventory' },
-      ]
+      name: 'Reports & Analytics',
+      path: '/admin/reports',
+      icon: ChartBarIcon
     },
   ];
 

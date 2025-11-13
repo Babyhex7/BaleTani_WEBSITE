@@ -14,9 +14,14 @@ const Procurement = sequelize.define(
       allowNull: false,
       unique: true
     },
+    procurement_type: {
+      type: DataTypes.ENUM("online", "offline"),
+      allowNull: false,
+      defaultValue: "online"
+    },
     supplier_name: {
       type: DataTypes.STRING(150),
-      allowNull: false
+      allowNull: true
     },
     procurement_date: {
       type: DataTypes.DATEONLY,
@@ -67,12 +72,21 @@ const Procurement = sequelize.define(
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
       allowNull: false
+    },
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    deleted_by: {
+      type: DataTypes.UUID,
+      allowNull: true
     }
     },
   {
     tableName: "procurements",
     timestamps: false,
-    paranoid: false,
+    paranoid: true,
+    deletedAt: 'deleted_at',
     underscored: true
   }
 );
