@@ -114,17 +114,29 @@ const ProductDetailPage = () => {
     setTimeout(() => setQuantity(1), 500);
   };
 
-  // ✅ Handle buy now - Use hook + navigate
-  const handleBuyNow = () => {
-    // Call hook handler
-    hookHandleAddToCart(product, quantity, false)(); // Call returned function
-    
-    // Navigate after successful add (delay untuk toast muncul)
-    setTimeout(() => {
-      if (isAuthenticated) {
-        navigate('/cart');
-      }
-    }, 800);
+  // ✅ Handle buy now - Direct redirect, no toast
+  const handleBuyNow = async () => {
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    if (product.stock === 0) {
+      toast.error('Produk habis');
+      return;
+    }
+
+    try {
+      // Add to cart silently (no toast)
+      // Parameters: (product, quantity, stopPropagation, silent)
+      await hookHandleAddToCart(product, quantity, false, true)(); // silent = true
+      
+      // Redirect immediately to cart
+      navigate('/cart');
+    } catch (error) {
+      console.error('Error buy now:', error);
+      toast.error('Gagal menambahkan ke keranjang');
+    }
   };
 
   if (loading) {

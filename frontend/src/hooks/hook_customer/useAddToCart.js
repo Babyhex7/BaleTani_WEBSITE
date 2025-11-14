@@ -90,6 +90,7 @@ const useAddToCart = () => {
    * @param {String} product.image - Product image URL
    * @param {Number} quantity - Jumlah produk yang ingin ditambahkan (default: 1)
    * @param {Boolean} stopPropagation - Stop event bubbling ke parent (default: true)
+   * @param {Boolean} silent - Jika true, tidak tampilkan toast success (default: false)
    *
    * @returns {Function} Event handler function
    *
@@ -99,9 +100,14 @@ const useAddToCart = () => {
    * 3. Validasi stock availability
    * 4. Validasi quantity vs stock
    * 5. Add to cart via Zustand store
-   * 6. Show success/error notification
+   * 6. Show success/error notification (kecuali silent mode)
    */
-  const handleAddToCart = (product, quantity = 1, stopPropagation = true) => {
+  const handleAddToCart = (
+    product,
+    quantity = 1,
+    stopPropagation = true,
+    silent = false
+  ) => {
     // Return event handler function
     return async (e) => {
       // ========================================
@@ -124,7 +130,9 @@ const useAddToCart = () => {
         console.log(
           `⚠️ Spam click detected! Blocked. (${timeSinceLastClick}ms since last click)`
         );
-        toast.error("Terlalu cepat! Tunggu sebentar...", { duration: 1000 });
+        if (!silent) {
+          toast.error("Terlalu cepat! Tunggu sebentar...", { duration: 1000 });
+        }
         return;
       }
 
@@ -269,17 +277,22 @@ const useAddToCart = () => {
         addItem(product, quantity);
 
         // ========================================
-        // SUCCESS NOTIFICATION
+        // SUCCESS NOTIFICATION (Skip if silent mode)
         // ========================================
-        // Format pesan sesuai quantity
-        const message =
-          quantity === 1
-            ? `${product.name} ditambahkan ke keranjang!`
-            : `${product.name} (${quantity}x) ditambahkan ke keranjang!`;
+        if (!silent) {
+          // Format pesan sesuai quantity
+          const message =
+            quantity === 1
+              ? `${product.name} ditambahkan ke keranjang!`
+              : `${product.name} (${quantity}x) ditambahkan ke keranjang!`;
 
-        toast.success(message);
+          toast.success(message);
+        }
 
-        console.log("✅ Successfully added to cart");
+        console.log(
+          "✅ Successfully added to cart",
+          silent ? "(silent mode)" : ""
+        );
       } catch (error) {
         // ========================================
         // ERROR HANDLING

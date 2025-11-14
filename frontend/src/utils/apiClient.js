@@ -7,27 +7,60 @@
  *
  * FEATURES:
  * - 15 second timeout untuk semua requests
- * - Auto retry 3x untuk network errors
- * - Exponential backoff (1s, 2s, 3s)
+ * - Auto retry 3x untuk network errors (configurable)
+ * - Exponential backoff dengan jitter (1s, 2s, 4s)
  * - Global error handling
  * - Request/Response interceptors
  * - Token management
+ * - Retry only untuk safe methods (GET, HEAD, OPTIONS) by default
+ * - Custom retry config per request
  *
  * USAGE:
  * import apiClient from '@/utils/apiClient';
  *
- * // GET request
+ * // GET request (auto retry)
  * const response = await apiClient.get('/products');
  *
- * // POST request
+ * // POST request (no retry by default)
  * const response = await apiClient.post('/cart', { product_id: 1 });
+ *
+ * // POST with retry enabled
+ * const response = await apiClient.post('/cart', data, {
+ *   retry: true,
+ *   retryCount: 3
+ * });
  *
  * @module apiClient
  * @author BaleTani Development Team
  * @created 2025-11-14
+ * @updated 2025-11-14 - Enhanced retry logic
  */
 
 import axios from "axios";
+
+/**
+ * Default retry configuration
+ */
+const DEFAULT_RETRY_CONFIG = {
+  retries: 3,
+  retryDelay: 1000, // Base delay in ms
+  retryCondition: (error) => {
+    // Retry on network errors or 5xx server errors
+    return (
+      error.code === "ECONNABORTED" ||
+      error.code === "ERR_NETWORK" ||
+      error.code === "ETIMEDOUT" ||
+      error.code === "ENOTFOUND" ||
+      (error.response &&
+        error.response.status >= 500 &&
+        error.response.status <= 599)
+    );
+  },
+  shouldRetryMethod: (method) => {
+    // Only retry safe methods by default
+    return ["get", "head", "options"].includes(method?.toLowerCase());
+  },
+};
 
 /**
  * Create axios instance dengan config default
