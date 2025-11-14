@@ -21,27 +21,32 @@
 ## 🚦 **Rate Limiting**
 
 ### **Implementation Files**
+
 - `backend/src/middlewares/rateLimiter.middleware.js`
 - Applied in: `customerAuth.routes.js`, `adminAuth.routes.js`
 
 ### **Rate Limiters**
 
 #### 1️⃣ **Login Rate Limiter** (CRITICAL)
+
 ```javascript
 // Max 5 login attempts per 15 minutes per IP
-loginLimiter
+loginLimiter;
 ```
 
 **Applied to:**
+
 - `/api/customer/auth/login`
 - `/api/admin/auth/login`
 
 **Protection:**
+
 - ✅ Prevent brute force attacks
 - ✅ Block automated login attempts
 - ✅ Track by IP + phone number/username
 
 **Response when exceeded:**
+
 ```json
 {
   "success": false,
@@ -52,49 +57,59 @@ loginLimiter
 ```
 
 #### 2️⃣ **Register Rate Limiter**
+
 ```javascript
 // Max 3 registrations per hour per IP
-registerLimiter
+registerLimiter;
 ```
 
 **Applied to:**
+
 - `/api/customer/auth/register`
 
 **Protection:**
+
 - ✅ Prevent spam registrations
 - ✅ Block automated bot registrations
 
 #### 3️⃣ **General API Rate Limiter**
+
 ```javascript
 // Max 100 requests per 15 minutes per IP
-apiLimiter
+apiLimiter;
 ```
 
 **Applied to:**
+
 - All API endpoints (global)
 
 **Protection:**
+
 - ✅ Prevent API abuse
 - ✅ DDoS mitigation
 
 #### 4️⃣ **Sensitive Operations Limiter**
+
 ```javascript
 // Max 3 attempts per hour per IP
-sensitiveLimiter
+sensitiveLimiter;
 ```
 
 **For future use:**
+
 - Password change
 - Account deletion
 - Payment operations
 
 #### 5️⃣ **Upload Limiter**
+
 ```javascript
 // Max 10 uploads per hour per IP
-uploadLimiter
+uploadLimiter;
 ```
 
 **For future use:**
+
 - Product image uploads
 - Profile picture uploads
 
@@ -103,11 +118,13 @@ uploadLimiter
 ## 🧹 **Input Sanitization**
 
 ### **Implementation Files**
+
 - `backend/src/middlewares/sanitize.middleware.js`
 
 ### **Sanitization Functions**
 
 #### **1. sanitizeString(str)**
+
 ```javascript
 // Remove/escape dangerous HTML tags and characters
 const clean = sanitizeString('<script>alert("XSS")</script>Hello');
@@ -115,21 +132,24 @@ const clean = sanitizeString('<script>alert("XSS")</script>Hello');
 ```
 
 **Protections:**
+
 - ✅ Remove `<script>` tags
 - ✅ Escape HTML entities: `<`, `>`, `&`, `"`, `'`, `/`
 - ✅ Trim whitespace
 
 #### **2. sanitizeObject(obj)**
+
 ```javascript
 // Recursively sanitize all string values in object
 const input = {
   name: '<script>alert("XSS")</script>',
-  address: 'Jl. Test <b>Bold</b>'
+  address: "Jl. Test <b>Bold</b>",
 };
 const clean = sanitizeObject(input);
 ```
 
 #### **3. sanitizeSQLInput(str)**
+
 ```javascript
 // Extra protection against SQL injection
 // Note: Sequelize already protects, this is extra layer
@@ -137,6 +157,7 @@ const clean = sanitizeSQLInput("' OR 1=1 --");
 ```
 
 **Protections:**
+
 - ✅ Remove SQL comments (`--`, `/* */`)
 - ✅ Block common injection patterns:
   - `OR 1=1`
@@ -147,21 +168,23 @@ const clean = sanitizeSQLInput("' OR 1=1 --");
 ### **Middleware Usage**
 
 #### **Global Sanitization** (app.js)
+
 ```javascript
 // Sanitize query params for all routes
 app.use(sanitizeQuery);
 ```
 
 #### **Per-Route Sanitization**
+
 ```javascript
 // Sanitize body + query + params
-router.post('/login', sanitizeInput, loginController);
+router.post("/login", sanitizeInput, loginController);
 
 // Sanitize only body
-router.post('/register', sanitizeBody, registerController);
+router.post("/register", sanitizeBody, registerController);
 
 // Sanitize only query
-router.get('/products', sanitizeQuery, productController);
+router.get("/products", sanitizeQuery, productController);
 ```
 
 ---
@@ -171,30 +194,37 @@ router.get('/products', sanitizeQuery, productController);
 ### **Multiple Layers of Defense**
 
 #### **1. Input Sanitization**
+
 - All user input is sanitized before processing
 - HTML tags are escaped or removed
 - Script tags are completely removed
 
 #### **2. Helmet Security Headers**
+
 ```javascript
 // app.js
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  contentSecurityPolicy: false, // Can be configured for production
-}));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: false, // Can be configured for production
+  })
+);
 ```
 
 **Headers added by Helmet:**
+
 - `X-Content-Type-Options: nosniff`
 - `X-Frame-Options: SAMEORIGIN`
 - `X-XSS-Protection: 1; mode=block`
 - `Strict-Transport-Security`
 
 #### **3. Output Encoding** (Frontend)
+
 - React automatically escapes output by default
 - Use `dangerouslySetInnerHTML` only when necessary
 
 #### **4. Content Security Policy** (Future)
+
 ```javascript
 // Production CSP example
 contentSecurityPolicy: {
@@ -214,10 +244,11 @@ contentSecurityPolicy: {
 ### **Sequelize ORM Protection**
 
 #### ✅ **Always Use Parameterized Queries**
+
 ```javascript
 // ✅ SAFE - Sequelize parameterized query
 const user = await User.findOne({
-  where: { phone_number: req.body.phone_number }
+  where: { phone_number: req.body.phone_number },
 });
 
 // ❌ UNSAFE - Raw query without bindings
@@ -226,29 +257,30 @@ const user = await sequelize.query(
 );
 
 // ✅ SAFE - Raw query with bindings
-const user = await sequelize.query(
-  'SELECT * FROM users WHERE phone = ?',
-  { replacements: [req.body.phone] }
-);
+const user = await sequelize.query("SELECT * FROM users WHERE phone = ?", {
+  replacements: [req.body.phone],
+});
 ```
 
 #### ✅ **Input Validation**
+
 ```javascript
 // Always validate input types and formats
-const { body } = require('express-validator');
+const { body } = require("express-validator");
 
 const validateLogin = [
-  body('phone_number')
+  body("phone_number")
     .notEmpty()
     .isLength({ min: 10, max: 15 })
-    .withMessage('Invalid phone number'),
+    .withMessage("Invalid phone number"),
 ];
 ```
 
 #### ✅ **Sanitization Layer**
+
 ```javascript
 // Extra layer of SQL injection protection
-const { sanitizeSQLInput } = require('./middlewares/sanitize.middleware');
+const { sanitizeSQLInput } = require("./middlewares/sanitize.middleware");
 const phone = sanitizeSQLInput(req.body.phone_number);
 ```
 
@@ -259,35 +291,38 @@ const phone = sanitizeSQLInput(req.body.phone_number);
 ### **JWT Token Security**
 
 #### **1. Token Storage**
+
 ```javascript
 // Frontend - localStorage (HttpOnly cookies better for production)
-localStorage.setItem('token', jwtToken);
+localStorage.setItem("token", jwtToken);
 ```
 
 #### **2. Token Expiration**
+
 ```javascript
 // Backend - 24 hour expiration
 const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-  expiresIn: '24h'
+  expiresIn: "24h",
 });
 ```
 
 #### **3. Token Validation**
+
 ```javascript
 // Middleware checks token on every request
 const authenticateCustomer = async (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  
+  const token = req.headers.authorization?.split(" ")[1];
+
   if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
+    return res.status(401).json({ message: "No token provided" });
   }
-  
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.customer = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ message: 'Invalid token' });
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
 ```
@@ -295,6 +330,7 @@ const authenticateCustomer = async (req, res, next) => {
 ### **Password Security**
 
 #### **1. Hashing with bcrypt**
+
 ```javascript
 // Registration - hash password
 const hashedPassword = await bcrypt.hash(password, 10);
@@ -304,11 +340,12 @@ const isMatch = await bcrypt.compare(password, user.password);
 ```
 
 #### **2. Password Requirements**
+
 ```javascript
 // Minimum 6 characters (can be increased)
-body('password')
+body("password")
   .isLength({ min: 6 })
-  .withMessage('Password minimal 6 karakter')
+  .withMessage("Password minimal 6 karakter");
 ```
 
 ---
@@ -318,24 +355,28 @@ body('password')
 ### **DO's**
 
 ✅ **Always sanitize user input**
+
 ```javascript
-router.post('/create', sanitizeInput, createController);
+router.post("/create", sanitizeInput, createController);
 ```
 
 ✅ **Use rate limiters for sensitive endpoints**
+
 ```javascript
-router.post('/login', loginLimiter, sanitizeInput, loginController);
+router.post("/login", loginLimiter, sanitizeInput, loginController);
 ```
 
 ✅ **Validate input with express-validator**
+
 ```javascript
 const validate = [
-  body('email').isEmail(),
-  body('phone').isMobilePhone('id-ID'),
+  body("email").isEmail(),
+  body("phone").isMobilePhone("id-ID"),
 ];
 ```
 
 ✅ **Use HTTPS in production**
+
 ```javascript
 // .env
 NODE_ENV=production
@@ -343,12 +384,14 @@ FRONTEND_URL=https://baletani.com
 ```
 
 ✅ **Keep dependencies updated**
+
 ```bash
 npm audit
 npm update
 ```
 
 ✅ **Use environment variables for secrets**
+
 ```javascript
 // Never commit .env file
 JWT_SECRET=your-super-secret-key-here
@@ -358,6 +401,7 @@ DB_PASSWORD=database-password
 ### **DON'Ts**
 
 ❌ **Never trust user input**
+
 ```javascript
 // Bad
 const name = req.body.name; // Use directly
@@ -367,6 +411,7 @@ const name = sanitizeString(req.body.name);
 ```
 
 ❌ **Never use raw SQL without bindings**
+
 ```javascript
 // Bad
 const query = `SELECT * FROM users WHERE id = ${userId}`;
@@ -376,21 +421,23 @@ const user = await User.findByPk(userId);
 ```
 
 ❌ **Never log sensitive data**
+
 ```javascript
 // Bad
-console.log('Password:', req.body.password);
+console.log("Password:", req.body.password);
 
 // Good
-console.log('Login attempt for user:', req.body.username);
+console.log("Login attempt for user:", req.body.username);
 ```
 
 ❌ **Never expose error details in production**
+
 ```javascript
 // Bad
 res.status(500).json({ error: error.stack });
 
 // Good
-res.status(500).json({ message: 'Internal server error' });
+res.status(500).json({ message: "Internal server error" });
 ```
 
 ---
@@ -400,6 +447,7 @@ res.status(500).json({ message: 'Internal server error' });
 ### **Manual Testing**
 
 #### **1. Test Rate Limiting**
+
 ```bash
 # Test login rate limit (should block after 5 attempts)
 for i in {1..10}; do
@@ -410,6 +458,7 @@ done
 ```
 
 #### **2. Test XSS Protection**
+
 ```bash
 # Try to inject script (should be sanitized)
 curl -X POST http://localhost:5000/api/customer/auth/register \
@@ -422,6 +471,7 @@ curl -X POST http://localhost:5000/api/customer/auth/register \
 ```
 
 #### **3. Test SQL Injection**
+
 ```bash
 # Try SQL injection (should be blocked)
 curl -X POST http://localhost:5000/api/customer/auth/login \
@@ -456,6 +506,7 @@ curl -X POST http://localhost:5000/api/customer/auth/login \
 ## 🚀 **Deployment Security**
 
 ### **Environment Variables**
+
 ```bash
 # .env.production
 NODE_ENV=production
@@ -468,11 +519,13 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
 ### **HTTPS Setup**
+
 - Use Let's Encrypt for free SSL certificates
 - Force HTTPS redirect
 - Enable HSTS header
 
 ### **Server Hardening**
+
 - Keep Node.js updated
 - Use PM2 or similar process manager
 - Enable firewall (UFW, iptables)

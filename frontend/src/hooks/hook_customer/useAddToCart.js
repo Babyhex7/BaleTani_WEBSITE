@@ -62,7 +62,7 @@ const useAddToCart = () => {
 
   // Ref untuk AbortController - prevent race condition
   const abortControllerRef = useRef(null);
-  
+
   // ✅ CRITICAL: Debounce timer untuk prevent spam click
   const debounceTimerRef = useRef(null);
   const lastClickTimeRef = useRef(0);
@@ -118,14 +118,16 @@ const useAddToCart = () => {
       // ========================================
       const currentTime = Date.now();
       const timeSinceLastClick = currentTime - lastClickTimeRef.current;
-      
+
       // ✅ CRITICAL: Block rapid clicks (less than 300ms apart)
       if (timeSinceLastClick < 300) {
-        console.log(`⚠️ Spam click detected! Blocked. (${timeSinceLastClick}ms since last click)`);
+        console.log(
+          `⚠️ Spam click detected! Blocked. (${timeSinceLastClick}ms since last click)`
+        );
         toast.error("Terlalu cepat! Tunggu sebentar...", { duration: 1000 });
         return;
       }
-      
+
       // Update last click time
       lastClickTimeRef.current = currentTime;
 
@@ -214,27 +216,33 @@ const useAddToCart = () => {
       // ========================================
       // ✅ CRITICAL: Check if adding will exceed stock limit
       const cartStore = useCartStore.getState();
-      const existingCartItem = cartStore.items.find(item => item.id === product.id);
-      
+      const existingCartItem = cartStore.items.find(
+        (item) => item.id === product.id
+      );
+
       if (existingCartItem) {
         const newTotalQuantity = existingCartItem.quantity + quantity;
-        
+
         if (newTotalQuantity > product.stock) {
           console.log("⚠️ Adding would exceed stock:", {
             currentInCart: existingCartItem.quantity,
             tryingToAdd: quantity,
             newTotal: newTotalQuantity,
-            maxStock: product.stock
+            maxStock: product.stock,
           });
-          
+
           const remaining = product.stock - existingCartItem.quantity;
-          
+
           if (remaining <= 0) {
-            toast.error(`${product.name} sudah maksimal di keranjang (${product.stock} unit)`);
+            toast.error(
+              `${product.name} sudah maksimal di keranjang (${product.stock} unit)`
+            );
           } else {
-            toast.error(`Hanya bisa menambah ${remaining} unit lagi. Stok maksimal: ${product.stock}`);
+            toast.error(
+              `Hanya bisa menambah ${remaining} unit lagi. Stok maksimal: ${product.stock}`
+            );
           }
-          
+
           return; // Stop execution
         }
       }

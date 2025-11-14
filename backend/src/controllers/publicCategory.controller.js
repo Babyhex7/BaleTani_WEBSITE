@@ -260,7 +260,9 @@ const getCategoryById = async (req, res) => {
         name: productData.name,
         description: productData.description,
         price: parseFloat(productData.selling_price),
-        finalPrice: discountInfo ? discountInfo.finalPrice : parseFloat(productData.selling_price),
+        finalPrice: discountInfo
+          ? discountInfo.finalPrice
+          : parseFloat(productData.selling_price),
         stock: productData.total_stock,
         unit: productData.quantity_info || "unit", // ✅ Added for consistency with publicProduct
         image:

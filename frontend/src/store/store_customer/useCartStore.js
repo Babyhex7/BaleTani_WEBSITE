@@ -33,10 +33,12 @@ const useCartStore = create(
           // ✅ CRITICAL FIX: Enforce stock limit when adding to existing item
           const newQuantity = existingItem.quantity + quantity;
           const maxAllowed = product.stock || existingItem.stock;
-          
+
           // Prevent exceeding stock
           if (newQuantity > maxAllowed) {
-            console.warn(`⚠️ Cannot add more. Stock limit: ${maxAllowed}, Requested: ${newQuantity}`);
+            console.warn(
+              `⚠️ Cannot add more. Stock limit: ${maxAllowed}, Requested: ${newQuantity}`
+            );
             // Set to max stock instead of ignoring
             set({
               items: items.map((item) =>
@@ -47,13 +49,11 @@ const useCartStore = create(
             });
             return; // Stop here
           }
-          
+
           // Update quantity if within stock limit
           set({
             items: items.map((item) =>
-              item.id === product.id
-                ? { ...item, quantity: newQuantity }
-                : item
+              item.id === product.id ? { ...item, quantity: newQuantity } : item
             ),
           });
         } else {

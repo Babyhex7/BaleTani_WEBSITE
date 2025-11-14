@@ -68,13 +68,11 @@ apiClient.interceptors.response.use(
       });
 
       // ✅ Retry logic untuk network errors (max 3 retries)
-      const shouldRetry = 
-        config.__retryCount < 3 && 
-        (
-          code === 'ECONNABORTED' || 
-          code === 'ERR_NETWORK' || 
-          code === 'ETIMEDOUT'
-        );
+      const shouldRetry =
+        config.__retryCount < 3 &&
+        (code === "ECONNABORTED" ||
+          code === "ERR_NETWORK" ||
+          code === "ETIMEDOUT");
 
       if (shouldRetry) {
         config.__retryCount++;
@@ -82,7 +80,9 @@ apiClient.interceptors.response.use(
         console.log(`🔄 Retrying request (${config.__retryCount}/3)...`);
 
         // Exponential backoff: 1s, 2s, 3s
-        await new Promise((resolve) => setTimeout(resolve, 1000 * config.__retryCount));
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1000 * config.__retryCount)
+        );
 
         return apiClient(config);
       }
