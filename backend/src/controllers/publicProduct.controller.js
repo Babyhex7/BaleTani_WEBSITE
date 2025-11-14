@@ -424,10 +424,10 @@ exports.getProductDetail = async (req, res) => {
 
     // Get discount info from ProductDiscount table (pre-calculated)
     let discountInfo = null;
-    
-    console.log('🔍 [DEBUG] Product ID:', productData.id);
-    console.log('🔍 [DEBUG] ProductDiscounts:', productData.productDiscounts);
-    
+
+    console.log("🔍 [DEBUG] Product ID:", productData.id);
+    console.log("🔍 [DEBUG] ProductDiscounts:", productData.productDiscounts);
+
     if (
       productData.productDiscounts &&
       productData.productDiscounts.length > 0
@@ -436,7 +436,7 @@ exports.getProductDetail = async (req, res) => {
         (pd) => pd.discount && pd.discount.is_active
       );
 
-      console.log('🔍 [DEBUG] Active Discount:', activeDiscount);
+      console.log("🔍 [DEBUG] Active Discount:", activeDiscount);
 
       if (activeDiscount?.discount) {
         const discount = activeDiscount.discount;
@@ -467,11 +467,14 @@ exports.getProductDetail = async (req, res) => {
           savingsPercentage: Math.round((savingsAmount / originalPrice) * 100),
           validUntil: discount.end_date,
         };
-        
-        console.log('✅ [DEBUG] Discount Info Created:', discountInfo);
+
+        console.log("✅ [DEBUG] Discount Info Created:", discountInfo);
       }
     } else {
-      console.log('⚠️ [DEBUG] No productDiscounts found for product:', productData.id);
+      console.log(
+        "⚠️ [DEBUG] No productDiscounts found for product:",
+        productData.id
+      );
     }
 
     // Calculate final price with discount

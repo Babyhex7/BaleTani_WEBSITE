@@ -123,7 +123,8 @@ exports.getAllDiscounts = async (req, res) => {
             : parseFloat(product.selling_price);
 
           // Calculate actual discount amount (sudah include max_discount)
-          const actualDiscountAmount = parseFloat(product.selling_price) - discountedPrice;
+          const actualDiscountAmount =
+            parseFloat(product.selling_price) - discountedPrice;
 
           return {
             id: product.id,
@@ -268,7 +269,9 @@ exports.getDiscountById = async (req, res) => {
       discountData.products?.map((product) => {
         const primaryImage = product.images?.[0];
 
-        const discountedPrice = parseFloat(product.ProductDiscount.discounted_price);
+        const discountedPrice = parseFloat(
+          product.ProductDiscount.discounted_price
+        );
         const originalPrice = parseFloat(product.selling_price);
         const actualDiscountAmount = originalPrice - discountedPrice; // Sudah include max_discount
 

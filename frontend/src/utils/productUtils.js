@@ -81,10 +81,12 @@ export const calculateDiscount = (product) => {
     : 0;
 
   // Savings amount: prioritas dari BE, fallback calculate manual
-  const savingsAmount = product?.discount?.savings 
-    ? product.discount.savings 
-    : (hasDiscount ? original - finalP : 0);
-  
+  const savingsAmount = product?.discount?.savings
+    ? product.discount.savings
+    : hasDiscount
+    ? original - finalP
+    : 0;
+
   const maxDiscount = product?.discount?.maxDiscount || null;
 
   // Original discount percentage untuk display badge (dari BE, misal 78%)
@@ -94,7 +96,10 @@ export const calculateDiscount = (product) => {
     if (product?.discount?.percentage && product.discount.percentage > 0) {
       // Priority 1: Gunakan percentage dari BE
       displayPercentage = Math.round(product.discount.percentage);
-    } else if (product?.discount?.value && product?.discount?.type === 'percentage') {
+    } else if (
+      product?.discount?.value &&
+      product?.discount?.type === "percentage"
+    ) {
       // Priority 2: Gunakan value jika type = percentage
       displayPercentage = Math.round(product.discount.value);
     } else {
