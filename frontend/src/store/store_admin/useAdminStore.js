@@ -53,10 +53,10 @@ const useAdminStore = create(
           hasToken: !!token,
           permissionsCount: permissions.length,
         });
-        
+
         // Calculate token expiry (7 days from now for admin)
-        const expiryTime = Date.now() + (7 * 24 * 60 * 60 * 1000); // 7 hari dalam milliseconds
-        
+        const expiryTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 hari dalam milliseconds
+
         set({
           admin,
           token,
@@ -122,14 +122,14 @@ const useAdminStore = create(
       isTokenValid: () => {
         const { token, tokenExpiry } = get();
         if (!token || !tokenExpiry) return false;
-        
+
         const now = Date.now();
         const isValid = now < tokenExpiry;
-        
+
         if (!isValid) {
           console.log("[AdminStore] Token expired, auto logout");
         }
-        
+
         return isValid;
       },
 

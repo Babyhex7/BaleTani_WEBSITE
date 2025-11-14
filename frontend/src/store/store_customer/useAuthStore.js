@@ -37,7 +37,7 @@ const useAuthStore = create(
 
       login: (userData, token) => {
         debugLog("AUTH", "Customer login()", { userData, hasToken: !!token });
-        
+
         // Clear cart jika user berbeda login (atau user baru)
         const currentUser = get().user;
         if (currentUser && currentUser.id !== userData.id) {
@@ -48,10 +48,10 @@ const useAuthStore = create(
           debugLog("AUTH", "New login session, clearing cart");
           useCartStore.getState().clearCart();
         }
-        
+
         // Calculate token expiry (24 hours from now)
-        const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 jam dalam milliseconds
-        
+        const expiryTime = Date.now() + 24 * 60 * 60 * 1000; // 24 jam dalam milliseconds
+
         set({
           user: userData,
           token,
@@ -63,10 +63,10 @@ const useAuthStore = create(
 
       logout: () => {
         debugLog("AUTH", "Customer logout()");
-        
+
         // Clear cart saat logout untuk mencegah cart tercampur antar user
         useCartStore.getState().clearCart();
-        
+
         set({
           user: null,
           token: null,
@@ -84,14 +84,14 @@ const useAuthStore = create(
       isTokenValid: () => {
         const { token, tokenExpiry } = get();
         if (!token || !tokenExpiry) return false;
-        
+
         const now = Date.now();
         const isValid = now < tokenExpiry;
-        
+
         if (!isValid) {
           debugLog("AUTH", "Token expired, auto logout");
         }
-        
+
         return isValid;
       },
 
