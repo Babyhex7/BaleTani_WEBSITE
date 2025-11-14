@@ -13,6 +13,7 @@ import LoginModal from '../../components/ui/LoginModal';
 import Button from '../../components/ui/Button';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
+import useAddToCart from '../../hooks/hook_customer/useAddToCart'; // ✅ Import hook
 import productService from '../../services/services_customer/productService';
 import { getImageUrl as getImageUrlUtil } from '../../utils/imageUtils';
 import { calculateDiscount } from '../../utils/productUtils';
@@ -22,12 +23,19 @@ const ProductDetailPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
   const addItem = useCartStore((state) => state.addItem);
+  
+  // ✅ Use hook untuk consistent validation
+  const { 
+    handleAddToCart: hookHandleAddToCart, 
+    showLoginModal, 
+    setShowLoginModal,
+    isProcessing 
+  } = useAddToCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Fetch product detail
   useEffect(() => {
@@ -92,37 +100,31 @@ const ProductDetailPage = () => {
     }
   };
 
-  // Handle add to cart
+  // ✅ Handle add to cart - Use hook dengan semua validasi
   const handleAddToCart = () => {
-    if (!isAuthenticated) {
-      setShowLoginModal(true);
-      return;
-    }
-
-    if (product.stock === 0) {
-      toast.error('Maaf, produk ini sedang habis stok');
-      return;
-    }
-
-    addItem(product, quantity);
-    toast.success(`${quantity} ${product.name} berhasil ditambahkan ke keranjang!`);
-    setQuantity(1);
+    // Call hook handler yang sudah ada validasi lengkap:
+    // - Debounce (300ms)
+    // - isProcessing check
+    // - Stock availability
+    // - Cart quantity check
+    // - Store stock validation
+    hookHandleAddToCart(product, quantity, false)(); // Call returned function
+    
+    // Reset quantity setelah berhasil (delay sedikit)
+    setTimeout(() => setQuantity(1), 500);
   };
 
-  // Handle buy now
+  // ✅ Handle buy now - Use hook + navigate
   const handleBuyNow = () => {
-    if (!isAuthenticated) {
-      setShowLoginModal(true);
-      return;
-    }
-
-    if (product.stock === 0) {
-      toast.error('Maaf, produk ini sedang habis stok');
-      return;
-    }
-
-    addItem(product, quantity);
-    navigate('/cart');
+    // Call hook handler
+    hookHandleAddToCart(product, quantity, false)(); // Call returned function
+    
+    // Navigate after successful add (delay untuk toast muncul)
+    setTimeout(() => {
+      if (isAuthenticated) {
+        navigate('/cart');
+      }
+    }, 800);
   };
 
   if (loading) {
@@ -367,19 +369,31 @@ const ProductDetailPage = () => {
                 <div className="flex flex-col sm:flex-row gap-3 mt-auto pt-4 border-t border-gray-100">
                   <button
                     onClick={handleAddToCart}
-                    disabled={product.stock === 0}
+                    disabled={product.stock === 0 || isProcessing}
                     className="btn-touch flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-lg bg-green-600 text-white text-sm sm:text-base font-semibold hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    <ShoppingCart size={16} className="sm:w-5 sm:h-5" />
-                    <span className="hidden sm:inline">Tambah ke Keranjang</span>
-                    <span className="sm:hidden">+ Keranjang</span>
+                    {isProcessing ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                        </svg>
+                        <span>Menambahkan...</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart size={16} className="sm:w-5 sm:h-5" />
+                        <span className="hidden sm:inline">Tambah ke Keranjang</span>
+                        <span className="sm:hidden">+ Keranjang</span>
+                      </>
+                    )}
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    disabled={product.stock === 0}
+                    disabled={product.stock === 0 || isProcessing}
                     className="btn-touch flex-1 flex items-center justify-center px-4 sm:px-6 py-3 rounded-lg bg-white border-2 border-green-600 text-green-600 text-sm sm:text-base font-semibold hover:bg-green-50 active:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    Beli Sekarang
+                    {isProcessing ? 'Memproses...' : 'Beli Sekarang'}
                   </button>
                 </div>
               </div>

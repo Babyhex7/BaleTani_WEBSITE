@@ -244,15 +244,8 @@ const CategoryDetailPage = () => {
                   <ProductCard
                     key={product.id}
                     product={{
-                      id: product.id,
-                      name: product.name,
-                      description: product.description,
-                      price: product.price,
-                      unit: product.unit,
-                      stock: product.stock,
-                      images: product.images || [product.image], // Handle both array and single image
+                      ...product,
                       category: category.category_name,
-                      discount: product.discount,
                     }}
                     formatPrice={formatPrice}
                   />

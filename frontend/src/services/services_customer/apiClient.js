@@ -8,7 +8,7 @@ const API_BASE_URL =
 // Create axios instance with improved configuration
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000, // Naik dari 10s ke 30s untuk request yang lebih lambat
+  timeout: 15000, // ✅ 15 second timeout (standardized)
   headers: {
     "Content-Type": "application/json",
   },
@@ -37,13 +37,8 @@ apiClient.interceptors.request.use(
 );
 
 // Response interceptor to handle errors with retry logic
-let retryCount = 0;
-const MAX_RETRIES = 2;
-
 apiClient.interceptors.response.use(
   (response) => {
-    // Reset retry count on success
-    retryCount = 0;
     debugLog(
       "API:RES",
       `${response.config.method?.toUpperCase()} ${response.config.url}`,
@@ -57,6 +52,11 @@ apiClient.interceptors.response.use(
   async (error) => {
     const { response, message, code, config } = error;
 
+    // Initialize retry count per request (not global)
+    if (!config.__retryCount) {
+      config.__retryCount = 0;
+    }
+
     // ========================================
     // Handle Network Errors (Backend Down/CORS)
     // ========================================
@@ -67,15 +67,22 @@ apiClient.interceptors.response.use(
         url: config?.url,
       });
 
-      // Retry logic untuk network errors
-      if (retryCount < MAX_RETRIES && config && !config._retry) {
-        retryCount++;
-        config._retry = true;
+      // ✅ Retry logic untuk network errors (max 3 retries)
+      const shouldRetry = 
+        config.__retryCount < 3 && 
+        (
+          code === 'ECONNABORTED' || 
+          code === 'ERR_NETWORK' || 
+          code === 'ETIMEDOUT'
+        );
 
-        console.log(`🔄 Retrying request (${retryCount}/${MAX_RETRIES})...`);
+      if (shouldRetry) {
+        config.__retryCount++;
 
-        // Exponential backoff: 1s, 2s
-        await new Promise((resolve) => setTimeout(resolve, 1000 * retryCount));
+        console.log(`🔄 Retrying request (${config.__retryCount}/3)...`);
+
+        // Exponential backoff: 1s, 2s, 3s
+        await new Promise((resolve) => setTimeout(resolve, 1000 * config.__retryCount));
 
         return apiClient(config);
       }

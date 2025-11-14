@@ -10,7 +10,7 @@ const adminApiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000,
+  timeout: 15000, // ✅ 15 second timeout (standardized)
 });
 
 // Request interceptor - tambahkan token admin
@@ -33,21 +33,50 @@ adminApiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor - handle errors
+// Response interceptor - handle errors with retry
 adminApiClient.interceptors.response.use(
   (response) => {
     // Response received
     return response;
   },
-  (error) => {
+  async (error) => {
+    const { response, code, config } = error;
+
+    // Initialize retry count per request
+    if (!config.__retryCount) {
+      config.__retryCount = 0;
+    }
+
     console.error("[AdminAPI] Response error:", {
-      url: error.config?.url,
-      status: error.response?.status,
-      message: error.response?.data?.message || error.message,
+      url: config?.url,
+      status: response?.status,
+      message: response?.data?.message || error.message,
+      code,
     });
 
+    // ✅ Retry logic untuk network errors (max 3 retries)
+    if (!response) {
+      const shouldRetry = 
+        config.__retryCount < 3 && 
+        (
+          code === 'ECONNABORTED' || 
+          code === 'ERR_NETWORK' || 
+          code === 'ETIMEDOUT'
+        );
+
+      if (shouldRetry) {
+        config.__retryCount++;
+        console.log(`[AdminAPI] 🔄 Retrying (${config.__retryCount}/3)...`);
+        
+        // Exponential backoff: 1s, 2s, 3s
+        await new Promise((resolve) => setTimeout(resolve, 1000 * config.__retryCount));
+        
+        return adminApiClient(config);
+      }
+    }
+
     // Handle 401 - Unauthorized (token expired atau invalid)
-    if (error.response?.status === 401) {
+    if (response?.status === 401) {
       console.warn("[AdminAPI] Unauthorized - logging out admin");
       const { logout } = useAdminStore.getState();
       logout();
@@ -57,7 +86,7 @@ adminApiClient.interceptors.response.use(
     }
 
     // Handle 403 - Forbidden (tidak punya akses)
-    if (error.response?.status === 403) {
+    if (response?.status === 403) {
       console.warn("[AdminAPI] Forbidden - insufficient permissions");
     }
 

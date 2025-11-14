@@ -30,11 +30,29 @@ const useCartStore = create(
         const existingItem = items.find((item) => item.id === product.id);
 
         if (existingItem) {
-          // Update quantity if item exists
+          // ✅ CRITICAL FIX: Enforce stock limit when adding to existing item
+          const newQuantity = existingItem.quantity + quantity;
+          const maxAllowed = product.stock || existingItem.stock;
+          
+          // Prevent exceeding stock
+          if (newQuantity > maxAllowed) {
+            console.warn(`⚠️ Cannot add more. Stock limit: ${maxAllowed}, Requested: ${newQuantity}`);
+            // Set to max stock instead of ignoring
+            set({
+              items: items.map((item) =>
+                item.id === product.id
+                  ? { ...item, quantity: maxAllowed }
+                  : item
+              ),
+            });
+            return; // Stop here
+          }
+          
+          // Update quantity if within stock limit
           set({
             items: items.map((item) =>
               item.id === product.id
-                ? { ...item, quantity: item.quantity + quantity }
+                ? { ...item, quantity: newQuantity }
                 : item
             ),
           });

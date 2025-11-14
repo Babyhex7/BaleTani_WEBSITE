@@ -165,7 +165,15 @@ const AddToCartButton = ({
 
   return (
     <button
-      onClick={onClick}
+      onClick={(e) => {
+        // ✅ CRITICAL FIX: Prevent event bubbling to parent (card navigation)
+        e.stopPropagation();
+        e.preventDefault();
+        // Call original handler
+        if (onClick && !isDisabled) {
+          onClick(e);
+        }
+      }}
       disabled={isDisabled}
       type="button"
       className={`

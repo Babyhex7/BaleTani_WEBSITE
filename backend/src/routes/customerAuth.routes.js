@@ -7,6 +7,8 @@ const {
 } = require("../controllers/customerAuth.controller");
 const { logout } = require("../controllers/customerProfile.controller");
 const { authenticateCustomer } = require("../middlewares/auth.middleware");
+const { loginLimiter, registerLimiter } = require("../middlewares/rateLimiter.middleware");
+const { sanitizeInput } = require("../middlewares/sanitize.middleware");
 
 const router = express.Router();
 
@@ -33,9 +35,9 @@ const validateCustomerLogin = [
   body("password").notEmpty().withMessage("Password wajib diisi"),
 ];
 
-// Customer auth routes
-router.post("/register", validateCustomerRegister, registerCustomer);
-router.post("/login", validateCustomerLogin, loginCustomer);
+// Customer auth routes with security middleware
+router.post("/register", registerLimiter, sanitizeInput, validateCustomerRegister, registerCustomer);
+router.post("/login", loginLimiter, sanitizeInput, validateCustomerLogin, loginCustomer);
 router.get("/profile", authenticateCustomer, getCustomerProfile);
 router.post("/logout", authenticateCustomer, logout);
 

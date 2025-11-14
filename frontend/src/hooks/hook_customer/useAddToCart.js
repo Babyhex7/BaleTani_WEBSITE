@@ -22,7 +22,7 @@
  * @created 2025-11-12
  */
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import toast from "react-hot-toast";
 import useAuthStore from "../../store/store_customer/useAuthStore";
 import useCartStore from "../../store/store_customer/useCartStore";
@@ -59,6 +59,13 @@ const useAddToCart = () => {
 
   // State untuk tracking proses add to cart (loading state)
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Ref untuk AbortController - prevent race condition
+  const abortControllerRef = useRef(null);
+  
+  // ✅ CRITICAL: Debounce timer untuk prevent spam click
+  const debounceTimerRef = useRef(null);
+  const lastClickTimeRef = useRef(0);
 
   // ========================================
   // ZUSTAND STORES
@@ -104,6 +111,39 @@ const useAddToCart = () => {
       if (stopPropagation && e) {
         e.stopPropagation();
         e.preventDefault();
+      }
+
+      // ========================================
+      // STEP 0.5: PREVENT SPAM CLICK (DEBOUNCE)
+      // ========================================
+      const currentTime = Date.now();
+      const timeSinceLastClick = currentTime - lastClickTimeRef.current;
+      
+      // ✅ CRITICAL: Block rapid clicks (less than 300ms apart)
+      if (timeSinceLastClick < 300) {
+        console.log(`⚠️ Spam click detected! Blocked. (${timeSinceLastClick}ms since last click)`);
+        toast.error("Terlalu cepat! Tunggu sebentar...", { duration: 1000 });
+        return;
+      }
+      
+      // Update last click time
+      lastClickTimeRef.current = currentTime;
+
+      // ========================================
+      // STEP 0.6: PREVENT RACE CONDITION
+      // ========================================
+      // Cancel previous request if user spam-click
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      // Create new AbortController for this request
+      abortControllerRef.current = new AbortController();
+
+      // Prevent duplicate processing
+      if (isProcessing) {
+        console.log("⚠️ Already processing, ignoring duplicate request");
+        return;
       }
 
       // ========================================
@@ -170,16 +210,47 @@ const useAddToCart = () => {
       }
 
       // ========================================
+      // STEP 4.5: VALIDASI CURRENT CART QUANTITY
+      // ========================================
+      // ✅ CRITICAL: Check if adding will exceed stock limit
+      const cartStore = useCartStore.getState();
+      const existingCartItem = cartStore.items.find(item => item.id === product.id);
+      
+      if (existingCartItem) {
+        const newTotalQuantity = existingCartItem.quantity + quantity;
+        
+        if (newTotalQuantity > product.stock) {
+          console.log("⚠️ Adding would exceed stock:", {
+            currentInCart: existingCartItem.quantity,
+            tryingToAdd: quantity,
+            newTotal: newTotalQuantity,
+            maxStock: product.stock
+          });
+          
+          const remaining = product.stock - existingCartItem.quantity;
+          
+          if (remaining <= 0) {
+            toast.error(`${product.name} sudah maksimal di keranjang (${product.stock} unit)`);
+          } else {
+            toast.error(`Hanya bisa menambah ${remaining} unit lagi. Stok maksimal: ${product.stock}`);
+          }
+          
+          return; // Stop execution
+        }
+      }
+
+      // ========================================
       // STEP 5: ADD TO CART
       // ========================================
       try {
-        // Set loading state
+        // Set loading state IMMEDIATELY before any async operation
         setIsProcessing(true);
 
         console.log("🛒 Adding to cart:", {
           product: product.name,
           quantity,
           stock: product.stock,
+          currentInCart: existingCartItem?.quantity || 0,
         });
 
         // Add item to cart via Zustand store

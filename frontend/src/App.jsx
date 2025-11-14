@@ -4,6 +4,7 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import TokenExpiryChecker from './components/auth/TokenExpiryChecker';
 import AdminTokenExpiryChecker from './components/auth/AdminTokenExpiryChecker';
+import ErrorBoundary from './components/ErrorBoundary';
 import LandingPage from './pages/customer/LandingPage';
 import Home from './pages/customer/Home';
 import Login from './pages/customer/Login';
@@ -39,7 +40,7 @@ import CustomerManagement from './pages/admin/CustomerManagement';
  */
 function App() {
   return (
-    <>
+    <ErrorBoundary>
       {/* Token Expiry Checker - Automatically checks token validity */}
       <TokenExpiryChecker />
       <AdminTokenExpiryChecker />
@@ -327,7 +328,7 @@ function App() {
         </div>
       } />
       </Routes>
-    </>
+    </ErrorBoundary>
   );
 }
 

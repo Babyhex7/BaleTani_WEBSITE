@@ -310,6 +310,129 @@ class CacheService {
       return undefined;
     }
   }
+
+  /**
+   * ========================================
+   * INVALIDATE PRODUCT CACHES
+   * ========================================
+   * 
+   * Hapus semua cache terkait product tertentu
+   * Dipanggil saat: update product, update discount, update stock
+   * 
+   * @param {number} productId - Product ID
+   */
+  invalidateProductCaches(productId) {
+    try {
+      const patterns = [
+        `products:${productId}`, // Product detail
+        'products:*', // All product lists (with pagination)
+        'public:products:*', // Public product lists
+        'home:*', // Home page (featured products)
+      ];
+
+      patterns.forEach(pattern => this.delPattern(pattern));
+      console.log(`[CACHE INVALIDATE] ✅ Product ${productId} caches cleared`);
+    } catch (err) {
+      console.error(`[CACHE ERROR] Invalidate product ${productId}:`, err.message);
+    }
+  }
+
+  /**
+   * ========================================
+   * INVALIDATE CATEGORY CACHES
+   * ========================================
+   * 
+   * Hapus semua cache terkait category tertentu
+   * Dipanggil saat: update category, assign product to category
+   * 
+   * @param {number} categoryId - Category ID
+   */
+  invalidateCategoryCaches(categoryId) {
+    try {
+      const patterns = [
+        `categories:${categoryId}`, // Category detail
+        'categories:*', // All categories
+        `products:category:${categoryId}:*`, // Products in this category
+        'public:categories:*', // Public category lists
+        'home:*', // Home page
+      ];
+
+      patterns.forEach(pattern => this.delPattern(pattern));
+      console.log(`[CACHE INVALIDATE] ✅ Category ${categoryId} caches cleared`);
+    } catch (err) {
+      console.error(`[CACHE ERROR] Invalidate category ${categoryId}:`, err.message);
+    }
+  }
+
+  /**
+   * ========================================
+   * INVALIDATE DISCOUNT CACHES
+   * ========================================
+   * 
+   * Hapus semua cache terkait discount
+   * Dipanggil saat: create/update/delete discount
+   */
+  invalidateDiscountCaches() {
+    try {
+      const patterns = [
+        'discounts:*', // All discounts
+        'products:*', // Product lists (karena ada diskon)
+        'public:products:*', // Public product lists
+        'public:discounts:*', // Public discount lists
+        'home:*', // Home page
+      ];
+
+      patterns.forEach(pattern => this.delPattern(pattern));
+      console.log('[CACHE INVALIDATE] ✅ All discount caches cleared');
+    } catch (err) {
+      console.error('[CACHE ERROR] Invalidate discount:', err.message);
+    }
+  }
+
+  /**
+   * ========================================
+   * INVALIDATE ORDER CACHES
+   * ========================================
+   * 
+   * Hapus cache terkait orders
+   * Dipanggil saat: create order, update order status
+   * 
+   * @param {number} customerId - Customer ID (optional)
+   */
+  invalidateOrderCaches(customerId = null) {
+    try {
+      const patterns = [
+        'orders:*', // All orders
+        'admin:dashboard:*', // Admin dashboard stats
+      ];
+
+      if (customerId) {
+        patterns.push(`orders:customer:${customerId}:*`); // Customer orders
+      }
+
+      patterns.forEach(pattern => this.delPattern(pattern));
+      console.log('[CACHE INVALIDATE] ✅ Order caches cleared');
+    } catch (err) {
+      console.error('[CACHE ERROR] Invalidate order:', err.message);
+    }
+  }
+
+  /**
+   * ========================================
+   * INVALIDATE PUBLIC PRODUCT LIST CACHE
+   * ========================================
+   * 
+   * Hapus semua cache public product lists (semua page)
+   * Dipanggil saat: ada perubahan produk yang visible untuk customer
+   */
+  invalidatePublicProductListCache() {
+    try {
+      this.delPattern('public:products:*');
+      console.log('[CACHE INVALIDATE] ✅ Public product list caches cleared');
+    } catch (err) {
+      console.error('[CACHE ERROR] Invalidate public product list:', err.message);
+    }
+  }
 }
 
 // Export instance (singleton pattern)

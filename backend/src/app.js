@@ -98,6 +98,15 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+// ============================================
+// SECURITY: Input Sanitization
+// ============================================
+// Apply sanitization to all routes (except static files)
+const { sanitizeQuery } = require("./middlewares/sanitize.middleware");
+app.use(sanitizeQuery); // Sanitize query params globally
+
+console.log("🛡️ Input sanitization enabled globally");
+
 // Static file serving for uploads
 const path = require("path");
 app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));

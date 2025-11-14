@@ -180,7 +180,8 @@ const getCategoryById = async (req, res) => {
           model: ProductImage,
           as: "images",
           attributes: ["image_url", "is_primary"],
-          where: { is_primary: true },
+          // ✅ FIX: Don't filter by is_primary, get all images and pick first one
+          // where: { is_primary: true },
           required: false,
         },
         {
@@ -259,7 +260,9 @@ const getCategoryById = async (req, res) => {
         name: productData.name,
         description: productData.description,
         price: parseFloat(productData.selling_price),
+        finalPrice: discountInfo ? discountInfo.finalPrice : parseFloat(productData.selling_price),
         stock: productData.total_stock,
+        unit: productData.quantity_info || "unit", // ✅ Added for consistency with publicProduct
         image:
           productData.images && productData.images.length > 0
             ? productData.images[0].image_url
