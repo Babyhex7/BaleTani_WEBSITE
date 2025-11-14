@@ -210,9 +210,19 @@ exports.getAllProducts = async (req, res) => {
             name: discount.discount_name,
             type: discount.discount_type,
             value: parseFloat(discount.value),
+            percentage:
+              discount.discount_type === "percentage"
+                ? parseFloat(discount.value)
+                : null, // Original % untuk display
+            maxDiscount: discount.max_discount
+              ? parseFloat(discount.max_discount)
+              : null,
             finalPrice: finalPrice,
             originalPrice: originalPrice,
             savings: Math.round(savingsAmount * 100) / 100,
+            savingsPercentage: Math.round(
+              (savingsAmount / originalPrice) * 100
+            ), // Actual % setelah max discount
             validUntil: discount.end_date,
           };
         }
@@ -386,6 +396,7 @@ exports.getProductDetail = async (req, res) => {
                 "discount_name",
                 "discount_type",
                 "value",
+                "max_discount",
                 "start_date",
                 "end_date",
                 "is_active",
@@ -437,9 +448,17 @@ exports.getProductDetail = async (req, res) => {
           name: discount.discount_name,
           type: discount.discount_type,
           value: parseFloat(discount.value),
+          percentage:
+            discount.discount_type === "percentage"
+              ? parseFloat(discount.value)
+              : null,
+          maxDiscount: discount.max_discount
+            ? parseFloat(discount.max_discount)
+            : null,
           finalPrice: finalPrice,
           originalPrice: originalPrice,
           savings: Math.round(savingsAmount * 100) / 100,
+          savingsPercentage: Math.round((savingsAmount / originalPrice) * 100),
           validUntil: discount.end_date,
         };
       }

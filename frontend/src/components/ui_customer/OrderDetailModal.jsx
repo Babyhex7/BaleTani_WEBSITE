@@ -43,18 +43,18 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
     }).format(value);
   };
 
-  // Status timeline mapping
+  // Status timeline mapping dengan Lucide icons
   const getStatusIcon = (status) => {
-    const icons = {
-      'pending_payment': '⏳',
-      'paid': '💳',
-      'processing': '👨‍🍳',
-      'ready_for_pickup': '📦',
-      'out_for_delivery': '🚚',
-      'completed': '✅',
-      'cancelled': '❌'
+    const iconMap = {
+      'pending_payment': { Component: Clock, color: 'text-orange-500', bg: 'bg-orange-100' },
+      'paid': { Component: CheckCircle, color: 'text-green-500', bg: 'bg-green-100' },
+      'processing': { Component: Package, color: 'text-blue-500', bg: 'bg-blue-100' },
+      'ready_for_pickup': { Component: Package, color: 'text-purple-500', bg: 'bg-purple-100' },
+      'out_for_delivery': { Component: MapPin, color: 'text-indigo-500', bg: 'bg-indigo-100' },
+      'completed': { Component: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
+      'cancelled': { Component: AlertCircle, color: 'text-red-500', bg: 'bg-red-100' },
     };
-    return icons[status] || '📝';
+    return iconMap[status] || { Component: Clock, color: 'text-gray-500', bg: 'bg-gray-100' };
   };
 
   const canCancel = ['pending_payment', 'paid'].includes(status);
@@ -91,27 +91,35 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
                 Riwayat Status Pesanan
               </h3>
               <div className="space-y-3">
-                {timeline.map((item, index) => (
-                  <div key={index} className="flex gap-3">
-                    <div className="flex flex-col items-center">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${
-                        index === 0 ? 'bg-green-500' : 'bg-gray-300'
-                      }`}>
-                        {getStatusIcon(item.status)}
+                {timeline
+                  .filter(item => !item.status.startsWith('payment:'))
+                  .map((item, index) => {
+                    const iconData = getStatusIcon(item.status);
+                    const IconComponent = iconData.Component;
+                    return (
+                      <div key={index} className="flex gap-3">
+                        <div className="flex flex-col items-center">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            index === 0 ? iconData.bg + ' ring-2 ring-green-400' : iconData.bg
+                          }`}>
+                            <IconComponent className={`w-5 h-5 ${
+                              index === 0 ? 'text-green-700' : iconData.color
+                            }`} />
+                          </div>
+                          {index < timeline.filter(t => !t.status.startsWith('payment:')).length - 1 && (
+                            <div className="w-0.5 h-8 bg-gray-300 my-1"></div>
+                          )}
+                        </div>
+                        <div className="flex-1 pb-3">
+                          <p className="font-semibold text-gray-900">{formatOrderStatus(item.status)}</p>
+                          <p className="text-sm text-gray-600">{formatDate(item.timestamp)}</p>
+                          {item.notes && (
+                            <p className="text-sm text-gray-700 mt-1 bg-white/50 px-3 py-2 rounded">{item.notes}</p>
+                          )}
+                        </div>
                       </div>
-                      {index < timeline.length - 1 && (
-                        <div className="w-0.5 h-8 bg-gray-300 my-1"></div>
-                      )}
-                    </div>
-                    <div className="flex-1 pb-3">
-                      <p className="font-semibold text-gray-900">{formatOrderStatus(item.status)}</p>
-                      <p className="text-sm text-gray-600">{formatDate(item.timestamp)}</p>
-                      {item.notes && (
-                        <p className="text-sm text-gray-700 mt-1 bg-white/50 px-3 py-2 rounded">{item.notes}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })}
               </div>
             </div>
           )}
@@ -150,9 +158,13 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
               </div>
               <div className="flex gap-2">
                 <span className="font-medium w-32">Metode:</span>
-                <span className="flex items-center gap-1">
-                  {delivery?.method === 'delivery' ? '🚚 Delivery' : '🏪 Pick Up'}
-                  {delivery?.fee > 0 && ` (${formatCurrency(delivery.fee)})`}
+                <span className="flex items-center gap-2">
+                  {delivery?.method === 'delivery' ? (
+                    <><MapPin className="w-4 h-4 text-blue-600" /> <span>Delivery</span></>
+                  ) : (
+                    <><Package className="w-4 h-4 text-green-600" /> <span>Pick Up</span></>
+                  )}
+                  {delivery?.fee > 0 && <span className="text-gray-600">({formatCurrency(delivery.fee)})</span>}
                 </span>
               </div>
               {customer_notes && (
@@ -272,10 +284,14 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Status Pembayaran:</span>
-                <span className={`font-semibold ${
+                <span className={`font-semibold flex items-center gap-1 ${
                   payment?.status === 'paid' ? 'text-green-600' : 'text-orange-600'
                 }`}>
-                  {payment?.status === 'paid' ? '✅ Lunas' : '⏳ Menunggu Pembayaran'}
+                  {payment?.status === 'paid' ? (
+                    <><CheckCircle className="w-4 h-4" /> <span>Lunas</span></>
+                  ) : (
+                    <><Clock className="w-4 h-4" /> <span>Menunggu Pembayaran</span></>
+                  )}
                 </span>
               </div>
               {payment?.paid_at && (

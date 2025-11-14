@@ -96,7 +96,8 @@ const CheckoutPage = () => {
         delivery_address: pickupMethod === 'delivery' ? deliveryAddress : null,
         delivery_notes: deliveryNotes || null,
         payment_method: paymentMethod,
-        bank_name: paymentMethod === 'transfer' ? selectedBank : null, // TAMBAHAN
+        // Bank name hanya untuk transfer/bank_transfer, tidak untuk cash/qris
+        bank_name: (paymentMethod === 'transfer' || paymentMethod === 'bank_transfer') ? selectedBank : null,
         items: items.map((item) => ({
           product_id: item.id,
           quantity: item.quantity,

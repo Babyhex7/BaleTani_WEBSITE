@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter, X } from 'lucide-react';
+import { Search, Filter, X, Clock, CreditCard, Package, MapPin, CheckCircle, AlertCircle } from 'lucide-react';
 
 /**
  * OrderFilters Component
@@ -17,13 +17,13 @@ const OrderFilters = ({
   onReset
 }) => {
   const statusOptions = [
-    { value: '', label: 'Semua Status' },
-    { value: 'pending_payment', label: '⏳ Menunggu Pembayaran' },
-    { value: 'paid', label: '💳 Dibayar' },
-    { value: 'processing', label: '👨‍🍳 Diproses' },
-    { value: 'out_for_delivery', label: '🚚 Dalam Pengiriman' },
-    { value: 'completed', label: '✅ Selesai' },
-    { value: 'cancelled', label: '❌ Dibatalkan' }
+    { value: '', label: 'Semua Status', Icon: null },
+    { value: 'pending_payment', label: 'Menunggu Pembayaran', Icon: Clock },
+    { value: 'paid', label: 'Dibayar', Icon: CreditCard },
+    { value: 'processing', label: 'Diproses', Icon: Package },
+    { value: 'out_for_delivery', label: 'Dalam Pengiriman', Icon: MapPin },
+    { value: 'completed', label: 'Selesai', Icon: CheckCircle },
+    { value: 'cancelled', label: 'Dibatalkan', Icon: AlertCircle }
   ];
 
   const dateRangeOptions = [
@@ -85,17 +85,26 @@ const OrderFilters = ({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Status Pesanan
           </label>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          >
-            {statusOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none bg-white"
+            >
+              {statusOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {filterStatus && statusOptions.find(opt => opt.value === filterStatus)?.Icon && (
+              <div className="absolute right-10 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                {React.createElement(statusOptions.find(opt => opt.value === filterStatus).Icon, {
+                  className: "w-4 h-4 text-gray-500"
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Date Range Filter */}

@@ -164,9 +164,16 @@ const ProductDetailPage = () => {
     : (product?.discount?.finalPrice ?? originalPrice);
   const hasDiscount = computedFinal < originalPrice;
   const finalPrice = computedFinal;
+  
+  // Actual discount percentage (after max discount)
   const discountPercentage = hasDiscount 
     ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100)
     : 0;
+  
+  // Original discount percentage untuk display badge (60%)
+  const displayPercentage = product?.discount?.percentage 
+    ? Math.round(product.discount.percentage) 
+    : discountPercentage;
 
   return (
     <>
@@ -287,7 +294,7 @@ const ProductDetailPage = () => {
                           {formatPrice(product.price)}
                         </span>
                         <span className="px-2 py-1 bg-red-500 text-white text-xs sm:text-sm font-bold rounded">
-                          -{discountPercentage}%
+                          -{displayPercentage}% {/* ✅ Show original % (60%) */}
                         </span>
                       </>
                     )}

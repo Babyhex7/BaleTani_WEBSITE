@@ -121,11 +121,12 @@ const ProductCard = ({
   
   /**
    * Hitung diskon dan harga final
-   * Returns: { hasDiscount, discountPercentage, finalPrice, originalPrice, savingsAmount }
+   * Returns: { hasDiscount, discountPercentage, displayPercentage, finalPrice, originalPrice, savingsAmount, maxDiscount }
    */
   const { 
     hasDiscount, 
     discountPercentage, 
+    displayPercentage, // Original % untuk badge (60%)
     finalPrice, 
     originalPrice 
   } = calculateDiscount(product);
@@ -203,7 +204,7 @@ const ProductCard = ({
       <ProductImage 
         src={product.image}
         alt={product.name}
-        discountPercentage={discountPercentage}
+        discountPercentage={displayPercentage} // ✅ Use original % for badge (60%)
         category={categoryName}
         showBadges={true}
         aspectRatio={"h-[180px] sm:h-[200px]"}

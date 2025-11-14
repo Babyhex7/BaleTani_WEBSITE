@@ -61,16 +61,19 @@ exports.getCustomerOrders = async (req, res) => {
     }
 
     // Sorting
-    let orderBy = [["created_at", "DESC"]]; // Default: newest
+    let orderBy = [["created_at", "DESC"]]; // Default: newest first (terbaru di atas)
     switch (sort) {
+      case "newest":
+        orderBy = [["created_at", "DESC"]]; // Terbaru ke atas
+        break;
       case "oldest":
-        orderBy = [["created_at", "ASC"]];
+        orderBy = [["created_at", "ASC"]]; // Terlama ke atas
         break;
       case "highest":
-        orderBy = [["total_amount", "DESC"]];
+        orderBy = [["total_amount", "DESC"]]; // Tertinggi ke atas
         break;
       case "lowest":
-        orderBy = [["total_amount", "ASC"]];
+        orderBy = [["total_amount", "ASC"]]; // Terendah ke atas
         break;
     }
 
@@ -239,6 +242,8 @@ exports.getOrderDetail = async (req, res) => {
         {
           model: OrderStatusHistory,
           as: "statusHistory",
+          separate: true, // Separate query agar bisa sort
+          order: [["changed_at", "DESC"]], // Terbaru di atas
         },
       ],
     });
@@ -306,13 +311,15 @@ exports.getOrderDetail = async (req, res) => {
         total: parseFloat(order.total_amount || 0),
       },
 
-      // Status history timeline
+      // Status history timeline (filter out payment status changes)
       timeline:
-        order.statusHistory?.map((history) => ({
-          status: history.new_status,
-          timestamp: history.changed_at || history.created_at,
-          notes: history.notes,
-        })) || [],
+        order.statusHistory
+          ?.filter((history) => !history.new_status.startsWith("payment:"))
+          .map((history) => ({
+            status: history.new_status,
+            timestamp: history.changed_at || history.created_at,
+            notes: history.notes,
+          })) || [],
 
       // Notes
       customer_notes: order.delivery_notes,

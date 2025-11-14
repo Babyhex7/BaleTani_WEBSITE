@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Package, Tag, Gift, Users, ShoppingCart, DollarSign, FileText, LogOut, Leaf } from 'lucide-react';
 import useAdminStore from '../../store/store_admin/useAdminStore';
 
 /**
@@ -16,42 +17,42 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
     {
       id: 'dashboard',
       label: 'Dashboard',
-      icon: '📊',
+      icon: LayoutDashboard,
       path: '/admin/dashboard',
       description: 'Ringkasan dan statistik'
     },
     {
       id: 'products',
       label: 'Products',
-      icon: '📦',
+      icon: Package,
       path: '/admin/products',
       description: 'Manajemen Produk'
     },
     {
       id: 'categories',
       label: 'Categories',
-      icon: '🏷️',
+      icon: Tag,
       path: '/admin/categories',
       description: 'Manajemen Kategori'
     },
     {
       id: 'discounts',
       label: 'Discount Management',
-      icon: '🎁',
+      icon: Gift,
       path: '/admin/discounts',
       description: 'Kelola Diskon & Promo'
     },
     {
       id: 'users',
       label: 'User Management',
-      icon: '👥',
+      icon: Users,
       path: '/admin/users',
       description: 'Kelola Pengguna'
     },
     {
       id: 'orders',
       label: 'Order Management',
-      icon: '🛒',
+      icon: ShoppingCart,
       path: '/admin/orders',
       description: 'Kelola Pesanan',
       comingSoon: true
@@ -59,7 +60,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
     {
       id: 'accounting',
       label: 'Akuntansi',
-      icon: '💰',
+      icon: DollarSign,
       path: '/admin/accounting',
       description: 'Laporan Keuangan',
       comingSoon: true
@@ -67,7 +68,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
     {
       id: 'reports',
       label: 'Reports',
-      icon: '📋',
+      icon: FileText,
       path: '/admin/reports',
       description: 'Laporan & Analitik',
       comingSoon: true
@@ -98,8 +99,9 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between h-16 px-6 bg-green-600 text-white">
-            <div className="flex items-center">
-              <span className="text-xl font-bold">🌾 BaleTani</span>
+            <div className="flex items-center gap-2">
+              <Leaf className="w-6 h-6" />
+              <span className="text-xl font-bold">BaleTani</span>
             </div>
             <button
               onClick={() => setIsOpen(false)}
@@ -134,7 +136,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
               <div key={item.id}>
                 {item.comingSoon ? (
                   <div className="flex items-center px-4 py-3 text-sm text-gray-400 rounded-lg cursor-not-allowed">
-                    <span className="mr-3 text-lg">{item.icon}</span>
+                    <item.icon className="mr-3 w-5 h-5" />
                     <div className="flex-1">
                       <div className="font-medium">{item.label}</div>
                       <div className="text-xs">Coming Soon</div>
@@ -150,7 +152,9 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
                     }`}
                     onClick={() => setIsOpen(false)}
                   >
-                    <span className="mr-3 text-lg">{item.icon}</span>
+                    <item.icon className={`mr-3 w-5 h-5 ${
+                      isActive(item.path) ? 'text-green-700' : 'text-gray-600'
+                    }`} />
                     <div className="flex-1">
                       <div className="font-medium">{item.label}</div>
                       <div className="text-xs text-gray-500">{item.description}</div>
@@ -167,7 +171,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
               onClick={handleLogout}
               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <span className="mr-3 text-lg">🚪</span>
+              <LogOut className="mr-3 w-5 h-5 text-red-600" />
               <span>Logout</span>
             </button>
           </div>

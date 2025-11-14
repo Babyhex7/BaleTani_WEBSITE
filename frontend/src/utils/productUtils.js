@@ -44,9 +44,11 @@ export const calculateDiscount = (product) => {
     return {
       hasDiscount: false,
       discountPercentage: 0,
+      displayPercentage: 0, // Original % untuk badge (60%)
       finalPrice: 0,
       originalPrice: 0,
       savingsAmount: 0,
+      maxDiscount: null,
     };
   }
 
@@ -55,6 +57,7 @@ export const calculateDiscount = (product) => {
   // - product.finalPrice (opsional, dihitung BE)
   // - product.discount.finalPrice (opsional, dihitung BE)
   // - product.discount.originalPrice (opsional)
+  // - product.discount.percentage (original % untuk display badge seperti Shopee)
   const original =
     typeof product?.discount?.originalPrice === "number"
       ? product.discount.originalPrice
@@ -72,18 +75,27 @@ export const calculateDiscount = (product) => {
 
   const hasDiscount = finalP < original;
 
-  const discountPercentage = hasDiscount
+  // Actual discount percentage (after max discount applied)
+  const actualPercentage = hasDiscount
     ? Math.round(((original - finalP) / original) * 100)
     : 0;
 
+  // Original discount percentage untuk display badge (dari BE, misal 60%)
+  const displayPercentage = product?.discount?.percentage
+    ? Math.round(product.discount.percentage)
+    : actualPercentage;
+
   const savingsAmount = hasDiscount ? original - finalP : 0;
+  const maxDiscount = product?.discount?.maxDiscount || null;
 
   return {
     hasDiscount,
-    discountPercentage,
+    discountPercentage: actualPercentage, // Actual % after max discount
+    displayPercentage, // Original % untuk badge (60%)
     finalPrice: finalP,
     originalPrice: original,
     savingsAmount,
+    maxDiscount,
   };
 };
 

@@ -369,13 +369,39 @@ const updateOrderStatus = async (req, res) => {
     // Update order
     await order.update(updateData);
 
-    // Log status change to history
+    // Update PaymentDetail if payment_status changed
+    if (payment_status && payment_status !== oldPaymentStatus) {
+      await PaymentDetail.update(
+        {
+          payment_status: payment_status,
+          updated_at: getWIBDate(),
+          ...(payment_status === "paid" && { paid_at: getWIBDate() }),
+        },
+        {
+          where: { order_id: id },
+        }
+      );
+    }
+
+    // Log status change to history (untuk ORDER status)
     if (order_status && order_status !== oldOrderStatus) {
       await OrderStatusHistory.create({
         order_id: id,
         old_status: oldOrderStatus,
         new_status: order_status,
         notes: notes || null,
+        changed_by: adminId,
+        changed_at: getWIBDate(),
+      });
+    }
+
+    // Log payment status change to history (TAMBAHAN)
+    if (payment_status && payment_status !== oldPaymentStatus) {
+      await OrderStatusHistory.create({
+        order_id: id,
+        old_status: `payment:${oldPaymentStatus}`,
+        new_status: `payment:${payment_status}`,
+        notes: notes || `Status pembayaran diubah menjadi ${payment_status}`,
         changed_by: adminId,
         changed_at: getWIBDate(),
       });
