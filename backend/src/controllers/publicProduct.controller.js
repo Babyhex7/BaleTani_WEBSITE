@@ -80,7 +80,7 @@ exports.getAllProducts = async (req, res) => {
     const whereConditions = {
       is_active: true,
       product_type: "online", // Only show online products to customers
-      total_stock: { [Op.gt]: 0 }, // Only products with stock
+      // NOTE: Tidak filter total_stock agar produk habis tetap tampil dengan badge "HABIS"
       selling_price: {
         [Op.between]: [parseFloat(minPrice), parseFloat(maxPrice)],
       },

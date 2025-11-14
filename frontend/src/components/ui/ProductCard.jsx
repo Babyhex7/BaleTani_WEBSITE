@@ -201,15 +201,25 @@ const ProductCard = ({
           - category: Badge kategori
           - showBadges: Toggle badges
           ======================================== */}
-      <ProductImage 
-        src={product.image}
-        alt={product.name}
-        discountPercentage={displayPercentage} // ✅ Use original % for badge (60%)
-        category={categoryName}
-        showBadges={true}
-        aspectRatio={"h-[180px] sm:h-[200px]"}
-        hoverEffect={"scale"}
-      />
+      <div className="relative">
+        <ProductImage 
+          src={product.image}
+          alt={product.name}
+          discountPercentage={displayPercentage} // ✅ Use original % for badge (60%)
+          category={categoryName}
+          showBadges={true}
+          aspectRatio={"h-[180px] sm:h-[200px]"}
+          hoverEffect={"scale"}
+        />
+        
+        {/* ========================================
+            OUT OF STOCK OVERLAY
+            Overlay hitam transparan jika stock = 0
+            ======================================== */}
+        {product.stock === 0 && (
+          <div className="absolute inset-0 bg-black bg-opacity-60 rounded-t-md sm:rounded-t-lg z-10"></div>
+        )}
+      </div>
       
       {/* ========================================
           PRODUCT INFO SECTION

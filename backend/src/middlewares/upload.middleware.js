@@ -26,13 +26,22 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter - only allow images
+// File filter - only allow images (exclude SVG for security)
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|webp|gif/;
-  const extname = allowedTypes.test(
-    path.extname(file.originalname).toLowerCase()
-  );
+  const blockedTypes = /svg/; // Block SVG (XSS vector)
+
+  const ext = path.extname(file.originalname).toLowerCase();
+  const extname = allowedTypes.test(ext);
   const mimetype = allowedTypes.test(file.mimetype);
+
+  // Explicitly block SVG
+  if (blockedTypes.test(ext) || file.mimetype === "image/svg+xml") {
+    return cb(
+      new Error("File SVG tidak diperbolehkan karena alasan keamanan"),
+      false
+    );
+  }
 
   if (extname && mimetype) {
     cb(null, true);
@@ -52,6 +61,7 @@ const upload = multer({
   fileFilter: fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB max per file
+    files: 5, // Max 5 files per request
   },
 });
 

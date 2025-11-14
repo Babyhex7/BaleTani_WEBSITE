@@ -214,11 +214,35 @@ const OrderManagement = () => {
 
   // Load data on mount dan ketika filters/page berubah (with debounced search)
   useEffect(() => {
-    fetchOrders();
+    let isMounted = true;
+    
+    const loadOrders = async () => {
+      if (isMounted) {
+        await fetchOrders();
+      }
+    };
+    
+    loadOrders();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [currentPage, limit, filters.order_status, filters.payment_status, filters.order_type, filters.payment_method, filters.delivery_method, filters.date_from, filters.date_to, debouncedSearch, useDummyData]);
 
   useEffect(() => {
-    fetchStatistics();
+    let isMounted = true;
+    
+    const loadStats = async () => {
+      if (isMounted) {
+        await fetchStatistics();
+      }
+    };
+    
+    loadStats();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [filters.date_from, filters.date_to, useDummyData]);
 
   // Format currency

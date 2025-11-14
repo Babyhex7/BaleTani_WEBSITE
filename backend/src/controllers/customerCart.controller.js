@@ -286,6 +286,9 @@ exports.addToCart = async (req, res) => {
  * Update cart item quantity
  */
 exports.updateCartItem = async (req, res) => {
+  const { sequelize } = require("../config/database");
+  const transaction = await sequelize.transaction();
+
   try {
     const customerId = req.customer.id;
     const { id } = req.params;
@@ -293,13 +296,14 @@ exports.updateCartItem = async (req, res) => {
 
     // Validate input
     if (!quantity || quantity < 1) {
+      await transaction.rollback();
       return res.status(400).json({
         success: false,
         message: "Valid quantity is required",
       });
     }
 
-    // Find cart item
+    // Find cart item with row lock to prevent race condition
     const cartItem = await Cart.findOne({
       where: {
         id: id,
@@ -312,9 +316,12 @@ exports.updateCartItem = async (req, res) => {
           attributes: ["total_stock", "quantity_info"],
         },
       ],
+      lock: transaction.LOCK.UPDATE,
+      transaction,
     });
 
     if (!cartItem) {
+      await transaction.rollback();
       return res.status(404).json({
         success: false,
         message: "Cart item not found",
@@ -323,6 +330,7 @@ exports.updateCartItem = async (req, res) => {
 
     // Check stock
     if (cartItem.product.total_stock < quantity) {
+      await transaction.rollback();
       return res.status(400).json({
         success: false,
         message: `Not enough stock. Available: ${
@@ -333,7 +341,9 @@ exports.updateCartItem = async (req, res) => {
 
     // Update quantity
     cartItem.quantity = quantity;
-    await cartItem.save();
+    await cartItem.save({ transaction });
+
+    await transaction.commit();
 
     res.status(200).json({
       success: true,
@@ -345,6 +355,7 @@ exports.updateCartItem = async (req, res) => {
       },
     });
   } catch (error) {
+    if (transaction) await transaction.rollback();
     console.error("Error updating cart item:", error);
     res.status(500).json({
       success: false,

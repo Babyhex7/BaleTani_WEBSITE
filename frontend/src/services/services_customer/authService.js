@@ -24,7 +24,7 @@ const authService = {
 
       // Debug: log raw response structure
       if (import.meta.env.VITE_DEBUG_AUTH === "true") {
-        console.log("[DEBUG] Raw login response:", response.data);
+        // Login successful
       }
 
       // Backend returns: { success: true, message: '...', data: { customer: {...}, token: '...' } }

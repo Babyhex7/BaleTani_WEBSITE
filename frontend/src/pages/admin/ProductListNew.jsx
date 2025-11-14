@@ -55,11 +55,35 @@ const ProductListNew = () => {
 
   // Fetch data on mount and filter change (with debounced search)
   useEffect(() => {
-    fetchProducts();
+    let isMounted = true;
+    
+    const loadProducts = async () => {
+      if (isMounted) {
+        await fetchProducts();
+      }
+    };
+    
+    loadProducts();
+    
+    return () => {
+      isMounted = false; // Cleanup to prevent state update on unmounted component
+    };
   }, [currentPage, debouncedSearch, filterType, filterStatus, itemsPerPage]);
 
   useEffect(() => {
-    fetchCategories();
+    let isMounted = true;
+    
+    const loadCategories = async () => {
+      if (isMounted) {
+        await fetchCategories();
+      }
+    };
+    
+    loadCategories();
+    
+    return () => {
+      isMounted = false; // Cleanup
+    };
   }, []);
 
   // API Calls

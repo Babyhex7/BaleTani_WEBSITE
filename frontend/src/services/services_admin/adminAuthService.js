@@ -62,7 +62,7 @@ const adminAuthService = {
    */
   logout: async () => {
     try {
-      console.log("[AdminAuthService] Logout");
+      // Logout
       // Bisa tambahkan call ke backend untuk invalidate token jika perlu
       // await adminApiClient.post('/admin/auth/logout');
       return { success: true };

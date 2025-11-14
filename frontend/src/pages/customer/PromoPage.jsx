@@ -125,7 +125,7 @@ const PromoPage = () => {
             }))
           );
           
-          console.log('📦 [PROMO PAGE] Total products:', productsWithDiscounts.length);
+          // Set products with discounts
           
           setPromoProducts(productsWithDiscounts);
           setFilteredProducts(productsWithDiscounts);
@@ -233,13 +233,13 @@ const PromoPage = () => {
     }
 
     setFilteredProducts(result);
-    console.log('🔍 [PROMO FILTER] Results:', result.length, 'products');
+    // Filter applied
     // reset pagination when filters change
     setCurrentPage(1);
     
     // Debug pagination
     const totalPages = Math.ceil(result.length / itemsPerPage);
-    console.log('📄 [PROMO PAGE] Total products:', result.length, '| Pages:', totalPages, '| Items per page:', itemsPerPage);
+    // Pagination calculated
   }, [promoProducts, debouncedSearch, selectedCategory, selectedDiscount, sortBy, itemsPerPage]);
 
   // ========================================

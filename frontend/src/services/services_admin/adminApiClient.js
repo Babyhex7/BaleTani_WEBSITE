@@ -20,11 +20,7 @@ adminApiClient.interceptors.request.use(
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("[AdminAPI] Request with admin token:", {
-        url: config.url,
-        method: config.method,
-        hasToken: !!token,
-      });
+      // Admin API request
     } else {
       console.warn("[AdminAPI] Request without admin token:", config.url);
     }
@@ -40,11 +36,7 @@ adminApiClient.interceptors.request.use(
 // Response interceptor - handle errors
 adminApiClient.interceptors.response.use(
   (response) => {
-    console.log("[AdminAPI] Response:", {
-      url: response.config.url,
-      status: response.status,
-      data: response.data,
-    });
+    // Response received
     return response;
   },
   (error) => {

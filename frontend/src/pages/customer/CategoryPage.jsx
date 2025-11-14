@@ -95,7 +95,19 @@ const CategoryPage = () => {
       }
     };
 
-    fetchCategories();
+    let isMounted = true;
+    
+    const loadCategories = async () => {
+      if (isMounted) {
+        await fetchCategories();
+      }
+    };
+    
+    loadCategories();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Filter and sort categories (with debounced search)
@@ -127,7 +139,7 @@ const CategoryPage = () => {
     
     // Debug pagination
     const totalPages = Math.ceil(result.length / itemsPerPage);
-    console.log('📄 [CATEGORY PAGE] Total categories:', result.length, '| Pages:', totalPages, '| Items per page:', itemsPerPage);
+    // Pagination calculated
   }, [debouncedSearch, sortBy, categories, itemsPerPage]);
 
   // Handle category click

@@ -61,7 +61,19 @@ const DiscountManagement = () => {
 
   // Fetch data on mount and filter change (with debounced search)
   useEffect(() => {
-    fetchDiscounts();
+    let isMounted = true;
+    
+    const loadDiscounts = async () => {
+      if (isMounted) {
+        await fetchDiscounts();
+      }
+    };
+    
+    loadDiscounts();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [currentPage, debouncedSearch, filterStatus, filterType, itemsPerPage]);
 
   // API Calls

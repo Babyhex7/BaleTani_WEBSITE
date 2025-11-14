@@ -76,7 +76,7 @@ exports.getAllDiscounts = async (req, res) => {
           where: {
             is_active: true,
             product_type: "online", // Only show online products to customers
-            total_stock: { [Op.gt]: 0 },
+            // NOTE: Tidak filter total_stock agar produk habis tetap tampil dengan overlay
           },
           attributes: [
             "id",

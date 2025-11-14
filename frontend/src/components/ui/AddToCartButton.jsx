@@ -147,7 +147,7 @@ const AddToCartButton = ({
     
     // Out of stock state
     if (isOutOfStock) {
-      return 'Habis';
+      return 'Stok Habis';
     }
     
     // Normal state

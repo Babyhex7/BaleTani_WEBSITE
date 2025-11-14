@@ -65,14 +65,14 @@ const ProductPage = () => {
 
   // Handle category filter
   const handleCategoryChange = (categoryId) => {
-    console.log('🔍 Category changed to:', categoryId);
+    // Category filter changed
     setSelectedCategory(categoryId);
     filterByCategory(categoryId);
   };
 
   // Handle sort
   const handleSortChange = (sortValue) => {
-    console.log('🔍 Sort changed to:', sortValue);
+    // Sort changed
     setSelectedSort(sortValue);
     sortProducts(sortValue);
   };

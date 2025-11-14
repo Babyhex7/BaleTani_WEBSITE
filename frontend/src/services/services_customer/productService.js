@@ -31,8 +31,7 @@ const productService = {
         queryParams.append("maxPrice", params.maxPrice);
       if (params.sortBy) queryParams.append("sortBy", params.sortBy);
 
-      console.log("📡 API Request params:", params);
-      console.log("📡 Query string:", queryParams.toString());
+      // Build query params
 
       const response = await apiClient.get(
         `/public/products?${queryParams.toString()}`

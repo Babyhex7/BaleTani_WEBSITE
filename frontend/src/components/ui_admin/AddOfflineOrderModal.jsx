@@ -47,7 +47,7 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
   // Fetch products when modal opens
   useEffect(() => {
     if (isOpen) {
-      console.log('Modal opened, fetching products...');
+      // Fetch products when modal opens
       fetchProducts();
     }
   }, [isOpen]);
@@ -64,12 +64,10 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
         }
       });
       
-      console.log('Fetch products response:', response.data);
       
       if (response.data.success && response.data.data && response.data.data.products) {
         const list = response.data.data.products.filter(p => p.product_type === 'offline');
         setProducts(list);
-        console.log('Offline products loaded:', list.length, list);
         
         if (list.length === 0) {
           toast("Belum ada produk offline. Silakan tambah produk dengan tipe 'offline' terlebih dahulu.", {
