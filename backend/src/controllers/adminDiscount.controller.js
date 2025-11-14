@@ -135,6 +135,7 @@ const getAllDiscounts = async (req, res) => {
         discount_name: discount.discount_name,
         discount_type: discount.discount_type,
         value: discount.value,
+        max_discount: discount.max_discount, // TAMBAHAN: Max potongan untuk percentage
         start_date: discount.start_date,
         end_date: discount.end_date,
         is_active: discount.is_active,
@@ -231,6 +232,7 @@ const getDiscountById = async (req, res) => {
         discount_name: discount.discount_name,
         discount_type: discount.discount_type,
         value: discount.value,
+        max_discount: discount.max_discount, // TAMBAHAN: Max potongan untuk percentage
         start_date: discount.start_date,
         end_date: discount.end_date,
         is_active: discount.is_active,

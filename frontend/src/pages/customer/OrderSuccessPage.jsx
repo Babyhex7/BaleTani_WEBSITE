@@ -236,7 +236,7 @@ const OrderSuccessPage = () => {
           </div>
 
           {/* Payment Instructions - Mobile Responsive */}
-          {orderData.payment_method !== 'tunai' && orderData.payment_method !== 'cash' && (
+          {orderData.payment_method !== 'cash' && orderData.payment_method !== 'tunai' && (
             <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
               <h3 className="heading-sub sm:text-lg text-blue-900 mb-3 sm:mb-4 flex items-center gap-2">
                 <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />

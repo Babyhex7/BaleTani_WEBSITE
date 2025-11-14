@@ -15,6 +15,7 @@ import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
 import productService from '../../services/services_customer/productService';
 import { getImageUrl as getImageUrlUtil } from '../../utils/imageUtils';
+import { calculateDiscount } from '../../utils/productUtils';
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -38,22 +39,26 @@ const ProductDetailPage = () => {
         if (response.success) {
           console.log('✅ Product Detail API Response:', response);
           console.log('📦 Full Product Data:', JSON.stringify(response.data, null, 2));
+          
+          console.log('🔍 DEBUG - Price Info:', {
+            price: response.data.price,
+            finalPrice: response.data.finalPrice,
+            hasPriceDifference: response.data.finalPrice < response.data.price
+          });
+          
           if (response.data.discount) {
             console.log('💰 Discount Info:', {
-              originalPrice: response.data.price,
+              type: response.data.discount.type,
+              value: response.data.discount.value,
+              percentage: response.data.discount.percentage,
+              maxDiscount: response.data.discount.maxDiscount,
+              originalPrice: response.data.discount.originalPrice,
               finalPrice: response.data.discount.finalPrice,
-              discountType: response.data.discount.type,
-              discountValue: response.data.discount.value,
-              savings: response.data.discount.savings
+              savings: response.data.discount.savings,
+              savingsPercentage: response.data.discount.savingsPercentage
             });
-            
-            // Calculate expected values
-            const calculatedSavings = response.data.price - response.data.discount.finalPrice;
-            const calculatedPercentage = Math.round((calculatedSavings / response.data.price) * 100);
-            console.log('🧮 Calculated:', {
-              savings: calculatedSavings,
-              percentage: calculatedPercentage + '%'
-            });
+          } else {
+            console.log('⚠️ NO DISCOUNT OBJECT IN RESPONSE!');
           }
           setProduct(response.data);
         }
@@ -157,23 +162,25 @@ const ProductDetailPage = () => {
     );
   }
 
-  // Prefer harga final dari BE (top-level), fallback ke discount.finalPrice
-  const originalPrice = typeof product?.discount?.originalPrice === 'number' ? product.discount.originalPrice : product.price;
-  const computedFinal = typeof product?.finalPrice === 'number' 
-    ? product.finalPrice 
-    : (product?.discount?.finalPrice ?? originalPrice);
-  const hasDiscount = computedFinal < originalPrice;
-  const finalPrice = computedFinal;
+  // ✅ DISKON SEPERTI SHOPEE: Tampilkan % original (78%), tapi pakai harga dengan max discount
+  // Gunakan logic yang SAMA dengan ProductCard (dari productUtils.js)
+  const { 
+    hasDiscount, 
+    displayPercentage, 
+    finalPrice, 
+    originalPrice,
+    savingsAmount
+  } = calculateDiscount(product);
   
-  // Actual discount percentage (after max discount)
-  const discountPercentage = hasDiscount 
-    ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100)
-    : 0;
-  
-  // Original discount percentage untuk display badge (60%)
-  const displayPercentage = product?.discount?.percentage 
-    ? Math.round(product.discount.percentage) 
-    : discountPercentage;
+  // DEBUG: Log hasil calculation
+  console.log('🔥 ProductDetail - Discount Calculation:', {
+    hasDiscount,
+    displayPercentage,
+    finalPrice,
+    originalPrice,
+    savingsAmount,
+    rawProductDiscount: product?.discount
+  });
 
   return (
     <>
@@ -299,9 +306,9 @@ const ProductDetailPage = () => {
                       </>
                     )}
                   </div>
-                  {hasDiscount && (
+                  {hasDiscount && savingsAmount > 0 && (
                     <p className="text-xs sm:text-sm text-red-600 font-medium">
-                      Hemat {formatPrice(product.price - finalPrice)}
+                      Hemat {formatPrice(savingsAmount)} {/* ✅ Gunakan savings dari backend (sudah include max_discount) */}
                     </p>
                   )}
                 </div>

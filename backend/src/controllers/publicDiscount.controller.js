@@ -122,12 +122,16 @@ exports.getAllDiscounts = async (req, res) => {
             ? parseFloat(product.ProductDiscount.discounted_price)
             : parseFloat(product.selling_price);
 
+          // Calculate actual discount amount (sudah include max_discount)
+          const actualDiscountAmount = parseFloat(product.selling_price) - discountedPrice;
+
           return {
             id: product.id,
             name: product.name,
             description: product.description,
             price: parseFloat(product.selling_price),
             discountedPrice: discountedPrice,
+            actualDiscountAmount: actualDiscountAmount, // Untuk tampilan "Hemat Rp xxx" (sudah consider max_discount)
             stock: product.total_stock,
             category: product.category?.category_name || null,
             image: primaryImage?.image_url || "/placeholder-product.jpg",
@@ -139,9 +143,7 @@ exports.getAllDiscounts = async (req, res) => {
         name: discountData.discount_name,
         type: discountData.discount_type,
         value: parseFloat(discountData.value),
-        maxDiscount: discountData.max_discount
-          ? parseFloat(discountData.max_discount)
-          : null,
+        // maxDiscount tidak dikirim ke FE (seperti Shopee), tapi sudah diterapkan di discountedPrice
         startDate: discountData.start_date,
         endDate: discountData.end_date,
         productsCount: products.length,
@@ -266,12 +268,17 @@ exports.getDiscountById = async (req, res) => {
       discountData.products?.map((product) => {
         const primaryImage = product.images?.[0];
 
+        const discountedPrice = parseFloat(product.ProductDiscount.discounted_price);
+        const originalPrice = parseFloat(product.selling_price);
+        const actualDiscountAmount = originalPrice - discountedPrice; // Sudah include max_discount
+
         return {
           id: product.id,
           name: product.name,
-          price: parseFloat(product.selling_price),
+          price: originalPrice,
           originalPrice: parseFloat(product.ProductDiscount.original_price),
-          discountedPrice: parseFloat(product.ProductDiscount.discounted_price),
+          discountedPrice: discountedPrice,
+          actualDiscountAmount: actualDiscountAmount, // Untuk tampilan "Hemat Rp xxx"
           stock: product.total_stock,
           category: product.category?.category_name,
           image: primaryImage?.image_url || "/placeholder-product.jpg",
@@ -283,9 +290,7 @@ exports.getDiscountById = async (req, res) => {
       name: discountData.discount_name,
       type: discountData.discount_type,
       value: parseFloat(discountData.value),
-      maxDiscount: discountData.max_discount
-        ? parseFloat(discountData.max_discount)
-        : null,
+      // maxDiscount tidak dikirim ke FE (seperti Shopee), tapi sudah diterapkan di discountedPrice
       startDate: discountData.start_date,
       endDate: discountData.end_date,
       products: formattedProducts,

@@ -20,7 +20,7 @@ const CheckoutPage = () => {
   const { items, clearCart, getTotalItems, getTotalPrice } = useCartStore();
 
   const [pickupMethod, setPickupMethod] = useState('self_pickup');
-  const [paymentMethod, setPaymentMethod] = useState('transfer');
+  const [paymentMethod, setPaymentMethod] = useState('qris'); // Default QRIS - gunakan: 'cash', 'transfer', 'qris'
   const [selectedBank, setSelectedBank] = useState(''); // TAMBAHAN
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryNotes, setDeliveryNotes] = useState('');
@@ -447,15 +447,15 @@ const CheckoutPage = () => {
 
                   {/* Tunai */}
                   <label className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 rounded-lg border-2 cursor-pointer transition-all ${
-                    paymentMethod === 'tunai' 
+                    paymentMethod === 'cash' 
                       ? 'border-green-600 bg-green-50' 
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
                       type="radio"
                       name="payment"
-                      value="tunai"
-                      checked={paymentMethod === 'tunai'}
+                      value="cash"
+                      checked={paymentMethod === 'cash'}
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="mt-0.5 sm:mt-1"
                     />
@@ -463,7 +463,7 @@ const CheckoutPage = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <CreditCard size={16} className="sm:w-[18px] sm:h-[18px] lg:w-5 lg:h-5 text-green-600 flex-shrink-0" />
                         <span className="font-semibold text-gray-900 text-sm sm:text-base lg:text-lg">Tunai</span>
-                        {paymentMethod === 'tunai' && (
+                        {paymentMethod === 'cash' && (
                           <Check size={14} className="sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-green-600 ml-auto" />
                         )}
                       </div>
@@ -518,7 +518,7 @@ const CheckoutPage = () => {
                       <CreditCard size={14} className="sm:w-4 sm:h-4 text-gray-500" />
                       <span className="text-gray-600">Pembayaran:</span>
                       <span className="font-semibold text-gray-900">
-                        {paymentMethod === 'qris' ? 'QRIS' : paymentMethod === 'transfer' ? 'Transfer Bank' : 'Tunai'}
+                        {paymentMethod === 'qris' ? 'QRIS' : paymentMethod === 'transfer' ? 'Transfer Bank' : paymentMethod === 'cash' ? 'Tunai' : 'Tunai'}
                       </span>
                     </div>
                   </div>
@@ -598,7 +598,7 @@ const CheckoutPage = () => {
                     <CreditCard size={16} className="text-gray-500" />
                     <span className="text-gray-600">Pembayaran:</span>
                     <span className="font-semibold text-gray-900">
-                      {paymentMethod === 'qris' ? 'QRIS' : paymentMethod === 'transfer' ? 'Transfer Bank' : 'Tunai'}
+                      {paymentMethod === 'qris' ? 'QRIS' : paymentMethod === 'transfer' ? 'Transfer Bank' : paymentMethod === 'cash' ? 'Tunai' : 'Tunai'}
                     </span>
                   </div>
                 </div>

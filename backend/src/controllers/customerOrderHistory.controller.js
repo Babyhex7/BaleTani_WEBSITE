@@ -179,7 +179,13 @@ exports.getCustomerOrders = async (req, res) => {
                 va_number: order.payment.virtual_account,
                 status: order.payment.payment_status,
               }
-            : null,
+            : {
+                // Fallback jika tidak ada payment detail (misalnya cash)
+                method: order.payment_method,
+                bank: null,
+                va_number: null,
+                status: order.payment_status,
+              },
         })),
         stats,
         pagination: {
@@ -286,7 +292,7 @@ exports.getOrderDetail = async (req, res) => {
           product_name: item.product_name,
           product_image: item.product?.images?.[0]?.image_url || null,
           quantity: parseFloat(item.quantity),
-          unit: "pcs", // Default unit
+          unit: "pcs", // Default unit (TODO: Nanti bisa tambah kolom unit di table products)
           price: parseFloat(item.final_price ?? item.original_price ?? 0),
           subtotal: parseFloat(item.subtotal),
           product_stock: item.product?.total_stock || 0,
@@ -307,7 +313,7 @@ exports.getOrderDetail = async (req, res) => {
         subtotal: parseFloat(order.item_subtotal || 0),
         shipping_cost: parseFloat(order.delivery_fee || 0),
         discount: parseFloat(order.discount_amount || 0),
-        service_fee: 2000,
+        // service_fee: DIHAPUS - tidak ada service fee
         total: parseFloat(order.total_amount || 0),
       },
 

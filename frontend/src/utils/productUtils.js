@@ -80,18 +80,33 @@ export const calculateDiscount = (product) => {
     ? Math.round(((original - finalP) / original) * 100)
     : 0;
 
-  // Original discount percentage untuk display badge (dari BE, misal 60%)
-  const displayPercentage = product?.discount?.percentage
-    ? Math.round(product.discount.percentage)
-    : actualPercentage;
-
-  const savingsAmount = hasDiscount ? original - finalP : 0;
+  // Savings amount: prioritas dari BE, fallback calculate manual
+  const savingsAmount = product?.discount?.savings 
+    ? product.discount.savings 
+    : (hasDiscount ? original - finalP : 0);
+  
   const maxDiscount = product?.discount?.maxDiscount || null;
+
+  // Original discount percentage untuk display badge (dari BE, misal 78%)
+  // LOGIC BARU: Jika BE tidak kirim percentage atau percentage = 0, hitung dari value
+  let displayPercentage = 0;
+  if (hasDiscount) {
+    if (product?.discount?.percentage && product.discount.percentage > 0) {
+      // Priority 1: Gunakan percentage dari BE
+      displayPercentage = Math.round(product.discount.percentage);
+    } else if (product?.discount?.value && product?.discount?.type === 'percentage') {
+      // Priority 2: Gunakan value jika type = percentage
+      displayPercentage = Math.round(product.discount.value);
+    } else {
+      // Priority 3: Calculate dari selisih harga
+      displayPercentage = actualPercentage;
+    }
+  }
 
   return {
     hasDiscount,
     discountPercentage: actualPercentage, // Actual % after max discount
-    displayPercentage, // Original % untuk badge (60%)
+    displayPercentage, // Original % untuk badge (78%)
     finalPrice: finalP,
     originalPrice: original,
     savingsAmount,

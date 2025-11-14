@@ -258,10 +258,11 @@ const ProductCard = ({
             - className: Spacing bottom - compact di mobile
             ======================================== */}
         <div className="min-h-[52px] sm:min-h-[56px] flex flex-col justify-start">
+          {/* Use displayPercentage (original %) not actual % - seperti Shopee */}
           <ProductPrice 
             finalPrice={finalPrice}
             originalPrice={originalPrice}
-            discountPercentage={discountPercentage}
+            discountPercentage={displayPercentage}
             hasDiscount={hasDiscount}
             formatPrice={formatPrice}
             size="sm"
