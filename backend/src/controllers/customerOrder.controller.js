@@ -97,13 +97,25 @@ const createOrder = async (req, res) => {
       });
     }
 
-    // Validate payment method
-    if (!["transfer", "cash", "bank_transfer"].includes(payment_method)) {
+    // Validate payment method (allow transfer, bank_transfer, cash, qris)
+    const validPaymentMethods = ["transfer", "bank_transfer", "cash", "qris"];
+    if (!validPaymentMethods.includes(payment_method)) {
       await transaction.rollback();
       return res.status(400).json({
         success: false,
-        message: "Metode pembayaran tidak valid",
+        message: "Metode pembayaran tidak valid. Pilih: transfer, cash, atau qris",
       });
+    }
+    
+    // Validasi bank_name jika payment_method adalah transfer/bank_transfer
+    if ((payment_method === "transfer" || payment_method === "bank_transfer")) {
+      if (!bank_name || !["BRI", "BCA", "MANDIRI"].includes(bank_name)) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: "Pilih bank terlebih dahulu untuk transfer (BRI/BCA/MANDIRI)",
+        });
+      }
     }
 
     // Generate order number
@@ -328,15 +340,8 @@ const createOrder = async (req, res) => {
     // CREATE PAYMENT DETAIL (JIKA TRANSFER BANK)
     let paymentDetail = null;
     if (payment_method === "transfer" || payment_method === "bank_transfer") {
-      // Validasi bank_name
-      if (!bank_name || !["BRI", "BCA", "MANDIRI"].includes(bank_name)) {
-        await transaction.rollback();
-        return res.status(400).json({
-          success: false,
-          message: "Pilih bank terlebih dahulu (BRI/BCA/MANDIRI)",
-        });
-      }
-
+      // bank_name sudah divalidasi di atas, seharusnya sudah valid di sini
+      
       // Dummy account numbers untuk masing-masing bank
       const bankAccounts = {
         BRI: "0021-01-123456-50-9",
