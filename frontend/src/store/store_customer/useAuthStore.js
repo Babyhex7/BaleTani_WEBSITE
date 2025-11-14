@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { debugLog, diffStates } from "../../utils/debugLogger";
+import useCartStore from "./useCartStore";
 
 const useAuthStore = create(
   persist(
@@ -8,6 +9,7 @@ const useAuthStore = create(
       // State
       user: null,
       token: null,
+      tokenExpiry: null, // Timestamp when token expires
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -35,9 +37,25 @@ const useAuthStore = create(
 
       login: (userData, token) => {
         debugLog("AUTH", "Customer login()", { userData, hasToken: !!token });
+        
+        // Clear cart jika user berbeda login (atau user baru)
+        const currentUser = get().user;
+        if (currentUser && currentUser.id !== userData.id) {
+          debugLog("AUTH", "Different user detected, clearing cart");
+          useCartStore.getState().clearCart();
+        } else if (!currentUser) {
+          // User baru login pertama kali, clear cart untuk memastikan fresh start
+          debugLog("AUTH", "New login session, clearing cart");
+          useCartStore.getState().clearCart();
+        }
+        
+        // Calculate token expiry (24 hours from now)
+        const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 jam dalam milliseconds
+        
         set({
           user: userData,
           token,
+          tokenExpiry: expiryTime,
           isAuthenticated: true,
           error: null,
         });
@@ -45,9 +63,14 @@ const useAuthStore = create(
 
       logout: () => {
         debugLog("AUTH", "Customer logout()");
+        
+        // Clear cart saat logout untuk mencegah cart tercampur antar user
+        useCartStore.getState().clearCart();
+        
         set({
           user: null,
           token: null,
+          tokenExpiry: null,
           isAuthenticated: false,
           error: null,
         });
@@ -56,6 +79,31 @@ const useAuthStore = create(
       },
 
       clearError: () => set({ error: null }),
+
+      // Check if token is still valid (not expired)
+      isTokenValid: () => {
+        const { token, tokenExpiry } = get();
+        if (!token || !tokenExpiry) return false;
+        
+        const now = Date.now();
+        const isValid = now < tokenExpiry;
+        
+        if (!isValid) {
+          debugLog("AUTH", "Token expired, auto logout");
+        }
+        
+        return isValid;
+      },
+
+      // Check and auto-logout if token expired
+      checkAndLogoutIfExpired: () => {
+        const { isTokenValid, logout } = get();
+        if (!isTokenValid()) {
+          logout();
+          return true; // Token expired
+        }
+        return false; // Token still valid
+      },
 
       // Check if user has specific role
       hasRole: (role) => {
@@ -110,6 +158,7 @@ const useAuthStore = create(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        tokenExpiry: state.tokenExpiry,
         isAuthenticated: state.isAuthenticated,
       }),
     }

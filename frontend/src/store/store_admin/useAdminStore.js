@@ -11,6 +11,7 @@ const useAdminStore = create(
       // Admin Auth State
       admin: null,
       token: null,
+      tokenExpiry: null, // Timestamp when token expires (7 days)
       permissions: [], // RBAC permissions array dari backend
       isAuthenticated: false,
       isLoading: false,
@@ -52,9 +53,14 @@ const useAdminStore = create(
           hasToken: !!token,
           permissionsCount: permissions.length,
         });
+        
+        // Calculate token expiry (7 days from now for admin)
+        const expiryTime = Date.now() + (7 * 24 * 60 * 60 * 1000); // 7 hari dalam milliseconds
+        
         set({
           admin,
           token,
+          tokenExpiry: expiryTime,
           permissions, // Simpan permissions dari backend RBAC
           isAuthenticated: true,
         });
@@ -65,6 +71,7 @@ const useAdminStore = create(
         set({
           admin: null,
           token: null,
+          tokenExpiry: null,
           permissions: [], // Clear permissions saat logout
           isAuthenticated: false,
         });
@@ -109,6 +116,31 @@ const useAdminStore = create(
         return checks.some(({ module, action }) =>
           hasPermission(module, action)
         );
+      },
+
+      // Check if token is still valid (not expired)
+      isTokenValid: () => {
+        const { token, tokenExpiry } = get();
+        if (!token || !tokenExpiry) return false;
+        
+        const now = Date.now();
+        const isValid = now < tokenExpiry;
+        
+        if (!isValid) {
+          console.log("[AdminStore] Token expired, auto logout");
+        }
+        
+        return isValid;
+      },
+
+      // Check and auto-logout if token expired
+      checkAndLogoutIfExpired: () => {
+        const { isTokenValid, logout } = get();
+        if (!isTokenValid()) {
+          logout();
+          return true; // Token expired
+        }
+        return false; // Token still valid
       },
 
       // Helper untuk check role
@@ -233,6 +265,7 @@ const useAdminStore = create(
       partialize: (state) => ({
         admin: state.admin,
         token: state.token,
+        tokenExpiry: state.tokenExpiry, // Persist token expiry
         permissions: state.permissions, // Persist permissions untuk RBAC
         isAuthenticated: state.isAuthenticated,
         dashboardStats: state.dashboardStats,

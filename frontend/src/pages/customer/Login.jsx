@@ -24,6 +24,8 @@ const Login = () => {
   useEffect(() => {
     if (location.state?.registered) {
       toast.success('Registrasi berhasil! Silakan login dengan akun Anda.');
+      // Clear the state to prevent toast from showing again on refresh
+      window.history.replaceState({}, document.title);
     }
     
     if (import.meta.env.VITE_DEBUG_AUTH === 'true') {

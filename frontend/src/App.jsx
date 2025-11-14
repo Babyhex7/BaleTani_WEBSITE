@@ -2,6 +2,8 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import TokenExpiryChecker from './components/auth/TokenExpiryChecker';
+import AdminTokenExpiryChecker from './components/auth/AdminTokenExpiryChecker';
 import LandingPage from './pages/customer/LandingPage';
 import Home from './pages/customer/Home';
 import Login from './pages/customer/Login';
@@ -38,6 +40,10 @@ import CustomerManagement from './pages/admin/CustomerManagement';
 function App() {
   return (
     <>
+      {/* Token Expiry Checker - Automatically checks token validity */}
+      <TokenExpiryChecker />
+      <AdminTokenExpiryChecker />
+      
       <Toaster
         position="top-right"
         reverseOrder={false}

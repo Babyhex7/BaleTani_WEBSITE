@@ -47,6 +47,7 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
   // Fetch products when modal opens
   useEffect(() => {
     if (isOpen) {
+      console.log('Modal opened, fetching products...');
       fetchProducts();
     }
   }, [isOpen]);
@@ -56,24 +57,42 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
       // Fetch active products with product_type = 'offline' only
       const response = await adminApiClient.get('/admin/products', {
         params: {
-          // Backend expects string 'true'/'false' via querystring; boolean true becomes 'true'
-          is_active: true,
+          is_active: 'true', // Backend expects string 'true'/'false'
           product_type: 'offline', // Only fetch offline products
           limit: 1000,
           page: 1
         }
       });
       
-      if (response.data.success && response.data.data.products) {
+      console.log('Fetch products response:', response.data);
+      
+      if (response.data.success && response.data.data && response.data.data.products) {
         const list = response.data.data.products.filter(p => p.product_type === 'offline');
         setProducts(list);
-        console.log('Offline products loaded:', list.length);
+        console.log('Offline products loaded:', list.length, list);
+        
+        if (list.length === 0) {
+          toast("Belum ada produk offline. Silakan tambah produk dengan tipe 'offline' terlebih dahulu.", {
+            icon: 'ℹ️'
+          });
+        }
       } else {
         throw new Error('Invalid response format');
       }
     } catch (error) {
       console.error("Error fetching products:", error);
-      toast.error("Gagal memuat daftar produk offline, menggunakan data dummy");
+      console.error("Error response:", error.response);
+      console.error("Error status:", error.response?.status);
+      console.error("Error data:", error.response?.data);
+      
+      // Check if it's a permission error
+      if (error.response?.status === 403) {
+        toast.error("Akses ditolak. Anda tidak memiliki izin untuk melihat produk.");
+      } else if (error.response?.status === 401) {
+        toast.error("Sesi login habis. Silakan login kembali.");
+      } else {
+        toast.error("Gagal memuat daftar produk offline, menggunakan data dummy");
+      }
       
       // Fallback to dummy data (offline products only)
       const dummyProducts = [
@@ -230,7 +249,7 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
     setDeliveryAddress("");
     setDeliveryNotes("");
     setPaymentMethod("cash");
-    setDeliveryMethod("pickup");
+    setDeliveryMethod("self_pickup");
     setDeliveryFee(0);
     setDiscountAmount(0);
     setAdminNotes("");
@@ -477,12 +496,16 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
                         required
                       >
-                        <option value="">Pilih Produk...</option>
-                        {products.map((product) => (
-                          <option key={product.id} value={product.id}>
-                            {product.name} - {formatCurrency(product.selling_price)} (Stock: {product.total_stock})
-                          </option>
-                        ))}
+                        <option value="">Pilih Produk... ({products.length} produk tersedia)</option>
+                        {products.length === 0 ? (
+                          <option disabled>Loading produk...</option>
+                        ) : (
+                          products.map((product) => (
+                            <option key={product.id} value={product.id}>
+                              {product.name} - {formatCurrency(product.selling_price)} (Stock: {product.total_stock})
+                            </option>
+                          ))
+                        )}
                       </select>
                     </div>
 
