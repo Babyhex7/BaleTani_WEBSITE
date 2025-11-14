@@ -39,24 +39,34 @@ const useCartStore = create(
             ),
           });
         } else {
-          // Add new item
+          // Add new item - Handle multiple image format scenarios
+          let imageUrl = null;
+
+          // Scenario 1: Array of image URLs (from getAllProducts)
+          if (Array.isArray(product.images) && product.images.length > 0) {
+            imageUrl = product.images[0];
+          }
+          // Scenario 2: Single image URL (from product detail or cart)
+          else if (product.image) {
+            imageUrl = product.image;
+          }
+
           set({
             items: [
               ...items,
               {
                 id: product.id,
                 name: product.name,
-                // Handle both single image and array of images
-                image:
-                  Array.isArray(product.images) && product.images.length > 0
-                    ? product.images[0]
-                    : product.image || null,
+                image: imageUrl,
                 price: product.price,
-                finalPrice: product.discount?.finalPrice || product.price,
+                finalPrice:
+                  product.finalPrice ||
+                  product.discount?.finalPrice ||
+                  product.price,
                 discount: product.discount,
                 quantity,
                 stock: product.stock,
-                unit: product.unit,
+                unit: product.unit || product.quantityInfo || "unit",
               },
             ],
           });

@@ -82,6 +82,15 @@ const DiscountFormModal = ({
       newErrors.value = "Nilai persentase harus antara 0-100";
     }
 
+    // Validasi max_discount untuk percentage > 50%
+    if (
+      formData.discount_type === "percentage" &&
+      parseFloat(formData.value) > 50 &&
+      (!formData.max_discount || parseFloat(formData.max_discount) <= 0)
+    ) {
+      newErrors.max_discount = "Max. potongan wajib diisi untuk diskon > 50% (untuk menghindari kerugian)";
+    }
+
     if (!formData.start_date) {
       newErrors.start_date = "Tanggal mulai wajib diisi";
     }
@@ -255,7 +264,12 @@ const DiscountFormModal = ({
               {formData.discount_type === "percentage" && (
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Max. Potongan <span className="text-gray-400">(Opsional)</span>
+                    Max. Potongan 
+                    {parseFloat(formData.value) > 50 ? (
+                      <span className="text-red-500"> *</span>
+                    ) : (
+                      <span className="text-gray-400"> (Opsional)</span>
+                    )}
                   </label>
                   <div className="relative">
                     <input
@@ -266,15 +280,25 @@ const DiscountFormModal = ({
                       placeholder="20000"
                       min="0"
                       step="1000"
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
+                      className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base ${
+                        errors.max_discount ? "border-red-500" : "border-gray-300"
+                      }`}
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
                       Rp
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Batasan maksimal potongan harga (misal: Rp 20.000)
-                  </p>
+                  {errors.max_discount ? (
+                    <p className="text-red-500 text-sm mt-1">{errors.max_discount}</p>
+                  ) : parseFloat(formData.value) > 50 ? (
+                    <p className="text-orange-600 text-xs mt-1 font-medium">
+                      ⚠️ Wajib diisi untuk diskon &gt; 50% (mencegah kerugian besar)
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Batasan maksimal potongan harga (contoh: Rp 20.000 = maksimal hemat Rp 20rb per produk)
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -364,6 +388,15 @@ const DiscountFormModal = ({
                         Status diskon akan otomatis berubah berdasarkan tanggal
                         (Upcoming/Active/Expired)
                       </li>
+                      {formData.discount_type === "percentage" && formData.value && formData.max_discount && (
+                        <li className="font-semibold text-green-700">
+                          📊 Contoh: Diskon {formData.value}% dengan max Rp {parseFloat(formData.max_discount).toLocaleString('id-ID')}
+                          <br />
+                          <span className="ml-4">• Produk Rp 200.000 → Hemat Rp {Math.min(200000 * parseFloat(formData.value) / 100, parseFloat(formData.max_discount)).toLocaleString('id-ID')} ({Math.round(Math.min(200000 * parseFloat(formData.value) / 100, parseFloat(formData.max_discount)) / 200000 * 100)}%)</span>
+                          <br />
+                          <span className="ml-4">• Produk Rp 50.000 → Hemat Rp {Math.min(50000 * parseFloat(formData.value) / 100, parseFloat(formData.max_discount)).toLocaleString('id-ID')} ({Math.round(Math.min(50000 * parseFloat(formData.value) / 100, parseFloat(formData.max_discount)) / 50000 * 100)}%)</span>
+                        </li>
+                      )}
                     </ul>
                   </div>
                 </div>

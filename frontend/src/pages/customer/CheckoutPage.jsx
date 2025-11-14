@@ -73,7 +73,13 @@ const CheckoutPage = () => {
       return;
     }
 
-    // Validasi bank untuk transfer
+    // Validasi payment method
+    if (!paymentMethod) {
+      toast.error('Pilih metode pembayaran terlebih dahulu');
+      return;
+    }
+
+    // Validasi bank HANYA untuk transfer
     if (paymentMethod === 'transfer' && !selectedBank) {
       toast.error('Pilih bank terlebih dahulu (BRI/BCA/MANDIRI)');
       return;
@@ -94,6 +100,7 @@ const CheckoutPage = () => {
         items: items.map((item) => ({
           product_id: item.id,
           quantity: item.quantity,
+          // Backend akan calculate final_price dari database dengan discount
         })),
       };
 

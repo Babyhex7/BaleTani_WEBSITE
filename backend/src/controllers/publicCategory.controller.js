@@ -186,7 +186,7 @@ const getCategoryById = async (req, res) => {
         {
           model: ProductDiscount,
           as: "productDiscounts",
-          attributes: ["id", "product_id", "discount_id"],
+          attributes: ["id", "product_id", "discount_id", "discounted_price"],
           required: false,
           include: [
             {
@@ -197,6 +197,7 @@ const getCategoryById = async (req, res) => {
                 "discount_name",
                 "discount_type",
                 "value",
+                "max_discount",
                 "start_date",
                 "end_date",
                 "is_active",
@@ -229,25 +230,26 @@ const getCategoryById = async (req, res) => {
     const formattedProducts = products.map((product) => {
       const productData = product.toJSON();
 
-      // Get active discount
+      // Get active discount - Use pre-calculated discounted_price from table
       const activeDiscount = productData.productDiscounts?.[0];
       const discount = activeDiscount?.discount;
 
       let discountInfo = null;
-      if (discount) {
-        let discountAmount = 0;
-        if (discount.discount_type === "percentage") {
-          discountAmount = (productData.selling_price * discount.value) / 100;
-        } else if (discount.discount_type === "fixed_amount") {
-          discountAmount = discount.value;
-        }
+      if (discount && activeDiscount.discounted_price) {
+        const finalPrice = parseFloat(activeDiscount.discounted_price);
+        const originalPrice = parseFloat(productData.selling_price);
+        const savingsAmount = originalPrice - finalPrice;
 
         discountInfo = {
           id: discount.id,
           name: discount.discount_name,
           type: discount.discount_type,
           value: parseFloat(discount.value),
-          finalPrice: Math.max(0, productData.selling_price - discountAmount),
+          maxDiscount: discount.max_discount
+            ? parseFloat(discount.max_discount)
+            : null,
+          finalPrice: finalPrice,
+          savings: Math.round(savingsAmount * 100) / 100,
           validUntil: discount.end_date,
         };
       }

@@ -493,6 +493,9 @@ const DiscountManagement = () => {
                         Nilai
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Max Potongan
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                         Periode
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -543,6 +546,15 @@ const DiscountManagement = () => {
                                 discount.value
                               )}
                             </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            {discount.discount_type === "percentage" && discount.max_discount ? (
+                              <span className="text-sm font-medium text-orange-600">
+                                {formatValue("fixed_amount", discount.max_discount)}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-gray-400">-</span>
+                            )}
                           </td>
                           <td className="px-6 py-4">
                             <div className="text-sm text-gray-600">

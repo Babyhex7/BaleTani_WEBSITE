@@ -36,6 +36,25 @@ const ProductDetailPage = () => {
         const response = await productService.getProductDetail(id);
         
         if (response.success) {
+          console.log('✅ Product Detail API Response:', response);
+          console.log('📦 Full Product Data:', JSON.stringify(response.data, null, 2));
+          if (response.data.discount) {
+            console.log('💰 Discount Info:', {
+              originalPrice: response.data.price,
+              finalPrice: response.data.discount.finalPrice,
+              discountType: response.data.discount.type,
+              discountValue: response.data.discount.value,
+              savings: response.data.discount.savings
+            });
+            
+            // Calculate expected values
+            const calculatedSavings = response.data.price - response.data.discount.finalPrice;
+            const calculatedPercentage = Math.round((calculatedSavings / response.data.price) * 100);
+            console.log('🧮 Calculated:', {
+              savings: calculatedSavings,
+              percentage: calculatedPercentage + '%'
+            });
+          }
           setProduct(response.data);
         }
       } catch (error) {
@@ -138,10 +157,15 @@ const ProductDetailPage = () => {
     );
   }
 
-  const hasDiscount = product.discount && product.discount.finalPrice < product.price;
-  const finalPrice = hasDiscount ? product.discount.finalPrice : product.price;
+  // Prefer harga final dari BE (top-level), fallback ke discount.finalPrice
+  const originalPrice = typeof product?.discount?.originalPrice === 'number' ? product.discount.originalPrice : product.price;
+  const computedFinal = typeof product?.finalPrice === 'number' 
+    ? product.finalPrice 
+    : (product?.discount?.finalPrice ?? originalPrice);
+  const hasDiscount = computedFinal < originalPrice;
+  const finalPrice = computedFinal;
   const discountPercentage = hasDiscount 
-    ? Math.round(((product.price - finalPrice) / product.price) * 100)
+    ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100)
     : 0;
 
   return (

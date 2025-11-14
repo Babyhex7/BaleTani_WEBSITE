@@ -5,7 +5,6 @@
 
 const {
   Cart,
-  CartItem,
   Product,
   ProductImage,
   ProductDiscount,
@@ -20,60 +19,57 @@ exports.getCart = async (req, res) => {
   try {
     const customerId = req.customer.id;
 
-    // Find or create cart for customer
-    let cart = await Cart.findOne({
+    // Find all cart items for customer
+    const cartItems = await Cart.findAll({
       where: { customer_id: customerId },
       include: [
         {
-          model: CartItem,
-          as: "items",
+          model: Product,
+          as: "product",
+          attributes: [
+            "id",
+            "name",
+            "description",
+            "selling_price",
+            "total_stock",
+            "quantity_info",
+          ],
           include: [
             {
-              model: Product,
-              as: "product",
-              attributes: [
-                "id",
-                "name",
-                "description",
-                "selling_price",
-                "total_stock",
-                "quantity_info",
-              ],
+              model: ProductImage,
+              as: "images",
+              attributes: ["image_url", "display_order"],
+              required: false,
+              separate: true,
+              order: [["display_order", "ASC"]],
+            },
+            {
+              model: ProductDiscount,
+              as: "productDiscounts",
+              required: false,
               include: [
                 {
-                  model: ProductImage,
-                  as: "images",
-                  attributes: ["image_url", "display_order"],
-                  // where clause cleaned,
-                  required: false,
-                  order: [["display_order", "ASC"]],
-                },
-                {
-                  model: ProductDiscount,
-                  as: "productDiscounts",
-                  required: false,
-                  // where clause cleaned,
-                  include: [
-                    {
-                      model: Discount,
-                      as: "discount",
-                      attributes: [
-                        "id",
-                        "discount_name",
-                        "discount_type",
-                        "value",
-                        "start_date",
-                        "end_date",
-                        "is_active",
-                      ],
-                      where: {
-                        is_active: true,
-                        start_date: { [Op.lte]: new Date() },
-                        end_date: { [Op.gte]: new Date() },
-                      },
-                      required: false,
-                    },
+                  model: Discount,
+                  as: "discount",
+                  attributes: [
+                    "id",
+                    "discount_name",
+                    "discount_type",
+                    "value",
+                    "start_date",
+                    "end_date",
+                    "is_active",
                   ],
+                  where: {
+                    is_active: true,
+                    start_date: {
+                      [Op.lte]: require("../utils/dateHelper").getWIBDate(),
+                    },
+                    end_date: {
+                      [Op.gte]: require("../utils/dateHelper").getWIBDate(),
+                    },
+                  },
+                  required: false,
                 },
               ],
             },
@@ -82,52 +78,48 @@ exports.getCart = async (req, res) => {
       ],
     });
 
-    if (!cart) {
-      cart = await Cart.create({ customer_id: customerId });
-      cart.items = [];
-    }
-
     // Calculate totals and discounts
-    const itemsWithCalculations = cart.items.map((item) => {
+    const itemsWithCalculations = cartItems.map((item) => {
       const product = item.product;
-      let finalPrice = parseFloat(product.price);
+      let finalPrice = parseFloat(product.selling_price);
       let discount = null;
 
-      // Check if product has active discount
+      // Check if product has active discount - ALWAYS use pre-calculated discounted_price
       if (product.productDiscounts && product.productDiscounts.length > 0) {
         const productDiscount = product.productDiscounts[0];
-        if (productDiscount.discount) {
-          const discountData = productDiscount.discount;
 
-          if (discountData.discount_type === "percentage") {
-            const discountAmount =
-              (finalPrice * parseFloat(discountData.value)) / 100;
-            finalPrice = finalPrice - discountAmount;
-          } else if (discountData.discount_type === "fixed_amount") {
-            finalPrice = finalPrice - parseFloat(discountData.value);
+        // ALWAYS use discounted_price from ProductDiscount table (set by admin)
+        if (productDiscount.discounted_price) {
+          finalPrice = parseFloat(productDiscount.discounted_price);
+
+          if (productDiscount.discount) {
+            discount = {
+              id: productDiscount.discount.id,
+              name: productDiscount.discount.discount_name,
+              type: productDiscount.discount.discount_type,
+              value: parseFloat(productDiscount.discount.value),
+              finalPrice: finalPrice,
+            };
           }
-
-          discount = {
-            id: discountData.id,
-            name: discountData.discount_name,
-            type: discountData.discount_type,
-            value: parseFloat(discountData.value),
-            finalPrice: finalPrice,
-          };
         }
       }
 
-      const subtotal = finalPrice * item.quantity;
+      // Round to 2 decimal places
+      finalPrice = Math.round(finalPrice * 100) / 100;
+      const subtotal =
+        Math.round(finalPrice * parseFloat(item.quantity) * 100) / 100;
 
       return {
         id: item.id,
         product_id: product.id,
         name: product.name,
         description: product.description,
-        price: parseFloat(product.price),
+        price: parseFloat(product.selling_price),
         finalPrice: finalPrice,
-        stock: product.stock,
-        quantity: item.quantity,
+        stock: product.total_stock,
+        unit: product.quantity_info || "unit", // ✅ Added for consistency
+        quantityInfo: product.quantity_info, // ✅ Added for consistency
+        quantity: parseFloat(item.quantity),
         subtotal: subtotal,
         image:
           product.images && product.images.length > 0
@@ -151,7 +143,6 @@ exports.getCart = async (req, res) => {
       success: true,
       message: "Cart fetched successfully",
       data: {
-        cart_id: cart.id,
         items: itemsWithCalculations,
         summary: {
           totalItems: totalItems,
@@ -175,88 +166,113 @@ exports.getCart = async (req, res) => {
  * Add item to cart
  */
 exports.addToCart = async (req, res) => {
+  const { sequelize } = require("../config/database");
+  const transaction = await sequelize.transaction();
+
   try {
     const customerId = req.customer.id;
     const { product_id, quantity } = req.body;
 
     // Validate input
     if (!product_id || !quantity || quantity < 1) {
+      await transaction.rollback();
       return res.status(400).json({
         success: false,
         message: "Product ID and valid quantity are required",
       });
     }
 
-    // Check if product exists and has enough stock
+    // Validate quantity limit (max 100 per product)
+    if (quantity > 100) {
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: "Maksimal pembelian 100 item per produk",
+      });
+    }
+
+    // Check if product exists and has enough stock (with row locking)
     const product = await Product.findOne({
       where: { id: product_id },
+      lock: transaction.LOCK.UPDATE,
+      transaction,
     });
 
     if (!product) {
+      await transaction.rollback();
       return res.status(404).json({
         success: false,
         message: "Product not found",
       });
     }
 
-    if (product.stock < quantity) {
+    if (product.total_stock < quantity) {
+      await transaction.rollback();
       return res.status(400).json({
         success: false,
-        message: `Not enough stock. Available: ${product.stock}`,
+        message: `Not enough stock. Available: ${product.total_stock}`,
       });
     }
 
-    // Find or create cart
-    let cart = await Cart.findOne({
-      where: { customer_id: customerId },
-    });
-
-    if (!cart) {
-      cart = await Cart.create({ customer_id: customerId });
-    }
-
     // Check if item already exists in cart
-    let cartItem = await CartItem.findOne({
+    let cartItem = await Cart.findOne({
       where: {
-        cart_id: cart.id,
+        customer_id: customerId,
         product_id: product_id,
       },
+      transaction,
     });
 
     if (cartItem) {
       // Update quantity
-      const newQuantity = cartItem.quantity + quantity;
+      const newQuantity = parseFloat(cartItem.quantity) + quantity;
 
-      if (product.stock < newQuantity) {
+      if (product.total_stock < newQuantity) {
+        await transaction.rollback();
         return res.status(400).json({
           success: false,
-          message: `Cannot add more. Maximum stock: ${product.stock}`,
+          message: `Cannot add more. Maximum stock: ${product.total_stock}`,
         });
       }
 
       cartItem.quantity = newQuantity;
-      await cartItem.save();
+      await cartItem.save({ transaction });
+      await transaction.commit();
 
       return res.status(200).json({
         success: true,
         message: "Cart updated successfully",
-        data: cartItem,
+        data: {
+          id: cartItem.id,
+          product_id: cartItem.product_id,
+          quantity: parseFloat(cartItem.quantity),
+        },
       });
     } else {
       // Create new cart item
-      cartItem = await CartItem.create({
-        cart_id: cart.id,
-        product_id: product_id,
-        quantity: quantity,
-      });
+      cartItem = await Cart.create(
+        {
+          customer_id: customerId,
+          product_id: product_id,
+          quantity: quantity,
+        },
+        { transaction }
+      );
+
+      await transaction.commit();
 
       return res.status(201).json({
         success: true,
         message: "Item added to cart successfully",
-        data: cartItem,
+        data: {
+          id: cartItem.id,
+          product_id: cartItem.product_id,
+          quantity: parseFloat(cartItem.quantity),
+        },
       });
     }
   } catch (error) {
+    if (transaction) await transaction.rollback();
     console.error("Error adding to cart:", error);
     res.status(500).json({
       success: false,
@@ -284,14 +300,12 @@ exports.updateCartItem = async (req, res) => {
     }
 
     // Find cart item
-    const cartItem = await CartItem.findOne({
-      where: { id: id },
+    const cartItem = await Cart.findOne({
+      where: {
+        id: id,
+        customer_id: customerId,
+      },
       include: [
-        {
-          model: Cart,
-          as: "cart",
-          where: { customer_id: customerId },
-        },
         {
           model: Product,
           as: "product",
@@ -324,7 +338,11 @@ exports.updateCartItem = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Cart item updated successfully",
-      data: cartItem,
+      data: {
+        id: cartItem.id,
+        product_id: cartItem.product_id,
+        quantity: parseFloat(cartItem.quantity),
+      },
     });
   } catch (error) {
     console.error("Error updating cart item:", error);
@@ -345,15 +363,11 @@ exports.removeFromCart = async (req, res) => {
     const { id } = req.params;
 
     // Find cart item
-    const cartItem = await CartItem.findOne({
-      where: { id: id },
-      include: [
-        {
-          model: Cart,
-          as: "cart",
-          where: { customer_id: customerId },
-        },
-      ],
+    const cartItem = await Cart.findOne({
+      where: {
+        id: id,
+        customer_id: customerId,
+      },
     });
 
     if (!cartItem) {
@@ -387,22 +401,17 @@ exports.clearCart = async (req, res) => {
   try {
     const customerId = req.customer.id;
 
-    // Find cart
-    const cart = await Cart.findOne({
+    // Delete all cart items for this customer
+    const deletedCount = await Cart.destroy({
       where: { customer_id: customerId },
     });
 
-    if (!cart) {
+    if (deletedCount === 0) {
       return res.status(404).json({
         success: false,
-        message: "Cart not found",
+        message: "Cart is already empty",
       });
     }
-
-    // Delete all cart items
-    await CartItem.destroy({
-      where: { cart_id: cart.id },
-    });
 
     res.status(200).json({
       success: true,

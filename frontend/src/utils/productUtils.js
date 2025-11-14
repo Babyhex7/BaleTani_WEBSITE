@@ -50,34 +50,39 @@ export const calculateDiscount = (product) => {
     };
   }
 
-  // Cek apakah produk memiliki diskon yang valid
-  // Kondisi: discount object exist DAN finalPrice < price
-  const hasDiscount =
-    product.discount &&
-    product.discount.finalPrice &&
-    product.discount.finalPrice < product.price;
+  // Sumber data harga yang mungkin tersedia dari BE:
+  // - product.price (harga asli / selling_price)
+  // - product.finalPrice (opsional, dihitung BE)
+  // - product.discount.finalPrice (opsional, dihitung BE)
+  // - product.discount.originalPrice (opsional)
+  const original =
+    typeof product?.discount?.originalPrice === "number"
+      ? product.discount.originalPrice
+      : typeof product.price === "number"
+      ? product.price
+      : parseFloat(product.price || 0);
 
-  // Hitung persentase diskon (dibulatkan ke integer)
-  // Formula: ((harga_asli - harga_diskon) / harga_asli) * 100
+  // Prefer finalPrice dari top-level, fallback ke discount.finalPrice, lalu ke price
+  const finalP =
+    typeof product.finalPrice === "number"
+      ? product.finalPrice
+      : typeof product?.discount?.finalPrice === "number"
+      ? product.discount.finalPrice
+      : original;
+
+  const hasDiscount = finalP < original;
+
   const discountPercentage = hasDiscount
-    ? Math.round(
-        ((product.price - product.discount.finalPrice) / product.price) * 100
-      )
+    ? Math.round(((original - finalP) / original) * 100)
     : 0;
 
-  // Tentukan harga final (dengan atau tanpa diskon)
-  const finalPrice = hasDiscount ? product.discount.finalPrice : product.price;
-
-  // Hitung jumlah penghematan
-  const savingsAmount = hasDiscount
-    ? product.price - product.discount.finalPrice
-    : 0;
+  const savingsAmount = hasDiscount ? original - finalP : 0;
 
   return {
     hasDiscount,
     discountPercentage,
-    finalPrice,
-    originalPrice: product.price,
+    finalPrice: finalP,
+    originalPrice: original,
     savingsAmount,
   };
 };

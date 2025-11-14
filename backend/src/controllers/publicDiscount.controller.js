@@ -71,7 +71,7 @@ exports.getAllDiscounts = async (req, res) => {
           model: Product,
           as: "products",
           through: {
-            attributes: [], // Hide junction table
+            attributes: ["discounted_price", "original_price"], // Include pre-calculated prices
           },
           where: {
             is_active: true,
@@ -117,23 +117,10 @@ exports.getAllDiscounts = async (req, res) => {
         discountData.products?.map((product) => {
           const primaryImage = product.images?.[0];
 
-          // Calculate discounted price
-          let discountedPrice = parseFloat(product.selling_price);
-          if (discountData.discount_type === "percentage") {
-            const discountAmount =
-              (parseFloat(product.selling_price) *
-                parseFloat(discountData.value)) /
-              100;
-            discountedPrice = Math.max(
-              0,
-              parseFloat(product.selling_price) - discountAmount
-            );
-          } else if (discountData.discount_type === "fixed_amount") {
-            discountedPrice = Math.max(
-              0,
-              parseFloat(product.selling_price) - parseFloat(discountData.value)
-            );
-          }
+          // Use pre-calculated discounted_price from ProductDiscount table
+          const discountedPrice = product.ProductDiscount?.discounted_price
+            ? parseFloat(product.ProductDiscount.discounted_price)
+            : parseFloat(product.selling_price);
 
           return {
             id: product.id,

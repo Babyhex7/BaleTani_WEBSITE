@@ -11,6 +11,39 @@ const cacheService = require("../cache/cacheService");
 const { PATTERNS } = require("../cache/cacheKeys");
 
 /**
+ * Helper function untuk calculate discounted price dengan max_discount
+ * @param {Number} originalPrice - Harga asli produk
+ * @param {String} discountType - 'percentage' atau 'fixed_amount'
+ * @param {Number} discountValue - Nilai diskon (percentage atau fixed)
+ * @param {Number|null} maxDiscount - Maksimal potongan untuk percentage discount
+ * @returns {Number} - Harga setelah diskon (rounded to 2 decimal)
+ */
+const calculateDiscountedPrice = (
+  originalPrice,
+  discountType,
+  discountValue,
+  maxDiscount = null
+) => {
+  let discountAmount = 0;
+
+  if (discountType === "percentage") {
+    discountAmount = (originalPrice * discountValue) / 100;
+
+    // Apply max_discount limit if set
+    if (maxDiscount && discountAmount > maxDiscount) {
+      discountAmount = maxDiscount;
+    }
+  } else if (discountType === "fixed_amount") {
+    discountAmount = discountValue;
+  }
+
+  const discountedPrice = originalPrice - discountAmount;
+
+  // Ensure price is not negative and round to 2 decimal places
+  return Math.max(0, Math.round(discountedPrice * 100) / 100);
+};
+
+/**
  * GET /api/admin/discounts
  * Get all discounts with filters and pagination
  */
@@ -287,6 +320,47 @@ const createDiscount = async (req, res) => {
 
     // Add products to discount if provided
     if (product_ids && product_ids.length > 0) {
+      // ========================================
+      // VALIDATION: Check if products already have active discount
+      // ========================================
+      const existingDiscounts = await ProductDiscount.findAll({
+        where: {
+          product_id: product_ids,
+        },
+        include: [
+          {
+            model: Discount,
+            as: "discount",
+            where: {
+              is_active: true,
+              start_date: { [Op.lte]: new Date() },
+              end_date: { [Op.gte]: new Date() },
+            },
+            required: true,
+          },
+        ],
+      });
+
+      if (existingDiscounts.length > 0) {
+        const productsWithDiscount = existingDiscounts.map(
+          (pd) => pd.product_id
+        );
+
+        // Get product names for error message
+        const products = await Product.findAll({
+          where: { id: productsWithDiscount },
+          attributes: ["id", "name"],
+        });
+
+        const productNames = products.map((p) => p.name).join(", ");
+
+        return res.status(400).json({
+          success: false,
+          message: `Produk berikut sudah memiliki diskon aktif: ${productNames}. Hapus diskon lama terlebih dahulu.`,
+          products_with_discount: productsWithDiscount,
+        });
+      }
+
       // Get products to calculate prices
       const products = await Product.findAll({
         where: { id: product_ids },
@@ -295,18 +369,14 @@ const createDiscount = async (req, res) => {
 
       const productDiscounts = products.map((product) => {
         const originalPrice = parseFloat(product.selling_price);
-        let discountedPrice = originalPrice;
 
-        // Calculate discounted price
-        if (discount_type === "percentage") {
-          const discountAmount = (originalPrice * value) / 100;
-          discountedPrice = originalPrice - discountAmount;
-        } else if (discount_type === "fixed_amount") {
-          discountedPrice = originalPrice - value;
-        }
-
-        // Ensure discounted price is not negative
-        discountedPrice = Math.max(0, discountedPrice);
+        // Use helper function to calculate discounted price with max_discount
+        const discountedPrice = calculateDiscountedPrice(
+          originalPrice,
+          discount_type,
+          value,
+          max_discount
+        );
 
         return {
           product_id: product.id,
@@ -435,13 +505,64 @@ const updateDiscount = async (req, res) => {
 
     await discount.update(updateData);
 
+    // ========================================
+    // AUTO-RECALCULATE: If discount value/type/max_discount changed, update all product prices
+    // ========================================
+    const needsRecalculation =
+      updateData.discount_type !== undefined ||
+      updateData.value !== undefined ||
+      updateData.max_discount !== undefined;
+
+    if (needsRecalculation) {
+      // Get all products with this discount
+      const existingProductDiscounts = await ProductDiscount.findAll({
+        where: { discount_id: id },
+        include: [
+          {
+            model: Product,
+            as: "product",
+            attributes: ["id", "selling_price"],
+          },
+        ],
+      });
+
+      // Recalculate all prices
+      for (const pd of existingProductDiscounts) {
+        if (pd.product) {
+          const originalPrice = parseFloat(pd.product.selling_price);
+          const discountType =
+            updateData.discount_type || discount.discount_type;
+          const discountValue = updateData.value || discount.value;
+          const maxDiscount =
+            updateData.max_discount !== undefined
+              ? updateData.max_discount
+              : discount.max_discount;
+
+          const newDiscountedPrice = calculateDiscountedPrice(
+            originalPrice,
+            discountType,
+            discountValue,
+            maxDiscount
+          );
+
+          await pd.update({
+            original_price: originalPrice,
+            discounted_price: newDiscountedPrice,
+          });
+        }
+      }
+
+      console.log(
+        `[DISCOUNT UPDATE] ✅ Auto-recalculated prices for ${existingProductDiscounts.length} products`
+      );
+    }
+
     // Update products if provided
     if (product_ids !== undefined) {
       // Remove all existing product associations
-      await ProductDiscount.update(
-        { deleted_at: new Date() },
-        { where: { discount_id: id } }
-      );
+      await ProductDiscount.destroy({
+        where: { discount_id: id },
+      });
 
       // Add new product associations with calculated prices
       if (product_ids.length > 0) {
@@ -453,22 +574,23 @@ const updateDiscount = async (req, res) => {
 
         const productDiscounts = products.map((product) => {
           const originalPrice = parseFloat(product.selling_price);
-          let discountedPrice = originalPrice;
 
           // Calculate discounted price based on updated discount values
           const discountType =
             updateData.discount_type || discount.discount_type;
           const discountValue = updateData.value || discount.value;
+          const maxDiscount =
+            updateData.max_discount !== undefined
+              ? updateData.max_discount
+              : discount.max_discount;
 
-          if (discountType === "percentage") {
-            const discountAmount = (originalPrice * discountValue) / 100;
-            discountedPrice = originalPrice - discountAmount;
-          } else if (discountType === "fixed_amount") {
-            discountedPrice = originalPrice - discountValue;
-          }
-
-          // Ensure discounted price is not negative
-          discountedPrice = Math.max(0, discountedPrice);
+          // Use helper function to calculate discounted price with max_discount
+          const discountedPrice = calculateDiscountedPrice(
+            originalPrice,
+            discountType,
+            discountValue,
+            maxDiscount
+          );
 
           return {
             product_id: product.id,
@@ -675,7 +797,45 @@ const addProductsToDiscount = async (req, res) => {
       });
     }
 
-    // Add products (skip if already exists)
+    // ========================================
+    // VALIDATION: Check if products already have active discount
+    // ========================================
+    const existingDiscounts = await ProductDiscount.findAll({
+      where: {
+        product_id: product_ids,
+      },
+      include: [
+        {
+          model: Discount,
+          as: "discount",
+          where: {
+            is_active: true,
+            start_date: { [Op.lte]: new Date() },
+            end_date: { [Op.gte]: new Date() },
+          },
+          required: true,
+        },
+      ],
+    });
+
+    if (existingDiscounts.length > 0) {
+      const productsWithDiscount = existingDiscounts.map((pd) => pd.product_id);
+
+      // Get product names for error message
+      const products = await Product.findAll({
+        where: { id: productsWithDiscount },
+        attributes: ["id", "name"],
+      });
+
+      const productNames = products.map((p) => p.name).join(", ");
+
+      return res.status(400).json({
+        success: false,
+        message: `Produk berikut sudah memiliki diskon aktif: ${productNames}. Hapus diskon lama terlebih dahulu.`,
+        products_with_discount: productsWithDiscount,
+      });
+    }
+
     // Get products to calculate prices
     const products = await Product.findAll({
       where: { id: product_ids },
@@ -684,18 +844,14 @@ const addProductsToDiscount = async (req, res) => {
 
     const productDiscounts = products.map((product) => {
       const originalPrice = parseFloat(product.selling_price);
-      let discountedPrice = originalPrice;
 
-      // Calculate discounted price
-      if (discount.discount_type === "percentage") {
-        const discountAmount = (originalPrice * discount.value) / 100;
-        discountedPrice = originalPrice - discountAmount;
-      } else if (discount.discount_type === "fixed_amount") {
-        discountedPrice = originalPrice - discount.value;
-      }
-
-      // Ensure discounted price is not negative
-      discountedPrice = Math.max(0, discountedPrice);
+      // Use helper function to calculate discounted price with max_discount
+      const discountedPrice = calculateDiscountedPrice(
+        originalPrice,
+        discount.discount_type,
+        discount.value,
+        discount.max_discount
+      );
 
       return {
         product_id: product.id,
@@ -705,9 +861,7 @@ const addProductsToDiscount = async (req, res) => {
       };
     });
 
-    await ProductDiscount.bulkCreate(productDiscounts, {
-      ignoreDuplicates: true,
-    });
+    await ProductDiscount.bulkCreate(productDiscounts);
 
     // Get updated discount with products
     const updatedDiscount = await Discount.findByPk(id, {

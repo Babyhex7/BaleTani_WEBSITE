@@ -140,12 +140,27 @@ exports.getAllProducts = async (req, res) => {
         {
           model: ProductDiscount,
           as: "productDiscounts",
+          attributes: [
+            "id",
+            "product_id",
+            "discount_id",
+            "discounted_price",
+            "original_price",
+          ],
           required: false,
-          // where clause cleaned,
           include: [
             {
               model: Discount,
               as: "discount",
+              attributes: [
+                "id",
+                "discount_name",
+                "discount_type",
+                "value",
+                "start_date",
+                "end_date",
+                "is_active",
+              ],
               where: {
                 is_active: true,
                 start_date: { [Op.lte]: new Date() },
@@ -169,7 +184,7 @@ exports.getAllProducts = async (req, res) => {
       // Get primary image (first image by display_order)
       const primaryImage = productData.images?.[0];
 
-      // Calculate discount
+      // Get discount info from ProductDiscount table (pre-calculated)
       let discountInfo = null;
       if (
         productData.productDiscounts &&
@@ -181,31 +196,42 @@ exports.getAllProducts = async (req, res) => {
 
         if (activeDiscount?.discount) {
           const discount = activeDiscount.discount;
-          let discountAmount = 0;
 
-          if (discount.discount_type === "percentage") {
-            discountAmount = (productData.selling_price * discount.value) / 100;
-          } else if (discount.discount_type === "fixed_amount") {
-            discountAmount = discount.value;
-          }
+          // Use pre-calculated discounted_price from ProductDiscount table
+          const finalPrice = activeDiscount.discounted_price
+            ? parseFloat(activeDiscount.discounted_price)
+            : parseFloat(productData.selling_price);
+
+          const originalPrice = parseFloat(productData.selling_price);
+          const savingsAmount = originalPrice - finalPrice;
 
           discountInfo = {
             id: discount.id,
             name: discount.discount_name,
             type: discount.discount_type,
             value: parseFloat(discount.value),
-            finalPrice: Math.max(0, productData.selling_price - discountAmount),
+            finalPrice: finalPrice,
+            originalPrice: originalPrice,
+            savings: Math.round(savingsAmount * 100) / 100,
             validUntil: discount.end_date,
           };
         }
       }
+
+      // Calculate final price with discount
+      const finalPrice = discountInfo
+        ? discountInfo.finalPrice
+        : parseFloat(productData.selling_price);
 
       return {
         id: productData.id,
         name: productData.name,
         description: productData.description,
         price: parseFloat(productData.selling_price),
+        finalPrice: finalPrice, // ✅ Added for frontend
         stock: productData.total_stock,
+        unit: productData.quantity_info || "unit", // ✅ Added for frontend
+        quantityInfo: productData.quantity_info, // ✅ Added for frontend
         shelfLifeDays: productData.shelf_life_days,
         category: productData.category
           ? {
@@ -343,12 +369,27 @@ exports.getProductDetail = async (req, res) => {
         {
           model: ProductDiscount,
           as: "productDiscounts",
-          // where clause cleaned,
+          attributes: [
+            "id",
+            "product_id",
+            "discount_id",
+            "discounted_price",
+            "original_price",
+          ],
           required: false,
           include: [
             {
               model: Discount,
               as: "discount",
+              attributes: [
+                "id",
+                "discount_name",
+                "discount_type",
+                "value",
+                "start_date",
+                "end_date",
+                "is_active",
+              ],
               where: {
                 is_active: true,
                 start_date: { [Op.lte]: new Date() },
@@ -370,7 +411,7 @@ exports.getProductDetail = async (req, res) => {
 
     const productData = product.toJSON();
 
-    // Calculate discount
+    // Get discount info from ProductDiscount table (pre-calculated)
     let discountInfo = null;
     if (
       productData.productDiscounts &&
@@ -382,33 +423,42 @@ exports.getProductDetail = async (req, res) => {
 
       if (activeDiscount?.discount) {
         const discount = activeDiscount.discount;
-        let discountAmount = 0;
 
-        if (discount.discount_type === "percentage") {
-          discountAmount = (productData.selling_price * discount.value) / 100;
-        } else if (discount.discount_type === "fixed_amount") {
-          discountAmount = discount.value;
-        }
+        // Use pre-calculated discounted_price from ProductDiscount table
+        const finalPrice = activeDiscount.discounted_price
+          ? parseFloat(activeDiscount.discounted_price)
+          : parseFloat(productData.selling_price);
+
+        const originalPrice = parseFloat(productData.selling_price);
+        const savingsAmount = originalPrice - finalPrice;
 
         discountInfo = {
           id: discount.id,
           name: discount.discount_name,
           type: discount.discount_type,
           value: parseFloat(discount.value),
-          finalPrice: Math.max(0, productData.selling_price - discountAmount),
-          originalPrice: parseFloat(productData.selling_price),
-          savings: discountAmount,
+          finalPrice: finalPrice,
+          originalPrice: originalPrice,
+          savings: Math.round(savingsAmount * 100) / 100,
           validUntil: discount.end_date,
         };
       }
     }
+
+    // Calculate final price with discount
+    const finalPrice = discountInfo
+      ? discountInfo.finalPrice
+      : parseFloat(productData.selling_price);
 
     const formattedProduct = {
       id: productData.id,
       name: productData.name,
       description: productData.description,
       price: parseFloat(productData.selling_price),
+      finalPrice: finalPrice, // ✅ Added for frontend
       stock: productData.total_stock,
+      unit: productData.quantity_info || "unit", // ✅ Added for frontend
+      quantityInfo: productData.quantity_info, // ✅ Added for frontend
       shelfLifeDays: productData.shelf_life_days,
       category: productData.category
         ? {
@@ -515,8 +565,14 @@ exports.getFeaturedProducts = async (req, res) => {
         {
           model: ProductDiscount,
           as: "productDiscounts",
-          attributes: ["id", "product_id", "discount_id", "created_at"],
-          // where clause cleaned,
+          attributes: [
+            "id",
+            "product_id",
+            "discount_id",
+            "discounted_price",
+            "original_price",
+            "created_at",
+          ],
           required: true, // Only get products that have discounts
           include: [
             {
@@ -556,31 +612,42 @@ exports.getFeaturedProducts = async (req, res) => {
 
       let discountInfo = null;
       if (discount) {
-        let discountAmount = 0;
-        if (discount.discount_type === "percentage") {
-          discountAmount = (productData.selling_price * discount.value) / 100;
-        } else if (discount.discount_type === "fixed_amount") {
-          discountAmount = discount.value;
-        }
+        // Use pre-calculated discounted_price from ProductDiscount table
+        const finalPrice = activeDiscount.discounted_price
+          ? parseFloat(activeDiscount.discounted_price)
+          : parseFloat(productData.selling_price);
+
+        const originalPrice = parseFloat(productData.selling_price);
+        const savingsAmount = originalPrice - finalPrice;
 
         discountInfo = {
           id: discount.id,
           name: discount.discount_name,
           type: discount.discount_type,
           value: parseFloat(discount.value),
-          finalPrice: Math.max(0, productData.selling_price - discountAmount),
+          finalPrice: finalPrice,
+          savings: Math.round(savingsAmount * 100) / 100,
           validUntil: discount.end_date,
         };
       }
+
+      // Calculate final price with discount
+      const finalPrice = discountInfo
+        ? discountInfo.finalPrice
+        : parseFloat(productData.selling_price);
 
       return {
         id: productData.id,
         name: productData.name,
         description: productData.description,
         price: parseFloat(productData.selling_price),
+        finalPrice: finalPrice, // ✅ Added for consistency
         stock: productData.total_stock,
+        unit: productData.quantity_info || "unit", // ✅ Added for consistency
+        quantityInfo: productData.quantity_info, // ✅ Added for consistency
         category: productData.category?.category_name,
         image: primaryImage?.image_url || "/placeholder-product.jpg",
+        images: productData.images?.map((img) => img.image_url) || [], // ✅ Added for consistency
         discount: discountInfo,
       };
     });
@@ -637,8 +704,12 @@ exports.getProductById = async (req, res) => {
         {
           model: ProductDiscount,
           as: "productDiscounts",
-          attributes: ["discount_id"],
-          // where clause cleaned,
+          attributes: [
+            "id",
+            "discount_id",
+            "discounted_price",
+            "original_price",
+          ],
           required: false,
           include: [
             {
@@ -672,36 +743,32 @@ exports.getProductById = async (req, res) => {
       });
     }
 
-    // Calculate discount
+    // Get discount info from ProductDiscount table (pre-calculated by admin)
     let discountInfo = null;
-    let finalPrice = product.selling_price;
+    let finalPrice = parseFloat(product.selling_price);
 
-    if (
-      product.productDiscounts &&
-      product.productDiscounts.length > 0 &&
-      product.productDiscounts[0].discount
-    ) {
-      const discount = product.productDiscounts[0].discount;
-      let discountAmount = 0;
+    if (product.productDiscounts && product.productDiscounts.length > 0) {
+      const productDiscount = product.productDiscounts[0];
 
-      if (discount.discount_type === "percentage") {
-        discountAmount = (product.selling_price * discount.value) / 100;
-      } else if (discount.discount_type === "fixed_amount") {
-        discountAmount = discount.value;
+      // ALWAYS use discounted_price from ProductDiscount table (set by admin)
+      if (productDiscount.discounted_price && productDiscount.discount) {
+        finalPrice = parseFloat(productDiscount.discounted_price);
+        const discount = productDiscount.discount;
+        const originalPrice = parseFloat(product.selling_price);
+        const savingsAmount = originalPrice - finalPrice;
+
+        discountInfo = {
+          id: discount.id,
+          name: discount.discount_name,
+          type: discount.discount_type,
+          value: parseFloat(discount.value),
+          startDate: discount.start_date,
+          endDate: discount.end_date,
+          discountAmount: savingsAmount,
+          finalPrice: finalPrice,
+          originalPrice: originalPrice,
+        };
       }
-
-      finalPrice = Math.max(0, product.selling_price - discountAmount);
-
-      discountInfo = {
-        id: discount.id,
-        name: discount.discount_name,
-        type: discount.discount_type,
-        value: discount.value,
-        startDate: discount.start_date,
-        endDate: discount.end_date,
-        discountAmount,
-        finalPrice,
-      };
     }
 
     // Get all images (sorted by display_order) - with safety check
@@ -718,12 +785,16 @@ exports.getProductById = async (req, res) => {
       name: product.name,
       description: product.description,
       price: product.selling_price,
+      finalPrice: finalPrice, // ✅ Added for consistency
       stock: product.total_stock,
+      unit: product.quantity_info || "unit", // ✅ Added for consistency
+      quantityInfo: product.quantity_info, // ✅ Added for consistency
       weight: product.weight,
       category: {
         id: product.category?.id,
         name: product.category?.category_name,
       },
+      image: images.length > 0 ? images[0] : "/placeholder-product.jpg", // ✅ Added primary image
       images: images.length > 0 ? images : ["/placeholder-product.jpg"],
       discount: discountInfo,
       specifications: {

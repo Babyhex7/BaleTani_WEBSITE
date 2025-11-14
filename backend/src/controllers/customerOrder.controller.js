@@ -53,6 +53,16 @@ const createOrder = async (req, res) => {
       });
     }
 
+    // Validate phone number format (Indonesia)
+    const phoneRegex = /^(\+62|62|0)[0-9]{9,13}$/;
+    if (!phoneRegex.test(customer_phone.replace(/[\s-]/g, ""))) {
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: "Format nomor telepon tidak valid",
+      });
+    }
+
     if (!items || items.length === 0) {
       await transaction.rollback();
       return res.status(400).json({
@@ -61,11 +71,38 @@ const createOrder = async (req, res) => {
       });
     }
 
+    // Limit max items per order
+    if (items.length > 50) {
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: "Maksimal 50 item per order",
+      });
+    }
+
+    // Validate delivery method
+    if (!["delivery", "self_pickup"].includes(delivery_method)) {
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: "Metode pengiriman tidak valid",
+      });
+    }
+
     if (delivery_method === "delivery" && !delivery_address) {
       await transaction.rollback();
       return res.status(400).json({
         success: false,
         message: "Alamat pengiriman wajib diisi untuk metode delivery",
+      });
+    }
+
+    // Validate payment method
+    if (!["transfer", "cash", "bank_transfer"].includes(payment_method)) {
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: "Metode pembayaran tidak valid",
       });
     }
 
@@ -98,11 +135,64 @@ const createOrder = async (req, res) => {
     const orderItemsData = [];
 
     for (const item of items) {
+      // Validate item structure
+      if (!item.product_id || !item.quantity || item.quantity < 1) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: "Item tidak valid: product_id dan quantity wajib diisi",
+        });
+      }
+
+      // Limit quantity per item
+      if (item.quantity > 100) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: "Maksimal 100 quantity per item",
+        });
+      }
+
       const product = await Product.findOne({
         where: {
           id: item.product_id,
           is_active: true,
         },
+        include: [
+          {
+            model: require("../models").ProductDiscount,
+            as: "productDiscounts",
+            attributes: [
+              "id",
+              "product_id",
+              "discount_id",
+              "original_price",
+              "discounted_price",
+            ],
+            required: false,
+            include: [
+              {
+                model: require("../models").Discount,
+                as: "discount",
+                attributes: [
+                  "id",
+                  "discount_name",
+                  "discount_type",
+                  "value",
+                  "start_date",
+                  "end_date",
+                  "is_active",
+                ],
+                where: {
+                  is_active: true,
+                  start_date: { [require("sequelize").Op.lte]: getWIBDate() },
+                  end_date: { [require("sequelize").Op.gte]: getWIBDate() },
+                },
+                required: false,
+              },
+            ],
+          },
+        ],
       });
 
       if (!product) {
@@ -122,17 +212,32 @@ const createOrder = async (req, res) => {
         });
       }
 
-      const itemPrice = parseFloat(product.selling_price);
-      const itemTotal = itemPrice * item.quantity;
+      // Calculate price with discount - ALWAYS use pre-calculated discounted_price
+      const originalPrice = parseFloat(product.selling_price);
+      let finalPrice = originalPrice;
+      let discountValue = 0;
+
+      // Check if product has active discount - ALWAYS use discounted_price from table
+      if (product.productDiscounts && product.productDiscounts.length > 0) {
+        const activeDiscount = product.productDiscounts[0];
+
+        // ALWAYS use discounted_price from ProductDiscount table (set by admin with max_discount)
+        if (activeDiscount.discounted_price) {
+          finalPrice = parseFloat(activeDiscount.discounted_price);
+          discountValue = originalPrice - finalPrice;
+        }
+      }
+
+      const itemTotal = Math.round(finalPrice * item.quantity * 100) / 100;
       itemSubtotal += itemTotal;
 
       orderItemsData.push({
         product_id: item.product_id,
         product_name: product.name,
         quantity: item.quantity,
-        original_price: itemPrice,
-        discount_price: 0,
-        final_price: itemPrice,
+        original_price: Math.round(originalPrice * 100) / 100,
+        discount_price: Math.round(discountValue * 100) / 100,
+        final_price: Math.round(finalPrice * 100) / 100,
         subtotal: itemTotal,
       });
 
@@ -391,17 +496,23 @@ const createOrder = async (req, res) => {
     waMessage += `Terima kasih sudah berbelanja di *BaleTani Fresh Market*! 🌿✨\n`;
     waMessage += `\n_Pesan otomatis dari sistem BaleTani_`;
 
-    // Add WhatsApp message to response
-    const adminWhatsAppPhone =
-      process.env.WHATSAPP_ADMIN_PHONE || "6285885725027";
+    // Add WhatsApp message to response (with error handling)
+    try {
+      const adminWhatsAppPhone =
+        process.env.WHATSAPP_ADMIN_PHONE || "6285885725027";
 
-    responseData.whatsapp = {
-      phone: adminWhatsAppPhone,
-      message: waMessage,
-      url: `https://wa.me/${adminWhatsAppPhone}?text=${encodeURIComponent(
-        waMessage
-      )}`,
-    };
+      responseData.whatsapp = {
+        phone: adminWhatsAppPhone,
+        message: waMessage,
+        url: `https://wa.me/${adminWhatsAppPhone}?text=${encodeURIComponent(
+          waMessage
+        )}`,
+      };
+    } catch (waError) {
+      console.error("WhatsApp message generation failed:", waError);
+      // Order tetap sukses meskipun WhatsApp gagal
+      responseData.whatsapp = null;
+    }
 
     return res.status(201).json({
       success: true,

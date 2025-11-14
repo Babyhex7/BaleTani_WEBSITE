@@ -142,7 +142,7 @@ const getAllOrders = async (req, res) => {
     const formattedOrders = orders.map((order) => ({
       id: order.id,
       order_number: order.order_number,
-      order_type: order.order_type || order.transaction_type, // Gunakan order_type terlebih dahulu
+      order_type: order.transaction_type, // Use transaction_type from database consistently
       customer_name: order.customer_name || order.customer?.full_name || "-",
       customer_phone:
         order.customer_phone || order.customer?.phone_number || "-",
@@ -737,8 +737,8 @@ const createOfflineOrder = async (req, res) => {
             as: "discount",
             where: {
               is_active: 1,
-              start_date: { [Op.lte]: new Date() },
-              end_date: { [Op.gte]: new Date() },
+              start_date: { [Op.lte]: getWIBDate() },
+              end_date: { [Op.gte]: getWIBDate() },
             },
             required: false,
           },
@@ -746,14 +746,20 @@ const createOfflineOrder = async (req, res) => {
         transaction,
       });
 
-      const originalPrice = parseFloat(product.selling_price);
-      const discountPrice =
-        productDiscount && productDiscount.discount
-          ? parseFloat(productDiscount.discounted_price)
-          : null;
-      const finalPrice = discountPrice || originalPrice;
+      const originalPrice =
+        Math.round(parseFloat(product.selling_price) * 100) / 100;
+      let finalPrice = originalPrice;
+      let discountValue = 0;
+
+      // ALWAYS use pre-calculated discounted_price from ProductDiscount table
+      if (productDiscount && productDiscount.discounted_price) {
+        finalPrice =
+          Math.round(parseFloat(productDiscount.discounted_price) * 100) / 100;
+        discountValue = Math.round((originalPrice - finalPrice) * 100) / 100;
+      }
+
       const qty = parseFloat(item.quantity);
-      const itemSubtotal = finalPrice * qty;
+      const itemSubtotal = Math.round(finalPrice * qty * 100) / 100;
 
       subtotal += itemSubtotal;
 
@@ -762,7 +768,7 @@ const createOfflineOrder = async (req, res) => {
         product_name: product.name,
         quantity: qty,
         original_price: originalPrice,
-        discount_price: discountPrice,
+        discount_price: discountValue,
         final_price: finalPrice,
         subtotal: itemSubtotal,
       });
@@ -835,6 +841,18 @@ const createOfflineOrder = async (req, res) => {
         notes: `Order offline dibuat oleh admin. Payment: ${payment_method}`,
         changed_by: adminId,
         changed_at: getWIBDate(),
+      },
+      { transaction }
+    );
+
+    // Create payment detail for offline orders
+    await PaymentDetail.create(
+      {
+        order_id: order.id,
+        payment_method: payment_method,
+        payment_status: paymentStatus,
+        amount: totalAmount,
+        paid_at: payment_method === "cash" ? getWIBDate() : null,
       },
       { transaction }
     );

@@ -288,37 +288,28 @@ Discount.hasMany(ProductDiscount, {
   as: "productDiscounts",
 });
 
-// Customer ↔ Product via Cart
-Customer.belongsToMany(Product, {
-  through: Cart,
-  foreignKey: "customer_id",
-  otherKey: "product_id",
-  as: "cartProducts",
-});
-Product.belongsToMany(Customer, {
-  through: Cart,
-  foreignKey: "product_id",
-  otherKey: "customer_id",
-  as: "cartCustomers",
-});
+// =============================
+// CART RELATIONSHIPS
+// =============================
 
-// Direct Cart relationships
-Cart.belongsTo(Customer, {
-  foreignKey: "customer_id",
-  as: "customer",
-});
-Customer.hasMany(Cart, {
-  foreignKey: "customer_id",
-  as: "carts",
-});
-
+// Cart → Product (Each cart item references a product)
 Cart.belongsTo(Product, {
   foreignKey: "product_id",
   as: "product",
 });
 Product.hasMany(Cart, {
   foreignKey: "product_id",
-  as: "carts",
+  as: "cartItems",
+});
+
+// Cart → Customer (Each cart item belongs to a customer)
+Cart.belongsTo(Customer, {
+  foreignKey: "customer_id",
+  as: "customer",
+});
+Customer.hasMany(Cart, {
+  foreignKey: "customer_id",
+  as: "cartItems",
 });
 
 module.exports = {
