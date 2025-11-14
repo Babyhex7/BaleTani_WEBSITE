@@ -6,9 +6,11 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronDown, ChevronRight, Star, Search, SlidersHorizontal } from 'lucide-react';
 import ProductCard from '../../components/ui/ProductCard';
+import ProductCardSkeleton from '../../components/ui/ProductCardSkeleton';
 import SearchBar from '../../components/ui/SearchBar';
 import Button from '../../components/ui/Button';
 import Pagination from '../../components/ui/Pagination';
+import ErrorBoundary from '../../components/ErrorBoundary';
 import useProducts from '../../hooks/hook_customer/useProducts';
 import useDebounce from '../../hooks/useDebounce';
 import Navbar from '../../components/layout/Navbar';
@@ -264,9 +266,8 @@ const ProductPage = () => {
 
             {/* Loading State */}
             {loading && (
-              <div className="text-center py-12 sm:py-16 md:py-20">
-                <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-4 border-green-600 border-t-transparent"></div>
-                <p className="mt-4 text-body text-gray-600">Memuat produk...</p>
+              <div className="grid-products-sidebar">
+                <ProductCardSkeleton count={12} />
               </div>
             )}
 
@@ -290,11 +291,12 @@ const ProductPage = () => {
                   <>
                     <div className="grid-products-sidebar mb-6">
                       {products.map((product) => (
-                        <ProductCard
-                          key={product.id}
-                          product={product}
-                          formatPrice={formatPrice}
-                        />
+                        <ErrorBoundary key={product.id}>
+                          <ProductCard
+                            product={product}
+                            formatPrice={formatPrice}
+                          />
+                        </ErrorBoundary>
                       ))}
                     </div>
 

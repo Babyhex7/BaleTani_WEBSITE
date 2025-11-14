@@ -16,6 +16,8 @@ import {
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import ProductCard from '../../components/ui/ProductCard';
+import ProductCardSkeleton from '../../components/ui/ProductCardSkeleton';
+import ErrorBoundary from '../../components/ErrorBoundary';
 import SearchBar from '../../components/ui/SearchBar';
 import Pagination from '../../components/ui/Pagination';
 import categoryService from '../../services/services_customer/categoryService';
@@ -105,10 +107,11 @@ const CategoryDetailPage = () => {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center py-12 sm:py-16">
-            <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-4 border-green-600 border-t-transparent"></div>
-            <p className="mt-4 text-body text-gray-600">Memuat kategori...</p>
+        <div className="min-h-screen bg-gray-50 section-py">
+          <div className="container-app">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+              <ProductCardSkeleton count={12} />
+            </div>
           </div>
         </div>
         <Footer />
@@ -241,14 +244,15 @@ const CategoryDetailPage = () => {
               {/* Grid layout: 1 col mobile, 2 cols tablet, 3 cols desktop, 4 cols xl */}
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
                 {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={{
-                      ...product,
-                      category: category.category_name,
-                    }}
-                    formatPrice={formatPrice}
-                  />
+                  <ErrorBoundary key={product.id}>
+                    <ProductCard
+                      product={{
+                        ...product,
+                        category: category.category_name,
+                      }}
+                      formatPrice={formatPrice}
+                    />
+                  </ErrorBoundary>
                 ))}
               </div>
 

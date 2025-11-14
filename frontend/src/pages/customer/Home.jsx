@@ -5,6 +5,8 @@ import useAuthStore from '../../store/store_customer/useAuthStore';
 import productService from '../../services/services_customer/productService';
 import Button from '../../components/ui/Button';
 import ProductCard from '../../components/ui/ProductCard';
+import ProductCardSkeleton from '../../components/ui/ProductCardSkeleton';
+import ErrorBoundary from '../../components/ErrorBoundary';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 
@@ -244,20 +246,20 @@ const Home = () => {
           </div>
 
           {loading ? (
-            <div className="text-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent"></div>
-              <p className="mt-4 text-gray-600">Memuat produk...</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <ProductCardSkeleton count={6} />
             </div>
           ) : featuredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  formatPrice={formatPrice}
-                  onWhatsAppOrder={handleWhatsAppOrder}
-                  onAddToCart={handleAddToCart}
-                />
+                <ErrorBoundary key={product.id}>
+                  <ProductCard
+                    product={product}
+                    formatPrice={formatPrice}
+                    onWhatsAppOrder={handleWhatsAppOrder}
+                    onAddToCart={handleAddToCart}
+                  />
+                </ErrorBoundary>
               ))}
             </div>
           ) : (

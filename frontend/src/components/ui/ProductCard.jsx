@@ -43,6 +43,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast'; // ✅ ADDED: For error notifications
 import LoginModal from './LoginModal';
 import ProductImage from './ProductImage';
 import ProductPrice from './ProductPrice';
@@ -145,15 +146,36 @@ const ProductCard = ({
    * Handle card click - Navigate ke product detail
    * Bisa di-override dengan onCardClick prop untuk custom behavior
    * 
+   * ✅ FIXED: Proper event handling dan error handling
+   * 
    * @param {Event} e - Click event (optional, for keyboard support)
    */
   const handleCardClick = (e) => {
+    // ✅ CRITICAL: Null check untuk event
+    if (e) {
+      e.preventDefault();
+      // Tidak perlu stopPropagation di sini karena ini parent handler
+    }
+    
     // Jika ada custom handler, gunakan itu
     if (onCardClick) {
       onCardClick(product);
-    } else {
-      // Default: Navigate ke detail page
+      return;
+    }
+    
+    // ✅ CRITICAL: Validate product.id sebelum navigate
+    if (!product?.id) {
+      console.error('ProductCard: Cannot navigate, invalid product ID');
+      toast.error('Produk tidak valid');
+      return;
+    }
+    
+    // Default: Navigate ke detail page
+    try {
       navigate(`/products/${product.id}`);
+    } catch (error) {
+      console.error('ProductCard: Navigation error', error);
+      toast.error('Gagal membuka detail produk');
     }
   };
   
@@ -179,15 +201,18 @@ const ProductCard = ({
         border-gray-200 
         hover:border-green-500 
         cursor-pointer
+        ${isProcessing ? 'pointer-events-none opacity-75' : ''}
         ${className}
       `}
       role="button"
       tabIndex={0}
       aria-label={`Lihat detail ${product.name}`}
       onKeyPress={(e) => {
+        // ✅ FIXED: Pass event ke handler dan handle space key properly
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          handleCardClick();
+          e.stopPropagation(); // Prevent scroll on space
+          handleCardClick(e);
         }
       }}
     >
@@ -290,9 +315,18 @@ const ProductCard = ({
             - size: 'xs' untuk mobile grid 2 kolom, 'sm' tablet, 'md' desktop
             - variant: 'primary' (green)
             - fullWidth: true untuk full width
+            
+            ✅ CRITICAL: stopPropagation untuk prevent bubble ke card onClick
             ======================================== */}
         <AddToCartButton 
-          onClick={handleAddToCart(product, 1)}
+          onClick={(e) => {
+            // ✅ CRITICAL: Stop propagation agar tidak trigger handleCardClick
+            if (e) {
+              e.stopPropagation();
+            }
+            // handleAddToCart sudah return function, langsung call
+            handleAddToCart(product, 1)(e);
+          }}
           stock={product.stock}
           loading={isProcessing}
           size="xs"

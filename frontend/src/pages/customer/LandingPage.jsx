@@ -10,6 +10,8 @@ import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'fra
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import Button from '../../components/ui/Button';
 import ProductCard from '../../components/ui/ProductCard';
+import ProductCardSkeleton from '../../components/ui/ProductCardSkeleton';
+import ErrorBoundary from '../../components/ErrorBoundary';
 import productService from '../../services/services_customer/productService';
 import categoryService from '../../services/services_customer/categoryService';
 // Navbar & Footer disediakan oleh CustomerLayout pada routing level
@@ -581,13 +583,15 @@ const LandingPage = () => {
                           transition={{ delay: index * 0.1, duration: 0.5 }}
                           className="snap-start min-w-[46%] sm:min-w-[42%] md:min-w-0"
                         >
-                          <ProductCard
-                            product={product}
-                            onWhatsAppOrder={handleWhatsAppOrder}
-                            onAddToCart={handleAddToCart}
-                            formatPrice={formatPrice}
-                            className="mx-2"
-                          />
+                          <ErrorBoundary>
+                            <ProductCard
+                              product={product}
+                              onWhatsAppOrder={handleWhatsAppOrder}
+                              onAddToCart={handleAddToCart}
+                              formatPrice={formatPrice}
+                              className="mx-2"
+                            />
+                          </ErrorBoundary>
                         </motion.div>
                       ))}
                     </motion.div>

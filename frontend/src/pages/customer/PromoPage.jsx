@@ -25,6 +25,8 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronDown, ChevronRight, Percent, SlidersHorizontal } from 'lucide-react';
 import ProductCard from '../../components/ui/ProductCard';
+import ProductCardSkeleton from '../../components/ui/ProductCardSkeleton';
+import ErrorBoundary from '../../components/ErrorBoundary';
 import SearchBar from '../../components/ui/SearchBar';
 import Pagination from '../../components/ui/Pagination';
 import discountService from '../../services/services_customer/discountService';
@@ -594,9 +596,8 @@ const PromoPage = () => {
 
             {/* Loading State */}
             {loading && (
-              <div className="text-center py-12 sm:py-16 md:py-20">
-                <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-4 border-green-600 border-t-transparent"></div>
-                <p className="mt-4 text-body text-gray-600">Memuat produk promo...</p>
+              <div className="grid-products-sidebar">
+                <ProductCardSkeleton count={12} />
               </div>
             )}
 
@@ -623,10 +624,11 @@ const PromoPage = () => {
                       {filteredProducts
                         .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                         .map((product) => (
-                          <ProductCard 
-                            key={`${product.id}-${product.discount?.id || 'no'}`}
-                            product={product} 
-                          />
+                          <ErrorBoundary key={`${product.id}-${product.discount?.id || 'no'}`}>
+                            <ProductCard 
+                              product={product} 
+                            />
+                          </ErrorBoundary>
                         ))}
                     </div>
 
