@@ -14,6 +14,7 @@ const router = express.Router();
 const productRoutes = require("./products");
 const categoryRoutes = require("./categories");
 const discountRoutes = require("./discounts");
+const faqRoutes = require("./faqs");
 
 /**
  * PUBLIC ROUTES (No authentication required)
@@ -28,5 +29,8 @@ router.use("/categories", categoryRoutes); // /api/public/categories/*
 
 // View discounts/promos (public access - no auth)
 router.use("/discounts", discountRoutes); // /api/public/discounts/*
+
+// View FAQs (public access - no auth)
+router.use("/faqs", faqRoutes); // /api/public/faqs/*
 
 module.exports = router;

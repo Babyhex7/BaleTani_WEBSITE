@@ -11,7 +11,9 @@ import {
   ChartBarIcon,
   ChevronDownIcon,
   ChevronRightIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  QuestionMarkCircleIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
 import useAdminStore from '../../store/store_admin/useAdminStore';
 
@@ -65,6 +67,15 @@ const AdminSidebarNew = () => {
       submenu: [
         { name: 'Customer Management', path: '/admin/customers' },
         { name: 'Admin Management', path: '/admin/admins' },
+      ]
+    },
+    {
+      name: 'Customer Support',
+      icon: ChatBubbleLeftRightIcon,
+      key: 'support',
+      submenu: [
+        { name: 'FAQ Management', path: '/admin/faqs' },
+        { name: 'Contact Messages', path: '/admin/contacts' },
       ]
     },
     {

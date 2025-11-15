@@ -202,6 +202,50 @@ const roleMiddleware = (allowedRoles) => {
   };
 };
 
+/**
+ * Optional Authentication Middleware
+ * Set req.user if token exists, but don't throw error if not
+ * Useful for endpoints yang bisa diakses dengan/tanpa login
+ */
+const optionalAuth = async (req, res, next) => {
+  try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+
+    if (!token) {
+      // No token, continue without setting req.user
+      return next();
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Check if it's a customer token
+    if (decoded.type === "customer") {
+      const customer = await Customer.findOne({
+        where: {
+          id: decoded.userId,
+          is_active: true,
+        },
+        attributes: { exclude: ["password_hash"] },
+      });
+
+      if (customer) {
+        req.user = {
+          id: customer.id,
+          name: customer.name,
+          email: customer.email,
+          phone_number: customer.phone_number,
+          is_active: customer.is_active,
+        };
+      }
+    }
+
+    next();
+  } catch (error) {
+    // If token is invalid, just continue without setting req.user
+    next();
+  }
+};
+
 // Legacy middleware untuk backward compatibility
 const authMiddleware = authenticateAdmin;
 
@@ -209,5 +253,6 @@ module.exports = {
   authMiddleware, // Legacy support
   authenticateAdmin, // ADMIN dengan RBAC
   authenticateCustomer, // CUSTOMER tanpa RBAC (basic auth only)
+  optionalAuth, // Optional auth (set req.user if token exists)
   roleMiddleware, // RBAC checker untuk admin
 };

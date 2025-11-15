@@ -17,6 +17,7 @@ import CheckoutPage from './pages/customer/CheckoutPage';
 import OrderSuccessPage from './pages/customer/OrderSuccessPage';
 import CategoryPage from './pages/customer/CategoryPage';
 import CategoryDetailPage from './pages/customer/CategoryDetailPage';
+import ContactPage from './pages/customer/ContactPage';
 import ProfilePage from './pages/customer/ProfilePage';
 import PurchaseHistory from './pages/customer/PurchaseHistory';
 import ProtectedRoute, { RoleBasedRedirect } from './components/auth/ProtectedRoute';
@@ -33,6 +34,7 @@ import ProductListNew from './pages/admin/ProductListNew';
 import CategoryManagement from './pages/admin/CategoryManagement';
 import DiscountManagement from './pages/admin/DiscountManagement';
 import CustomerManagement from './pages/admin/CustomerManagement';
+import FAQManagement from './pages/admin/FAQManagement';
 
 /**
  * Komponen utama aplikasi yang mengatur routing
@@ -170,15 +172,8 @@ function App() {
       {/* Category Detail - Produk dalam kategori tertentu */}
       <Route path="/categories/:id" element={<CategoryDetailPage />} />
 
-      <Route path="/contact" element={
-        <ProtectedRoute requiredRole="customer">
-          <CustomerLayout>
-            <div className="container-custom section-padding">
-              <h1 className="text-2xl font-bold">Halaman Kontak (Coming Soon)</h1>
-            </div>
-          </CustomerLayout>
-        </ProtectedRoute>
-      } />
+      {/* Contact Page - Halaman kontak customer */}
+      <Route path="/contact" element={<ContactPage />} />
 
       <Route path="/about" element={
         <ProtectedRoute requiredRole="customer">
@@ -254,6 +249,13 @@ function App() {
       <Route path="/admin/customers" element={
         <ProtectedRoute requiredRole="admin">
           <CustomerManagement />
+        </ProtectedRoute>
+      } />
+
+      {/* FAQ Management */}
+      <Route path="/admin/faqs" element={
+        <ProtectedRoute requiredRole="admin">
+          <FAQManagement />
         </ProtectedRoute>
       } />
 

@@ -16,6 +16,8 @@ const OrderItem = require("./orderItem.model");
 const OrderStatusHistory = require("./orderStatusHistory.model");
 const PaymentDetail = require("./paymentDetail.model");
 const StockMovement = require("./stockMovement.model");
+const FAQ = require("./faq.model");
+const ContactMessage = require("./contactMessage.model");
 
 // =============================
 // ONE-TO-MANY RELATIONSHIPS
@@ -312,6 +314,40 @@ Customer.hasMany(Cart, {
   as: "cartItems",
 });
 
+// =============================
+// FAQ & CONTACT MESSAGE RELATIONSHIPS
+// =============================
+
+// FAQ → Admin (created_by & updated_by)
+FAQ.belongsTo(Admin, {
+  foreignKey: "created_by",
+  as: "creator",
+});
+FAQ.belongsTo(Admin, {
+  foreignKey: "updated_by",
+  as: "updater",
+});
+
+// ContactMessage → Customer (optional, jika user login)
+ContactMessage.belongsTo(Customer, {
+  foreignKey: "customer_id",
+  as: "customer",
+});
+Customer.hasMany(ContactMessage, {
+  foreignKey: "customer_id",
+  as: "contactMessages",
+});
+
+// ContactMessage → Admin (replied_by)
+ContactMessage.belongsTo(Admin, {
+  foreignKey: "replied_by",
+  as: "replier",
+});
+Admin.hasMany(ContactMessage, {
+  foreignKey: "replied_by",
+  as: "repliedMessages",
+});
+
 module.exports = {
   Admin,
   Role,
@@ -331,6 +367,8 @@ module.exports = {
   OrderStatusHistory,
   PaymentDetail,
   StockMovement,
+  FAQ,
+  ContactMessage,
   // Legacy exports for backward compatibility
   User: Admin,
 };

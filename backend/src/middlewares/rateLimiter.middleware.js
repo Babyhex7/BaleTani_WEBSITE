@@ -123,6 +123,29 @@ const apiLimiter = rateLimit({
 
 /**
  * ========================================
+ * GENERIC RATE LIMITER FACTORY
+ * ========================================
+ *
+ * Membuat limiter custom sesuai opsi yang diberikan.
+ * Digunakan ketika route membutuhkan konfigurasi khusus.
+ * Contoh penggunaan:
+ *   router.post('/', rateLimiter({ windowMs: 15*60*1000, max: 5 }), handler)
+ */
+const rateLimiter = (options = {}) => {
+  return rateLimit({
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+      success: false,
+      message: "Terlalu banyak permintaan. Silakan coba lagi nanti.",
+      code: "RATE_LIMIT_GENERIC",
+    },
+    ...options,
+  });
+};
+
+/**
+ * ========================================
  * SENSITIVE OPERATIONS LIMITER
  * ========================================
  *
@@ -190,4 +213,5 @@ module.exports = {
   apiLimiter,
   sensitiveLimiter,
   uploadLimiter,
+  rateLimiter,
 };

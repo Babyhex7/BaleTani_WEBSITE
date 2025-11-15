@@ -14,6 +14,7 @@ const authRoutes = require("../customerAuth.routes");
 const cartRoutes = require("./cart.routes");
 const orderRoutes = require("./order.routes");
 const profileRoutes = require("./profile.routes");
+const contactRoutes = require("./contact.routes");
 
 /**
  * PUBLIC CUSTOMER ROUTES (No auth required)
@@ -29,5 +30,6 @@ router.use("/auth", authRoutes);
 router.use("/cart", cartRoutes);
 router.use("/orders", orderRoutes);
 router.use("/profile", profileRoutes);
+router.use("/contact", contactRoutes); // Contact form & messages
 
 module.exports = router;

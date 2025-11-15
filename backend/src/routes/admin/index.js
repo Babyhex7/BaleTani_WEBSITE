@@ -18,6 +18,8 @@ const discountRoutes = require("./discounts");
 const userRoutes = require("./users");
 const orderRoutes = require("./orders");
 const customerRoutes = require("./customers");
+const faqRoutes = require("./faqs");
+const contactRoutes = require("./contacts");
 
 /**
  * PUBLIC ADMIN ROUTES (No auth required)
@@ -50,5 +52,11 @@ router.use("/users", userRoutes); // /api/admin/users/*
 
 // Customer Management
 router.use("/customers", customerRoutes); // /api/admin/customers/*
+
+// FAQ Management
+router.use("/faqs", faqRoutes); // /api/admin/faqs/*
+
+// Contact Message Management
+router.use("/contacts", contactRoutes); // /api/admin/contacts/*
 
 module.exports = router;
