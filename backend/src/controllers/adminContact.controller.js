@@ -75,6 +75,7 @@ exports.getAllMessages = async (req, res, next) => {
     // Format data untuk frontend
     const formattedMessages = messages.map((msg) => ({
       id: msg.id,
+      customer_id: msg.customer_id,
       name: msg.full_name,
       email: msg.email,
       phone: msg.whatsapp_number,
@@ -85,8 +86,7 @@ exports.getAllMessages = async (req, res, next) => {
       created_at: msg.created_at,
       updated_at: msg.updated_at,
       replied_at: msg.replied_at,
-      customer: msg.customer,
-      replier: msg.replier,
+      replied_by: msg.replied_by,
     }));
 
     res.status(200).json({
@@ -111,20 +111,7 @@ exports.getMessageById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const message = await ContactMessage.findByPk(id, {
-      include: [
-        {
-          model: Customer,
-          as: "customer",
-          attributes: ["id", "name", "email", "phone_number"],
-        },
-        {
-          model: Admin,
-          as: "replier",
-          attributes: ["id", "name", "email"],
-        },
-      ],
-    });
+    const message = await ContactMessage.findByPk(id);
 
     if (!message) {
       return res.status(404).json({
@@ -193,26 +180,10 @@ exports.updateStatus = async (req, res, next) => {
 
     await message.save();
 
-    // Fetch with relations
-    const updatedMessage = await ContactMessage.findByPk(id, {
-      include: [
-        {
-          model: Customer,
-          as: "customer",
-          attributes: ["id", "name", "email"],
-        },
-        {
-          model: Admin,
-          as: "replier",
-          attributes: ["id", "name", "email"],
-        },
-      ],
-    });
-
     res.status(200).json({
       success: true,
       message: "Status pesan berhasil diupdate",
-      data: updatedMessage,
+      data: message,
     });
   } catch (error) {
     next(error);

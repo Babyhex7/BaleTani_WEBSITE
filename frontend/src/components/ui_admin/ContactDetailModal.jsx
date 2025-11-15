@@ -3,28 +3,73 @@ import { XMarkIcon, EnvelopeIcon, PhoneIcon, UserIcon, CalendarIcon } from '@her
 
 const ContactDetailModal = ({ message, onClose, onUpdateStatus }) => {
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('id-ID', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
+    if (!dateString) return '-';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '-';
+      
+      return new Intl.DateTimeFormat('id-ID', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+    } catch (error) {
+      return '-';
+    }
   };
 
   const handleWhatsAppReply = () => {
-    const text = `Halo ${message.name}, terima kasih telah menghubungi BaleTani mengenai: "${message.subject}"`;
-    const phone = message.phone?.replace(/\D/g, '');
+    const name = message.name || message.full_name || 'Customer';
+    const subject = message.subject || 'pesan Anda';
+    const text = `Halo ${name}, terima kasih telah menghubungi BaleTani mengenai: "${subject}"`;
+    const phoneNumber = message.phone || message.whatsapp_number || '';
+    const phone = phoneNumber.replace(/\D/g, '');
+    
+    if (!phone) {
+      alert('Nomor WhatsApp tidak tersedia');
+      return;
+    }
+    
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, '_blank');
   };
 
   const statusOptions = [
-    { value: 'pending', label: 'Pending', color: 'yellow' },
-    { value: 'read', label: 'Dibaca', color: 'blue' },
-    { value: 'replied', label: 'Dibalas', color: 'purple' },
-    { value: 'resolved', label: 'Selesai', color: 'green' }
+    { 
+      value: 'pending', 
+      label: 'Pending', 
+      bgActive: 'bg-yellow-600',
+      bgInactive: 'bg-yellow-100 hover:bg-yellow-200',
+      textActive: 'text-white',
+      textInactive: 'text-yellow-700'
+    },
+    { 
+      value: 'read', 
+      label: 'Dibaca', 
+      bgActive: 'bg-blue-600',
+      bgInactive: 'bg-blue-100 hover:bg-blue-200',
+      textActive: 'text-white',
+      textInactive: 'text-blue-700'
+    },
+    { 
+      value: 'replied', 
+      label: 'Dibalas', 
+      bgActive: 'bg-purple-600',
+      bgInactive: 'bg-purple-100 hover:bg-purple-200',
+      textActive: 'text-white',
+      textInactive: 'text-purple-700'
+    },
+    { 
+      value: 'resolved', 
+      label: 'Selesai', 
+      bgActive: 'bg-green-600',
+      bgInactive: 'bg-green-100 hover:bg-green-200',
+      textActive: 'text-white',
+      textInactive: 'text-green-700'
+    }
   ];
 
   return (
@@ -49,7 +94,7 @@ const ContactDetailModal = ({ message, onClose, onUpdateStatus }) => {
               <UserIcon className="w-5 h-5 text-gray-400" />
               <div>
                 <p className="text-xs text-gray-500">Nama</p>
-                <p className="text-sm font-medium text-gray-900">{message.name}</p>
+                <p className="text-sm font-medium text-gray-900">{message.name || message.full_name || '-'}</p>
               </div>
             </div>
 
@@ -57,16 +102,16 @@ const ContactDetailModal = ({ message, onClose, onUpdateStatus }) => {
               <EnvelopeIcon className="w-5 h-5 text-gray-400" />
               <div>
                 <p className="text-xs text-gray-500">Email</p>
-                <p className="text-sm font-medium text-gray-900">{message.email}</p>
+                <p className="text-sm font-medium text-gray-900">{message.email || '-'}</p>
               </div>
             </div>
 
-            {message.phone && (
+            {(message.phone || message.whatsapp_number) && (
               <div className="flex items-center gap-3">
                 <PhoneIcon className="w-5 h-5 text-gray-400" />
                 <div>
-                  <p className="text-xs text-gray-500">No. Telepon</p>
-                  <p className="text-sm font-medium text-gray-900">{message.phone}</p>
+                  <p className="text-xs text-gray-500">WhatsApp</p>
+                  <p className="text-sm font-medium text-gray-900">{message.phone || message.whatsapp_number || '-'}</p>
                 </div>
               </div>
             )}
@@ -83,14 +128,14 @@ const ContactDetailModal = ({ message, onClose, onUpdateStatus }) => {
           {/* Subject */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Subjek</label>
-            <p className="text-gray-900">{message.subject}</p>
+            <p className="text-gray-900">{message.subject || '-'}</p>
           </div>
 
           {/* Message */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Pesan</label>
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-gray-900 whitespace-pre-wrap">{message.message}</p>
+              <p className="text-gray-900 whitespace-pre-wrap">{message.message || '-'}</p>
             </div>
           </div>
 
@@ -104,8 +149,8 @@ const ContactDetailModal = ({ message, onClose, onUpdateStatus }) => {
                   onClick={() => onUpdateStatus(message.id, status.value)}
                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                     message.status === status.value
-                      ? `bg-${status.color}-600 text-white`
-                      : `bg-${status.color}-100 text-${status.color}-700 hover:bg-${status.color}-200`
+                      ? `${status.bgActive} ${status.textActive}`
+                      : `${status.bgInactive} ${status.textInactive}`
                   }`}
                 >
                   {status.label}

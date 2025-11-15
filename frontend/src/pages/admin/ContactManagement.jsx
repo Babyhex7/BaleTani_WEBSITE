@@ -70,9 +70,9 @@ const ContactManagement = () => {
         setTotalPages(data.pagination?.totalPages || 1);
         setTotalItems(data.pagination?.total || 0);
 
-        // Calculate stats
+        // Calculate stats from current page data
         setStats({
-          total: messagesList.length,
+          total: data.pagination?.total || 0,
           pending: messagesList.filter(m => m.status === 'pending').length,
           replied: messagesList.filter(m => m.status === 'replied').length,
           resolved: messagesList.filter(m => m.status === 'resolved').length
@@ -166,14 +166,22 @@ const ContactManagement = () => {
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('id-ID', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
+    if (!dateString) return '-';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '-';
+      
+      return new Intl.DateTimeFormat('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+    } catch (error) {
+      return '-';
+    }
   };
 
   return (
@@ -335,14 +343,14 @@ const ContactManagement = () => {
                           {formatDate(message.created_at)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {message.name}
+                          {message.name || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {message.email}
+                          {message.email || '-'}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900">
                           <div className="max-w-xs truncate">
-                            {message.subject}
+                            {message.subject || '-'}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
