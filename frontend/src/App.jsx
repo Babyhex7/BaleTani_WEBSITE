@@ -35,6 +35,7 @@ import CategoryManagement from './pages/admin/CategoryManagement';
 import DiscountManagement from './pages/admin/DiscountManagement';
 import CustomerManagement from './pages/admin/CustomerManagement';
 import FAQManagement from './pages/admin/FAQManagement';
+import ContactManagement from './pages/admin/ContactManagement';
 
 /**
  * Komponen utama aplikasi yang mengatur routing
@@ -256,6 +257,13 @@ function App() {
       <Route path="/admin/faqs" element={
         <ProtectedRoute requiredRole="admin">
           <FAQManagement />
+        </ProtectedRoute>
+      } />
+
+      {/* Contact Messages Management */}
+      <Route path="/admin/contacts" element={
+        <ProtectedRoute requiredRole="admin">
+          <ContactManagement />
         </ProtectedRoute>
       } />
 

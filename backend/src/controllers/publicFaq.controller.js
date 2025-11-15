@@ -12,7 +12,7 @@
 
 const { FAQ } = require("../models");
 const { Op } = require("sequelize");
-const { getCache, setCache } = require("../cache/cacheService");
+const cacheService = require("../cache/cacheService");
 
 /**
  * Get all active FAQs (public)
@@ -20,12 +20,15 @@ const { getCache, setCache } = require("../cache/cacheService");
  */
 exports.getActiveFAQs = async (req, res, next) => {
   try {
+    console.log("🔍 [PUBLIC FAQ] getActiveFAQs called");
     const { category = "", search = "" } = req.query;
     const cacheKey = `public_faqs_${category}_${search}`;
+    console.log("📋 [PUBLIC FAQ] Query params:", { category, search });
 
     // Check cache
-    const cachedData = getCache(cacheKey);
+    const cachedData = cacheService.get(cacheKey);
     if (cachedData) {
+      console.log("✅ [PUBLIC FAQ] Returning cached data");
       return res.status(200).json({
         success: true,
         message: "FAQs retrieved successfully (from cache)",
@@ -37,6 +40,7 @@ exports.getActiveFAQs = async (req, res, next) => {
     const whereClause = {
       is_active: true,
     };
+    console.log("🔍 [PUBLIC FAQ] Building where clause...");
 
     // Category filter
     if (category) {
@@ -51,6 +55,7 @@ exports.getActiveFAQs = async (req, res, next) => {
       ];
     }
 
+    console.log("🔍 [PUBLIC FAQ] Where clause:", whereClause);
     const faqs = await FAQ.findAll({
       where: whereClause,
       attributes: ["id", "question", "answer", "category", "order_number"],
@@ -59,6 +64,7 @@ exports.getActiveFAQs = async (req, res, next) => {
         ["created_at", "DESC"],
       ],
     });
+    console.log(`✅ [PUBLIC FAQ] Found ${faqs.length} FAQs`);
 
     // Group by category
     const groupedFAQs = faqs.reduce((acc, faq) => {
@@ -76,8 +82,9 @@ exports.getActiveFAQs = async (req, res, next) => {
     };
 
     // Cache for 1 hour
-    setCache(cacheKey, result, 3600);
+    cacheService.set(cacheKey, result, 3600);
 
+    console.log("📤 [PUBLIC FAQ] Sending response with", faqs.length, "FAQs");
     res.status(200).json({
       success: true,
       message: "FAQs retrieved successfully",
@@ -85,6 +92,8 @@ exports.getActiveFAQs = async (req, res, next) => {
       cached: false,
     });
   } catch (error) {
+    console.error("❌ [PUBLIC FAQ] Error:", error.message);
+    console.error("❌ [PUBLIC FAQ] Stack:", error.stack);
     next(error);
   }
 };
@@ -131,7 +140,7 @@ exports.getCategories = async (req, res, next) => {
     const cacheKey = "faq_categories";
 
     // Check cache
-    const cachedData = getCache(cacheKey);
+    const cachedData = cacheService.get(cacheKey);
     if (cachedData) {
       return res.status(200).json({
         success: true,
@@ -162,7 +171,7 @@ exports.getCategories = async (req, res, next) => {
     );
 
     // Cache for 1 hour
-    setCache(cacheKey, categoriesWithCount, 3600);
+    cacheService.set(cacheKey, categoriesWithCount, 3600);
 
     res.status(200).json({
       success: true,

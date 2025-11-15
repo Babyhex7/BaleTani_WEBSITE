@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { MessageCircle, MapPin, Phone, Mail, HelpCircle } from 'lucide-react';
+import { MessageCircle, MapPin, Phone, Mail, HelpCircle, Clock } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import ContactForm from '../../components/ui_customer/ContactForm';
@@ -88,148 +88,156 @@ const ContactPage = () => {
       
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-green-600 to-green-700 text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-            <div className="text-center">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4">
-                Hubungi Kami
-              </h1>
-              <p className="text-base md:text-lg lg:text-xl text-green-50 max-w-2xl mx-auto px-4">
-                Punya pertanyaan atau butuh bantuan? Tim dukungan kami siap membantu Anda. 
-                Kami berkomitmen memberikan layanan terbaik untuk Anda.
-              </p>
-            </div>
-          </div>
-        </div>
-
-      {/* Notification */}
-      {notification && (
-        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6`}>
-          <div className={`p-4 rounded-md ${
-            notification.type === 'success' 
-              ? 'bg-green-50 border border-green-200 text-green-800' 
-              : 'bg-red-50 border border-red-200 text-red-800'
-          }`}>
-            <p className="font-medium">{notification.message}</p>
-          </div>
-        </div>
-      )}
-
-        {/* Contact Info Cards */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-          <div className="text-center mb-8 md:mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 md:mb-4">
-              Cara Menghubungi Kami
-            </h2>
-            <p className="text-sm md:text-base text-gray-600 max-w-2xl mx-auto px-4">
-              Pilih cara yang paling nyaman untuk Anda. Kami tersedia melalui berbagai channel komunikasi.
+        <section className="bg-gradient-to-br from-green-600 via-green-700 to-green-800 text-white hero-gradient">
+          <div className="container-app section-py text-center">
+            <h1 className="heading-hero mb-4">
+              Hubungi Kami
+            </h1>
+            <p className="text-body text-green-50 max-w-2xl mx-auto">
+              Punya pertanyaan atau butuh bantuan? Tim dukungan kami siap membantu Anda. 
+              Kami berkomitmen memberikan layanan terbaik untuk Anda.
             </p>
           </div>
-          
-          <ContactInfoCards />
-        </div>
+        </section>
 
-        {/* Google Maps Section */}
-        <div className="bg-white py-8 md:py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-6 md:mb-8">
-              <div className="flex items-center justify-center mb-3 md:mb-4">
-                <MapPin className="w-6 h-6 md:w-7 md:h-7 text-green-600 mr-2" />
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900">
-                  Lokasi Toko Kami
-                </h3>
-              </div>
-              <p className="text-sm md:text-base text-gray-600 px-4">
-                Kunjungi toko kami untuk melihat langsung produk-produk berkualitas
-              </p>
-            </div>
-
-            <div className="bg-gray-200 rounded-lg overflow-hidden shadow-lg">
-              <iframe
-                src={MAPS_CONFIG.embedUrl}
-                width="100%"
-                height="400"
-                style={{ border: 0 }}
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Lokasi Toko BaleTani"
-                className="w-full h-64 md:h-96 lg:h-[450px]"
-              ></iframe>
+        {/* Notification */}
+        {notification && (
+          <div className="container-app pt-6">
+            <div className={`card-responsive ${
+              notification.type === 'success' 
+                ? 'bg-green-50 border-l-4 border-green-500 text-green-800' 
+                : 'bg-red-50 border-l-4 border-red-500 text-red-800'
+            }`}>
+              <p className="font-medium text-body">{notification.message}</p>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Main Content: Contact Form & Map */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
-            {/* Contact Form */}
-            <div className="order-2 lg:order-1">
+        {/* Contact Info Cards - Fixed/Sticky */}
+        <section className="bg-gradient-to-b from-gray-50 to-white section-py">
+          <div className="container-app">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="heading-section mb-4">
+                Cara Menghubungi Kami
+              </h2>
+              <p className="text-body text-gray-600 max-w-2xl mx-auto">
+                Pilih cara yang paling nyaman untuk Anda. Kami tersedia melalui berbagai channel komunikasi.
+              </p>
+            </div>
+            
+            {/* Cards Grid - Sticky pada Desktop */}
+            <div className="relative">
+              <div className="lg:sticky lg:top-20 z-10">
+                <ContactInfoCards />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Main Content: Contact Form & Sidebar Info */}
+        <section className="container-app section-py bg-gray-50">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+            {/* Contact Form - 2 columns on desktop */}
+            <div className="lg:col-span-2">
               <ContactForm 
                 onSuccess={handleContactSuccess}
                 onError={handleContactError}
               />
             </div>
 
-            {/* Info Tambahan atau Ilustrasi */}
-            <div className="order-1 lg:order-2">
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow-md p-6 md:p-8 h-full">
-                <div className="flex items-center mb-4 md:mb-6">
-                  <MessageCircle className="w-6 h-6 md:w-7 md:h-7 text-green-600 mr-3" />
-                  <h3 className="text-lg md:text-xl font-semibold text-gray-900">
-                    Kirim Pesan
+            {/* Sidebar - Jam Operasional - 1 column on desktop */}
+            <div>
+              {/* Jam Operasional Card */}
+              <div className="card-responsive bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 h-full">
+                <div className="flex items-center mb-6">
+                  <div className="bg-green-600 p-3 rounded-lg shadow-md">
+                    <Clock className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 ml-3">
+                    Jam Operasional
                   </h3>
                 </div>
-                <div className="space-y-4 text-sm md:text-base text-gray-700">
-                  <p>
-                    Isi formulir di samping untuk mengirim pesan kepada kami. 
-                    Tim customer service kami akan merespons pesan Anda secepatnya.
-                  </p>
-                  <div className="bg-white rounded-lg p-4 space-y-3">
-                    <div className="flex items-start">
-                      <Clock className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="font-medium text-gray-900">Jam Operasional</p>
-                        <p className="text-sm text-gray-600">Senin - Sabtu: 08:00 - 17:00 WIB</p>
-                        <p className="text-sm text-gray-600">Minggu & Tanggal Merah: Tutup</p>
-                      </div>
+                <div className="space-y-4">
+                  <div className="bg-white rounded-lg p-4 border border-green-100 flex items-center justify-between shadow-sm">
+                    <div className="flex items-center">
+                      <Clock className="w-5 h-5 text-green-600 mr-3" />
+                      <span className="font-semibold text-gray-800">Senin - Jumat</span>
                     </div>
-                    <div className="flex items-start">
-                      <MessageCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="font-medium text-gray-900">Waktu Respon</p>
-                        <p className="text-sm text-gray-600">Kami akan merespons dalam 1x24 jam</p>
-                      </div>
-                    </div>
+                    <span className="text-green-600 font-bold text-lg">08:00 - 21:00</span>
                   </div>
-                  <div className="bg-green-600 text-white rounded-lg p-4">
-                    <p className="font-medium mb-2">💡 Tips</p>
-                    <p className="text-sm">
-                      Untuk respons lebih cepat, hubungi kami melalui WhatsApp atau cek FAQ di bawah
-                    </p>
+                  <div className="bg-white rounded-lg p-4 border border-green-100 flex items-center justify-between shadow-sm">
+                    <div className="flex items-center">
+                      <Clock className="w-5 h-5 text-green-600 mr-3" />
+                      <span className="font-semibold text-gray-800">Sabtu</span>
+                    </div>
+                    <span className="text-green-600 font-bold text-lg">08:00 - 22:00</span>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 border border-green-100 flex items-center justify-between shadow-sm">
+                    <div className="flex items-center">
+                      <Clock className="w-5 h-5 text-green-600 mr-3" />
+                      <span className="font-semibold text-gray-800">Minggu</span>
+                    </div>
+                    <span className="text-green-600 font-bold text-lg">07:00 - 20:00</span>
+                  </div>
+                  <div className="bg-green-600 text-white rounded-lg p-4 flex items-center justify-center shadow-md mt-6">
+                    <Clock className="w-5 h-5 mr-2" />
+                    <p className="text-base font-bold">Buka Sekarang</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* Google Maps Section - Full Width */}
+        <section className="bg-white section-py">
+          <div className="container-app">
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center mb-4">
+                <div className="bg-red-600 p-2 rounded-lg">
+                  <MapPin className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="heading-section ml-3">
+                  Peta Lokasi Toko Kami
+                </h3>
+              </div>
+              <p className="text-body text-gray-600 max-w-2xl mx-auto">
+                Kunjungi toko kami untuk melihat langsung produk-produk segar berkualitas
+              </p>
+            </div>
+
+            <div className="card rounded-xl overflow-hidden shadow-lg">
+              <iframe
+                src={MAPS_CONFIG.embedUrl}
+                width="100%"
+                height="450"
+                style={{ border: 0 }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Lokasi Toko BaleTani"
+                className="w-full h-64 md:h-96 lg:h-[500px]"
+              ></iframe>
+            </div>
+          </div>
+        </section>
 
         {/* FAQ Section */}
-        <div className="bg-gray-50 py-8 md:py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-6 md:mb-8">
-              <div className="flex items-center justify-center mb-3 md:mb-4">
-                <HelpCircle className="w-6 h-6 md:w-7 md:h-7 text-green-600 mr-3" />
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
+        <section className="bg-gray-100 section-py">
+          <div className="container-app">
+            <div className="text-center mb-8 md:mb-10">
+              <div className="flex items-center justify-center mb-4">
+                <HelpCircle className="w-6 h-6 md:w-8 md:h-8 text-green-600 mr-3" />
+                <h3 className="heading-section">
                   Pertanyaan yang Sering Diajukan
                 </h3>
               </div>
-              <p className="text-sm md:text-base text-gray-600 px-4">
+              <p className="text-body text-gray-600 max-w-2xl mx-auto">
                 Temukan jawaban untuk pertanyaan umum sebelum menghubungi kami
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 lg:p-8">
+            <div className="card-responsive max-w-5xl mx-auto">
               {/* FAQ Categories Filter */}
               <div className="mb-6">
                 <div className="flex flex-wrap gap-2">
@@ -237,9 +245,9 @@ const ContactPage = () => {
                     <button
                       key={category.value}
                       onClick={() => setSelectedCategory(category.value)}
-                      className={`px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium transition-colors ${
+                      className={`btn-touch px-4 rounded-full text-caption font-medium transition-all ${
                         selectedCategory === category.value
-                          ? 'bg-green-600 text-white shadow-md'
+                          ? 'bg-green-600 text-white shadow-md hover:bg-green-700'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -251,13 +259,11 @@ const ContactPage = () => {
 
               {/* FAQ Accordion */}
               {isLoadingFAQs ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="border border-gray-200 rounded-lg p-4">
-                      <div className="animate-pulse">
-                        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                      </div>
+                    <div key={i} className="card p-4 animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                     </div>
                   ))}
                 </div>
@@ -269,7 +275,7 @@ const ContactPage = () => {
               )}
             </div>
           </div>
-        </div>
+        </section>
       </div>
       
       <Footer />

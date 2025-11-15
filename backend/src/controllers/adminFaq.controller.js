@@ -56,18 +56,6 @@ exports.getAllFAQs = async (req, res, next) => {
 
     const { count, rows: faqs } = await FAQ.findAndCountAll({
       where: whereClause,
-      include: [
-        {
-          model: Admin,
-          as: "creator",
-          attributes: ["id", "name", "email"],
-        },
-        {
-          model: Admin,
-          as: "updater",
-          attributes: ["id", "name", "email"],
-        },
-      ],
       order: [
         ["order_number", "ASC"],
         ["created_at", "DESC"],
@@ -76,14 +64,26 @@ exports.getAllFAQs = async (req, res, next) => {
       offset: parseInt(offset),
     });
 
+    // Format data untuk frontend
+    const formattedFaqs = faqs.map((faq) => ({
+      id: faq.id,
+      question: faq.question,
+      answer: faq.answer,
+      category: faq.category,
+      display_order: faq.order_number,
+      is_active: faq.is_active,
+      created_at: faq.created_at,
+      updated_at: faq.updated_at,
+      creator: faq.creator,
+      updater: faq.updater,
+    }));
+
     res.status(200).json({
       success: true,
       message: "FAQs retrieved successfully",
-      data: faqs,
+      data: formattedFaqs,
       pagination: {
         total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
         totalPages: Math.ceil(count / limit),
       },
     });

@@ -67,31 +67,34 @@ exports.getAllMessages = async (req, res, next) => {
 
     const { count, rows: messages } = await ContactMessage.findAndCountAll({
       where: whereClause,
-      include: [
-        {
-          model: Customer,
-          as: "customer",
-          attributes: ["id", "name", "email", "phone_number"],
-        },
-        {
-          model: Admin,
-          as: "replier",
-          attributes: ["id", "name", "email"],
-        },
-      ],
       order: [["created_at", "DESC"]],
       limit: parseInt(limit),
       offset: parseInt(offset),
     });
 
+    // Format data untuk frontend
+    const formattedMessages = messages.map((msg) => ({
+      id: msg.id,
+      name: msg.full_name,
+      email: msg.email,
+      phone: msg.whatsapp_number,
+      subject: msg.subject,
+      message: msg.message,
+      status: msg.status,
+      admin_notes: msg.admin_notes,
+      created_at: msg.created_at,
+      updated_at: msg.updated_at,
+      replied_at: msg.replied_at,
+      customer: msg.customer,
+      replier: msg.replier,
+    }));
+
     res.status(200).json({
       success: true,
       message: "Contact messages retrieved successfully",
-      data: messages,
+      data: formattedMessages,
       pagination: {
         total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
         totalPages: Math.ceil(count / limit),
       },
     });

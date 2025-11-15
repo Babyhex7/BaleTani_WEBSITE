@@ -13,33 +13,35 @@
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
 import { CONTACT_INFO, getWhatsAppURL, getEmailLink, getDirectionURL } from '../../utils/contactConfig';
 
-const ContactInfoCard = ({ title, icon: IconComponent, info, actionButton }) => {
+const ContactInfoCard = ({ title, icon: IconComponent, info, actionButton, bgColor = "bg-green-50", iconBg = "bg-green-100", iconColor = "text-green-600" }) => {
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-      {/* Icon & Title */}
-      <div className="flex items-center mb-4">
-        <div className="bg-green-100 p-3 rounded-full">
-          <IconComponent className="w-6 h-6 text-green-600" />
+    <div className={`${bgColor} rounded-xl p-6 shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-gray-100`}>
+      {/* Icon */}
+      <div className="flex justify-center mb-4">
+        <div className={`${iconBg} p-4 rounded-full shadow-sm`}>
+          <IconComponent className={`w-8 h-8 ${iconColor}`} />
         </div>
-        <h3 className="ml-4 text-lg font-semibold text-gray-900">
-          {title}
-        </h3>
       </div>
 
+      {/* Title */}
+      <h3 className="text-center text-lg font-bold text-gray-900 mb-3">
+        {title}
+      </h3>
+
       {/* Info Content */}
-      <div className="text-gray-600 mb-4 space-y-1">
+      <div className="text-center text-gray-600 mb-4 space-y-1 flex-grow">
         {Array.isArray(info) ? (
           info.map((item, index) => (
-            <p key={index}>{item}</p>
+            <p key={index} className="text-sm leading-relaxed">{item}</p>
           ))
         ) : (
-          <p>{info}</p>
+          <p className="text-sm leading-relaxed">{info}</p>
         )}
       </div>
 
       {/* Action Button */}
       {actionButton && (
-        <div>
+        <div className="mt-auto">
           {actionButton}
         </div>
       )}
@@ -49,11 +51,14 @@ const ContactInfoCard = ({ title, icon: IconComponent, info, actionButton }) => 
 
 const ContactInfoCards = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
       {/* WhatsApp Card */}
       <ContactInfoCard
-        title="WhatsApp Customer Service"
+        title="WhatsApp"
         icon={Phone}
+        bgColor="bg-green-50"
+        iconBg="bg-green-100"
+        iconColor="text-green-600"
         info={[
           `+${CONTACT_INFO.whatsapp}`,
           'Chat langsung dengan tim kami'
@@ -63,7 +68,7 @@ const ContactInfoCards = () => {
             href={getWhatsAppURL('Halo, saya ingin bertanya tentang produk BaleTani')}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            className="flex items-center justify-center w-full px-4 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors shadow-sm hover:shadow-md"
           >
             <Phone className="w-4 h-4 mr-2" />
             Kirim WhatsApp
@@ -75,6 +80,9 @@ const ContactInfoCards = () => {
       <ContactInfoCard
         title="Email Support"
         icon={Mail}
+        bgColor="bg-blue-50"
+        iconBg="bg-blue-100"
+        iconColor="text-blue-600"
         info={[
           CONTACT_INFO.email,
           'Kami akan membalas dalam 24 jam'
@@ -82,7 +90,7 @@ const ContactInfoCards = () => {
         actionButton={
           <a
             href={getEmailLink('Pertanyaan dari Website', '')}
-            className="inline-flex items-center justify-center w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
           >
             <Mail className="w-4 h-4 mr-2" />
             Kirim Email
@@ -94,6 +102,9 @@ const ContactInfoCards = () => {
       <ContactInfoCard
         title="Kunjungi Toko"
         icon={MapPin}
+        bgColor="bg-red-50"
+        iconBg="bg-red-100"
+        iconColor="text-red-600"
         info={[
           CONTACT_INFO.address.street,
           `${CONTACT_INFO.address.city}, ${CONTACT_INFO.address.province}`,
@@ -104,7 +115,7 @@ const ContactInfoCards = () => {
             href={getDirectionURL()}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            className="flex items-center justify-center w-full px-4 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors shadow-sm hover:shadow-md"
           >
             <MapPin className="w-4 h-4 mr-2" />
             Lihat Peta
@@ -116,14 +127,17 @@ const ContactInfoCards = () => {
       <ContactInfoCard
         title="Jam Operasional"
         icon={Clock}
+        bgColor="bg-purple-50"
+        iconBg="bg-purple-100"
+        iconColor="text-purple-600"
         info={[
           'Senin - Jumat: 08.00 - 21.00',
           'Sabtu: 08.00 - 22.00',
           'Minggu: 09.00 - 20.00'
         ]}
         actionButton={
-          <div className="text-center">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+          <div className="text-center py-2">
+            <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-800 shadow-sm">
               <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
               Buka Sekarang
             </span>

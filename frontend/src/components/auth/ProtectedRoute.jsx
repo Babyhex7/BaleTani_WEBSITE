@@ -51,40 +51,71 @@ const ProtectedRoute = ({
   const adminAuth = useAdminStore();
   const location = useLocation();
 
-  // Determine which auth to use based on required role
+  // Check if current path is admin route
+  const isAdminPath = location.pathname.startsWith('/admin');
+  
+  // Determine which auth to use based on required role OR path
   let isAuthenticated, user;
   
-  if (requiredRole === 'admin' || requiredRole === 'staff') {
-    // For admin routes, use admin store
-    isAuthenticated = adminAuth.isAuthenticated;
+  if (requiredRole === 'admin' || requiredRole === 'staff' || isAdminPath) {
+    // For admin routes, ALWAYS use admin store
+    isAuthenticated = adminAuth.isAuthenticated && !!adminAuth.token && !!adminAuth.admin;
     user = adminAuth.admin;
+    
+    // Check token expiry for admin
+    if (isAuthenticated && adminAuth.tokenExpiry) {
+      const now = Date.now();
+      if (now > adminAuth.tokenExpiry) {
+        console.warn('[ProtectedRoute] Admin token expired, logging out');
+        adminAuth.logout();
+        isAuthenticated = false;
+        user = null;
+      }
+    }
   } else {
     // For customer routes or no specific role, use customer store
     isAuthenticated = customerAuth.isAuthenticated;
     user = customerAuth.user;
   }
 
-  // Debug logging
-  console.log('[ProtectedRoute] Check:', {
+  // Enhanced debug logging
+  console.log('[ProtectedRoute] ===== ROUTE PROTECTION CHECK =====');
+  console.log('[ProtectedRoute] Path:', location.pathname);
+  console.log('[ProtectedRoute] Is Admin Path:', isAdminPath);
+  console.log('[ProtectedRoute] Required Role:', requiredRole);
+  console.log('[ProtectedRoute] Require Auth:', requireAuth);
+  console.log('[ProtectedRoute] Authentication Status:', {
     isAuthenticated,
-    user,
+    user: user?.name || user?.username,
     userRole: user?.role,
-    normalizedRole: typeof user?.role === 'string' ? user?.role : user?.role?.role_name,
-    requiredRole,
-    requireAuth,
-    path: location.pathname,
-    adminAuth: adminAuth.isAuthenticated,
-    customerAuth: customerAuth.isAuthenticated
   });
+  console.log('[ProtectedRoute] Admin Store:', {
+    isAuthenticated: adminAuth.isAuthenticated,
+    hasToken: !!adminAuth.token,
+    hasAdmin: !!adminAuth.admin,
+    adminName: adminAuth.admin?.name,
+    tokenExpiry: adminAuth.tokenExpiry ? new Date(adminAuth.tokenExpiry).toISOString() : null,
+    isExpired: adminAuth.tokenExpiry ? Date.now() > adminAuth.tokenExpiry : null
+  });
+  console.log('[ProtectedRoute] Customer Store:', {
+    isAuthenticated: customerAuth.isAuthenticated,
+    hasToken: !!customerAuth.token,
+    hasUser: !!customerAuth.user
+  });
+  console.log('[ProtectedRoute] =====================================');
 
   // Jika butuh authentication tapi user belum login
   if (requireAuth && !isAuthenticated) {
-    console.log('[ProtectedRoute] Not authenticated, redirecting to login');
-    // Redirect admin ke admin login
-    if (requiredRole === 'admin' || requiredRole === 'staff') {
+    console.warn('[ProtectedRoute] ❌ NOT AUTHENTICATED - REDIRECTING');
+    
+    // ALWAYS redirect admin paths to admin login
+    if (isAdminPath || requiredRole === 'admin' || requiredRole === 'staff') {
+      console.log('[ProtectedRoute] 🔐 Redirecting to ADMIN LOGIN (/admin/login)');
       return <Navigate to="/admin/login" state={{ from: location }} replace />;
     }
+    
     // Redirect customer ke customer login
+    console.log('[ProtectedRoute] 🔐 Redirecting to CUSTOMER LOGIN:', redirectTo);
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 

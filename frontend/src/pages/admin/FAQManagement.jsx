@@ -1,385 +1,480 @@
-/**
- * ============================================
- * ADMIN FAQ MANAGEMENT PAGE
- * ============================================
- * Page untuk admin manage FAQ (CRUD operations)
- * dengan filtering, search, dan sorting
- * 
- * @page FAQManagement
- * @author BaleTani Development Team
- * @created 2025-11-15
- */
-
-import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Edit, Trash2, Eye, MoreHorizontal } from 'lucide-react';
-import faqService from '../../services/services_admin/faqService';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import Pagination from '../../components/ui_admin/Pagination';
+import React, { useState, useEffect } from 'react';
+import {
+  MagnifyingGlassIcon,
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  EyeIcon,
+  QuestionMarkCircleIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ArrowPathIcon
+} from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
+import AdminSidebarNew from '../../components/layout_admin/AdminSidebarNew';
+import AdminHeaderNew from '../../components/layout_admin/AdminHeaderNew';
 import FAQFormModal from '../../components/ui_admin/FAQFormModal';
+import FAQDetailModal from '../../components/ui_admin/FAQDetailModal';
 import DeleteConfirmModal from '../../components/ui_admin/DeleteConfirmModal';
+import Pagination from '../../components/ui_admin/Pagination';
+import faqService from '../../services/services_admin/faqService';
+import useDebounce from '../../hooks/useDebounce';
 
 const FAQManagement = () => {
+  // State management
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState(null);
+
+  // Filters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalFAQs, setTotalFAQs] = useState(0);
-  
-  // Filters & Search
-  const [filters, setFilters] = useState({
-    search: '',
-    category: '',
-    is_active: ''
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Debounce search query
+  const debouncedSearch = useDebounce(searchQuery, 500);
+
+  // Stats
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    inactive: 0
   });
 
   // Modals
   const [showFormModal, setShowFormModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [modalMode, setModalMode] = useState('create');
   const [selectedFAQ, setSelectedFAQ] = useState(null);
-  const [formMode, setFormMode] = useState('create'); // 'create' or 'edit'
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
-  // Categories for filter
-  const categories = [
-    { value: '', label: 'Semua Kategori' },
-    { value: 'umum', label: 'Umum' },
-    { value: 'pembayaran', label: 'Pembayaran' },
-    { value: 'pengiriman', label: 'Pengiriman' },
-    { value: 'produk', label: 'Produk' }
-  ];
-
-  // Status options for filter
-  const statusOptions = [
-    { value: '', label: 'Semua Status' },
-    { value: 'true', label: 'Aktif' },
-    { value: 'false', label: 'Tidak Aktif' }
-  ];
-
-  // Fetch FAQs
+  // Fetch data on mount and filter change (with debounced search)
   useEffect(() => {
     fetchFAQs();
-  }, [currentPage, filters]);
+  }, [currentPage, debouncedSearch, filterCategory, filterStatus, itemsPerPage]);
 
+  // API Calls
   const fetchFAQs = async () => {
     try {
       setLoading(true);
       const params = {
         page: currentPage,
-        limit: 10,
-        ...filters
+        limit: itemsPerPage,
+        search: debouncedSearch,
+        category: filterCategory,
+        is_active: filterStatus
       };
 
-      const response = await faqService.getAllFAQs(params);
-      
-      if (response.success) {
-        setFaqs(response.data);
-        setTotalPages(response.pagination.totalPages);
-        setTotalFAQs(response.pagination.total);
+      const data = await faqService.getAllFAQs(params);
+
+      if (data.success) {
+        const faqsList = data.data || [];
+
+        setFaqs(faqsList);
+        setTotalPages(data.pagination?.totalPages || 1);
+        setTotalItems(data.pagination?.total || 0);
+
+        // Calculate stats
+        setStats({
+          total: faqsList.length,
+          active: faqsList.filter(f => f.is_active).length,
+          inactive: faqsList.filter(f => !f.is_active).length
+        });
+
+        setError(null);
       }
-    } catch (error) {
-      console.error('Error fetching FAQs:', error);
+    } catch (err) {
+      console.error('Error fetching FAQs:', err);
+      setError(err.message || 'Gagal memuat FAQ');
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle filter change
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value
-    }));
-    setCurrentPage(1); // Reset to first page when filtering
-  };
-
-  // Handle create FAQ
-  const handleCreateFAQ = () => {
+  // CRUD Handlers
+  const handleCreate = () => {
+    setModalMode('create');
     setSelectedFAQ(null);
-    setFormMode('create');
     setShowFormModal(true);
   };
 
-  // Handle edit FAQ
-  const handleEditFAQ = (faq) => {
-    setSelectedFAQ(faq);
-    setFormMode('edit');
-    setShowFormModal(true);
+  const handleView = async (faq) => {
+    try {
+      const data = await faqService.getFAQById(faq.id);
+      if (data.success) {
+        setSelectedFAQ(data.data);
+        setShowDetailModal(true);
+      }
+    } catch (err) {
+      console.error('Error viewing FAQ:', err);
+      showNotification('error', err.message || 'Gagal memuat detail FAQ');
+    }
   };
 
-  // Handle delete FAQ
-  const handleDeleteFAQ = (faq) => {
+  const handleEdit = async (faq) => {
+    try {
+      const data = await faqService.getFAQById(faq.id);
+      if (data.success) {
+        setSelectedFAQ(data.data);
+        setModalMode('edit');
+        setShowFormModal(true);
+      }
+    } catch (err) {
+      console.error('Error editing FAQ:', err);
+      showNotification('error', err.message || 'Gagal memuat data FAQ');
+    }
+  };
+
+  const handleDelete = (faq) => {
     setSelectedFAQ(faq);
     setShowDeleteModal(true);
   };
 
-  // Confirm delete FAQ
-  const confirmDeleteFAQ = async () => {
+  const confirmDelete = async () => {
     try {
-      await faqService.deleteFAQ(selectedFAQ.id);
-      setShowDeleteModal(false);
-      setSelectedFAQ(null);
-      fetchFAQs(); // Refresh data
-    } catch (error) {
-      console.error('Error deleting FAQ:', error);
+      setDeleteLoading(true);
+      const data = await faqService.deleteFAQ(selectedFAQ.id);
+      
+      if (data.success) {
+        showNotification('success', 'FAQ berhasil dihapus');
+        setShowDeleteModal(false);
+        fetchFAQs();
+      }
+    } catch (err) {
+      showNotification('error', err.message || 'Gagal menghapus FAQ');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
-  // Handle form success
-  const handleFormSuccess = () => {
-    setShowFormModal(false);
-    setSelectedFAQ(null);
-    fetchFAQs(); // Refresh data
+  const handleFormSubmit = async (formData) => {
+    try {
+      let data;
+      if (modalMode === 'create') {
+        data = await faqService.createFAQ(formData);
+        showNotification('success', 'FAQ berhasil dibuat');
+      } else {
+        data = await faqService.updateFAQ(selectedFAQ.id, formData);
+        showNotification('success', 'FAQ berhasil diperbarui');
+      }
+
+      if (data.success) {
+        setShowFormModal(false);
+        fetchFAQs();
+      }
+    } catch (err) {
+      showNotification('error', err.message || 'Gagal menyimpan FAQ');
+    }
   };
 
-  // Get category label
-  const getCategoryLabel = (category) => {
-    const cat = categories.find(c => c.value === category);
-    return cat ? cat.label : category;
+  // Utilities
+  const showNotification = (type, message) => {
+    if (type === 'success') {
+      toast.success(message);
+    } else {
+      toast.error(message);
+    }
+  };
+
+  const getStatusBadge = (isActive) => {
+    return isActive ? (
+      <span className="px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full flex items-center gap-1 w-fit">
+        <CheckCircleIcon className="w-3 h-3" />
+        Aktif
+      </span>
+    ) : (
+      <span className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full flex items-center gap-1 w-fit">
+        <XCircleIcon className="w-3 h-3" />
+        Nonaktif
+      </span>
+    );
+  };
+
+  const getCategoryBadge = (category) => {
+    const categoryColors = {
+      umum: 'bg-blue-100 text-blue-700',
+      pembayaran: 'bg-purple-100 text-purple-700',
+      pengiriman: 'bg-orange-100 text-orange-700',
+      produk: 'bg-green-100 text-green-700'
+    };
+
+    const categoryLabels = {
+      umum: 'Umum',
+      pembayaran: 'Pembayaran',
+      pengiriman: 'Pengiriman',
+      produk: 'Produk'
+    };
+
+    return (
+      <span className={`px-3 py-1 text-xs font-medium rounded-full ${categoryColors[category] || 'bg-gray-100 text-gray-700'}`}>
+        {categoryLabels[category] || category}
+      </span>
+    );
   };
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">FAQ Management</h1>
-          <p className="text-gray-600">Kelola FAQ untuk customer</p>
-        </div>
-        <Button
-          onClick={handleCreateFAQ}
-          className="flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Tambah FAQ
-        </Button>
-      </div>
+    <div className="flex min-h-screen bg-gray-50">
+      <AdminSidebarNew />
 
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Cari FAQ
-            </label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                type="text"
-                placeholder="Cari pertanyaan atau jawaban..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
+      <div className="flex-1">
+        <AdminHeaderNew
+          title="FAQ Management"
+          subtitle="Kelola pertanyaan yang sering ditanyakan"
+        />
 
-          {/* Category Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Kategori
-            </label>
-            <select
-              value={filters.category}
-              onChange={(e) => handleFilterChange('category', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            >
-              {categories.map(cat => (
-                <option key={cat.value} value={cat.value}>
-                  {cat.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Status Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              value={filters.is_active}
-              onChange={(e) => handleFilterChange('is_active', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            >
-              {statusOptions.map(status => (
-                <option key={status.value} value={status.value}>
-                  {status.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Clear Filters */}
-          <div className="flex items-end">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setFilters({ search: '', category: '', is_active: '' });
-                setCurrentPage(1);
-              }}
-              className="w-full"
-            >
-              Clear Filters
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* FAQ Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        {/* Table Header */}
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">
-              FAQ List ({totalFAQs} total)
-            </h3>
-          </div>
-        </div>
-
-        {/* Table Content */}
-        {loading ? (
-          <div className="p-6">
-            <div className="animate-pulse space-y-4">
-              {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="flex space-x-4">
-                  <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+        <div className="p-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Total FAQ</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalItems}</p>
                 </div>
-              ))}
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <QuestionMarkCircleIcon className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
             </div>
-          </div>
-        ) : faqs.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="text-gray-400 mb-4">
-              <Search className="w-12 h-12 mx-auto" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Tidak ada FAQ ditemukan
-            </h3>
-            <p className="text-gray-500 mb-4">
-              Belum ada FAQ yang sesuai dengan filter Anda.
-            </p>
-            <Button onClick={handleCreateFAQ}>
-              Tambah FAQ Pertama
-            </Button>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Pertanyaan
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Kategori
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Urutan
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Dibuat
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Aksi
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {faqs.map((faq) => (
-                  <tr key={faq.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div className="max-w-xs">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {faq.question}
-                        </p>
-                        <p className="text-sm text-gray-500 truncate">
-                          {faq.answer.substring(0, 100)}...
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {getCategoryLabel(faq.category)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        faq.is_active 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {faq.is_active ? 'Aktif' : 'Tidak Aktif'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {faq.order_number}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(faq.created_at).toLocaleDateString('id-ID')}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEditFAQ(faq)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-red-600 hover:text-red-700"
-                          onClick={() => handleDeleteFAQ(faq)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
 
-        {/* Pagination */}
-        {!loading && faqs.length > 0 && (
-          <div className="px-6 py-4 border-t border-gray-200">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">FAQ Aktif</p>
+                  <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+                </div>
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <CheckCircleIcon className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">FAQ Nonaktif</p>
+                  <p className="text-2xl font-bold text-gray-600">{stats.inactive}</p>
+                </div>
+                <div className="p-3 bg-gray-100 rounded-lg">
+                  <XCircleIcon className="w-6 h-6 text-gray-600" />
+                </div>
+              </div>
+            </div>
           </div>
-        )}
+
+          {/* Main Card */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            {/* Header */}
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <h2 className="text-xl font-bold text-gray-900">Daftar FAQ</h2>
+
+                <button
+                  onClick={handleCreate}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  <PlusIcon className="w-5 h-5" />
+                  Tambah FAQ
+                </button>
+              </div>
+            </div>
+
+            {/* Filters */}
+            <div className="p-6 border-b border-gray-200 bg-gray-50">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <div className="relative">
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Cari pertanyaan atau jawaban..."
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <select
+                    value={filterCategory}
+                    onChange={(e) => {
+                      setFilterCategory(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Semua Kategori</option>
+                    <option value="umum">Umum</option>
+                    <option value="pembayaran">Pembayaran</option>
+                    <option value="pengiriman">Pengiriman</option>
+                    <option value="produk">Produk</option>
+                  </select>
+                </div>
+
+                <div>
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => {
+                      setFilterStatus(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Semua Status</option>
+                    <option value="true">Aktif</option>
+                    <option value="false">Nonaktif</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto">
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <ArrowPathIcon className="w-8 h-8 text-gray-400 animate-spin" />
+                </div>
+              ) : error ? (
+                <div className="text-center py-12">
+                  <p className="text-red-600">{error}</p>
+                  <button
+                    onClick={fetchFAQs}
+                    className="mt-4 text-sm text-green-600 hover:text-green-700"
+                  >
+                    Coba lagi
+                  </button>
+                </div>
+              ) : faqs.length === 0 ? (
+                <div className="text-center py-12">
+                  <QuestionMarkCircleIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">Tidak ada FAQ</p>
+                </div>
+              ) : (
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Pertanyaan
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Kategori
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Urutan
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Aksi
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {faqs.map((faq) => (
+                      <tr key={faq.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          <div className="max-w-md">
+                            <p className="font-medium line-clamp-2">{faq.question}</p>
+                            <p className="text-gray-500 text-xs mt-1 line-clamp-1">{faq.answer}</p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {getCategoryBadge(faq.category)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {faq.display_order || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {getStatusBadge(faq.is_active)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => handleView(faq)}
+                              className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                              title="Lihat detail"
+                            >
+                              <EyeIcon className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleEdit(faq)}
+                              className="p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors"
+                              title="Edit"
+                            >
+                              <PencilIcon className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(faq)}
+                              className="p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Hapus"
+                            >
+                              <TrashIcon className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* Pagination */}
+            {!loading && !error && faqs.length > 0 && (
+              <div className="px-6 py-4 border-t border-gray-200">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  totalItems={totalItems}
+                  itemsPerPage={itemsPerPage}
+                  onItemsPerPageChange={setItemsPerPage}
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* FAQ Form Modal */}
+      {/* Modals */}
       {showFormModal && (
         <FAQFormModal
-          isOpen={showFormModal}
-          onClose={() => setShowFormModal(false)}
-          onSuccess={handleFormSuccess}
+          mode={modalMode}
           faq={selectedFAQ}
-          mode={formMode}
+          onClose={() => setShowFormModal(false)}
+          onSubmit={handleFormSubmit}
         />
       )}
 
-      {/* Delete Confirmation Modal */}
+      {showDetailModal && selectedFAQ && (
+        <FAQDetailModal
+          faq={selectedFAQ}
+          onClose={() => setShowDetailModal(false)}
+          onEdit={() => {
+            setShowDetailModal(false);
+            handleEdit(selectedFAQ);
+          }}
+        />
+      )}
+
       {showDeleteModal && (
         <DeleteConfirmModal
           isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
-          onConfirm={confirmDeleteFAQ}
+          onConfirm={confirmDelete}
           title="Hapus FAQ"
           message={`Apakah Anda yakin ingin menghapus FAQ "${selectedFAQ?.question}"?`}
+          loading={deleteLoading}
         />
       )}
     </div>

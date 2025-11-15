@@ -1,0 +1,140 @@
+import React from 'react';
+import { XMarkIcon, EnvelopeIcon, PhoneIcon, UserIcon, CalendarIcon } from '@heroicons/react/24/outline';
+
+const ContactDetailModal = ({ message, onClose, onUpdateStatus }) => {
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  };
+
+  const handleWhatsAppReply = () => {
+    const text = `Halo ${message.name}, terima kasih telah menghubungi BaleTani mengenai: "${message.subject}"`;
+    const phone = message.phone?.replace(/\D/g, '');
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const statusOptions = [
+    { value: 'pending', label: 'Pending', color: 'yellow' },
+    { value: 'read', label: 'Dibaca', color: 'blue' },
+    { value: 'replied', label: 'Dibalas', color: 'purple' },
+    { value: 'resolved', label: 'Selesai', color: 'green' }
+  ];
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900">Detail Pesan Kontak</h2>
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <XMarkIcon className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-6">
+          {/* Sender Info */}
+          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+            <div className="flex items-center gap-3">
+              <UserIcon className="w-5 h-5 text-gray-400" />
+              <div>
+                <p className="text-xs text-gray-500">Nama</p>
+                <p className="text-sm font-medium text-gray-900">{message.name}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <EnvelopeIcon className="w-5 h-5 text-gray-400" />
+              <div>
+                <p className="text-xs text-gray-500">Email</p>
+                <p className="text-sm font-medium text-gray-900">{message.email}</p>
+              </div>
+            </div>
+
+            {message.phone && (
+              <div className="flex items-center gap-3">
+                <PhoneIcon className="w-5 h-5 text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-500">No. Telepon</p>
+                  <p className="text-sm font-medium text-gray-900">{message.phone}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center gap-3">
+              <CalendarIcon className="w-5 h-5 text-gray-400" />
+              <div>
+                <p className="text-xs text-gray-500">Tanggal</p>
+                <p className="text-sm font-medium text-gray-900">{formatDate(message.created_at)}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Subject */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Subjek</label>
+            <p className="text-gray-900">{message.subject}</p>
+          </div>
+
+          {/* Message */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Pesan</label>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-gray-900 whitespace-pre-wrap">{message.message}</p>
+            </div>
+          </div>
+
+          {/* Status Update */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Update Status</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {statusOptions.map((status) => (
+                <button
+                  key={status.value}
+                  onClick={() => onUpdateStatus(message.id, status.value)}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    message.status === status.value
+                      ? `bg-${status.color}-600 text-white`
+                      : `bg-${status.color}-100 text-${status.color}-700 hover:bg-${status.color}-200`
+                  }`}
+                >
+                  {status.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200">
+          {message.phone && (
+            <button
+              onClick={handleWhatsAppReply}
+              className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              Balas via WhatsApp
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ContactDetailModal;

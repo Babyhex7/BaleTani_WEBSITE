@@ -122,17 +122,17 @@ const ContactForm = ({ onSuccess, onError }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="card-responsive">
       <div className="mb-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+        <h3 className="heading-sub mb-2">
           Kirim Pesan
         </h3>
-        <p className="text-gray-600">
+        <p className="text-body text-gray-600">
           Kami akan membalas pesan Anda melalui WhatsApp dalam 1x24 jam
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Nama Lengkap */}
         <div>
           <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -221,14 +221,12 @@ const ContactForm = ({ onSuccess, onError }) => {
             value={formData.message}
             onChange={handleChange}
             placeholder="Tuliskan pesan Anda dengan detail..."
-            className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
-              errors.message ? 'border-red-500' : ''
-            }`}
+            className={`input-field ${errors.message ? 'border-red-500 focus:ring-red-500' : ''}`}
           />
           {errors.message && (
-            <p className="mt-1 text-sm text-red-600">{errors.message}</p>
+            <p className="mt-1 text-caption text-red-600">{errors.message}</p>
           )}
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-caption text-gray-500">
             Minimal 20 karakter ({formData.message.length}/20)
           </p>
         </div>
@@ -238,7 +236,7 @@ const ContactForm = ({ onSuccess, onError }) => {
           <Button
             type="submit"
             variant="primary"
-            className="w-full"
+            className="w-full btn-touch"
             disabled={isSubmitting}
             loading={isSubmitting}
           >

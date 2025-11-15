@@ -27,25 +27,25 @@ const FAQAccordion = ({ faqs, category = 'all' }) => {
 
   if (!filteredFAQs || filteredFAQs.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        <p>Belum ada FAQ untuk kategori ini.</p>
+      <div className="text-center py-8">
+        <p className="text-body text-gray-500">Belum ada FAQ untuk kategori ini.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {filteredFAQs.map((faq, index) => (
         <div 
           key={faq.id} 
-          className="border border-gray-200 rounded-lg overflow-hidden hover:border-green-500 transition-colors"
+          className="card overflow-hidden hover:shadow-md transition-all duration-200"
         >
           {/* Question Header */}
           <button
             onClick={() => toggleFAQ(index)}
-            className="w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-colors text-left"
+            className="btn-touch w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 text-left"
           >
-            <span className="font-medium text-gray-900 pr-4">
+            <span className="font-medium text-gray-900 pr-4 text-sm md:text-base">
               {faq.question}
             </span>
             {openIndex === index ? (
@@ -57,8 +57,8 @@ const FAQAccordion = ({ faqs, category = 'all' }) => {
 
           {/* Answer Body */}
           {openIndex === index && (
-            <div className="p-4 bg-gray-50 border-t border-gray-200">
-              <p className="text-gray-700 whitespace-pre-wrap">
+            <div className="p-4 bg-green-50 border-t border-green-100 animate-scale-in">
+              <p className="text-body text-gray-700 whitespace-pre-wrap">
                 {faq.answer}
               </p>
             </div>

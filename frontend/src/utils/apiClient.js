@@ -79,16 +79,35 @@ const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config) => {
-    // Add customer token if exists
-    const customerToken = localStorage.getItem("token");
-    if (customerToken) {
-      config.headers.Authorization = `Bearer ${customerToken}`;
+    // Check if this is an admin route
+    const isAdminRoute = config.url?.includes("/admin/");
+
+    // Get tokens from localStorage
+    let adminToken = null;
+    try {
+      // Admin token is stored in baletani-admin-storage by Zustand persist
+      const adminStorage = localStorage.getItem("baletani-admin-storage");
+      if (adminStorage) {
+        const parsed = JSON.parse(adminStorage);
+        adminToken = parsed?.state?.token;
+      }
+    } catch (e) {
+      console.error("Error parsing admin storage:", e);
     }
 
-    // Add admin token if exists
-    const adminToken = localStorage.getItem("adminToken");
-    if (adminToken && !customerToken) {
+    const customerToken = localStorage.getItem("token");
+
+    // Prioritize admin token for admin routes
+    if (isAdminRoute && adminToken) {
       config.headers.Authorization = `Bearer ${adminToken}`;
+      console.log("🔑 Using ADMIN token for:", config.url);
+    } else if (customerToken) {
+      config.headers.Authorization = `Bearer ${customerToken}`;
+      console.log("🔑 Using CUSTOMER token for:", config.url);
+    } else if (adminToken) {
+      // Fallback to admin token if no customer token
+      config.headers.Authorization = `Bearer ${adminToken}`;
+      console.log("🔑 Using ADMIN token (fallback) for:", config.url);
     }
 
     // Log request in development
@@ -172,12 +191,30 @@ apiClient.interceptors.response.use(
         case 401:
           // Unauthorized - clear tokens
           console.log("🔒 Unauthorized - clearing tokens");
-          localStorage.removeItem("token");
-          localStorage.removeItem("adminToken");
 
-          // Redirect to login if not already there
-          if (!window.location.pathname.includes("/login")) {
-            window.location.href = "/login";
+          // Check if this was an admin request
+          const isAdminRequest = config?.url?.includes("/admin/");
+
+          if (isAdminRequest) {
+            // Clear admin token
+            localStorage.removeItem("baletani-admin-storage");
+            console.log(
+              "🔒 Cleared admin storage, redirecting to /admin/login"
+            );
+
+            // Redirect to admin login if not already there
+            if (!window.location.pathname.includes("/admin/login")) {
+              window.location.href = "/admin/login";
+            }
+          } else {
+            // Clear customer token
+            localStorage.removeItem("token");
+            console.log("🔒 Cleared customer token, redirecting to /login");
+
+            // Redirect to customer login if not already there
+            if (!window.location.pathname.includes("/login")) {
+              window.location.href = "/login";
+            }
           }
           break;
 
