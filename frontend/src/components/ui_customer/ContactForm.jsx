@@ -11,6 +11,7 @@
  */
 
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import contactService from '../../services/services_customer/contactService';
 import Button from '../ui/Button';
@@ -104,7 +105,13 @@ const ContactForm = ({ onSuccess, onError }) => {
           message: ''
         });
         
-        // Call success callback
+        // Show success toast
+        toast.success(response.message || 'Pesan berhasil dikirim! Kami akan membalas segera via WhatsApp.', {
+          duration: 4000,
+          position: 'top-right'
+        });
+        
+        // Call success callback if provided
         if (onSuccess) {
           onSuccess(response.message);
         }
@@ -112,7 +119,13 @@ const ContactForm = ({ onSuccess, onError }) => {
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Terjadi kesalahan saat mengirim pesan';
       
-      // Call error callback
+      // Show error toast
+      toast.error(errorMessage, {
+        duration: 4000,
+        position: 'top-right'
+      });
+      
+      // Call error callback if provided
       if (onError) {
         onError(errorMessage);
       }

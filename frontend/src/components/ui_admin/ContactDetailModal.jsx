@@ -38,39 +38,28 @@ const ContactDetailModal = ({ message, onClose, onUpdateStatus }) => {
   };
 
   const statusOptions = [
-    { 
-      value: 'pending', 
-      label: 'Pending', 
-      bgActive: 'bg-yellow-600',
-      bgInactive: 'bg-yellow-100 hover:bg-yellow-200',
-      textActive: 'text-white',
-      textInactive: 'text-yellow-700'
-    },
-    { 
-      value: 'read', 
-      label: 'Dibaca', 
-      bgActive: 'bg-blue-600',
-      bgInactive: 'bg-blue-100 hover:bg-blue-200',
-      textActive: 'text-white',
-      textInactive: 'text-blue-700'
-    },
-    { 
-      value: 'replied', 
-      label: 'Dibalas', 
-      bgActive: 'bg-purple-600',
-      bgInactive: 'bg-purple-100 hover:bg-purple-200',
-      textActive: 'text-white',
-      textInactive: 'text-purple-700'
-    },
-    { 
-      value: 'resolved', 
-      label: 'Selesai', 
-      bgActive: 'bg-green-600',
-      bgInactive: 'bg-green-100 hover:bg-green-200',
-      textActive: 'text-white',
-      textInactive: 'text-green-700'
-    }
+    { value: 'pending', label: 'Pending', color: 'yellow' },
+    { value: 'read', label: 'Dibaca', color: 'blue' },
+    { value: 'replied', label: 'Dibalas', color: 'purple' },
+    { value: 'resolved', label: 'Selesai', color: 'green' }
   ];
+
+  const getStatusColor = (status) => {
+    const colorMap = {
+      'pending': 'bg-yellow-100 text-yellow-800',
+      'read': 'bg-blue-100 text-blue-800',
+      'replied': 'bg-purple-100 text-purple-800',
+      'resolved': 'bg-green-100 text-green-800'
+    };
+    return colorMap[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const handleStatusChange = (e) => {
+    const newStatus = e.target.value;
+    if (newStatus !== message.status) {
+      onUpdateStatus(message.id, newStatus);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -139,24 +128,28 @@ const ContactDetailModal = ({ message, onClose, onUpdateStatus }) => {
             </div>
           </div>
 
-          {/* Status Update */}
+          {/* Current Status */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Status Saat Ini</label>
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(message.status)}`}>
+              {statusOptions.find(s => s.value === message.status)?.label || message.status}
+            </span>
+          </div>
+
+          {/* Status Update Dropdown */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Update Status</label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <select
+              value={message.status}
+              onChange={handleStatusChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+            >
               {statusOptions.map((status) => (
-                <button
-                  key={status.value}
-                  onClick={() => onUpdateStatus(message.id, status.value)}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    message.status === status.value
-                      ? `${status.bgActive} ${status.textActive}`
-                      : `${status.bgInactive} ${status.textInactive}`
-                  }`}
-                >
+                <option key={status.value} value={status.value}>
                   {status.label}
-                </button>
+                </option>
               ))}
-            </div>
+            </select>
           </div>
         </div>
 

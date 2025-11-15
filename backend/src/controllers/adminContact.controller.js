@@ -83,9 +83,9 @@ exports.getAllMessages = async (req, res, next) => {
       message: msg.message,
       status: msg.status,
       admin_notes: msg.admin_notes,
-      created_at: msg.created_at,
-      updated_at: msg.updated_at,
-      replied_at: msg.replied_at,
+      created_at: msg.createdAt || msg.created_at,
+      updated_at: msg.updatedAt || msg.updated_at,
+      replied_at: msg.repliedAt || msg.replied_at,
       replied_by: msg.replied_by,
     }));
 
@@ -126,10 +126,27 @@ exports.getMessageById = async (req, res, next) => {
       await message.save();
     }
 
+    // Format response for frontend
+    const formattedMessage = {
+      id: message.id,
+      customer_id: message.customer_id,
+      name: message.full_name,
+      email: message.email,
+      phone: message.whatsapp_number,
+      subject: message.subject,
+      message: message.message,
+      status: message.status,
+      admin_notes: message.admin_notes,
+      created_at: message.createdAt || message.created_at,
+      updated_at: message.updatedAt || message.updated_at,
+      replied_at: message.repliedAt || message.replied_at,
+      replied_by: message.replied_by,
+    };
+
     res.status(200).json({
       success: true,
       message: "Contact message retrieved successfully",
-      data: message,
+      data: formattedMessage,
     });
   } catch (error) {
     next(error);
