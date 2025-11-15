@@ -3,7 +3,9 @@
 ## 🔧 Perbaikan yang Dilakukan
 
 ### Backend
+
 1. ✅ **adminContact.controller.js**
+
    - Removed `Customer` and `Admin` includes dari `getAllMessages()`
    - Removed includes dari `getMessageById()`
    - Removed includes dari `updateStatus()`
@@ -15,12 +17,15 @@
    - Optional auth: tracks customer_id if logged in
 
 ### Frontend
+
 1. ✅ **ContactDetailModal.jsx**
+
    - Fixed status button styling (was using template strings)
    - Changed to proper Tailwind classes with conditional rendering
    - Added bgActive, bgInactive, textActive, textInactive properties
 
 2. ✅ **ContactManagement.jsx**
+
    - Fixed stats calculation to use `pagination.total` instead of `messagesList.length`
    - Stats now show correct total across all pages
 
@@ -32,43 +37,45 @@
 ## 📋 API Endpoints
 
 ### Customer Endpoints
+
 ```
 POST   /api/customer/contact
   - Submit contact form
   - Auth: Optional (no auth = anonymous, with auth = tracked)
   - Rate limit: 5 requests per 15 minutes
   - Spam prevention: 5 messages per phone per day
-  
+
 GET    /api/customer/contact/my-messages
   - Get my messages (auth required)
-  
+
 GET    /api/customer/contact/my-messages/:id
   - Get single message detail (auth required)
 ```
 
 ### Admin Endpoints
+
 ```
 GET    /api/admin/contacts
   - Get all messages with filters
   - Filters: search, status, from_date, to_date
   - Pagination: page, limit
-  
+
 GET    /api/admin/contacts/:id
   - Get single message detail
   - Auto update status to 'read' if pending
-  
+
 PUT    /api/admin/contacts/:id/status
   - Update message status
   - Body: { status, admin_notes }
   - Valid statuses: pending, read, replied, resolved
-  
+
 PUT    /api/admin/contacts/:id/notes
   - Update admin notes only
   - Body: { admin_notes }
-  
+
 DELETE /api/admin/contacts/:id
   - Delete contact message
-  
+
 GET    /api/admin/contacts/stats
   - Get contact statistics
 ```
@@ -96,6 +103,7 @@ CREATE TABLE `contact_messages` (
 ## 🎨 Features
 
 ### Customer Side
+
 - ✅ Submit contact form (with/without login)
 - ✅ Auto-fill form data if logged in
 - ✅ Form validation (client-side)
@@ -109,6 +117,7 @@ CREATE TABLE `contact_messages` (
 - ✅ View my messages (if logged in)
 
 ### Admin Side
+
 - ✅ View all contact messages
 - ✅ Search by: name, email, subject, message, phone
 - ✅ Filter by status: pending, read, replied, resolved
@@ -131,6 +140,7 @@ pending → read → replied → resolved
 ```
 
 **Status Definitions:**
+
 - `pending`: Pesan baru, belum dibaca
 - `read`: Sudah dibaca admin, belum dibalas
 - `replied`: Sudah dibalas (via WhatsApp atau channel lain)
@@ -139,10 +149,13 @@ pending → read → replied → resolved
 ## 🧪 Testing
 
 ### Test File
+
 `api-tests/12-admin-contacts.http` (30 test cases)
 
 **Test Categories:**
+
 1. Customer Form Submission (8 tests)
+
    - Submit without auth
    - Submit with auth
    - Missing fields validation
@@ -151,6 +164,7 @@ pending → read → replied → resolved
    - Spam prevention (6th message)
 
 2. Admin Management (15 tests)
+
    - Get all messages
    - Pagination
    - Filter by status
@@ -163,6 +177,7 @@ pending → read → replied → resolved
    - Stats
 
 3. Validation & Security (3 tests)
+
    - Invalid status
    - No token
    - Invalid token
@@ -171,11 +186,13 @@ pending → read → replied → resolved
    - Various message types for testing
 
 ### Sample Data
+
 6 sample contact messages created via `backend/sync-faq-contact.js`
 
 ## 💡 Cara Menggunakan
 
 ### Customer - Submit Contact Form
+
 1. Buka halaman Contact
 2. Isi form:
    - Nama Lengkap (required, min 3 chars)
@@ -188,6 +205,7 @@ pending → read → replied → resolved
 5. Admin akan membalas via WhatsApp dalam 1x24 jam
 
 ### Admin - Manage Messages
+
 1. Login sebagai admin
 2. Buka "Contact Management"
 3. Lihat list messages dengan stats cards
@@ -210,19 +228,23 @@ pending → read → replied → resolved
 ## 🔐 Security
 
 ### Rate Limiting
+
 - Customer form: 5 requests per 15 minutes per IP
 - Prevents spam and abuse
 
 ### Spam Prevention
+
 - Max 5 messages per phone number per day
 - Checked by `whatsapp_number` and `created_at`
 
 ### Authentication
+
 - Customer endpoints: Optional auth (can be anonymous)
 - Admin endpoints: Required admin auth with RBAC
 - Allowed roles: super_admin, super_inventory_admin
 
 ### Data Validation
+
 - Backend: Sequelize model validations
 - Frontend: Form validations before submit
 - Format checks: phone (regex), email (regex)
@@ -230,16 +252,19 @@ pending → read → replied → resolved
 ## 📱 WhatsApp Integration
 
 ### Quick Reply Feature
+
 - Button in ContactDetailModal
 - Opens WhatsApp Web with pre-filled message:
   ```
-  Halo [Name], terima kasih telah menghubungi BaleTani 
+  Halo [Name], terima kasih telah menghubungi BaleTani
   mengenai: "[Subject]"
   ```
 - Uses customer's whatsapp_number from form
 
 ### Format WhatsApp Number
+
 Backend accepts multiple formats:
+
 - `0812XXXXXXXX` → Cleaned to `62812XXXXXXXX`
 - `62812XXXXXXXX` → Used as is
 - `+62812XXXXXXXX` → Cleaned to `62812XXXXXXXX`
@@ -247,6 +272,7 @@ Backend accepts multiple formats:
 ## 🚀 Response Format
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -270,6 +296,7 @@ Backend accepts multiple formats:
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
@@ -280,6 +307,7 @@ Backend accepts multiple formats:
 ## ✅ Checklist
 
 ### Backend
+
 - [x] Customer contact controller
 - [x] Admin contact controller
 - [x] Contact routes (customer)
@@ -291,6 +319,7 @@ Backend accepts multiple formats:
 - [x] Auto status update
 
 ### Frontend
+
 - [x] ContactForm component
 - [x] ContactDetailModal component
 - [x] ContactManagement page
@@ -303,6 +332,7 @@ Backend accepts multiple formats:
 - [x] Pagination
 
 ### Testing
+
 - [x] Test file created (30 cases)
 - [x] Sample data available
 - [x] API endpoints tested
@@ -312,6 +342,7 @@ Backend accepts multiple formats:
 ## 🎯 Status: READY TO USE ✅
 
 Semua fitur Contact Management sudah berfungsi dengan baik:
+
 - Customer bisa submit form ✅
 - Admin bisa manage messages ✅
 - WhatsApp quick reply ✅
