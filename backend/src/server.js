@@ -5,28 +5,41 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
+    console.log("🔄 Starting server initialization...");
+    
     // Test database connection
+    console.log("🔄 Testing database connection...");
     await testConnection();
 
     // Disable foreign key checks for sync
+    console.log("🔄 Disabling foreign key checks...");
     await sequelize.query("SET FOREIGN_KEY_CHECKS = 0;");
 
     // Sync database models
+    console.log("🔄 Synchronizing database models...");
+    console.log("⏳ This may take a moment...");
+    
     await sequelize.sync({
       force: false, // Don't drop tables - preserve existing data
-      alter: false,
+      alter: false, // Don't alter tables - prevent stuck on complex migrations
     });
 
     // Re-enable foreign key checks
+    console.log("🔄 Re-enabling foreign key checks...");
     await sequelize.query("SET FOREIGN_KEY_CHECKS = 1;");
 
     console.log("✅ Database models synchronized successfully.");
 
     // Start server
+    console.log("🔄 Starting HTTP server...");
     app.listen(PORT, () => {
+      console.log("\n" + "=".repeat(60));
       console.log(`🚀 BaleTani Fresh Market API is running on port ${PORT}`);
       console.log(`📖 Environment: ${process.env.NODE_ENV}`);
       console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
+      console.log(`🌐 API Base URL: http://localhost:${PORT}/api`);
+      console.log("=".repeat(60) + "\n");
+      console.log("✅ Server is ready to accept connections!");
     });
   } catch (error) {
     console.error("❌ Failed to start server:", error);
