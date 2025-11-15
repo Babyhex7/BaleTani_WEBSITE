@@ -116,20 +116,37 @@ const ProductCard = ({
   } = useAddToCart();
 
   // ========================================
-  // COMPUTED VALUES
+  // COMPUTED VALUES - DISKON REAL DARI DATABASE
   // Menggunakan utility functions dari productUtils.js
+  // 
+  // ✅ PENTING: calculateDiscount() sudah di-refactor untuk:
+  // - STRICT VALIDATION: Hanya return hasDiscount=true jika ada discount object dari backend
+  // - NO FALLBACK: Tidak ada perhitungan palsu jika tidak ada data diskon dari database
+  // - DATA DRIVEN: Semua data dari backend ProductDiscount table (pre-calculated)
+  // 
+  // ✅ Backend flow:
+  // 1. Admin create discount di database (table: discounts)
+  // 2. Admin assign product ke discount
+  // 3. Backend calculate & save ke ProductDiscount table (discounted_price, original_price)
+  // 4. Frontend ambil data pre-calculated dari API
+  // 5. Display HANYA jika product.discount object exists
   // ========================================
   
   /**
-   * Hitung diskon dan harga final
+   * Hitung diskon dan harga final dari data backend
    * Returns: { hasDiscount, discountPercentage, displayPercentage, finalPrice, originalPrice, savingsAmount, maxDiscount }
+   * 
+   * hasDiscount = true HANYA JIKA:
+   * - product.discount object exists dari backend
+   * - product.discount.finalPrice < product.price (ada diskon nyata)
+   * - Semua validasi passed
    */
   const { 
-    hasDiscount, 
-    discountPercentage, 
-    displayPercentage, // Original % untuk badge (60%)
-    finalPrice, 
-    originalPrice 
+    hasDiscount,        // ✅ true = diskon REAL dari database
+    discountPercentage, // ✅ Actual % setelah max_discount applied
+    displayPercentage,  // ✅ Original % untuk badge display (contoh: 80%)
+    finalPrice,         // ✅ Harga setelah diskon (dari backend)
+    originalPrice       // ✅ Harga asli sebelum diskon
   } = calculateDiscount(product);
   
   /**

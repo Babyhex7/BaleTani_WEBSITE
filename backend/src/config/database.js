@@ -18,6 +18,10 @@ const sequelize = new Sequelize(
       process.env.NODE_ENV === "development"
         ? (sql) => {
             // Log query tapi potong jika terlalu panjang
+            // Disable logging untuk sync operations (terlalu banyak)
+            if (sql.includes("SHOW INDEX") || sql.includes("SHOW TABLES")) {
+              return; // Skip logging schema queries
+            }
             const shortSql =
               sql.length > 200 ? sql.substring(0, 200) + "..." : sql;
             console.log("🔵 SQL:", shortSql);

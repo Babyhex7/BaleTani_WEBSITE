@@ -44,7 +44,7 @@ export const calculateDiscount = (product) => {
     return {
       hasDiscount: false,
       discountPercentage: 0,
-      displayPercentage: 0, // Original % untuk badge (60%)
+      displayPercentage: 0,
       finalPrice: 0,
       originalPrice: 0,
       savingsAmount: 0,
@@ -52,66 +52,96 @@ export const calculateDiscount = (product) => {
     };
   }
 
-  // Sumber data harga yang mungkin tersedia dari BE:
-  // - product.price (harga asli / selling_price)
-  // - product.finalPrice (opsional, dihitung BE)
-  // - product.discount.finalPrice (opsional, dihitung BE)
-  // - product.discount.originalPrice (opsional)
-  // - product.discount.percentage (original % untuk display badge seperti Shopee)
+  // ✅ STRICT VALIDATION: Hanya return hasDiscount=true jika ada discount object dari backend
+  // Cek apakah ada discount object yang valid dari backend
+  const hasDiscountObject =
+    product.discount &&
+    typeof product.discount === "object" &&
+    product.discount.finalPrice !== null &&
+    product.discount.finalPrice !== undefined;
+
+  // Jika tidak ada discount object dari backend, return no discount
+  if (!hasDiscountObject) {
+    const price =
+      typeof product.price === "number"
+        ? product.price
+        : parseFloat(product.price || 0);
+    return {
+      hasDiscount: false,
+      discountPercentage: 0,
+      displayPercentage: 0,
+      finalPrice: price,
+      originalPrice: price,
+      savingsAmount: 0,
+      maxDiscount: null,
+    };
+  }
+
+  // ✅ GUNAKAN DATA DARI BACKEND (PRE-CALCULATED)
+  // Backend sudah hitung semua di ProductDiscount table
+  const discountData = product.discount;
+
+  // Original price: dari discount.originalPrice atau product.price
   const original =
-    typeof product?.discount?.originalPrice === "number"
-      ? product.discount.originalPrice
+    typeof discountData.originalPrice === "number"
+      ? discountData.originalPrice
       : typeof product.price === "number"
       ? product.price
       : parseFloat(product.price || 0);
 
-  // Prefer finalPrice dari top-level, fallback ke discount.finalPrice, lalu ke price
+  // Final price: HARUS dari discount.finalPrice (pre-calculated by backend)
   const finalP =
-    typeof product.finalPrice === "number"
-      ? product.finalPrice
-      : typeof product?.discount?.finalPrice === "number"
-      ? product.discount.finalPrice
+    typeof discountData.finalPrice === "number"
+      ? discountData.finalPrice
       : original;
 
-  const hasDiscount = finalP < original;
+  // Validasi: pastikan ada diskon real (finalPrice < originalPrice)
+  const hasRealDiscount = finalP < original && finalP >= 0;
 
+  if (!hasRealDiscount) {
+    // Tidak ada diskon real, return no discount
+    return {
+      hasDiscount: false,
+      discountPercentage: 0,
+      displayPercentage: 0,
+      finalPrice: original,
+      originalPrice: original,
+      savingsAmount: 0,
+      maxDiscount: null,
+    };
+  }
+
+  // ✅ CALCULATE PERCENTAGES
   // Actual discount percentage (after max discount applied)
-  const actualPercentage = hasDiscount
-    ? Math.round(((original - finalP) / original) * 100)
-    : 0;
+  const actualPercentage = Math.round(((original - finalP) / original) * 100);
 
-  // Savings amount: prioritas dari BE, fallback calculate manual
-  const savingsAmount = product?.discount?.savings
-    ? product.discount.savings
-    : hasDiscount
-    ? original - finalP
-    : 0;
+  // Savings amount: gunakan dari BE atau calculate
+  const savingsAmount =
+    typeof discountData.savings === "number"
+      ? discountData.savings
+      : original - finalP;
 
-  const maxDiscount = product?.discount?.maxDiscount || null;
+  // Max discount value
+  const maxDiscount = discountData.maxDiscount || null;
 
-  // Original discount percentage untuk display badge (dari BE, misal 78%)
-  // LOGIC BARU: Jika BE tidak kirim percentage atau percentage = 0, hitung dari value
+  // Display percentage untuk badge (original % seperti di Shopee: "80% OFF")
   let displayPercentage = 0;
-  if (hasDiscount) {
-    if (product?.discount?.percentage && product.discount.percentage > 0) {
-      // Priority 1: Gunakan percentage dari BE
-      displayPercentage = Math.round(product.discount.percentage);
-    } else if (
-      product?.discount?.value &&
-      product?.discount?.type === "percentage"
-    ) {
-      // Priority 2: Gunakan value jika type = percentage
-      displayPercentage = Math.round(product.discount.value);
-    } else {
-      // Priority 3: Calculate dari selisih harga
-      displayPercentage = actualPercentage;
-    }
+
+  if (discountData.percentage && discountData.percentage > 0) {
+    // Priority 1: Gunakan percentage dari BE (original % sebelum max discount)
+    displayPercentage = Math.round(discountData.percentage);
+  } else if (discountData.value && discountData.type === "percentage") {
+    // Priority 2: Gunakan value jika type = percentage
+    displayPercentage = Math.round(discountData.value);
+  } else {
+    // Priority 3: Gunakan actual percentage
+    displayPercentage = actualPercentage;
   }
 
   return {
-    hasDiscount,
+    hasDiscount: true, // ✅ GUARANTEED TRUE karena sudah validated
     discountPercentage: actualPercentage, // Actual % after max discount
-    displayPercentage, // Original % untuk badge (78%)
+    displayPercentage, // Original % untuk badge (contoh: 80%)
     finalPrice: finalP,
     originalPrice: original,
     savingsAmount,

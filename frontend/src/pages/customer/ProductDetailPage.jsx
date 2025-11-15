@@ -176,17 +176,27 @@ const ProductDetailPage = () => {
     );
   }
 
-  // ✅ DISKON SEPERTI SHOPEE: Tampilkan % original (78%), tapi pakai harga dengan max discount
-  // Gunakan logic yang SAMA dengan ProductCard (dari productUtils.js)
+  // ========================================
+  // DISKON CALCULATION - HANYA DARI DATABASE
+  // ========================================
+  // ✅ SHOPEE-STYLE DISCOUNT: Tampilkan % original (contoh: 78%), tapi gunakan harga dengan max discount
+  // ✅ Gunakan logic yang SAMA dengan ProductCard (dari productUtils.js)
+  // ✅ STRICT: hasDiscount = true HANYA jika ada discount object dari backend API
+  // 
+  // Backend sudah pre-calculate semua di ProductDiscount table:
+  // - original_price: Harga asli saat assign
+  // - discounted_price: Harga setelah diskon (dengan max_discount applied)
+  // - Frontend tinggal display, NO calculation
+  // ========================================
   const { 
-    hasDiscount, 
-    displayPercentage, 
-    finalPrice, 
-    originalPrice,
-    savingsAmount
+    hasDiscount,        // ✅ true = diskon REAL dari database
+    displayPercentage,  // ✅ Original % untuk badge (contoh: 80%)
+    finalPrice,         // ✅ Harga final setelah diskon
+    originalPrice,      // ✅ Harga asli
+    savingsAmount       // ✅ Jumlah hemat (Rp)
   } = calculateDiscount(product);
   
-  // DEBUG: Log hasil calculation
+  // ✅ DEBUG: Log hasil calculation untuk troubleshooting
   console.log('🔥 ProductDetail - Discount Calculation:', {
     hasDiscount,
     displayPercentage,
