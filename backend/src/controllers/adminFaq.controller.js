@@ -71,11 +71,10 @@ exports.getAllFAQs = async (req, res, next) => {
       answer: faq.answer,
       category: faq.category,
       display_order: faq.order_number,
+      order_number: faq.order_number,
       is_active: faq.is_active,
       created_at: faq.created_at,
       updated_at: faq.updated_at,
-      creator: faq.creator,
-      updater: faq.updater,
     }));
 
     res.status(200).json({
@@ -100,20 +99,7 @@ exports.getFAQById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const faq = await FAQ.findByPk(id, {
-      include: [
-        {
-          model: Admin,
-          as: "creator",
-          attributes: ["id", "name", "email"],
-        },
-        {
-          model: Admin,
-          as: "updater",
-          attributes: ["id", "name", "email"],
-        },
-      ],
-    });
+    const faq = await FAQ.findByPk(id);
 
     if (!faq) {
       return res.status(404).json({
@@ -160,21 +146,10 @@ exports.createFAQ = async (req, res, next) => {
       updated_by: adminId,
     });
 
-    // Fetch with relations
-    const createdFAQ = await FAQ.findByPk(faq.id, {
-      include: [
-        {
-          model: Admin,
-          as: "creator",
-          attributes: ["id", "name", "email"],
-        },
-      ],
-    });
-
     res.status(201).json({
       success: true,
       message: "FAQ berhasil dibuat",
-      data: createdFAQ,
+      data: faq,
     });
   } catch (error) {
     next(error);
@@ -210,26 +185,10 @@ exports.updateFAQ = async (req, res, next) => {
 
     await faq.save();
 
-    // Fetch with relations
-    const updatedFAQ = await FAQ.findByPk(id, {
-      include: [
-        {
-          model: Admin,
-          as: "creator",
-          attributes: ["id", "name", "email"],
-        },
-        {
-          model: Admin,
-          as: "updater",
-          attributes: ["id", "name", "email"],
-        },
-      ],
-    });
-
     res.status(200).json({
       success: true,
       message: "FAQ berhasil diupdate",
-      data: updatedFAQ,
+      data: faq,
     });
   } catch (error) {
     next(error);

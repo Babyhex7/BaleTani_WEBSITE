@@ -1,0 +1,140 @@
+### ============================================
+### ADMIN FAQ CRUD TESTS
+### ============================================
+### Test all FAQ management endpoints
+### Requires: Admin authentication with super_admin or super_inventory_admin role
+
+### 1. Get All FAQs (No Filter)
+GET {{baseUrl}}/admin/faqs
+Authorization: Bearer {{adminToken}}
+
+### 2. Get All FAQs (With Search)
+GET {{baseUrl}}/admin/faqs?search=pembayaran
+Authorization: Bearer {{adminToken}}
+
+### 3. Get All FAQs (Filter by Category)
+GET {{baseUrl}}/admin/faqs?category=umum
+Authorization: Bearer {{adminToken}}
+
+### 4. Get All FAQs (Filter by Status - Active)
+GET {{baseUrl}}/admin/faqs?is_active=true
+Authorization: Bearer {{adminToken}}
+
+### 5. Get All FAQs (Filter by Status - Inactive)
+GET {{baseUrl}}/admin/faqs?is_active=false
+Authorization: Bearer {{adminToken}}
+
+### 6. Get All FAQs (With Pagination)
+GET {{baseUrl}}/admin/faqs?page=1&limit=5
+Authorization: Bearer {{adminToken}}
+
+### 7. Get FAQ by ID
+GET {{baseUrl}}/admin/faqs/1
+Authorization: Bearer {{adminToken}}
+
+### 8. Create New FAQ
+POST {{baseUrl}}/admin/faqs
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "question": "Bagaimana cara melakukan pemesanan?",
+  "answer": "Anda dapat melakukan pemesanan dengan cara: 1. Pilih produk yang diinginkan, 2. Tambahkan ke keranjang, 3. Lakukan checkout dan pembayaran. Pesanan akan diproses setelah pembayaran dikonfirmasi.",
+  "category": "umum",
+  "order_number": 1,
+  "is_active": true
+}
+
+### 9. Create FAQ - Pembayaran
+POST {{baseUrl}}/admin/faqs
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "question": "Metode pembayaran apa saja yang tersedia?",
+  "answer": "Kami menyediakan berbagai metode pembayaran: Transfer Bank (BCA, Mandiri, BRI), E-wallet (OVO, GoPay, Dana), dan COD (Cash on Delivery) untuk area tertentu.",
+  "category": "pembayaran",
+  "order_number": 1,
+  "is_active": true
+}
+
+### 10. Update FAQ
+PUT {{baseUrl}}/admin/faqs/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "question": "Bagaimana cara melakukan pemesanan produk?",
+  "answer": "Anda dapat melakukan pemesanan dengan mudah melalui website kami: 1. Browse produk, 2. Tambah ke keranjang, 3. Checkout dan bayar. Tim kami akan segera memproses pesanan Anda!",
+  "category": "umum",
+  "order_number": 1,
+  "is_active": true
+}
+
+### 11. Update FAQ Status (Deactivate)
+PUT {{baseUrl}}/admin/faqs/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "is_active": false
+}
+
+### 12. Update FAQ Status (Activate)
+PUT {{baseUrl}}/admin/faqs/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "is_active": true
+}
+
+### 13. Bulk Update FAQ Order
+PUT {{baseUrl}}/admin/faqs/bulk-order
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "faqs": [
+    { "id": 1, "order_number": 1 },
+    { "id": 2, "order_number": 2 },
+    { "id": 3, "order_number": 3 }
+  ]
+}
+
+### 14. Get FAQ Category Stats
+GET {{baseUrl}}/admin/faqs/categories/stats
+Authorization: Bearer {{adminToken}}
+
+### 15. Delete FAQ
+DELETE {{baseUrl}}/admin/faqs/1
+Authorization: Bearer {{adminToken}}
+
+### 16. Validation Test - Empty Question
+POST {{baseUrl}}/admin/faqs
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "question": "",
+  "answer": "Ini adalah jawaban test",
+  "category": "umum"
+}
+
+### 17. Validation Test - Short Answer
+POST {{baseUrl}}/admin/faqs
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "question": "Ini adalah pertanyaan test yang cukup panjang",
+  "answer": "Pendek",
+  "category": "umum"
+}
+
+### 18. Test Unauthorized Access (No Token)
+GET {{baseUrl}}/admin/faqs
+
+### 19. Test with Invalid Token
+GET {{baseUrl}}/admin/faqs
+Authorization: Bearer invalid_token_here

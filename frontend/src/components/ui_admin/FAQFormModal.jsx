@@ -12,6 +12,7 @@
 
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import toast from 'react-hot-toast';
 import faqService from '../../services/services_admin/faqService';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
@@ -115,8 +116,10 @@ const FAQFormModal = ({ isOpen, onClose, onSuccess, faq, mode = 'create' }) => {
       let response;
       if (mode === 'edit') {
         response = await faqService.updateFAQ(faq.id, formData);
+        toast.success('FAQ berhasil diperbarui');
       } else {
         response = await faqService.createFAQ(formData);
+        toast.success('FAQ berhasil dibuat');
       }
 
       if (response.success) {
@@ -124,7 +127,8 @@ const FAQFormModal = ({ isOpen, onClose, onSuccess, faq, mode = 'create' }) => {
       }
     } catch (error) {
       console.error('Error saving FAQ:', error);
-      const errorMessage = error.response?.data?.message || 'Terjadi kesalahan saat menyimpan FAQ';
+      const errorMessage = error.response?.data?.message || error.message || 'Terjadi kesalahan saat menyimpan FAQ';
+      toast.error(errorMessage);
       setErrors({ submit: errorMessage });
     } finally {
       setIsSubmitting(false);

@@ -79,9 +79,9 @@ const FAQManagement = () => {
         setTotalPages(data.pagination?.totalPages || 1);
         setTotalItems(data.pagination?.total || 0);
 
-        // Calculate stats
+        // Calculate stats from current page data
         setStats({
-          total: faqsList.length,
+          total: data.pagination?.total || 0,
           active: faqsList.filter(f => f.is_active).length,
           inactive: faqsList.filter(f => !f.is_active).length
         });
@@ -112,7 +112,7 @@ const FAQManagement = () => {
       }
     } catch (err) {
       console.error('Error viewing FAQ:', err);
-      showNotification('error', err.message || 'Gagal memuat detail FAQ');
+      toast.error(err.message || 'Gagal memuat detail FAQ');
     }
   };
 
@@ -126,7 +126,7 @@ const FAQManagement = () => {
       }
     } catch (err) {
       console.error('Error editing FAQ:', err);
-      showNotification('error', err.message || 'Gagal memuat data FAQ');
+      toast.error(err.message || 'Gagal memuat data FAQ');
     }
   };
 
@@ -141,43 +141,14 @@ const FAQManagement = () => {
       const data = await faqService.deleteFAQ(selectedFAQ.id);
       
       if (data.success) {
-        showNotification('success', 'FAQ berhasil dihapus');
+        toast.success('FAQ berhasil dihapus');
         setShowDeleteModal(false);
         fetchFAQs();
       }
     } catch (err) {
-      showNotification('error', err.message || 'Gagal menghapus FAQ');
+      toast.error(err.message || 'Gagal menghapus FAQ');
     } finally {
       setDeleteLoading(false);
-    }
-  };
-
-  const handleFormSubmit = async (formData) => {
-    try {
-      let data;
-      if (modalMode === 'create') {
-        data = await faqService.createFAQ(formData);
-        showNotification('success', 'FAQ berhasil dibuat');
-      } else {
-        data = await faqService.updateFAQ(selectedFAQ.id, formData);
-        showNotification('success', 'FAQ berhasil diperbarui');
-      }
-
-      if (data.success) {
-        setShowFormModal(false);
-        fetchFAQs();
-      }
-    } catch (err) {
-      showNotification('error', err.message || 'Gagal menyimpan FAQ');
-    }
-  };
-
-  // Utilities
-  const showNotification = (type, message) => {
-    if (type === 'success') {
-      toast.success(message);
-    } else {
-      toast.error(message);
     }
   };
 
@@ -449,10 +420,14 @@ const FAQManagement = () => {
       {/* Modals */}
       {showFormModal && (
         <FAQFormModal
+          isOpen={showFormModal}
           mode={modalMode}
           faq={selectedFAQ}
           onClose={() => setShowFormModal(false)}
-          onSubmit={handleFormSubmit}
+          onSuccess={() => {
+            setShowFormModal(false);
+            fetchFAQs();
+          }}
         />
       )}
 
