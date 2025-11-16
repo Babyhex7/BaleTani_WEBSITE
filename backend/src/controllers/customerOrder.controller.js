@@ -285,6 +285,23 @@ const createOrder = async (req, res) => {
       paymentStatus = "paid";
     }
 
+    // Set payment expiry time (10 detik untuk testing, 10 menit untuk production)
+    const PAYMENT_TIMEOUT_MS =
+      process.env.NODE_ENV === "production"
+        ? 10 * 60 * 1000 // 10 menit
+        : 10 * 1000; // 10 detik (TESTING)
+
+    const paymentExpiredAt =
+      payment_method !== "cash"
+        ? new Date(Date.now() + PAYMENT_TIMEOUT_MS)
+        : null; // Cash tidak perlu expired time
+
+    console.log(
+      `[CREATE ORDER] Payment timeout: ${
+        PAYMENT_TIMEOUT_MS / 1000
+      } detik, expired at: ${paymentExpiredAt}`
+    );
+
     // Create order
     const order = await Order.create(
       {
@@ -307,6 +324,7 @@ const createOrder = async (req, res) => {
         total_amount: totalAmount,
         order_status: orderStatus,
         payment_status: paymentStatus,
+        payment_expired_at: paymentExpiredAt,
         admin_notes: null,
         processed_by: null,
         processed_at: null,

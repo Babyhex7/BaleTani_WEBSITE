@@ -1,5 +1,5 @@
-import React from 'react';
-import { ShoppingBag, Calendar, ExternalLink, ShoppingCart, MessageCircle, Eye } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShoppingBag, Calendar, ExternalLink, ShoppingCart, MessageCircle, Eye, Clock, AlertCircle } from 'lucide-react';
 import { formatOrderStatus, getStatusColor, formatPaymentMethod } from '../../services/services_customer/orderHistoryService';
 
 /**
@@ -13,10 +13,59 @@ const OrderCard = ({ order, onViewDetail, onReorder }) => {
     order_date,
     status,
     payment_status,
+    payment_expired_at,
+    cancelled_reason,
     total_amount,
     items = [],
     payment
   } = order;
+
+  // State untuk countdown timer
+  const [timeRemaining, setTimeRemaining] = useState(null);
+  const [isExpired, setIsExpired] = useState(false);
+
+  // Countdown timer untuk pending_payment orders
+  useEffect(() => {
+    if (status !== 'pending_payment' || !payment_expired_at) {
+      return;
+    }
+
+    console.log(`[COUNTDOWN] Order ${order_number} - Starting countdown`);
+
+    const calculateTimeRemaining = () => {
+      const now = new Date().getTime();
+      const expiry = new Date(payment_expired_at).getTime();
+      const diff = expiry - now;
+
+      if (diff <= 0) {
+        setIsExpired(true);
+        setTimeRemaining(null);
+        console.log(`[COUNTDOWN] Order ${order_number} - EXPIRED!`);
+        return null;
+      }
+
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      return { minutes, seconds, total: diff };
+    };
+
+    // Hitung pertama kali
+    const initial = calculateTimeRemaining();
+    setTimeRemaining(initial);
+
+    // Update setiap 1 detik
+    const interval = setInterval(() => {
+      const remaining = calculateTimeRemaining();
+      setTimeRemaining(remaining);
+
+      if (!remaining) {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [status, payment_expired_at, order_number]);
 
   // Format tanggal
   const formatDate = (dateString) => {
@@ -64,6 +113,40 @@ const OrderCard = ({ order, onViewDetail, onReorder }) => {
             </span>
           </div>
         </div>
+
+        {/* Countdown Timer untuk pending_payment */}
+        {status === 'pending_payment' && timeRemaining && (
+          <div className={`mt-3 p-3 rounded-lg flex items-center gap-2 ${
+            timeRemaining.total < 120000 // < 2 menit
+              ? 'bg-red-50 border border-red-200'
+              : 'bg-blue-50 border border-blue-200'
+          }`}>
+            <Clock className={`w-4 h-4 ${timeRemaining.total < 120000 ? 'text-red-600' : 'text-blue-600'}`} />
+            <span className={`text-sm font-semibold ${timeRemaining.total < 120000 ? 'text-red-700' : 'text-blue-700'}`}>
+              Bayar dalam: {String(timeRemaining.minutes).padStart(2, '0')}:{String(timeRemaining.seconds).padStart(2, '0')}
+            </span>
+          </div>
+        )}
+
+        {/* Expired Notice */}
+        {status === 'pending_payment' && isExpired && (
+          <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600" />
+            <span className="text-sm font-semibold text-red-700">
+              Waktu pembayaran habis - Order akan dibatalkan otomatis
+            </span>
+          </div>
+        )}
+
+        {/* Cancelled Reason */}
+        {status === 'cancelled' && cancelled_reason && (
+          <div className="mt-3 p-3 rounded-lg bg-gray-100 border border-gray-300">
+            <p className="text-sm text-gray-700">
+              <span className="font-semibold">Alasan: </span>
+              {cancelled_reason}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Items */}

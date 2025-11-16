@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Package, MapPin, CreditCard, Clock, MessageCircle, ShoppingCart, Calendar, CheckCircle, AlertCircle } from 'lucide-react';
 import { formatOrderStatus, getStatusColor, formatPaymentMethod, getWhatsAppLink } from '../../services/services_customer/orderHistoryService';
 
@@ -13,6 +13,7 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
     order_number,
     order_date,
     status,
+    payment_expired_at,
     customer,
     delivery,
     items = [],
@@ -21,6 +22,53 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
     customer_notes,
     cancelled_reason
   } = order;
+
+  // State untuk countdown timer
+  const [timeRemaining, setTimeRemaining] = useState(null);
+  const [isExpired, setIsExpired] = useState(false);
+
+  // Countdown timer untuk pending_payment orders
+  useEffect(() => {
+    if (status !== 'pending_payment' || !payment_expired_at) {
+      return;
+    }
+
+    console.log(`[COUNTDOWN MODAL] Order ${order_number} - Starting countdown`);
+
+    const calculateTimeRemaining = () => {
+      const now = new Date().getTime();
+      const expiry = new Date(payment_expired_at).getTime();
+      const diff = expiry - now;
+
+      if (diff <= 0) {
+        setIsExpired(true);
+        setTimeRemaining(null);
+        console.log(`[COUNTDOWN MODAL] Order ${order_number} - EXPIRED!`);
+        return null;
+      }
+
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      return { minutes, seconds, total: diff };
+    };
+
+    // Hitung pertama kali
+    const initial = calculateTimeRemaining();
+    setTimeRemaining(initial);
+
+    // Update setiap 1 detik
+    const interval = setInterval(() => {
+      const remaining = calculateTimeRemaining();
+      setTimeRemaining(remaining);
+
+      if (!remaining) {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [status, payment_expired_at, order_number]);
 
   // Format functions
   const formatDate = (dateString) => {
@@ -83,6 +131,39 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Countdown Timer untuk pending_payment */}
+          {status === 'pending_payment' && timeRemaining && (
+            <div className={`p-5 rounded-lg flex items-center gap-3 ${
+              timeRemaining.total < 120000 // < 2 menit
+                ? 'bg-red-50 border-2 border-red-300'
+                : 'bg-blue-50 border-2 border-blue-300'
+            }`}>
+              <Clock className={`w-6 h-6 ${timeRemaining.total < 120000 ? 'text-red-600' : 'text-blue-600'}`} />
+              <div className="flex-1">
+                <p className={`text-sm font-medium ${timeRemaining.total < 120000 ? 'text-red-700' : 'text-blue-700'}`}>
+                  Selesaikan pembayaran dalam:
+                </p>
+                <p className={`text-2xl font-bold ${timeRemaining.total < 120000 ? 'text-red-800' : 'text-blue-800'}`}>
+                  {String(timeRemaining.minutes).padStart(2, '0')}:{String(timeRemaining.seconds).padStart(2, '0')}
+                </p>
+              </div>
+              {timeRemaining.total < 120000 && (
+                <AlertCircle className="w-6 h-6 text-red-600 animate-pulse" />
+              )}
+            </div>
+          )}
+
+          {/* Expired Notice */}
+          {status === 'pending_payment' && isExpired && (
+            <div className="p-5 rounded-lg bg-red-50 border-2 border-red-300 flex items-center gap-3">
+              <AlertCircle className="w-6 h-6 text-red-600" />
+              <div className="flex-1">
+                <p className="font-bold text-red-800">Waktu Pembayaran Habis</p>
+                <p className="text-sm text-red-700">Pesanan akan otomatis dibatalkan oleh sistem</p>
+              </div>
+            </div>
+          )}
+
           {/* Timeline Status */}
           {timeline && timeline.length > 0 && (
             <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-5 border border-green-200">

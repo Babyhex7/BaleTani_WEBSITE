@@ -1,12 +1,13 @@
 const app = require("./app");
 const { sequelize, testConnection } = require("./config/database");
+const { startAutoCancelCron } = require("./services/orderAutoCancelCron");
 
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
     console.log("🔄 Starting server initialization...");
-    
+
     // Test database connection
     console.log("🔄 Testing database connection...");
     await testConnection();
@@ -18,7 +19,7 @@ const startServer = async () => {
     // Sync database models
     console.log("🔄 Synchronizing database models...");
     console.log("⏳ This may take a moment...");
-    
+
     await sequelize.sync({
       force: false, // Don't drop tables - preserve existing data
       alter: false, // Don't alter tables - prevent stuck on complex migrations
@@ -40,6 +41,10 @@ const startServer = async () => {
       console.log(`🌐 API Base URL: http://localhost:${PORT}/api`);
       console.log("=".repeat(60) + "\n");
       console.log("✅ Server is ready to accept connections!");
+
+      // Start auto-cancel cron job
+      console.log("⏰ Starting order auto-cancel cron job...");
+      startAutoCancelCron();
     });
   } catch (error) {
     console.error("❌ Failed to start server:", error);

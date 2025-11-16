@@ -161,6 +161,9 @@ exports.getCustomerOrders = async (req, res) => {
           order_date: order.created_at,
           status: order.order_status,
           payment_status: order.payment_status,
+          payment_expired_at: order.payment_expired_at, // Untuk countdown timer
+          cancelled_reason: order.cancelled_reason,
+          cancelled_at: order.cancelled_at,
           total_amount: parseFloat(order.total_amount || 0),
           items: (order.orderItems || []).map((item) => ({
             id: item.id,

@@ -120,6 +120,11 @@ const Order = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
+    payment_expired_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: "Waktu expired untuk pembayaran (10 menit dari created_at)",
+    },
     completed_at: {
       type: DataTypes.DATE,
       allowNull: true,
@@ -184,6 +189,13 @@ const Order = sequelize.define(
         fields: ["customer_id", "order_status"],
         comment: "Composite index untuk customer order dengan status tertentu",
       },
+      // NOTE: Index ini akan dibuat via migration SQL manual
+      // Uncomment setelah migration berhasil
+      // {
+      //   name: "idx_order_payment_expired",
+      //   fields: ["order_status", "payment_expired_at"],
+      //   comment: "Index untuk cron job auto-cancel expired orders",
+      // },
     ],
   }
 );
