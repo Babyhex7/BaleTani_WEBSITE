@@ -7,36 +7,55 @@ const Cart = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true
+      primaryKey: true,
     },
     customer_id: {
       type: DataTypes.UUID,
-      allowNull: false
+      allowNull: false,
     },
     product_id: {
       type: DataTypes.UUID,
-      allowNull: false
+      allowNull: false,
     },
     quantity: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false
+      allowNull: false,
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false
+      allowNull: false,
     },
     updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false
-    }
+      allowNull: false,
     },
+  },
   {
     tableName: "carts",
     timestamps: false,
     paranoid: false,
-    underscored: true
+    underscored: true,
+    // FIX: Tambah indexes untuk performance (cart per customer, cart per product)
+    indexes: [
+      {
+        name: "idx_cart_customer",
+        fields: ["customer_id"],
+        comment: "Index untuk ambil semua cart items per customer",
+      },
+      {
+        name: "idx_cart_product",
+        fields: ["product_id"],
+        comment: "Index untuk cek product ada di cart siapa aja",
+      },
+      {
+        name: "idx_cart_customer_product",
+        fields: ["customer_id", "product_id"],
+        unique: true,
+        comment: "Unique index untuk prevent duplicate product dalam cart",
+      },
+    ],
   }
 );
 

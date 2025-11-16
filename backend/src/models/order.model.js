@@ -154,8 +154,37 @@ const Order = sequelize.define(
   {
     tableName: "orders",
     timestamps: false,
-    paranoid: false,
+    paranoid: true, // FIX: Enable soft delete untuk order (safety, jangan hapus order permanen)
+    deletedAt: "deleted_at", // Column name untuk soft delete
     underscored: true,
+    // FIX: Tambah indexes untuk performance (customer history, admin order management)
+    indexes: [
+      {
+        name: "idx_order_customer",
+        fields: ["customer_id"],
+        comment: "Index untuk order history per customer",
+      },
+      {
+        name: "idx_order_status",
+        fields: ["order_status"],
+        comment: "Index untuk filter order berdasarkan status",
+      },
+      {
+        name: "idx_order_payment_status",
+        fields: ["payment_status"],
+        comment: "Index untuk filter order berdasarkan payment status",
+      },
+      {
+        name: "idx_order_created",
+        fields: ["created_at"],
+        comment: "Index untuk sort order berdasarkan tanggal",
+      },
+      {
+        name: "idx_order_customer_status",
+        fields: ["customer_id", "order_status"],
+        comment: "Composite index untuk customer order dengan status tertentu",
+      },
+    ],
   }
 );
 

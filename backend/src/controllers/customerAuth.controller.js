@@ -64,9 +64,10 @@ const registerCustomer = async (req, res) => {
     });
 
     // Generate JWT token
+    // FIX: Gunakan userId untuk konsistensi dengan auth middleware
     const token = jwt.sign(
       {
-        id: customer.id,
+        userId: customer.id,
         phone_number: customer.phone_number,
         type: "customer",
       },
@@ -138,9 +139,10 @@ const loginCustomer = async (req, res) => {
     }
 
     // Generate JWT token
+    // FIX: Gunakan userId untuk konsistensi dengan auth middleware
     const token = jwt.sign(
       {
-        id: customer.id,
+        userId: customer.id,
         phone_number: customer.phone_number,
         type: "customer",
       },

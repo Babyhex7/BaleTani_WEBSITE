@@ -1,0 +1,97 @@
+### 1. TEST CSRF TOKEN
+GET http://localhost:5000/api/csrf-token
+Content-Type: application/json
+
+###
+
+### 2. TEST CUSTOMER REGISTER (dengan JWT userId baru)
+POST http://localhost:5000/api/customer/auth/register
+Content-Type: application/json
+
+{
+  "phone_number": "081234567890",
+  "full_name": "Test User Baru",
+  "password": "Test123!@#",
+  "address": "Jl. Test No. 123"
+}
+
+###
+
+### 3. TEST CUSTOMER LOGIN (dengan JWT userId baru)
+POST http://localhost:5000/api/customer/auth/login
+Content-Type: application/json
+
+{
+  "phone_number": "081234567890",
+  "password": "Test123!@#"
+}
+
+###
+
+### 4. TEST GET CART (verify token berfungsi)
+# @name cart
+GET http://localhost:5000/api/customer/cart
+Authorization: Bearer {{LOGIN_TOKEN_HERE}}
+Content-Type: application/json
+
+###
+
+### 5. TEST ADD TO CART (verify pessimistic lock)
+POST http://localhost:5000/api/customer/cart
+Authorization: Bearer {{LOGIN_TOKEN_HERE}}
+Content-Type: application/json
+
+{
+  "product_id": "PRODUCT_UUID_HERE",
+  "quantity": 2
+}
+
+###
+
+### 6. TEST CREATE ORDER (verify race condition fix)
+POST http://localhost:5000/api/customer/orders/create
+Authorization: Bearer {{LOGIN_TOKEN_HERE}}
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "product_id": "PRODUCT_UUID_HERE",
+      "quantity": 1
+    }
+  ],
+  "delivery_method": "delivery",
+  "payment_method": "transfer",
+  "delivery_address": "Jl. Test Delivery No. 456",
+  "delivery_notes": "Test order dengan race condition fix"
+}
+
+###
+
+### 7. TEST GET PRODUCTS (verify indexes performance)
+GET http://localhost:5000/api/public/products?page=1&limit=10
+Content-Type: application/json
+
+###
+
+### 8. TEST GET PRODUCTS BY CATEGORY (verify category index)
+GET http://localhost:5000/api/public/products?category_id=CATEGORY_UUID_HERE&page=1&limit=10
+Content-Type: application/json
+
+###
+
+### 9. TEST ADMIN LOGIN
+POST http://localhost:5000/api/admin/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+###
+
+### 10. TEST GET ORDERS (verify order indexes)
+GET http://localhost:5000/api/admin/orders?page=1&limit=10
+Authorization: Bearer {{ADMIN_TOKEN_HERE}}
+Content-Type: application/json

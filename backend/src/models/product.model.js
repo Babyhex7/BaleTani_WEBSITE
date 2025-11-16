@@ -64,6 +64,29 @@ const Product = sequelize.define(
     timestamps: false,
     paranoid: false,
     underscored: true,
+    // FIX: Tambah indexes untuk performance (category filter, active filter, dll)
+    indexes: [
+      {
+        name: "idx_product_category_active",
+        fields: ["category_id", "is_active"],
+        comment: "Index untuk filter produk per kategori dan status aktif",
+      },
+      {
+        name: "idx_product_active",
+        fields: ["is_active"],
+        comment: "Index untuk filter produk aktif saja",
+      },
+      {
+        name: "idx_product_type",
+        fields: ["product_type"],
+        comment: "Index untuk filter produk online/offline",
+      },
+      {
+        name: "idx_product_created",
+        fields: ["created_at"],
+        comment: "Index untuk sort produk terbaru",
+      },
+    ],
   }
 );
 

@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+// FIX: Tambah CSRF protection untuk keamanan
+const { doubleCsrf } = require("csrf-csrf");
 require("dotenv").config();
 
 const errorHandler = require("./middlewares/error.middleware");
@@ -97,6 +99,44 @@ app.use(cors(corsOptions));
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// ============================================
+// SECURITY: CSRF Protection
+// ============================================
+// FIX: CSRF protection untuk prevent cross-site request forgery attacks
+// DISABLED for development - akan diaktifkan untuk production
+if (process.env.NODE_ENV === "production") {
+  const { doubleCsrfProtection, generateToken } = doubleCsrf({
+    getSecret: () => process.env.JWT_SECRET || "default-csrf-secret",
+    cookieName: "x-csrf-token",
+    cookieOptions: {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: true,
+      path: "/",
+    },
+    size: 64,
+    ignoredMethods: ["GET", "HEAD", "OPTIONS"],
+    getTokenFromRequest: (req) => req.headers["x-csrf-token"],
+  });
+
+  app.use(doubleCsrfProtection);
+
+  // Endpoint untuk ambil CSRF token (frontend butuh ini)
+  app.get("/api/csrf-token", (req, res) => {
+    const token = generateToken(req, res);
+    res.json({
+      success: true,
+      csrfToken: token,
+      message: "CSRF token generated successfully",
+    });
+  });
+
+  console.log("🛡️ CSRF protection enabled (production mode)");
+} else {
+  // Development mode: CSRF disabled untuk kemudahan testing
+  console.log("⚠️ CSRF protection DISABLED (development mode)");
+}
 
 // ============================================
 // SECURITY: Input Sanitization

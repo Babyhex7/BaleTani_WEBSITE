@@ -119,9 +119,10 @@ const authenticateCustomer = async (req, res, next) => {
     }
 
     // Cari customer (TANPA role/permissions - basic auth only)
+    // FIX: Gunakan decoded.userId untuk konsistensi dengan admin auth
     const customer = await Customer.findOne({
       where: {
-        id: decoded.id,
+        id: decoded.userId,
         is_active: true,
       },
       attributes: { exclude: ["password_hash"] },

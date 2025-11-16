@@ -167,6 +167,7 @@ const createOrder = async (req, res) => {
         });
       }
 
+      // FIX: Gunakan pessimistic lock untuk prevent race condition pada stock
       const product = await Product.findOne({
         where: {
           id: item.product_id,
@@ -207,6 +208,8 @@ const createOrder = async (req, res) => {
             ],
           },
         ],
+        lock: transaction.LOCK.UPDATE, // Pessimistic lock untuk stock consistency
+        transaction,
       });
 
       if (!product) {

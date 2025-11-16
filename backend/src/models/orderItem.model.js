@@ -57,6 +57,24 @@ const OrderItem = sequelize.define(
     timestamps: false,
     paranoid: false,
     underscored: true,
+    // FIX: Tambah indexes untuk performance (items per order, product sales tracking)
+    indexes: [
+      {
+        name: "idx_order_item_order",
+        fields: ["order_id"],
+        comment: "Index untuk ambil semua items dalam 1 order",
+      },
+      {
+        name: "idx_order_item_product",
+        fields: ["product_id"],
+        comment: "Index untuk tracking penjualan per product",
+      },
+      {
+        name: "idx_order_item_created",
+        fields: ["created_at"],
+        comment: "Index untuk laporan penjualan berdasarkan waktu",
+      },
+    ],
   }
 );
 
