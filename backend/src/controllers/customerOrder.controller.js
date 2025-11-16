@@ -280,7 +280,9 @@ const createOrder = async (req, res) => {
     let paymentStatus = "pending";
 
     // TIDAK ada auto-paid untuk cash, admin yang konfirmasi setelah customer bayar di tempat
-    console.log(`[CREATE ORDER] Payment method: ${payment_method}, Initial status: ${orderStatus}`);
+    console.log(
+      `[CREATE ORDER] Payment method: ${payment_method}, Initial status: ${orderStatus}`
+    );
 
     // Set payment expiry time
     // Cash TIDAK ada expired time karena bayar di tempat (tidak bisa auto-cancel)
@@ -298,7 +300,9 @@ const createOrder = async (req, res) => {
         } menit, expired at: ${paymentExpiredAt}`
       );
     } else {
-      console.log(`[CREATE ORDER] Cash payment - No expiry time (pay on delivery/pickup)`);
+      console.log(
+        `[CREATE ORDER] Cash payment - No expiry time (pay on delivery/pickup)`
+      );
     }
 
     // Create order
@@ -351,9 +355,11 @@ const createOrder = async (req, res) => {
       {
         order_id: order.id,
         old_status: null,
-        new_status: orderStatus,
+        new_status: orderStatus, // pending_payment untuk semua metode
         changed_by: customerId,
-        notes: "Order created by customer",
+        notes: payment_method === "cash" 
+          ? "Order created - Cash payment (pay on delivery/pickup)"
+          : "Order created - Waiting for payment confirmation",
         changed_at: getWIBDate(),
       },
       { transaction }
