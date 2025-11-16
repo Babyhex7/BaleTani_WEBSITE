@@ -275,29 +275,31 @@ const createOrder = async (req, res) => {
     const discountAmount = 0; // TODO: implement discount logic jika ada
     const totalAmount = itemSubtotal + deliveryFee - discountAmount;
 
-    // Set initial status based on payment method
+    // Set initial status - SEMUA metode payment mulai dari pending_payment
     let orderStatus = "pending_payment";
     let paymentStatus = "pending";
 
-    if (payment_method === "cash") {
-      // Cash = bayar di tempat, langsung set paid
-      orderStatus = "paid";
-      paymentStatus = "paid";
-    }
+    // TIDAK ada auto-paid untuk cash, admin yang konfirmasi setelah customer bayar di tempat
+    console.log(`[CREATE ORDER] Payment method: ${payment_method}, Initial status: ${orderStatus}`);
 
-    // Set payment expiry time - 10 MENIT (PRODUCTION)
+    // Set payment expiry time
+    // Cash TIDAK ada expired time karena bayar di tempat (tidak bisa auto-cancel)
     const PAYMENT_TIMEOUT_MS = 10 * 60 * 1000; // 10 menit
 
     const paymentExpiredAt =
       payment_method !== "cash"
         ? new Date(Date.now() + PAYMENT_TIMEOUT_MS)
-        : null; // Cash tidak perlu expired time
+        : null; // Cash tidak perlu expired time (tidak akan auto-cancel)
 
-    console.log(
-      `[CREATE ORDER] Payment timeout: ${
-        PAYMENT_TIMEOUT_MS / 60000
-      } menit, expired at: ${paymentExpiredAt}`
-    );
+    if (paymentExpiredAt) {
+      console.log(
+        `[CREATE ORDER] Payment timeout: ${
+          PAYMENT_TIMEOUT_MS / 60000
+        } menit, expired at: ${paymentExpiredAt}`
+      );
+    } else {
+      console.log(`[CREATE ORDER] Cash payment - No expiry time (pay on delivery/pickup)`);
+    }
 
     // Create order
     const order = await Order.create(

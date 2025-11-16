@@ -582,7 +582,7 @@ async function calculateCustomerStats(customerId) {
 exports.triggerManualCancel = async (req, res) => {
   const { sequelize } = require("../config/database");
   const { getWIBDate } = require("../utils/dateHelper");
-  
+
   const transaction = await sequelize.transaction();
 
   try {

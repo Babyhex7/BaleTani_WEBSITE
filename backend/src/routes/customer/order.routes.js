@@ -59,7 +59,11 @@ router.put("/:id/cancel", authenticateCustomer, cancelOrder);
  * @desc    Manual trigger auto-cancel (saat countdown habis)
  * @access  Private (Customer only)
  */
-router.post("/:orderId/manual-cancel", authenticateCustomer, triggerManualCancel);
+router.post(
+  "/:orderId/manual-cancel",
+  authenticateCustomer,
+  triggerManualCancel
+);
 
 /**
  * @route   GET /api/customer/orders
