@@ -575,4 +575,132 @@ async function calculateCustomerStats(customerId) {
   }
 }
 
+/**
+ * POST /api/customer/orders/:orderId/manual-cancel
+ * Manual trigger auto-cancel (dipanggil dari frontend saat countdown habis)
+ */
+exports.triggerManualCancel = async (req, res) => {
+  const { sequelize } = require("../config/database");
+  const { getWIBDate } = require("../utils/dateHelper");
+  
+  const transaction = await sequelize.transaction();
+
+  try {
+    const { orderId } = req.params;
+    const customerId = req.customer.id;
+
+    console.log(
+      `[MANUAL CANCEL] Triggered for Order ID: ${orderId} by Customer: ${customerId}`
+    );
+
+    // Cari order
+    const order = await Order.findOne({
+      where: {
+        id: orderId,
+        customer_id: customerId,
+        order_status: "pending_payment",
+      },
+      include: [
+        {
+          model: OrderItem,
+          as: "orderItems",
+        },
+      ],
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    });
+
+    if (!order) {
+      await transaction.rollback();
+      return res.status(404).json({
+        success: false,
+        message: "Order tidak ditemukan atau sudah tidak pending",
+      });
+    }
+
+    // Cek apakah sudah expired
+    const now = getWIBDate();
+    if (new Date(order.payment_expired_at) > now) {
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: "Order belum expired, tidak bisa dibatalkan otomatis",
+      });
+    }
+
+    console.log(`[MANUAL CANCEL] Cancelling order: ${order.order_number}`);
+
+    // Update order status
+    await order.update(
+      {
+        order_status: "cancelled",
+        cancelled_reason:
+          "Pembayaran melebihi batas waktu (Triggered by frontend)",
+        cancelled_at: now,
+        cancelled_by: null, // NULL = system trigger
+        updated_at: now,
+      },
+      { transaction }
+    );
+
+    // Restore stock
+    for (const item of order.orderItems) {
+      const product = await Product.findByPk(item.product_id, {
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+
+      if (product) {
+        await product.update(
+          {
+            total_stock: product.total_stock + item.quantity,
+            updated_at: now,
+          },
+          { transaction }
+        );
+        console.log(
+          `[MANUAL CANCEL] Stock restored: ${product.name} (+${item.quantity})`
+        );
+      }
+    }
+
+    // Log ke history
+    await OrderStatusHistory.create(
+      {
+        order_id: order.id,
+        status: "cancelled",
+        notes: "Otomatis dibatalkan oleh sistem karena waktu pembayaran habis",
+        created_by: null,
+        created_at: now,
+      },
+      { transaction }
+    );
+
+    await transaction.commit();
+
+    console.log(
+      `[MANUAL CANCEL] ✅ Order ${order.order_number} cancelled successfully`
+    );
+
+    res.json({
+      success: true,
+      message: "Order berhasil dibatalkan otomatis",
+      data: {
+        order_id: order.id,
+        order_number: order.order_number,
+        order_status: "cancelled",
+        cancelled_at: now,
+      },
+    });
+  } catch (error) {
+    await transaction.rollback();
+    console.error("[MANUAL CANCEL] ❌ Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal membatalkan order",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = exports;

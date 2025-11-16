@@ -100,6 +100,20 @@ Customer Purchase History
 ✅ frontend/src/components/ui_customer/OrderDetailModal.jsx
 ```
 
+## 🎯 Fitur Countdown Timer
+
+### Lokasi Countdown:
+
+1. ✅ **Order Success Page** - Setelah checkout berhasil (BESAR & PROMINENT)
+2. ✅ **Purchase History** - Di OrderCard (compact)
+3. ✅ **Order Detail Modal** - Di modal detail (medium)
+
+### Visual Countdown:
+
+- **Normal** (> 2 menit): Background biru, icon Clock
+- **Warning** (< 2 menit): Background merah, icon AlertCircle berkedip
+- **Expired**: Notifikasi merah "Order akan dibatalkan otomatis"
+
 ## 🧪 Testing Instructions
 
 ### 1. Jalankan Database Migration

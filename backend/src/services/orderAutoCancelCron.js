@@ -8,14 +8,11 @@ const { Op } = require("sequelize");
 const { sequelize } = require("../config/database");
 const { getWIBDate } = require("../utils/dateHelper");
 
-// CONFIG: Timeout pembayaran (10 detik untuk testing, 10 menit untuk production)
-const PAYMENT_TIMEOUT_MS =
-  process.env.NODE_ENV === "production"
-    ? 10 * 60 * 1000 // 10 menit
-    : 10 * 1000; // 10 detik (TESTING)
+// CONFIG: Timeout pembayaran - 10 MENIT (PRODUCTION)
+const PAYMENT_TIMEOUT_MS = 10 * 60 * 1000; // 10 menit
 
 console.log(
-  `[AUTO-CANCEL] Payment timeout: ${PAYMENT_TIMEOUT_MS / 1000} detik`
+  `[AUTO-CANCEL] Payment timeout: ${PAYMENT_TIMEOUT_MS / 60000} menit`
 );
 
 /**
@@ -142,11 +139,8 @@ const autoCancelExpiredOrders = async () => {
  * Start cron job
  */
 const startAutoCancelCron = () => {
-  // Interval: 30 detik untuk testing, 1 menit untuk production
-  const CRON_INTERVAL_MS =
-    process.env.NODE_ENV === "production"
-      ? 60 * 1000 // 1 menit
-      : 30 * 1000; // 30 detik (TESTING)
+  // Interval: 30 detik (lebih responsive untuk production)
+  const CRON_INTERVAL_MS = 30 * 1000; // 30 detik
 
   console.log(
     `[AUTO-CANCEL] Cron job dimulai, interval: ${CRON_INTERVAL_MS / 1000} detik`

@@ -3,7 +3,7 @@
  * Success page after checkout with payment instructions
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   CheckCircle, 
@@ -14,7 +14,8 @@ import {
   Package, 
   Clock,
   Copy,
-  Building2
+  Building2,
+  AlertCircle
 } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
@@ -24,12 +25,109 @@ const OrderSuccessPage = () => {
   const location = useLocation();
   const orderData = location.state?.orderData;
 
+  // State untuk countdown timer
+  const [timeRemaining, setTimeRemaining] = useState(null);
+  const [isExpired, setIsExpired] = useState(false);
+
   useEffect(() => {
     // Redirect jika tidak ada order data
     if (!orderData) {
       navigate('/');
     }
   }, [orderData, navigate]);
+
+  // Countdown timer untuk pending_payment orders
+  useEffect(() => {
+    // HANYA untuk order yang perlu pembayaran transfer/QRIS
+    // TIDAK untuk cash/tunai (karena bayar di tempat)
+    if (!orderData) {
+      return;
+    }
+
+    const paymentMethod = orderData.payment_method?.toLowerCase();
+    const isCashPayment = paymentMethod === 'cash' || paymentMethod === 'tunai';
+
+    // Skip countdown untuk cash payment
+    if (isCashPayment) {
+      console.log(`[COUNTDOWN SUCCESS] Order ${orderData.order_number} - CASH payment, no countdown needed`);
+      return;
+    }
+
+    // Ambil payment_expired_at dari orderData
+    const paymentExpiredAt = orderData.payment_expired_at || orderData.payment?.expired_at;
+    
+    if (!paymentExpiredAt) {
+      console.log(`[COUNTDOWN SUCCESS] Order ${orderData.order_number} - No payment_expired_at, skipping countdown`);
+      return;
+    }
+
+    console.log(`[COUNTDOWN SUCCESS] Order ${orderData.order_number} - Starting countdown for ${paymentMethod}`);
+
+    const calculateTimeRemaining = () => {
+      const now = new Date().getTime();
+      const expiry = new Date(paymentExpiredAt).getTime();
+      const diff = expiry - now;
+
+      if (diff <= 0) {
+        setIsExpired(true);
+        setTimeRemaining(null);
+        console.log(`[COUNTDOWN SUCCESS] Order ${orderData.order_number} - EXPIRED!`);
+        
+        // 🔥 TRIGGER MANUAL CANCEL KE BACKEND
+        triggerManualCancel();
+        
+        return null;
+      }
+
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      return { minutes, seconds, total: diff };
+    };
+
+    // Hitung pertama kali
+    const initial = calculateTimeRemaining();
+    setTimeRemaining(initial);
+
+    // Update setiap 1 detik
+    const interval = setInterval(() => {
+      const remaining = calculateTimeRemaining();
+      setTimeRemaining(remaining);
+
+      if (!remaining) {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [orderData]);
+
+  // 🔥 FUNCTION: Trigger manual cancel ke backend saat countdown habis
+  const triggerManualCancel = async () => {
+    try {
+      console.log(`[MANUAL CANCEL] Triggering cancel for order: ${orderData.order_number}`);
+      
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/customer/orders/${orderData.id}/manual-cancel`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const data = await response.json();
+      console.log('[MANUAL CANCEL] Response:', data);
+      
+      if (data.success) {
+        console.log('[MANUAL CANCEL] ✅ Order cancelled successfully');
+      }
+    } catch (error) {
+      console.error('[MANUAL CANCEL] ❌ Failed:', error);
+    }
+  };
 
   if (!orderData) {
     return null;
@@ -170,6 +268,63 @@ const OrderSuccessPage = () => {
                 Terima kasih telah berbelanja di BaleTani Fresh Market
               </p>
             </div>
+
+            {/* Countdown Timer - HANYA untuk Transfer/QRIS (yang ada payment_expired_at) */}
+            {/* TIDAK muncul untuk Cash/COD karena bayar di tempat */}
+            {orderData.payment_expired_at && timeRemaining && (
+              <div className="mt-6">
+                {(
+                  <div className="bg-red-600 rounded-lg shadow-lg p-6">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                      {/* Timer */}
+                      <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 bg-red-700 rounded-lg flex items-center justify-center">
+                          <Clock className="w-8 h-8 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-white text-sm font-medium mb-1">Selesaikan pembayaran dalam:</p>
+                          <p className="text-white text-4xl font-bold">
+                            {String(timeRemaining.minutes).padStart(2, '0')}:{String(timeRemaining.seconds).padStart(2, '0')}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Info */}
+                      <div className="text-center sm:text-right">
+                        <p className="text-white text-sm">
+                          Pesanan akan dibatalkan otomatis<br />jika tidak dibayar
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Expired Notice - HANYA untuk order yang expired */}
+            {orderData.payment_expired_at && isExpired && (
+              <div className="mt-6">
+                <div className="bg-gray-800 rounded-lg shadow-lg p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <AlertCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-white text-xl font-bold mb-2">Waktu Pembayaran Habis</h3>
+                      <p className="text-gray-300 mb-4">
+                        Pesanan telah dibatalkan otomatis. Silakan pesan kembali jika masih ingin berbelanja.
+                      </p>
+                      <button
+                        onClick={() => navigate('/products')}
+                        className="px-5 py-2.5 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                      >
+                        Belanja Lagi
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Order Number & Total - Mobile Responsive */}
             <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">

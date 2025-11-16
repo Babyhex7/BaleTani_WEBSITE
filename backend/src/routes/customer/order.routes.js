@@ -15,6 +15,7 @@ const {
   getOrderDetail: getOrderHistoryDetail,
   reorderItems,
   cancelOrder,
+  triggerManualCancel,
 } = require("../../controllers/customerOrderHistory.controller");
 const { authenticateCustomer } = require("../../middlewares/auth.middleware");
 
@@ -52,6 +53,13 @@ router.post("/:id/reorder", authenticateCustomer, reorderItems);
  * @access  Private (Customer only)
  */
 router.put("/:id/cancel", authenticateCustomer, cancelOrder);
+
+/**
+ * @route   POST /api/customer/orders/:orderId/manual-cancel
+ * @desc    Manual trigger auto-cancel (saat countdown habis)
+ * @access  Private (Customer only)
+ */
+router.post("/:orderId/manual-cancel", authenticateCustomer, triggerManualCancel);
 
 /**
  * @route   GET /api/customer/orders
