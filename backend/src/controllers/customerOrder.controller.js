@@ -357,9 +357,10 @@ const createOrder = async (req, res) => {
         old_status: null,
         new_status: orderStatus, // pending_payment untuk semua metode
         changed_by: customerId,
-        notes: payment_method === "cash" 
-          ? "Order created - Cash payment (pay on delivery/pickup)"
-          : "Order created - Waiting for payment confirmation",
+        notes:
+          payment_method === "cash"
+            ? "Order created - Cash payment (pay on delivery/pickup)"
+            : "Order created - Waiting for payment confirmation",
         changed_at: getWIBDate(),
       },
       { transaction }
