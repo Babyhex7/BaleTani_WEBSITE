@@ -38,6 +38,7 @@
     "multer": "^2.0.2",
     "mysql2": "^3.6.1",
     "node-cache": "^5.1.2",
+    "react-icons": "^5.5.0",
     "sequelize": "^6.33.0"
   },
   "devDependencies": {

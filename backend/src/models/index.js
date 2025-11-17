@@ -16,6 +16,7 @@ const OrderItem = require("./orderItem.model");
 const OrderStatusHistory = require("./orderStatusHistory.model");
 const PaymentDetail = require("./paymentDetail.model");
 const StockMovement = require("./stockMovement.model");
+const SoftDeleteLog = require("./softDeleteLog.model");
 const FAQ = require("./faq.model");
 const ContactMessage = require("./contactMessage.model");
 
@@ -211,7 +212,7 @@ Admin.hasMany(Procurement, {
 });
 Procurement.belongsTo(Admin, {
   foreignKey: "rejected_by",
-  as: "rejecter",
+  as: "rejector",
 });
 
 // User → Orders (created_by, updated_by)
@@ -251,6 +252,37 @@ Product.hasMany(StockMovement, {
 StockMovement.belongsTo(Product, {
   foreignKey: "product_id",
   as: "product",
+});
+
+// =============================
+// SOFT DELETE LOG RELATIONSHIPS
+// =============================
+
+// Procurement → SoftDeleteLog (One-to-One)
+Procurement.hasOne(SoftDeleteLog, {
+  foreignKey: "record_id",
+  constraints: false,
+  scope: {
+    table_name: "procurements",
+  },
+  as: "softDeleteLog",
+});
+
+SoftDeleteLog.belongsTo(Procurement, {
+  foreignKey: "record_id",
+  constraints: false,
+  as: "procurement",
+});
+
+// SoftDeleteLog → Admin (deleted_by)
+SoftDeleteLog.belongsTo(Admin, {
+  foreignKey: "deleted_by",
+  as: "deleter",
+});
+
+Admin.hasMany(SoftDeleteLog, {
+  foreignKey: "deleted_by",
+  as: "deletedRecords",
 });
 
 // =============================
@@ -367,6 +399,7 @@ module.exports = {
   OrderStatusHistory,
   PaymentDetail,
   StockMovement,
+  SoftDeleteLog,
   FAQ,
   ContactMessage,
   // Legacy exports for backward compatibility

@@ -52,7 +52,7 @@ const AdminSidebarNew = () => {
       icon: TruckIcon,
       key: 'procurement',
       submenu: [
-        { name: 'Procurement List', path: '/admin/procurement' },
+        { name: 'Procurement List', path: '/admin/procurements' },
       ]
     },
     {

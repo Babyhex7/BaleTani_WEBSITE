@@ -36,6 +36,9 @@ import DiscountManagement from './pages/admin/DiscountManagement';
 import CustomerManagement from './pages/admin/CustomerManagement';
 import FAQManagement from './pages/admin/FAQManagement';
 import ContactManagement from './pages/admin/ContactManagement';
+import ProcurementList from './pages/admin/ProcurementList';
+import SalesReport from './pages/admin/SalesReport';
+import InventoryReport from './pages/admin/InventoryReport';
 
 /**
  * Komponen utama aplikasi yang mengatur routing
@@ -284,6 +287,26 @@ function App() {
       <Route path="/admin/orders" element={
         <ProtectedRoute requiredRole="admin">
           <OrderManagement />
+        </ProtectedRoute>
+      } />
+
+      {/* Procurement Management */}
+      <Route path="/admin/procurements" element={
+        <ProtectedRoute requiredRole="admin">
+          <ProcurementList />
+        </ProtectedRoute>
+      } />
+
+      {/* Reports */}
+      <Route path="/admin/reports/sales" element={
+        <ProtectedRoute requiredRole="admin">
+          <SalesReport />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/admin/reports/inventory" element={
+        <ProtectedRoute requiredRole="admin">
+          <InventoryReport />
         </ProtectedRoute>
       } />
 
