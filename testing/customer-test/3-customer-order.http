@@ -5,9 +5,30 @@
 # PENTING: Perlu token customer & cart harus ada item!
 ###############################################
 
+###############################################
+# ⚠️ BACA INI DULU SEBELUM TESTING!
+###############################################
+# 🔴 URUTAN TESTING YANG BENAR:
+# 1. Jalankan STEP 0.1 (Login) → COPY token → PASTE ke @customerToken
+# 2. Jalankan STEP 0.2 (Add Cart) → Pastikan sukses
+# 3. Jalankan TEST 1.1 (Create Order) → COPY order_id dari response
+# 4. PASTE order_id ke @orderId di bawah ini
+# 5. Baru jalankan TEST 3.x dan 4.x (History & Detail)
+#
+# ❌ JANGAN langsung jalankan TEST 4.1 tanpa update @orderId!
+# ❌ UUID di bawah hanya CONTOH, bukan UUID real dari database!
+# ❌ Jika langsung test tanpa create order dulu = 404 NOT FOUND!
+###############################################
+
 @baseUrl = http://localhost:5000
+
+# ⚠️ UPDATE token setelah login (STEP 0.1):
 @customerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MGVkNDgzZi03NWJjLTRjODYtOTE4ZC02NDUwNTQxMGI5MWMiLCJwaG9uZV9udW1iZXIiOiI2MjgxMjM0NTY3ODkwIiwidHlwZSI6ImN1c3RvbWVyIiwiaWF0IjoxNzYzNjEwMDM1LCJleHAiOjE3NjM2OTY0MzV9.JpT5LBWEFZYvqcgVRsqwZyWSl8SH-nTMo77Xkj-NYEo
+
+# ⚠️ UPDATE orderId setelah create order (TEST 1.1) - UUID di bawah hanya CONTOH:
 @orderId = 4eb98bd9-4e07-4be2-9a4a-999398889afd
+
+# ⚠️ UPDATE productId dari database atau admin panel - Harus product yang is_active=true:
 @productId1 = 9c8d0a8a-c506-11f0-b326-0a0027000015
 
 ###############################################
@@ -23,7 +44,14 @@ Content-Type: application/json
   "password": "password123"
 }
 
-# 📝 COPY token dari response dan paste ke @customerToken!
+# 📝 RESPONSE akan berisi:
+# {
+#   "success": true,
+#   "token": "eyJhbG...",  ← COPY TOKEN INI
+#   "customer": {...}
+# }
+#
+# ✅ PASTE token ke @customerToken di line 24!
 
 ###
 
@@ -75,13 +103,24 @@ Authorization: Bearer {{customerToken}}
 # - data.order_status === "pending_payment"
 # - data.payment_status === "pending"
 # - Response has "data.payment" object (untuk transfer)
-# - data.payment.bank === "BRI"
+# - data.payment.bank_name === "BRI"
 # - data.payment.virtual_account ada (nomor rekening)
-# - Response has "whatsappMessage" (message untuk WhatsApp)
-# - data.payment_expired_at ada (10 menit dari sekarang)
+# - Response has "data.whatsapp" object (message & url untuk WhatsApp)
+# - data.payment.expired_at ada (10 menit dari sekarang)
 
-# 📝 SIMPAN data.id untuk test berikutnya!
-# @orderId = <copy dari response>
+# 📝 RESPONSE akan berisi:
+# {
+#   "success": true,
+#   "message": "Order berhasil dibuat",
+#   "data": {
+#     "order_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",  ← COPY UUID INI!
+#     "order_number": "ORD-20241120-001",
+#     ...
+#   }
+# }
+#
+# ✅ PASTE order_id ke @orderId di line 27:
+# @orderId = a1b2c3d4-e5f6-7890-abcd-ef1234567890
 
 ###
 
@@ -135,7 +174,7 @@ Authorization: Bearer {{customerToken}}
 
 # ✅ Assertions:
 # - Status: 201
-# - payment.bank_name === "BCA"
+# - data.payment.bank_name === "BCA"
 
 ###
 
@@ -162,7 +201,7 @@ Authorization: Bearer {{customerToken}}
 
 # ✅ Assertions:
 # - Status: 201
-# - payment.bank_name === "MANDIRI"
+# - data.payment.bank_name === "MANDIRI"
 
 ###
 
@@ -188,8 +227,7 @@ Authorization: Bearer {{customerToken}}
 
 # ✅ Assertions:
 # - Status: 201
-# - payment_method === "qris"
-# - bank_name === null (QRIS tidak butuh bank)
+# - data.payment === null (QRIS tidak ada payment detail)
 
 ###
 
@@ -219,7 +257,7 @@ Authorization: Bearer {{customerToken}}
 
 # ✅ Assertions:
 # - Status: 201
-# - order.items.length === 2
+# - data.items.length === 2
 # - Total harga = sum(qty * price)
 
 ###
@@ -574,8 +612,9 @@ Authorization: Bearer {{customerToken}}
 # ✅ Assertions:
 # - Status: 200
 # - Response has "success": true
-# - Response has "orders" array
-# - Setiap order punya: order_number, order_status, total_price, created_at
+# - Response has "data.orders" array (bukan langsung orders!)
+# - Response has "data.pagination" object
+# - Setiap order punya: order_number, order_status, total_amount, created_at
 # - Orders sorted by created_at DESC (terbaru di atas)
 
 ###
