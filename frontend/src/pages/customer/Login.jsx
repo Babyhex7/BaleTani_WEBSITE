@@ -138,9 +138,21 @@ const Login = () => {
         const { debugLog } = await import('../../utils/debugLogger');
         debugLog('LOGIN', 'Login failed', { error });
       }
+      
+      // Handle rate limit error (429)
+      if (error.code === 'RATE_LIMIT_LOGIN') {
+        const retryMinutes = Math.ceil((error.retryAfter || 900) / 60);
+        toast.error(
+          `Terlalu banyak percobaan login. Silakan coba lagi setelah ${retryMinutes} menit.`,
+          { duration: 6000 }
+        );
+        return;
+      }
+      
+      // Generic error message
       toast.error(error.message || 'Login gagal. Silakan coba lagi.');
       
-      // Handle specific errors
+      // Handle specific field validation errors
       if (error.errors) {
         const fieldErrors = {};
         error.errors.forEach(err => {

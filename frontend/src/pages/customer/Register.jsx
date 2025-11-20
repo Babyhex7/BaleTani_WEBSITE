@@ -153,9 +153,21 @@ const Register = () => {
       }
     } catch (error) {
       console.error('Registration error:', error);
+      
+      // Handle rate limit error (429)
+      if (error.code === 'RATE_LIMIT_REGISTER') {
+        const retryMinutes = Math.ceil((error.retryAfter || 3600) / 60);
+        toast.error(
+          `Terlalu banyak percobaan registrasi. Silakan coba lagi setelah ${retryMinutes} menit.`,
+          { duration: 6000 }
+        );
+        return;
+      }
+      
+      // Generic error message
       toast.error(error.message || 'Registrasi gagal. Silakan coba lagi.');
       
-      // Handle specific errors
+      // Handle specific field validation errors
       if (error.errors) {
         const fieldErrors = {};
         error.errors.forEach(err => {
