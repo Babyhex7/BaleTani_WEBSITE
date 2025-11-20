@@ -140,7 +140,7 @@ const authenticateCustomer = async (req, res, next) => {
       id: customer.id,
       phone_number: customer.phone_number,
       full_name: customer.full_name,
-      email: customer.email,
+      address: customer.address,
       is_active: customer.is_active,
     };
 

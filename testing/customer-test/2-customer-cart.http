@@ -1,0 +1,601 @@
+###############################################
+# 🛒 TEST SUITE: CUSTOMER CART OPERATIONS
+# File: 2-customer-cart.http
+# Deskripsi: Test lengkap untuk operasi keranjang belanja customer
+# PENTING: Semua endpoint ini PERLU TOKEN customer yang valid!
+###############################################
+
+@baseUrl = http://localhost:5000
+@customerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MGVkNDgzZi03NWJjLTRjODYtOTE4ZC02NDUwNTQxMGI5MWMiLCJwaG9uZV9udW1iZXIiOiI2MjgxMjM0NTY3ODkwIiwidHlwZSI6ImN1c3RvbWVyIiwiaWF0IjoxNzYzNjEwNTI1LCJleHAiOjE3NjM2OTY5MjV9.0KDvnM1d_yZdIkwZ8NilIOyDCS0OBsyKYJxTM6_QTe4
+@productId1 = 9c8da214-c506-11f0-b326-0a0027000015
+@productId2 = 9c8da3d0-c506-11f0-b326-0a0027000015
+@cartItemId = REPLACE_WITH_CART_ITEM_ID_FROM_RESPONSE
+
+###############################################
+# ⚠️ SETUP: Login dulu dan ambil token!
+###############################################
+
+### STEP 0: Login Customer untuk Dapat Token
+POST {{baseUrl}}/api/customer/auth/login
+Content-Type: application/json
+
+{
+  "phone_number": "081234567890",
+  "password": "password123"
+}
+
+# 📝 COPY token dari response dan paste ke @customerToken di line 10!
+
+###
+
+###############################################
+# 📦 TEST GROUP 1: GET CART (Lihat Keranjang)
+###############################################
+
+### TEST 1.1: Get Cart - Keranjang Kosong (First Time)
+# Expected: 200 OK, cart kosong, total = 0
+GET {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+# ✅ Assertions:
+# - Status: 200
+# - Response has "success": true
+# - Response has "data.items" array (bisa kosong)
+# - Response has "data.summary" object
+# - data.summary.totalItems === 0
+# - data.summary.subtotal === 0
+
+###
+
+### TEST 1.2: Get Cart - Setelah Ada Item
+# Expected: 200 OK, ada items, harga terkalkulasi
+# CATATAN: Jalankan setelah TEST 2.1 (tambah item dulu)
+GET {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+# ✅ Assertions:
+# - Status: 200
+# - data.items.length > 0
+# - Setiap item punya: id, name, price, finalPrice, quantity, subtotal, image, discount
+# - data.summary.totalItems > 0
+# - data.summary.subtotal > 0
+# - Jika ada discount, finalPrice < price
+
+###
+
+### TEST 1.3: Get Cart - Tanpa Token (Unauthorized)
+# Expected: 401 Unauthorized
+GET {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+
+# ✅ Assertions:
+# - Status: 401
+# - Error message: "Token tidak ditemukan"
+
+###
+
+###############################################
+# ➕ TEST GROUP 2: ADD TO CART (Tambah Item)
+###############################################
+
+### TEST 2.1: Add to Cart - Item Baru (Sukses)
+# Expected: 201 Created, item ditambahkan ke cart
+# 📝 COPY data.id dari response dan paste ke @cartItemId!
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "{{productId1}}",
+  "quantity": 2
+}
+
+# ✅ Assertions:
+# - Status: 201
+# - Response has "success": true
+# - Response has "data" object
+# - data.id (UUID cart item)
+# - data.product_id === productId1
+# - data.quantity === 2
+
+###
+
+### TEST 2.2: Add to Cart - Tambah Quantity Item yang Sudah Ada
+# Expected: 200 OK, quantity bertambah (bukan duplicate item)
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "{{productId1}}",
+  "quantity": 3
+}
+
+# ✅ Assertions:
+# - Status: 200
+# - message: "Cart updated successfully"
+# - data.quantity === 5 (2 + 3 dari sebelumnya)
+# - Tidak ada duplikat item di cart
+
+###
+
+### TEST 2.3: Add to Cart - Produk Berbeda
+# Expected: 201 Created, item baru ditambahkan
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "{{productId2}}",
+  "quantity": 1
+}
+
+# ✅ Assertions:
+# - Status: 201
+# - Sekarang cart punya 2 item berbeda
+
+###
+
+### TEST 2.4: Add to Cart - Quantity = 0
+# Expected: 400 Bad Request
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "{{productId1}}",
+  "quantity": 0
+}
+
+# ✅ Assertions:
+# - Status: 400
+# - Error message: "Product ID and valid quantity are required"
+
+###
+
+### TEST 2.5: Add to Cart - Quantity Negatif
+# Expected: 400 Bad Request
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "{{productId1}}",
+  "quantity": -5
+}
+
+# ✅ Assertions:
+# - Status: 400
+# - Error message: "Product ID and valid quantity are required"
+
+###
+
+### TEST 2.6: Add to Cart - Product ID Tidak Ada
+# Expected: 404 Not Found
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "00000000-0000-0000-0000-000000000000",
+  "quantity": 1
+}
+
+# ✅ Assertions:
+# - Status: 404
+# - Error message: "Product not found"
+
+###
+
+### TEST 2.7: Add to Cart - Product ID Kosong
+# Expected: 400 Bad Request
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "",
+  "quantity": 1
+}
+
+# ✅ Assertions:
+# - Status: 400
+# - Error message: "Product ID and valid quantity are required"
+
+###
+
+### TEST 2.8: Add to Cart - Quantity Melebihi Stock
+# Expected: 400 Bad Request
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "{{productId1}}",
+  "quantity": 999999
+}
+
+# ✅ Assertions:
+# - Status: 400
+# - Error message: "Not enough stock. Available: X"
+
+###
+
+### TEST 2.9: Add to Cart - Tanpa Token
+# Expected: 401 Unauthorized
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+
+{
+  "product_id": "{{productId1}}",
+  "quantity": 1
+}
+
+# ✅ Assertions:
+# - Status: 401
+
+###
+
+###############################################
+# ✏️ TEST GROUP 3: UPDATE CART (Update Quantity)
+# ⚠️ PENTING: Gunakan cart item ID, bukan product ID!
+###############################################
+
+### TEST 3.1: Update Cart - Increase Quantity
+# Expected: 200 OK, quantity berubah
+# CATATAN: Ganti {{cartItemId}} dengan ID dari TEST 2.1 response
+PUT {{baseUrl}}/api/customer/cart/{{cartItemId}}
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "quantity": 10
+}
+
+# ✅ Assertions:
+# - Status: 200
+# - message: "Cart item updated successfully"
+# - data.quantity === 10
+
+###
+
+### TEST 3.2: Update Cart - Decrease Quantity
+# Expected: 200 OK, quantity berkurang
+PUT {{baseUrl}}/api/customer/cart/{{cartItemId}}
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "quantity": 3
+}
+
+# ✅ Assertions:
+# - Status: 200
+# - data.quantity === 3
+
+###
+
+### TEST 3.3: Update Cart - Quantity = 0
+# Expected: 400 Bad Request (backend tidak allow quantity 0 di update)
+PUT {{baseUrl}}/api/customer/cart/{{cartItemId}}
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "quantity": 0
+}
+
+# ✅ Assertions:
+# - Status: 400
+# - Error message: "Valid quantity is required"
+
+###
+
+### TEST 3.4: Update Cart - Cart Item ID Tidak Ada
+# Expected: 404 Not Found
+PUT {{baseUrl}}/api/customer/cart/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "quantity": 5
+}
+
+# ✅ Assertions:
+# - Status: 404
+# - Error message: "Cart item not found"
+
+###
+
+### TEST 3.5: Update Cart - Quantity Melebihi Stock
+# Expected: 400 Bad Request
+PUT {{baseUrl}}/api/customer/cart/{{cartItemId}}
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "quantity": 999999
+}
+
+# ✅ Assertions:
+# - Status: 400
+# - Error message: "Not enough stock. Available: X"
+
+###
+
+###############################################
+# 🗑️ TEST GROUP 4: REMOVE FROM CART (Hapus Item)
+# ⚠️ PENTING: Gunakan cart item ID, bukan product ID!
+###############################################
+
+### TEST 4.1: Remove Item - Sukses
+# Expected: 200 OK, item dihapus dari cart
+# CATATAN: Gunakan cart item ID yang valid
+DELETE {{baseUrl}}/api/customer/cart/{{cartItemId}}
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+# ✅ Assertions:
+# - Status: 200
+# - Response has "success": true
+# - Message: "Item removed from cart successfully"
+
+###
+
+### TEST 4.2: Remove Item - Cart Item Tidak Ada
+# Expected: 404 Not Found
+DELETE {{baseUrl}}/api/customer/cart/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+# ✅ Assertions:
+# - Status: 404
+# - Error message: "Cart item not found"
+
+###
+
+### TEST 4.3: Remove Item - Invalid Cart Item ID Format
+# Expected: 500 Internal Server Error (Sequelize validation error)
+DELETE {{baseUrl}}/api/customer/cart/invalid-uuid
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+# ✅ Assertions:
+# - Status: 500
+# - Error dari Sequelize UUID validation
+
+###
+
+### TEST 4.4: Remove Item - Tanpa Token
+# Expected: 401 Unauthorized
+DELETE {{baseUrl}}/api/customer/cart/{{cartItemId}}
+Content-Type: application/json
+
+# ✅ Assertions:
+# - Status: 401
+
+###
+
+###############################################
+# 🧹 TEST GROUP 5: CLEAR CART (Kosongkan Keranjang)
+###############################################
+
+### TEST 5.1: Clear Cart - Sukses
+# Expected: 200 OK, semua item di cart dihapus
+DELETE {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+# ✅ Assertions:
+# - Status: 200
+# - Response has "success": true
+# - Message: "Cart cleared successfully"
+
+###
+
+### TEST 5.2: Clear Cart - Keranjang Sudah Kosong
+# Expected: 404 Not Found (backend return error jika cart empty)
+DELETE {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+# ✅ Assertions:
+# - Status: 404
+# - Error message: "Cart is already empty"
+
+###
+
+### TEST 5.3: Clear Cart - Tanpa Token
+# Expected: 401 Unauthorized
+DELETE {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+
+# ✅ Assertions:
+# - Status: 401
+
+###
+
+###############################################
+# 💰 TEST GROUP 6: CART CALCULATION (Perhitungan Harga)
+###############################################
+
+### TEST 6.1: Cart Summary - Harga Tanpa Discount
+# Expected: Total = sum(quantity * finalPrice)
+# SETUP: Tambah 2 produk tanpa discount ke cart
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "{{productId1}}",
+  "quantity": 2
+}
+
+###
+
+GET {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+# ✅ Assertions:
+# - data.summary.subtotal === sum(item.subtotal)
+# - data.summary.shippingCost === 0 (free shipping)
+# - data.summary.total === subtotal + shippingCost
+# - Jika tidak ada discount: item.finalPrice === item.price
+
+###
+
+### TEST 6.2: Cart Summary - Harga Dengan Discount
+# Expected: FinalPrice < OriginalPrice
+# SETUP: Tambah produk yang punya discount aktif
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "PRODUCT_WITH_DISCOUNT_ID",
+  "quantity": 1
+}
+
+###
+
+GET {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+# ✅ Assertions:
+# - Item punya discount object (jika ada)
+# - item.discount.type: "percentage" atau "fixed"
+# - item.discount.value: nilai discount
+# - item.discount.finalPrice < item.price
+# - item.finalPrice === item.discount.finalPrice
+
+###
+
+###############################################
+# 🔒 TEST GROUP 7: CART ISOLATION (Isolasi Antar User)
+###############################################
+
+### TEST 7.1: Cart Customer A - Tidak Terlihat oleh Customer B
+# Expected: Setiap customer punya cart sendiri
+# MANUAL TEST:
+# 1. Login sebagai Customer A (token A)
+# 2. Tambah produk ke cart
+# 3. Login sebagai Customer B (token B)
+# 4. GET cart dengan token B
+# 5. Verify: Cart B kosong atau berbeda dari Cart A
+
+###
+
+###############################################
+# 🧪 TEST GROUP 8: EDGE CASES & RACE CONDITIONS
+###############################################
+
+### TEST 8.1: Add to Cart - Produk yang Stock = 0
+# Expected: 400 Bad Request
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "OUT_OF_STOCK_PRODUCT_ID",
+  "quantity": 1
+}
+
+# ✅ Assertions:
+# - Status: 400
+# - Error message: "Not enough stock. Available: 0"
+
+###
+
+### TEST 8.2: Add to Cart - Produk Soft Deleted
+# Expected: 404 Not Found
+POST {{baseUrl}}/api/customer/cart
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "product_id": "SOFT_DELETED_PRODUCT_ID",
+  "quantity": 1
+}
+
+# ✅ Assertions:
+# - Status: 404
+# - Error message: "Product not found"
+
+###
+
+### TEST 8.3: Cart Persistence - Tetap Ada Setelah Logout/Login
+# Expected: Cart tidak hilang setelah logout
+# MANUAL TEST:
+# 1. Login, tambah item ke cart
+# 2. Logout (hapus token dari frontend)
+# 3. Login lagi dengan user yang sama
+# 4. GET cart
+# 5. Verify: Item masih ada di cart
+
+###
+
+###############################################
+# 📊 SUMMARY OF TESTS
+###############################################
+
+# ✅ TOTAL TESTS: 35+
+# 
+# Get Cart: 3 tests
+# Add to Cart: 9 tests
+# Update Cart: 5 tests
+# Remove from Cart: 4 tests
+# Clear Cart: 3 tests
+# Cart Calculation: 2 tests
+# Cart Isolation: 1 test
+# Edge Cases: 3 tests
+#
+# Expected Results:
+# - Add/Update/Get cart sukses: 200/201 OK
+# - Validasi gagal: 400 Bad Request
+# - Item tidak ditemukan: 404 Not Found
+# - Tanpa token: 401 Unauthorized
+# - No 500 errors
+
+###############################################
+# 📝 MANUAL VERIFICATION CHECKLIST
+###############################################
+
+# Setelah running tests, verify:
+# ✅ Customer bisa tambah/update/hapus item di cart
+# ✅ Quantity tidak bisa negatif atau 0 saat add
+# ✅ Stock validation bekerja (tidak bisa add > stock)
+# ✅ Cart calculation benar (total, discount, final price)
+# ✅ Discount diterapkan jika ada dan masih aktif
+# ✅ Cart isolated per customer (tidak tercampur)
+# ✅ Cart persistent (tetap ada setelah logout/login)
+# ✅ Soft deleted products tidak bisa ditambahkan
+# ✅ Out of stock products di-reject
+
+###############################################
+# 🎯 CARA MENGGUNAKAN FILE INI
+###############################################
+
+# 1. Jalankan TEST LOGIN dulu (step 0) untuk dapat token
+# 2. Copy token dan paste ke @customerToken di line 10
+# 3. Ambil product_id dari database/API, paste ke @productId1 & @productId2
+# 4. Jalankan test secara berurutan
+# 5. Verify setiap response sesuai assertions
+# 6. Cek database untuk memastikan data tersimpan benar
+
+###############################################
+# 🚨 IMPORTANT NOTES
+###############################################
+
+# ⚠️ Semua endpoint cart HARUS pakai token customer
+# ⚠️ Cart per customer, tidak global
+# ⚠️ Quantity minimal 1 saat add/update
+# ⚠️ Stock validation penting untuk prevent overselling
+# ⚠️ Discount harga sudah pre-calculated di ProductDiscount table
+# ⚠️ Soft deleted products tidak boleh ditambahkan ke cart
+# ⚠️ Cart persistent di database, tidak pakai session
+
+###
