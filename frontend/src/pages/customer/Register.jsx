@@ -6,6 +6,7 @@ import useAuthStore from '../../store/store_customer/useAuthStore';
 import authService from '../../services/services_customer/authService';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import logoBaletani from '../../assets/img/BaleTanii.png';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -196,24 +197,23 @@ const Register = () => {
             Kembali ke Beranda
           </Link>
         </div>
-
-        {/* Logo and title */}
-        <div className="text-center">
-          <div className="mx-auto w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mb-3 sm:mb-4">
-            <span className="text-white font-bold text-xl sm:text-2xl">B</span>
-          </div>
-          <h2 className="heading-section text-gray-900 mb-2">
-            Daftar ke BaleTani
-          </h2>
-          <p className="text-body text-gray-600">
-            Bergabunglah dengan kami dan nikmati produk segar berkualitas tinggi!
-          </p>
-        </div>
       </div>
 
       <div className="mt-6 sm:mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-6 px-4 sm:py-8 sm:px-10 shadow-xl rounded-xl border border-gray-100">
           <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
+            {/* Logo and title */}
+              <div className="text-center">
+                <div className="mx-auto w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center mb-3 sm:mb-4">
+                  <img 
+                    src={logoBaletani} 
+                    alt="BaleTani Logo" 
+                    className="w-full h-full object-contain"/>
+                </div>
+                <p className="text-body text-gray-600">
+                  Bergabunglah dengan kami dan nikmati produk segar berkualitas tinggi!
+                </p>
+              </div>
             {/* Full Name field */}
             <Input
               label="Nama Lengkap"

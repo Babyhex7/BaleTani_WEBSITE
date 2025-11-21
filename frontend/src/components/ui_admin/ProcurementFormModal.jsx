@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { FiX, FiPlus, FiTrash2, FiSave } from "react-icons/fi";
+import { FiX, FiPlus, FiTrash2 } from "react-icons/fi";
 import procurementService from "../../services/services_admin/procurementService";
 import { getProducts } from "../../services/services_admin/inventoryService";
 
@@ -60,7 +60,6 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
     const newItems = [...formData.items];
     newItems[index][field] = value;
 
-    // Update product name when product selected
     if (field === "product_id") {
       const product = products.find((p) => p.id === value);
       if (product) {
@@ -192,27 +191,37 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold">
-            {isEdit ? "Edit Pengadaan" : "Tambah Pengadaan Baru"}
-          </h2>
+        <div className="bg-white px-6 py-4 border-b flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {isEdit ? "Edit Pengadaan" : "Buat Pengadaan Baru"}
+              </h2>
+              <p className="text-sm text-gray-500">Tambah pengadaan barang baru</p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors duration-200"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <FiX size={24} />
+            <FiX size={20} className="text-gray-500" />
           </button>
         </div>
 
         {/* Content */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
-          <div className="space-y-6">
-            {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-5">
+            {/* Basic Info - Horizontal Layout */}
+            <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Tanggal Pengadaan <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -220,206 +229,186 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
                   name="procurement_date"
                   value={formData.procurement_date}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tipe Pengadaan
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Tipe Pengadaan <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="procurement_type"
                   value={formData.procurement_type}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="online">Online</option>
                   <option value="offline">Offline</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Supplier (Opsional)
+                </label>
+                <input
+                  type="text"
+                  name="supplier_name"
+                  value={formData.supplier_name}
+                  onChange={handleInputChange}
+                  placeholder="Nama supplier..."
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
             </div>
 
+            {/* Items Section */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nama Supplier <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="supplier_name"
-                value={formData.supplier_name}
-                onChange={handleInputChange}
-                placeholder="Masukkan nama supplier"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-base font-semibold text-gray-900">
+                  Daftar Item
+                </h3>
+                <button
+                  type="button"
+                  onClick={addItem}
+                  className="text-green-600 hover:text-green-700 text-sm font-medium flex items-center gap-1.5"
+                >
+                  <FiPlus size={16} />
+                  Tambah Baris
+                </button>
+              </div>
+
+              {/* Table Header */}
+              <div className="grid grid-cols-12 gap-3 mb-2 px-3 text-xs font-medium text-gray-600">
+                <div className="col-span-4">Produk <span className="text-red-500">*</span></div>
+                <div className="col-span-2">Jumlah <span className="text-red-500">*</span></div>
+                <div className="col-span-2">Harga/Unit <span className="text-red-500">*</span></div>
+                <div className="col-span-2">Subtotal</div>
+                <div className="col-span-2">Expiry (Opsional)</div>
+              </div>
+
+              {/* Items List */}
+              <div className="space-y-2">
+                {formData.items.map((item, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-12 gap-3 items-center bg-gray-50 p-3 rounded-lg border border-gray-200"
+                  >
+                    <div className="col-span-4">
+                      <select
+                        value={item.product_id}
+                        onChange={(e) =>
+                          handleItemChange(index, "product_id", e.target.value)
+                        }
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      >
+                        <option value="">-- Pilih produk --</option>
+                        {products.map((product) => (
+                          <option key={product.id} value={product.id}>
+                            {product.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="col-span-2">
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) =>
+                          handleItemChange(index, "quantity", e.target.value)
+                        }
+                        min="1"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+
+                    <div className="col-span-2">
+                      <input
+                        type="number"
+                        value={item.unit_price}
+                        onChange={(e) =>
+                          handleItemChange(index, "unit_price", e.target.value)
+                        }
+                        min="0"
+                        placeholder="0"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+
+                    <div className="col-span-2">
+                      <div className="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md font-medium text-gray-900">
+                        {formatCurrency(
+                          parseFloat(item.quantity) *
+                            parseFloat(item.unit_price || 0)
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="col-span-2">
+                      <input
+                        type="date"
+                        value={item.expiry_date}
+                        onChange={(e) =>
+                          handleItemChange(index, "expiry_date", e.target.value)
+                        }
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+
+                    <div className="col-span-1 flex justify-end">
+                      {formData.items.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeItem(index)}
+                          className="text-red-600 hover:bg-red-50 p-2 rounded-md transition-colors"
+                        >
+                          <FiTrash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Catatan
+            <div className="mt-5">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Catatan (Opsional)
               </label>
               <textarea
                 name="notes"
                 value={formData.notes}
                 onChange={handleInputChange}
-                placeholder="Catatan tambahan (opsional)"
-                rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+                placeholder="Tulis catatan tambahan terkait pengadaan..."
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none"/>
             </div>
 
-            {/* Items */}
-            <div className="border-t pt-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Daftar Produk
-                </h3>
-                <button
-                  type="button"
-                  onClick={addItem}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors duration-200"
-                >
-                  <FiPlus />
-                  Tambah Item
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {formData.items.map((item, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-50 p-4 rounded-lg border border-gray-200"
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-gray-900">
-                        Item #{index + 1}
-                      </h4>
-                      {formData.items.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeItem(index)}
-                          className="text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors duration-200"
-                        >
-                          <FiTrash2 />
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Produk <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          value={item.product_id}
-                          onChange={(e) =>
-                            handleItemChange(index, "product_id", e.target.value)
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          required
-                        >
-                          <option value="">Pilih Produk</option>
-                          {products.map((product) => (
-                            <option key={product.id} value={product.id}>
-                              {product.name} (Stok: {product.total_stock})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Jumlah <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) =>
-                            handleItemChange(index, "quantity", e.target.value)
-                          }
-                          min="1"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Harga Satuan <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="number"
-                          value={item.unit_price}
-                          onChange={(e) =>
-                            handleItemChange(
-                              index,
-                              "unit_price",
-                              e.target.value
-                            )
-                          }
-                          min="0"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          required
-                        />
-                      </div>
-
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Tanggal Kadaluarsa
-                        </label>
-                        <input
-                          type="date"
-                          value={item.expiry_date}
-                          onChange={(e) =>
-                            handleItemChange(
-                              index,
-                              "expiry_date",
-                              e.target.value
-                            )
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Subtotal
-                        </label>
-                        <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg font-semibold text-gray-900">
-                          {formatCurrency(
-                            parseFloat(item.quantity) *
-                              parseFloat(item.unit_price || 0)
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Total */}
-              <div className="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-gray-900">
-                    Total Keseluruhan:
-                  </span>
-                  <span className="text-2xl font-bold text-blue-600">
-                    {formatCurrency(calculateTotal())}
-                  </span>
-                </div>
+            {/* Total */}
+            <div className="bg-green-50 px-4 py-3 rounded-lg border border-green-200">
+              <div className="flex justify-between items-center">
+                <span className="text-base font-semibold text-gray-900">
+                  Total Pengadaan
+                </span>
+                <span className="text-2xl font-bold text-green-600">
+                  {formatCurrency(calculateTotal())}
+                </span>
               </div>
             </div>
           </div>
         </form>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t">
+        <div className="bg-white px-6 py-4 flex justify-between border-t">
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2 border border-gray-300 hover:bg-gray-100 rounded-lg font-medium transition-colors duration-200"
+            className="px-5 py-2 text-sm border border-gray-300 hover:bg-gray-50 rounded-md font-medium transition-colors"
             disabled={submitting}
           >
             Batal
@@ -427,18 +416,15 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
           <button
             onClick={handleSubmit}
             disabled={submitting || loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                 Menyimpan...
               </>
             ) : (
-              <>
-                <FiSave />
-                {isEdit ? "Perbarui" : "Simpan"}
-              </>
+              isEdit ? "Perbarui Pengadaan" : "Buat Pengadaan"
             )}
           </button>
         </div>

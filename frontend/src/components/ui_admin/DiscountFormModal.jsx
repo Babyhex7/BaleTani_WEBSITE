@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon, TagIcon } from "@heroicons/react/24/outline";
 import toast from 'react-hot-toast';
 import {
   createDiscount,
@@ -171,11 +171,15 @@ const DiscountFormModal = ({
         {/* Modal - Diperbesar ke max-w-2xl */}
         <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
           {/* Header */}
-          <div className="bg-green-600 px-6 py-5 flex items-center justify-between">
-            <h3 className="text-xl font-bold text-white">
-              {isEditMode ? "Edit Diskon" : "Tambah Diskon"}
-            </h3>
-            <button onClick={onClose} className="text-white hover:text-gray-200">
+          <div className="bg-white px-6 py-5 flex items-center justify-between border-b border-gray-200">
+            <div className="flex items-center gap-2">
+              <TagIcon className="w-6 h-6 text-green-600" />
+              <h3 className="text-xl font-bold text-gray-900">
+                {isEditMode ? "Edit Diskon" : "Tambah Diskon"}
+              </h3>
+            </div>
+
+            <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
               <XMarkIcon className="w-6 h-6" />
             </button>
           </div>
@@ -390,7 +394,7 @@ const DiscountFormModal = ({
                       </li>
                       {formData.discount_type === "percentage" && formData.value && formData.max_discount && (
                         <li className="font-semibold text-green-700">
-                          📊 Contoh: Diskon {formData.value}% dengan max Rp {parseFloat(formData.max_discount).toLocaleString('id-ID')}
+                          Contoh: Diskon {formData.value}% dengan max Rp {parseFloat(formData.max_discount).toLocaleString('id-ID')}
                           <br />
                           <span className="ml-4">• Produk Rp 200.000 → Hemat Rp {Math.min(200000 * parseFloat(formData.value) / 100, parseFloat(formData.max_discount)).toLocaleString('id-ID')} ({Math.round(Math.min(200000 * parseFloat(formData.value) / 100, parseFloat(formData.max_discount)) / 200000 * 100)}%)</span>
                           <br />

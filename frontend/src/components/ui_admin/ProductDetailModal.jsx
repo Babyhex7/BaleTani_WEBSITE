@@ -8,7 +8,8 @@ import {
   CurrencyDollarIcon,
   CalendarIcon,
   CheckCircleIcon,
-  XCircleIcon
+  XCircleIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline';
 
 /**
@@ -93,13 +94,17 @@ const ProductDetailModal = ({
         {/* Modal */}
         <div className="relative inline-block w-full max-w-4xl overflow-hidden text-left align-middle transition-all transform bg-white rounded-lg shadow-2xl">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700">
-            <h3 className="text-xl font-bold text-white">
-              Detail Produk
-            </h3>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+            <div className="flex items-center gap-2">
+              <PhotoIcon className="w-6 h-6 text-green-600" /> 
+              <h3 className="text-xl font-bold text-gray-900">
+                Detail Produk
+              </h3>
+            </div>
+
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-200 transition-colors"
+              className="text-gray-600 hover:text-gray-800 transition-colors"
             >
               <XMarkIcon className="w-6 h-6" />
             </button>

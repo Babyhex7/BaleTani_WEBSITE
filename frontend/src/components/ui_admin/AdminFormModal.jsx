@@ -190,7 +190,7 @@ const AdminFormModal = ({ isOpen, admin, roles = [], isEditMode = false, onClose
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-accent-50">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-white rounded-lg shadow-sm">
                 <UserIcon className="w-6 h-6 text-primary-600" />

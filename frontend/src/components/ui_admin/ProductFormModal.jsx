@@ -257,17 +257,19 @@ const ProductFormModal = ({
         {/* Modal */}
         <div className="relative inline-block w-full max-w-4xl overflow-hidden text-left align-middle transition-all transform bg-white rounded-lg shadow-2xl">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700">
-            <h3 className="text-xl font-bold text-white">
-              {modalTitle}
-            </h3>
-            <button
-              onClick={onClose}
-              disabled={loading}
-              className="text-white hover:text-gray-200 transition-colors disabled:opacity-50"
-            >
-              <XMarkIcon className="w-6 h-6" />
-            </button>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-green-100">
+                <PhotoIcon className="w-6 h-6 text-green-600" />
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">{modalTitle}</h3>
+                <p className="text-sm text-gray-500">
+                  {mode === "create" ? "Tambah produk baru" : "Edit data produk"}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Body */}

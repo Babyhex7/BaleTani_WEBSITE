@@ -468,7 +468,7 @@ const LandingPage = () => {
               transition={{ delay: 0.2 }}
               className="text-2xl md:text-3xl font-bold text-white"
             >
-              🎉 Promo Spesial Hari Ini!
+              Promo Spesial Hari Ini!
             </motion.h2>
             <motion.p 
               initial={{ y: 20 }}
@@ -1080,7 +1080,7 @@ const LandingPage = () => {
               transition={{ delay: 0.2 }}
               className="heading-section text-white"
             >
-              🌟 Siap Belanja Produk Segar Hari Ini?
+              Siap Belanja Produk Segar Hari Ini?
             </motion.h2>
             <motion.p 
               initial={{ y: 30, opacity: 0 }}
@@ -1104,19 +1104,26 @@ const LandingPage = () => {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 size="md"
-                className="bg-white text-green-600 hover:bg-gray-100 w-full sm:w-auto"
+                style={{ backgroundColor: "#FFFFFF", color: "#16A34A" }} 
+                className="hover:!bg-green-600 hover:!text-white w-full sm:w-auto"
                 onClick={() => handleWhatsAppOrder('Konsultasi Pemesanan', 0, 'gratis')}
               >
                 <MessageCircle className="mr-1.5 sm:mr-2" size={18} />
                 Pesan via WhatsApp
               </Button>
             </motion.div>
+
             <Link to="/products">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button 
                   variant="outline" 
-                  size="md" 
-                  className="border-white text-white hover:bg-white hover:text-green-600 w-full sm:w-auto"
+                  size="md"
+                  style={{ 
+                    backgroundColor: "#16A34A",
+                    color: "#FFFFFF",
+                    borderColor: "#16A34A"
+                  }}
+                  className="hover:!bg-white hover:!text-green-600 hover:!border-green-600 w-full sm:w-auto"
                 >
                   Lihat Katalog Produk
                   <ArrowRight className="ml-1.5 sm:ml-2" size={18} />

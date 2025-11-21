@@ -56,7 +56,7 @@ const ProcurementList = () => {
 
   useEffect(() => {
     fetchProcurements();
-  }, [pagination.currentPage, statusFilter, typeFilter]);
+  }, [pagination.currentPage, statusFilter, typeFilter, dateFrom, dateTo]);
 
   const fetchProcurements = async () => {
     try {
@@ -86,15 +86,26 @@ const ProcurementList = () => {
   };
 
   const calculateStats = (data) => {
-    const stats = {
-      total: data.length,
-      pending: data.filter((p) => p.status === "pending").length,
-      approved: data.filter((p) => p.status === "approved").length,
-      rejected: data.filter((p) => p.status === "rejected").length,
-      totalAmount: data.reduce((sum, p) => sum + parseFloat(p.total_amount), 0),
+  const normalize = (s) => {
+    const map = {
+      Menunggu: "pending",
+      Disetujui: "approved",
+      Ditolak: "rejected",
     };
-    setStats(stats);
+    return map[s] || s;
   };
+
+  const stats = {
+    total: data.length,
+    pending: data.filter((p) => normalize(p.status) === "pending").length,
+    approved: data.filter((p) => normalize(p.status) === "approved").length,
+    rejected: data.filter((p) => normalize(p.status) === "rejected").length,
+    totalAmount: data.reduce((sum, p) => sum + parseFloat(p.total_amount), 0),
+  };
+
+  setStats(stats);
+};
+
 
   const handleSearch = () => {
     setPagination({ ...pagination, currentPage: 1 });
@@ -201,20 +212,35 @@ const ProcurementList = () => {
   };
 
   const getStatusBadge = (status) => {
-    const badges = {
-      pending: "bg-yellow-100 text-yellow-800 border border-yellow-300",
-      approved: "bg-green-100 text-green-800 border border-green-300",
-      rejected: "bg-red-100 text-red-800 border border-red-300",
-    };
-
-    return (
-      <span
-        className={`px-3 py-1 rounded-full text-xs font-semibold ${badges[status]}`}
-      >
-        {status.toUpperCase()}
-      </span>
-    );
+  // normalize Bahasa Indonesia → English
+  const map = {
+    Menunggu: "pending",
+    Disetujui: "approved",
+    Ditolak: "rejected",
   };
+
+  const normalized = map[status] || status;
+
+  const badges = {
+    pending: "bg-yellow-100 text-yellow-800 border border-yellow-300",
+    approved: "bg-green-100 text-green-800 border border-green-300",
+    rejected: "bg-red-100 text-red-800 border border-red-300",
+  };
+
+  const labels = {
+    pending: "Menunggu",
+    approved: "Disetujui",
+    rejected: "Ditolak",
+  };
+
+  return (
+    <span
+      className={`px-3 py-1 rounded-full text-xs font-semibold ${badges[normalized]}`}
+    >
+      {labels[normalized] || status}
+    </span>
+  );
+};
 
   const getTypeBadge = (type) => {
     const badges = {
@@ -243,7 +269,7 @@ const ProcurementList = () => {
         
         <div className="p-6">
           {/* Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -259,7 +285,7 @@ const ProcurementList = () => {
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Pending</p>
+                  <p className="text-sm text-gray-600 mb-1">Menunggu Persetujuan</p>
                   <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
                 </div>
                 <div className="p-3 bg-yellow-100 rounded-lg">
@@ -271,7 +297,7 @@ const ProcurementList = () => {
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Approved</p>
+                  <p className="text-sm text-gray-600 mb-1">Disetujui</p>
                   <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
                 </div>
                 <div className="p-3 bg-green-100 rounded-lg">
@@ -283,25 +309,13 @@ const ProcurementList = () => {
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Rejected</p>
-                  <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
-                </div>
-                <div className="p-3 bg-red-100 rounded-lg">
-                  <XCircleIcon className="w-6 h-6 text-red-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Nilai</p>
+                  <p className="text-sm text-gray-600 mb-1">Total Item</p>
                   <p className="text-xl font-bold text-purple-600">
-                    {formatCurrency(stats.totalAmount)}
+                    {stats.total}
                   </p>
                 </div>
                 <div className="p-3 bg-purple-100 rounded-lg">
-                  <BanknotesIcon className="w-6 h-6 text-purple-600" />
+                  <ShoppingCartIcon className="w-6 h-6 text-purple-600" />
                 </div>
               </div>
             </div>
@@ -326,7 +340,7 @@ const ProcurementList = () => {
 
             {/* Filters */}
             <div className="p-6 border-b border-gray-200 bg-gray-50">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                 <div className="md:col-span-2">
                   <div className="relative">
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -350,7 +364,6 @@ const ProcurementList = () => {
                     <option value="">Semua Status</option>
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
                   </select>
                 </div>
 
@@ -364,6 +377,24 @@ const ProcurementList = () => {
                     <option value="online">Online</option>
                     <option value="offline">Offline</option>
                   </select>
+                </div>
+
+                <div>
+                  <input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  />
                 </div>
               </div>
             </div>
@@ -397,16 +428,19 @@ const ProcurementList = () => {
                         Tanggal
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Jenis
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                         Supplier
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Tipe
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Total
+                        Total Nilai
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                         Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Dibuat Oleh
                       </th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                         Aksi
@@ -424,16 +458,11 @@ const ProcurementList = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                           {formatDate(procurement.procurement_date)}
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {procurement.supplier_name}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {procurement.items?.length || 0} item
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                           {getTypeBadge(procurement.procurement_type)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {procurement.supplier_name}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="font-semibold text-sm text-gray-900">
@@ -442,6 +471,9 @@ const ProcurementList = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {getStatusBadge(procurement.status)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {procurement.creator?.full_name || "-"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end gap-1">
@@ -461,22 +493,6 @@ const ProcurementList = () => {
                                   title="Edit"
                                 >
                                   <PencilIcon className="w-5 h-5" />
-                                </button>
-
-                                <button
-                                  onClick={() => handleApprove(procurement.id)}
-                                  className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                  title="Approve"
-                                >
-                                  <CheckIcon className="w-5 h-5" />
-                                </button>
-
-                                <button
-                                  onClick={() => handleReject(procurement.id)}
-                                  className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                                  title="Reject"
-                                >
-                                  <XMarkIcon className="w-5 h-5" />
                                 </button>
 
                                 <button

@@ -623,7 +623,7 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                 </>
               ) : (
                 <>
-                  💾 Buat Order
+                  Buat Order
                 </>
               )}
             </button>

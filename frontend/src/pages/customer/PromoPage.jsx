@@ -99,12 +99,12 @@ const PromoPage = () => {
         setLoading(true);
         setError(null);
         
-        console.log('🎁 [PROMO PAGE] Fetching discounts...');
+        console.log('[PROMO PAGE] Fetching discounts...');
         
         const response = await discountService.getAllDiscounts();
         
         if (response.success) {
-          console.log('✅ [PROMO PAGE] Received', response.data.length, 'discounts');
+          console.log('[PROMO PAGE] Received', response.data.length, 'discounts');
           
           // Transform ke flat array of products
           const productsWithDiscounts = response.data.flatMap(discount => 
@@ -150,7 +150,7 @@ const PromoPage = () => {
           
         }
       } catch (err) {
-        console.error('❌ [PROMO PAGE] Error:', err);
+        console.error('[PROMO PAGE] Error:', err);
         setError(err.message || 'Gagal memuat produk promo');
       } finally {
         setLoading(false);
@@ -278,7 +278,7 @@ const PromoPage = () => {
             
             {/* Title Section */}
             <div className="flex-shrink-0">
-              <h1 className="heading-section text-white">🎉 Promo Spesial</h1>
+              <h1 className="heading-section text-white">Promo Spesial</h1>
               <p className="text-body text-red-100 mt-1">Jangan lewatkan penawaran terbaik untuk produk segar</p>
             </div>
             

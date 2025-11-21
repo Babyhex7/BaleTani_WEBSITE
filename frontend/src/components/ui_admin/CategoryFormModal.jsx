@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 
 /**
  * Modal untuk Create/Edit Kategori
@@ -110,17 +110,21 @@ const CategoryFormModal = ({
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="relative bg-white rounded-lg shadow-xl max-w-lg w-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h3 className="text-xl font-bold text-gray-900">
-              {mode === 'create' ? 'Tambah Kategori Baru' : 'Edit Kategori'}
-            </h3>
-            <button
-              onClick={handleClose}
-              className="text-gray-400 hover:text-gray-500 transition-colors"
-            >
-              <XMarkIcon className="w-6 h-6" />
-            </button>
-          </div>
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center gap-2">
+                <Squares2X2Icon className="w-6 h-6 text-green-600" />
+                <h3 className="text-xl font-bold text-gray-900">
+                  {mode === 'create' ? 'Tambah Kategori Baru' : 'Edit Kategori'}
+                </h3>
+              </div>
+
+              <button
+                onClick={handleClose}
+                className="text-gray-400 hover:text-gray-500 transition-colors"
+              >
+                <XMarkIcon className="w-6 h-6" />
+              </button>
+            </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-6">

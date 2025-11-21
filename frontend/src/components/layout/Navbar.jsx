@@ -4,6 +4,7 @@ import { Menu, X, ShoppingCart, User, LogOut } from 'lucide-react';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
 import Button from '../ui/Button';
+import logoBaletani from '../../assets/img/BaleTanii.png';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,9 +55,11 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to={isAuthenticated ? '/home' : '/landing'} className="flex items-center gap-2 sm:gap-2.5 py-2 sm:py-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-lg sm:text-xl">B</span>
-              </div>
+              <img 
+                src={logoBaletani} 
+                alt="BaleTani Logo" 
+                className="w-12 h-12 sm:w-14 sm:h-14 object-contain flex-shrink-0"
+              />
               <div className="flex flex-col">
                 <span className="font-bold text-base sm:text-lg leading-tight text-gray-900">BaleTani</span>
                 <span className="text-[10px] sm:text-xs text-gray-500 leading-none">Fresh Market</span>

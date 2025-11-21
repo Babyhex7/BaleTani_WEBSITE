@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect  } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   HomeIcon,
@@ -20,7 +20,7 @@ import useAdminStore from '../../store/store_admin/useAdminStore';
 const AdminSidebarNew = () => {
   const location = useLocation();
   const { admin, logout } = useAdminStore();
-  const [expandedMenus, setExpandedMenus] = useState(['products']);
+  const [expandedMenus, setExpandedMenus] = useState([]);
 
   const toggleMenu = (menuName) => {
     setExpandedMenus(prev => 
@@ -95,6 +95,20 @@ const AdminSidebarNew = () => {
 
   const isActive = (path) => location.pathname === path;
   const isMenuExpanded = (key) => expandedMenus.includes(key);
+
+  useEffect(() => {
+  menuItems.forEach(item => {
+    if (item.submenu) {
+      item.submenu.forEach(sub => {
+        if (location.pathname.startsWith(sub.path)) {
+          if (!expandedMenus.includes(item.key)) {
+            setExpandedMenus(prev => [...prev, item.key]);
+          }
+        }
+      });
+    }
+  });
+}, [location.pathname]);
 
   return (
     <div className="bg-white text-gray-800 w-64 min-h-screen flex flex-col shadow-xl border-r border-gray-200">
