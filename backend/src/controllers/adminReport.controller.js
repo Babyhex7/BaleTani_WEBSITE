@@ -35,33 +35,46 @@ const getSalesReport = async (req, res) => {
       });
     }
 
-    // Build where clause for orders
+    // Build where clause for orders using model column names
+    // Use `created_at` for date range and `order_status` for status
     const whereClause = {
-      order_date: {
+      created_at: {
         [Op.between]: [date_from, date_to],
       },
-      status: {
-        [Op.in]: ["selesai", "dikirim"],
+      order_status: {
+        // Map legacy/localized statuses to real enum values used in the model
+        [Op.in]: ["completed", "out_for_delivery"],
       },
     };
 
-    // Filter by payment type
+    // Map frontend payment_type to actual `payment_method` values in Order model
     if (payment_type && ["midtrans", "cod"].includes(payment_type)) {
-      whereClause.payment_type = payment_type;
+      if (payment_type === "cod") {
+        whereClause.payment_method = "cash";
+      } else if (payment_type === "midtrans") {
+        // Midtrans typically maps to gateway/transfer payments; choose 'transfer' as best-effort
+        whereClause.payment_method = "transfer";
+      }
     }
 
-    // Filter by order type
+    // Map frontend order_type (pickup/delivery) to `delivery_method` on Order model
     if (order_type && ["pickup", "delivery"].includes(order_type)) {
-      whereClause.order_type = order_type;
+      if (order_type === "pickup") {
+        whereClause.delivery_method = "self_pickup";
+      } else if (order_type === "delivery") {
+        whereClause.delivery_method = "delivery";
+      }
     }
 
     // Get all orders with items
     const orders = await Order.findAll({
       where: whereClause,
+      // Exclude known-missing DB columns to avoid ER_BAD_FIELD_ERROR when DB isn't migrated yet
+      attributes: { exclude: ["payment_expired_at"] },
       include: [
         {
           model: OrderItem,
-          as: "items",
+          as: "orderItems",
           include: [
             {
               model: Product,
@@ -85,7 +98,7 @@ const getSalesReport = async (req, res) => {
           attributes: ["id", "full_name", "phone_number"],
         },
       ],
-      order: [["order_date", "ASC"]],
+      order: [["created_at", "ASC"]],
     });
 
     // Calculate summary statistics
@@ -97,7 +110,7 @@ const getSalesReport = async (req, res) => {
     const totalItems = orders.reduce((sum, order) => {
       return (
         sum +
-        order.items.reduce((itemSum, item) => itemSum + item.quantity, 0)
+        order.orderItems.reduce((itemSum, item) => itemSum + parseFloat(item.quantity || 0), 0)
       );
     }, 0);
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
@@ -105,7 +118,7 @@ const getSalesReport = async (req, res) => {
     // Group orders by date
     const groupedData = {};
     orders.forEach((order) => {
-      const orderDate = new Date(order.order_date);
+      const orderDate = new Date(order.created_at);
       let key;
 
       if (group_by === "day") {
@@ -131,8 +144,8 @@ const getSalesReport = async (req, res) => {
 
       groupedData[key].orders += 1;
       groupedData[key].revenue += parseFloat(order.total_amount);
-      groupedData[key].items += order.items.reduce(
-        (sum, item) => sum + item.quantity,
+      groupedData[key].items += order.orderItems.reduce(
+        (sum, item) => sum + parseFloat(item.quantity || 0),
         0
       );
     });
@@ -144,7 +157,7 @@ const getSalesReport = async (req, res) => {
 
     // Calculate breakdown by payment type
     const paymentBreakdown = orders.reduce((acc, order) => {
-      const type = order.payment_type || "unknown";
+      const type = order.payment_method || "unknown";
       if (!acc[type]) {
         acc[type] = { count: 0, revenue: 0 };
       }
@@ -155,7 +168,8 @@ const getSalesReport = async (req, res) => {
 
     // Calculate breakdown by order type
     const orderTypeBreakdown = orders.reduce((acc, order) => {
-      const type = order.order_type || "unknown";
+      // Use delivery_method for pickup/delivery breakdown
+      const type = order.delivery_method || "unknown";
       if (!acc[type]) {
         acc[type] = { count: 0, revenue: 0 };
       }
@@ -167,7 +181,7 @@ const getSalesReport = async (req, res) => {
     // Get top 10 products
     const productStats = {};
     orders.forEach((order) => {
-      order.items.forEach((item) => {
+      order.orderItems.forEach((item) => {
         const productId = item.product_id;
         if (!productStats[productId]) {
           productStats[productId] = {
@@ -184,7 +198,7 @@ const getSalesReport = async (req, res) => {
             order_count: 0,
           };
         }
-        productStats[productId].total_quantity += item.quantity;
+        productStats[productId].total_quantity += parseFloat(item.quantity || 0);
         productStats[productId].total_revenue += parseFloat(item.subtotal);
         productStats[productId].order_count += 1;
       });
