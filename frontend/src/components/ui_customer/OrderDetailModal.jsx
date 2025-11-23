@@ -172,7 +172,7 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
 
           {/* Timeline Status */}
           {timeline && timeline.length > 0 && (
-            <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-5 border border-green-200">
+            <div className="bg-white rounded-lg p-5 border border-green-200">
               <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
                 <Clock className="w-5 h-5 text-green-600" />
                 Riwayat Status Pesanan
@@ -303,7 +303,7 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
           </div>
 
           {/* Rincian Pembayaran */}
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-5">
+          <div className="bg-white border border-green-200 rounded-lg p-5">
             <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
               <CreditCard className="w-5 h-5 text-green-600" />
               Rincian Pembayaran
@@ -353,10 +353,6 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
                   <span className="font-medium">-{formatCurrency(payment.discount)}</span>
                 </div>
               )}
-              <div className="flex justify-between">
-                <span>Biaya Layanan</span>
-                <span className="font-medium">{formatCurrency(payment?.service_fee || 0)}</span>
-              </div>
               <div className="border-t-2 border-gray-300 pt-2 mt-2 flex justify-between items-center">
                 <span className="text-lg font-semibold">TOTAL PEMBAYARAN</span>
                 <span className="text-2xl font-bold text-green-600">{formatCurrency(payment?.total || 0)}</span>

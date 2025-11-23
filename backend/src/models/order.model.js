@@ -66,10 +66,6 @@ const Order = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       defaultValue: 0,
     },
-    service_fee: {
-      type: DataTypes.DECIMAL(10, 2),
-      defaultValue: 0,
-    },
     customer_notes: {
       type: DataTypes.TEXT,
       allowNull: true,

@@ -826,7 +826,6 @@ const createOfflineOrder = async (req, res) => {
         item_subtotal: subtotal,
         delivery_fee: parseFloat(delivery_fee),
         discount_amount: parseFloat(discount_amount),
-        service_fee: 0,
         total_amount: totalAmount,
         admin_notes: admin_notes || null,
         created_by: adminId,

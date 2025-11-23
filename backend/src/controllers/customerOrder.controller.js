@@ -323,7 +323,6 @@ const createOrder = async (req, res) => {
         item_subtotal: itemSubtotal,
         delivery_fee: deliveryFee,
         discount_amount: discountAmount,
-        service_fee: 0,
         total_amount: totalAmount,
         order_status: orderStatus,
         payment_status: paymentStatus,
