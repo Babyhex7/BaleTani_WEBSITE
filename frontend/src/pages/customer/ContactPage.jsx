@@ -148,7 +148,7 @@ const ContactPage = () => {
             {/* Sidebar - Jam Operasional - 1 column on desktop */}
             <div>
               {/* Jam Operasional Card */}
-              <div className="card-responsive bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 h-full">
+              <div className="card-responsive bg-white border-2 border-green-200 h-full">
                 <div className="flex items-center mb-6">
                   <div className="bg-green-600 p-3 rounded-lg shadow-md">
                     <Clock className="w-6 h-6 text-white" />
@@ -223,7 +223,7 @@ const ContactPage = () => {
         </section>
 
         {/* FAQ Section */}
-        <section className="bg-gray-100 section-py">
+        <section className="bg-white section-py">
           <div className="container-app">
             <div className="text-center mb-8 md:mb-10">
               <div className="flex items-center justify-center mb-4">

@@ -153,7 +153,7 @@ const OrderSuccessPage = () => {
             title: `Transfer Bank - ${orderData.payment.bank}`,
             instructions: [
               `Bank: ${orderData.payment.bank}`,
-              `Virtual Account: ${orderData.payment.virtual_account}`,
+              `Rekening Transfer: ${orderData.payment.virtual_account}`,
               `a/n: ${orderData.payment.account_name}`,
               `Nominal: ${formatCurrency(orderData.total_amount)}`,
               'Transfer sebelum: ' + new Date(orderData.payment.expired_at).toLocaleString('id-ID'),
@@ -200,7 +200,7 @@ const OrderSuccessPage = () => {
     if (orderData.payment?.virtual_account) {
       navigator.clipboard.writeText(orderData.payment.virtual_account);
       // You can add toast notification here
-      alert('Nomor Virtual Account berhasil disalin!');
+      alert('Nomor Rekening Transfer berhasil disalin!');
     }
   };
 
@@ -408,7 +408,7 @@ const OrderSuccessPage = () => {
                     </div>
                     
                     <div>
-                      <p className="text-xs text-gray-600 mb-1">Virtual Account</p>
+                      <p className="text-xs text-gray-600 mb-1">Rekening Transfer</p>
                       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-gray-50 p-3 rounded border border-gray-300">
                         <p className="text-lg sm:text-xl font-mono font-bold text-blue-900 tracking-wider flex-1 break-all">
                           {orderData.payment.virtual_account}

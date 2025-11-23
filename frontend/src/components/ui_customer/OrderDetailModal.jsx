@@ -9,10 +9,18 @@ import { formatOrderStatus, getStatusColor, formatPaymentMethod, getWhatsAppLink
 const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
   if (!order) return null;
 
+  // Debug: Log order data
+  console.log('[OrderDetailModal] Order data:', {
+    status: order.status,
+    payment_status: order.payment_status,
+    payment: order.payment
+  });
+
   const {
     order_number,
     order_date,
     status,
+    payment_status,
     payment_expired_at,
     customer,
     delivery,
@@ -104,8 +112,6 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
     };
     return iconMap[status] || { Component: Clock, color: 'text-gray-500', bg: 'bg-gray-100' };
   };
-
-  const canCancel = ['pending_payment', 'paid'].includes(status);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -306,7 +312,7 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
             {/* Payment Details - VA Info */}
             {payment?.method === 'bank_transfer' && payment?.virtual_account && (
               <div className="mb-4 p-4 bg-white rounded-lg border-2 border-green-300">
-                <p className="text-sm text-gray-600 mb-2">Virtual Account</p>
+                <p className="text-sm text-gray-600 mb-2">Rekening Transfer</p>
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <p className="text-xs text-gray-500">Bank {payment.bank}</p>
@@ -366,9 +372,9 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Status Pembayaran:</span>
                 <span className={`font-semibold flex items-center gap-1 ${
-                  payment?.status === 'paid' ? 'text-green-600' : 'text-orange-600'
+                  payment_status === 'paid' || payment_status === 'confirmed' ? 'text-green-600' : 'text-orange-600'
                 }`}>
-                  {payment?.status === 'paid' ? (
+                  {payment_status === 'paid' || payment_status === 'confirmed' ? (
                     <><CheckCircle className="w-4 h-4" /> <span>Lunas</span></>
                   ) : (
                     <><Clock className="w-4 h-4" /> <span>Menunggu Pembayaran</span></>
@@ -402,15 +408,6 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
               <ShoppingCart className="w-5 h-5" />
               Beli Lagi
             </button>
-            {canCancel && onCancel && (
-              <button
-                onClick={() => onCancel(order)}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
-              >
-                <X className="w-5 h-5" />
-                Batalkan Pesanan
-              </button>
-            )}
           </div>
         </div>
       </div>

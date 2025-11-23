@@ -212,7 +212,7 @@ const OrderDetailModal = ({ orderId, useDummyData, onClose, onUpdateStatus }) =>
                   )}
                   {order.payment_detail.virtual_account && (
                     <div>
-                      <p className="text-sm text-gray-600">Virtual Account</p>
+                      <p className="text-sm text-gray-600">Rekening Transfer</p>
                       <p className="font-mono font-semibold">{order.payment_detail.virtual_account}</p>
                     </div>
                   )}

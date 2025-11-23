@@ -41,6 +41,8 @@ const PurchaseHistory = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [showReorderModal, setShowReorderModal] = useState(false);
+  const [reorderOrder, setReorderOrder] = useState(null);
 
   // Reset to page 1 when search/filter changes
   useEffect(() => {
@@ -104,15 +106,16 @@ const PurchaseHistory = () => {
   };
 
   // Reorder handler
-  const handleReorder = async (order) => {
-    const confirmed = window.confirm(
-      `Tambahkan ${order.items?.length || 0} produk dari pesanan ini ke keranjang?`
-    );
+  const handleReorder = (order) => {
+    setReorderOrder(order);
+    setShowReorderModal(true);
+  };
 
-    if (!confirmed) return;
+  const confirmReorder = async () => {
+    if (!reorderOrder) return;
 
     try {
-      const response = await reorderItems(order.id);
+      const response = await reorderItems(reorderOrder.id);
       
       if (response.success) {
         toast.success(response.message);
@@ -127,6 +130,9 @@ const PurchaseHistory = () => {
     } catch (err) {
       console.error('Error reordering:', err);
       toast.error(err.message || 'Gagal menambahkan produk ke keranjang');
+    } finally {
+      setShowReorderModal(false);
+      setReorderOrder(null);
     }
   };
 
@@ -287,6 +293,35 @@ const PurchaseHistory = () => {
               />
             )}
           </>
+        )}
+
+        {/* Reorder Confirmation Modal */}
+        {showReorderModal && reorderOrder && (
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-2xl">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Beli Lagi</h3>
+              <p className="text-gray-600 mb-6">
+                Tambahkan {reorderOrder.items?.length || 0} produk dari pesanan ini ke keranjang?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowReorderModal(false);
+                    setReorderOrder(null);
+                  }}
+                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmReorder}
+                  className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
         )}
         </div>
       </div>
