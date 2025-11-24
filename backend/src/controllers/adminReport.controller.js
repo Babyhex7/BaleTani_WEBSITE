@@ -208,6 +208,34 @@ const getSalesReport = async (req, res) => {
       .sort((a, b) => b.total_revenue - a.total_revenue)
       .slice(0, 10);
 
+    // Prepare detailed sales list with customer and order information
+    const detailedSales = orders.map((order) => {
+      return {
+        order_id: order.id,
+        order_number: order.order_number,
+        order_date: order.created_at,
+        customer_name: order.customer ? order.customer.full_name : "N/A",
+        customer_phone: order.customer ? order.customer.phone_number : "N/A",
+        payment_method: order.payment_method,
+        delivery_method: order.delivery_method,
+        order_status: order.order_status,
+        total_amount: parseFloat(order.total_amount),
+        shipping_cost: parseFloat(order.shipping_cost || 0),
+        items: order.orderItems.map((item) => ({
+          product_id: item.product_id,
+          product_name: item.product.name,
+          product_unit: item.product.quantity_info,
+          product_price: parseFloat(item.product.selling_price),
+          product_image:
+            item.product.images && item.product.images.length > 0
+              ? item.product.images[0].image_url
+              : null,
+          quantity: parseFloat(item.quantity),
+          subtotal: parseFloat(item.subtotal),
+        })),
+      };
+    });
+
     res.status(200).json({
       success: true,
       data: {
@@ -221,6 +249,7 @@ const getSalesReport = async (req, res) => {
         paymentBreakdown,
         orderTypeBreakdown,
         topProducts,
+        detailedSales,
       },
     });
   } catch (error) {
@@ -431,8 +460,18 @@ const getInventoryReport = async (req, res) => {
       stock_status = "", // low, out, normal
     } = req.query;
 
+    console.log("📊 Inventory Report Filters:", {
+      date_from,
+      date_to,
+      category_id,
+      product_type,
+      stock_status,
+    });
+
     // Build where clause for products
-    const productWhere = {};
+    const productWhere = {
+      is_active: true, // Only active products
+    };
 
     if (product_type && ["online", "offline"].includes(product_type)) {
       productWhere.product_type = product_type;
@@ -455,29 +494,48 @@ const getInventoryReport = async (req, res) => {
       };
     }
 
+    console.log("📦 Product Where Clause:", productWhere);
+
     // Get all products with stock info
     const products = await Product.findAll({
       where: productWhere,
+      attributes: [
+        "id",
+        "name",
+        "product_type",
+        "category_id",
+        "quantity_info",
+        "selling_price",
+        "total_stock",
+        "shelf_life_days",
+      ],
       include: [
         {
           model: Category,
           as: "category",
           attributes: ["id", "category_name"],
+          required: false, // LEFT JOIN to include products without category
         },
         {
           model: ProductImage,
           as: "images",
           attributes: ["id", "image_url"],
           limit: 1,
+          required: false, // LEFT JOIN
+          separate: true, // Avoid cartesian product
         },
       ],
       order: [["name", "ASC"]],
     });
 
+    console.log(`✅ Found ${products.length} products`);
+
     // Calculate summary statistics
     const totalProducts = products.length;
     const totalStockValue = products.reduce((sum, p) => {
-      return sum + p.total_stock * parseFloat(p.selling_price);
+      const price = parseFloat(p.selling_price) || 0;
+      const stock = parseInt(p.total_stock) || 0;
+      return sum + stock * price;
     }, 0);
     const outOfStock = products.filter((p) => p.total_stock === 0).length;
     const lowStock = products.filter(
@@ -485,57 +543,66 @@ const getInventoryReport = async (req, res) => {
     ).length;
     const normalStock = products.filter((p) => p.total_stock > 10).length;
 
+    console.log("📊 Summary Stats:", {
+      totalProducts,
+      totalStockValue,
+      outOfStock,
+      lowStock,
+      normalStock,
+    });
+
     // Get stock movements if date range provided
     let stockMovements = [];
-    let movementSummary = {};
+    let movementSummary = {
+      procurement_in: { count: 0, quantity: 0 },
+      adjustment: { count: 0, quantity: 0 },
+      sale_out: { count: 0, quantity: 0 },
+      expired: { count: 0, quantity: 0 },
+    };
 
     if (date_from && date_to) {
+      console.log("📅 Fetching stock movements from", date_from, "to", date_to);
+      
       stockMovements = await StockMovement.findAll({
         where: {
           movement_date: {
             [Op.between]: [date_from, date_to],
           },
         },
+        attributes: [
+          "id",
+          "product_id",
+          "movement_type",
+          "quantity",
+          "movement_date",
+          "notes",
+        ],
         include: [
           {
             model: Product,
             as: "product",
             attributes: ["id", "name", "quantity_info"],
+            required: false,
           },
           {
             model: Admin,
             as: "creator",
             attributes: ["id", "username"],
+            required: false,
           },
         ],
         order: [["movement_date", "DESC"]],
+        limit: 50, // Limit recent movements
       });
 
-      // Group movements by type
-      movementSummary = {
-        procurement_in: {
-          count: 0,
-          quantity: 0,
-        },
-        adjustment: {
-          count: 0,
-          quantity: 0,
-        },
-        sale_out: {
-          count: 0,
-          quantity: 0,
-        },
-        expired: {
-          count: 0,
-          quantity: 0,
-        },
-      };
+      console.log(`📦 Found ${stockMovements.length} stock movements`);
 
+      // Group movements by type
       stockMovements.forEach((movement) => {
         const type = movement.movement_type;
         if (movementSummary[type]) {
           movementSummary[type].count++;
-          movementSummary[type].quantity += movement.quantity;
+          movementSummary[type].quantity += Math.abs(parseInt(movement.quantity) || 0);
         }
       });
     }
@@ -543,8 +610,8 @@ const getInventoryReport = async (req, res) => {
     // Category breakdown
     const categoryStats = {};
     products.forEach((p) => {
-      const catId = p.category_id;
-      const catName = p.category?.category_name || "Uncategorized";
+      const catId = p.category_id || "uncategorized";
+      const catName = p.category?.category_name || "Tanpa Kategori";
 
       if (!categoryStats[catId]) {
         categoryStats[catId] = {
@@ -556,55 +623,78 @@ const getInventoryReport = async (req, res) => {
         };
       }
 
+      const price = parseFloat(p.selling_price) || 0;
+      const stock = parseInt(p.total_stock) || 0;
+
       categoryStats[catId].total_products++;
-      categoryStats[catId].total_stock += p.total_stock;
-      categoryStats[catId].total_value += p.total_stock * parseFloat(p.selling_price);
+      categoryStats[catId].total_stock += stock;
+      categoryStats[catId].total_value += stock * price;
     });
 
     const categoryBreakdown = Object.values(categoryStats).sort(
       (a, b) => b.total_value - a.total_value
     );
 
+    console.log("📊 Category Breakdown:", categoryBreakdown.length, "categories");
+
     // Product type breakdown
+    const onlineProducts = products.filter((p) => p.product_type === "online");
+    const offlineProducts = products.filter((p) => p.product_type === "offline");
+
     const typeBreakdown = {
       online: {
-        count: products.filter((p) => p.product_type === "online").length,
-        stock: products
-          .filter((p) => p.product_type === "online")
-          .reduce((sum, p) => sum + p.total_stock, 0),
-        value: products
-          .filter((p) => p.product_type === "online")
-          .reduce((sum, p) => sum + p.total_stock * parseFloat(p.selling_price), 0),
+        count: onlineProducts.length,
+        stock: onlineProducts.reduce((sum, p) => sum + (parseInt(p.total_stock) || 0), 0),
+        value: onlineProducts.reduce(
+          (sum, p) => sum + (parseInt(p.total_stock) || 0) * (parseFloat(p.selling_price) || 0),
+          0
+        ),
       },
       offline: {
-        count: products.filter((p) => p.product_type === "offline").length,
-        stock: products
-          .filter((p) => p.product_type === "offline")
-          .reduce((sum, p) => sum + p.total_stock, 0),
-        value: products
-          .filter((p) => p.product_type === "offline")
-          .reduce((sum, p) => sum + p.total_stock * parseFloat(p.selling_price), 0),
+        count: offlineProducts.length,
+        stock: offlineProducts.reduce((sum, p) => sum + (parseInt(p.total_stock) || 0), 0),
+        value: offlineProducts.reduce(
+          (sum, p) => sum + (parseInt(p.total_stock) || 0) * (parseFloat(p.selling_price) || 0),
+          0
+        ),
       },
     };
 
+    console.log("📊 Type Breakdown:", typeBreakdown);
+
     // Format products list
-    const productsList = products.map((p) => ({
-      id: p.id,
-      name: p.name,
-      unit: p.quantity_info,
-      category_name: p.category?.category_name || "-",
-      product_type: p.product_type,
-      price: parseFloat(p.selling_price),
-      total_stock: p.total_stock,
-      stock_value: p.total_stock * parseFloat(p.selling_price),
-      status:
-        p.total_stock === 0
-          ? "out"
-          : p.total_stock <= 10
-          ? "low"
-          : "normal",
-      image_url: p.images?.[0]?.image_url || null,
+    const productsList = products.map((p) => {
+      const stock = parseInt(p.total_stock) || 0;
+      const price = parseFloat(p.selling_price) || 0;
+      
+      return {
+        id: p.id,
+        name: p.name,
+        unit: p.quantity_info || "-",
+        category_name: p.category?.category_name || "Tanpa Kategori",
+        product_type: p.product_type,
+        price: price,
+        total_stock: stock,
+        stock_value: stock * price,
+        status: stock === 0 ? "out" : stock <= 10 ? "low" : "normal",
+        image_url: p.images && p.images.length > 0 ? p.images[0].image_url : null,
+      };
+    });
+
+    // Format stock movements
+    const recentMovements = stockMovements.map((m) => ({
+      id: m.id,
+      product_id: m.product_id,
+      product_name: m.product?.name || "N/A",
+      product_unit: m.product?.quantity_info || "-",
+      movement_type: m.movement_type,
+      quantity: parseInt(m.quantity) || 0,
+      movement_date: m.movement_date,
+      notes: m.notes || "-",
+      creator_name: m.creator?.username || "System",
     }));
+
+    console.log("✅ Inventory report generated successfully");
 
     res.status(200).json({
       success: true,
@@ -618,16 +708,17 @@ const getInventoryReport = async (req, res) => {
         },
         categoryBreakdown,
         typeBreakdown,
-        movementSummary: date_from && date_to ? movementSummary : null,
-        stockMovements: date_from && date_to ? stockMovements.slice(0, 50) : [], // Limit to 50 recent movements
+        movementSummary,
         products: productsList,
+        recentMovements,
       },
     });
   } catch (error) {
     console.error("❌ Error in getInventoryReport:", error);
+    console.error("Error stack:", error.stack);
     res.status(500).json({
       success: false,
-      message: "Gagal mengambil laporan inventory",
+      message: "Gagal mengambil laporan inventori",
       error: error.message,
     });
   }

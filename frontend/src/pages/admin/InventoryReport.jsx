@@ -33,9 +33,9 @@ const InventoryReport = () => {
 
   useEffect(() => {
     fetchCategories();
-    // Auto-load report without date filter
+    // Auto-load report without date filter on mount
     fetchReport();
-  }, []);
+  }, []); // Only run once on mount
 
   const fetchCategories = async () => {
     try {
@@ -53,9 +53,18 @@ const InventoryReport = () => {
   const fetchReport = async () => {
     try {
       setLoading(true);
-      const response = await reportService.getInventoryReport(filters);
+      // Build query params, only include non-empty filters
+      const queryParams = {};
+      if (filters.date_from) queryParams.date_from = filters.date_from;
+      if (filters.date_to) queryParams.date_to = filters.date_to;
+      if (filters.category_id) queryParams.category_id = filters.category_id;
+      if (filters.product_type) queryParams.product_type = filters.product_type;
+      if (filters.stock_status) queryParams.stock_status = filters.stock_status;
+
+      const response = await reportService.getInventoryReport(queryParams);
       if (response.success) {
         setReportData(response.data);
+        toast.success("Laporan berhasil dimuat");
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Gagal memuat laporan");
@@ -554,7 +563,7 @@ const InventoryReport = () => {
               </div>
 
               {/* Recent Stock Movements */}
-              {reportData.stockMovements && reportData.stockMovements.length > 0 && (
+              {reportData.recentMovements && reportData.recentMovements.length > 0 && (
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                   <div className="p-6 border-b border-gray-200">
                     <h3 className="text-lg font-bold text-gray-900">
@@ -577,11 +586,8 @@ const InventoryReport = () => {
                           <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                             Qty
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                            Sebelum
-                          </th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                            Sesudah
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            Dibuat Oleh
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                             Catatan
@@ -589,19 +595,24 @@ const InventoryReport = () => {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {reportData.stockMovements.map((movement) => (
+                        {reportData.recentMovements.map((movement) => (
                           <tr key={movement.id} className="hover:bg-gray-50">
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                               {new Date(movement.movement_date).toLocaleDateString(
-                                "id-ID"
+                                "id-ID",
+                                {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                }
                               )}
                             </td>
                             <td className="px-6 py-4">
                               <div className="font-semibold text-sm text-gray-900">
-                                {movement.product?.name}
+                                {movement.product_name}
                               </div>
                               <div className="text-xs text-gray-500">
-                                {movement.product?.unit}
+                                {movement.product_unit}
                               </div>
                             </td>
                             <td className="px-6 py-4">
@@ -610,14 +621,11 @@ const InventoryReport = () => {
                             <td className="px-6 py-4 text-right font-semibold text-sm text-gray-900">
                               {movement.quantity}
                             </td>
-                            <td className="px-6 py-4 text-right text-sm text-gray-600">
-                              {movement.stock_before}
-                            </td>
-                            <td className="px-6 py-4 text-right text-sm text-gray-900 font-semibold">
-                              {movement.stock_after}
+                            <td className="px-6 py-4 text-sm text-gray-600">
+                              {movement.creator_name}
                             </td>
                             <td className="px-6 py-4 text-sm text-gray-600">
-                              {movement.notes || "-"}
+                              {movement.notes}
                             </td>
                           </tr>
                         ))}
