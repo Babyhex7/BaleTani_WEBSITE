@@ -124,7 +124,6 @@ const InventoryReport = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center gap-2">
-                <FunnelIcon className="w-5 h-5 text-gray-600" />
                 <h2 className="text-xl font-bold text-gray-900">Filter Laporan</h2>
               </div>
             </div>
