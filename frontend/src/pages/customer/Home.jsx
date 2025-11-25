@@ -27,6 +27,9 @@ const Home = () => {
   const { user } = useAuthStore();
   const { cart: cartItems } = useCartStore();
   
+  // Debug: Check user data
+  console.log('User data from store:', user);
+  
   // State management
   const [categories, setCategories] = useState([]);
   const [discounts, setDiscounts] = useState([]);
@@ -149,17 +152,9 @@ const Home = () => {
 
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
-            {/* Welcome Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6 sm:mb-8">
-              <Sparkles className="w-4 h-4 text-yellow-300" />
-              <span className="text-sm sm:text-base text-white font-medium">
-                Selamat Datang Kembali
-              </span>
-            </div>
-
             {/* Main Heading */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight">
-              Halo, <span className="text-yellow-300">{user?.name || 'Customer'}</span>! 👋
+              Halo, <span className="text-yellow-300">{user?.name || user?.full_name || user?.username || 'Customer'}</span>! 👋
             </h1>
             <p className="text-lg sm:text-xl md:text-2xl text-green-50 mb-8 sm:mb-10 max-w-2xl leading-relaxed">
               Dari kebun ke Balé, dari Balé ke rumahmu. Belanja produk segar hari ini!
@@ -191,56 +186,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Quick Stats - Floating Cards */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-16 mb-12 sm:mb-16">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-          <Link to="/products" className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-6 transform hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2 sm:p-3 bg-green-100 rounded-xl group-hover:bg-green-200 transition-colors">
-                <Package className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-              </div>
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-green-600 group-hover:translate-x-1 transition-all" />
-            </div>
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">Semua Produk</h3>
-            <p className="text-xs sm:text-sm text-gray-600">Belanja sekarang</p>
-          </Link>
 
-          <Link to="/promo" className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-6 transform hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2 sm:p-3 bg-red-100 rounded-xl group-hover:bg-red-200 transition-colors">
-                <Tag className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
-              </div>
-              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
-            </div>
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">Promo Spesial</h3>
-            <p className="text-xs sm:text-sm text-gray-600">Hemat lebih banyak</p>
-          </Link>
-
-          <Link to="/cart" className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-6 transform hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2 sm:p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors">
-                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-              </div>
-              <span className="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
-                {cartItems?.length || 0}
-              </span>
-            </div>
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">Keranjang</h3>
-            <p className="text-xs sm:text-sm text-gray-600">{cartItems?.length || 0} item menunggu</p>
-          </Link>
-
-          <Link to="/purchase-history" className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-6 transform hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2 sm:p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors">
-                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
-              </div>
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
-            </div>
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">Riwayat</h3>
-            <p className="text-xs sm:text-sm text-gray-600">Pesanan saya</p>
-          </Link>
-        </div>
-      </section>
 
       {/* Promo Section - Modern Design */}
       <section className="py-12 sm:py-16 lg:py-20">
