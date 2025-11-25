@@ -9,83 +9,132 @@ import {
   Leaf, 
   Apple, 
   Beef,
-  Popcorn
+  Popcorn,
+  Tag,
+  AlertCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import useAuthStore from '../../store/store_customer/useAuthStore';
+import useCartStore from '../../store/store_customer/useCartStore';
 import productService from '../../services/services_customer/productService';
+import apiClient from '../../utils/apiClient';
 import Button from '../../components/ui/Button';
 import ProductCard from '../../components/ui/ProductCard';
 import ProductCardSkeleton from '../../components/ui/ProductCardSkeleton';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const Home = () => {
   const { user } = useAuthStore();
-  const [cart, setCart] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
+  const { cart: cartItems } = useCartStore();
+  
+  // State management
+  const [categories, setCategories] = useState([]);
+  const [discounts, setDiscounts] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
+  // Loading states
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [loadingDiscounts, setLoadingDiscounts] = useState(true);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  
+  // Error states
+  const [errorCategories, setErrorCategories] = useState(null);
+  const [errorDiscounts, setErrorDiscounts] = useState(null);
+  const [errorProducts, setErrorProducts] = useState(null);
 
+  // Fetch Categories dari API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const response = await apiClient.get('/public/categories');
+        
+        if (response.data.success) {
+          setCategories(response.data.data.slice(0, 4)); // Ambil 4 kategori pertama
+          setErrorCategories(null);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setErrorCategories('Gagal memuat kategori');
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Fetch Discounts/Promo dari API
+  useEffect(() => {
+    const fetchDiscounts = async () => {
+      try {
+        setLoadingDiscounts(true);
+        const response = await apiClient.get('/public/discounts');
+        
+        if (response.data.success) {
+          setDiscounts(response.data.data.slice(0, 2)); // Ambil 2 promo utama
+          setErrorDiscounts(null);
+        }
+      } catch (error) {
+        console.error('Error fetching discounts:', error);
+        setErrorDiscounts('Gagal memuat promo');
+      } finally {
+        setLoadingDiscounts(false);
+      }
+    };
+    fetchDiscounts();
+  }, []);
+
+  // Fetch Featured Products dari API
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
-        setLoading(true);
-        const response = await productService.getFeaturedProducts(6);
-        if (response.success) {
-          setFeaturedProducts(response.data);
+        setLoadingProducts(true);
+        const response = await apiClient.get('/public/products', {
+          params: {
+            sortBy: 'newest',
+            limit: 6,
+            page: 1
+          }
+        });
+        
+        if (response.data.success) {
+          setFeaturedProducts(response.data.data.products);
+          setErrorProducts(null);
         }
       } catch (error) {
         console.error('Error fetching featured products:', error);
+        setErrorProducts('Gagal memuat produk');
       } finally {
-        setLoading(false);
+        setLoadingProducts(false);
       }
     };
     fetchFeaturedProducts();
   }, []);
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
-    }).format(price);
+  // Format tanggal untuk display promo
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
   };
 
-  const handleAddToCart = (product) => {
-    const existingItem = cart.find(item => item.id === product.id);
+  // Get discount badge color
+  const getDiscountColor = (type) => {
+    return type === 'percentage' ? 'bg-red-500' : 'bg-green-500';
+  };
 
-    if (existingItem) {
-      setCart(cart.map(item => 
-        item.id === product.id 
-          ? { ...item, quantity: item.quantity + 1 } 
-          : item
-      ));
-    } else {
-      setCart([...cart, { ...product, quantity: 1 }]);
+  // Get discount display value
+  const getDiscountDisplay = (discount) => {
+    if (discount.discount_type === 'percentage') {
+      return `${discount.discount_value}%`;
     }
-
-    alert(`${product.name} ditambahkan ke keranjang`);
-  };
-
-  const handleToggleWishlist = (product) => {
-    const isInWishlist = wishlist.find(item => item.id === product.id);
-
-    if (isInWishlist) {
-      setWishlist(wishlist.filter(item => item.id !== product.id));
-      alert(`${product.name} dihapus dari wishlist`);
-    } else {
-      setWishlist([...wishlist, product]);
-      alert(`${product.name} ditambahkan ke wishlist`);
-    }
-  };
-
-  const handleWhatsAppOrder = (productName, price, unit) => {
-    const userName = user?.name || 'Customer';
-    const message = `Halo, saya ${userName} ingin memesan ${productName} seharga ${formatPrice(price)}/${unit}. Mohon info ketersediaan dan cara pemesanannya. Terima kasih!`;
-    const whatsappUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    return formatCurrency(discount.discount_value);
   };
 
   // Icon map untuk kategori
@@ -122,7 +171,7 @@ const Home = () => {
             </Link>
 
             <Link to="/promo" className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-red-300 text-center p-6">
-              <TrendingUp className="w-8 h-8 text-red-600 mx-auto mb-3" />
+              <Tag className="w-8 h-8 text-red-600 mx-auto mb-3" />
               <h3 className="font-semibold">Promo Spesial</h3>
               <p className="text-sm text-gray-600">Lihat semua promo</p>
             </Link>
@@ -130,69 +179,94 @@ const Home = () => {
             <Link to="/cart" className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-300 text-center p-6">
               <ShoppingCart className="w-8 h-8 text-green-600 mx-auto mb-3" />
               <h3 className="font-semibold">Keranjang Saya</h3>
-              <p className="text-sm text-gray-600">{cart.length} item menunggu</p>
+              <p className="text-sm text-gray-600">{cartItems?.length || 0} item</p>
             </Link>
 
-            <Link to="/wishlist" className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-pink-300 text-center p-6">
-              <Heart className="w-8 h-8 text-pink-600 mx-auto mb-3" />
-              <h3 className="font-semibold">Wishlist</h3>
-              <p className="text-sm text-gray-600">{wishlist.length} produk favorit</p>
+            <Link to="/purchase-history" className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-blue-300 text-center p-6">
+              <Clock className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+              <h3 className="font-semibold">Riwayat</h3>
+              <p className="text-sm text-gray-600">Pesanan saya</p>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Member Promos */}
+      {/* Promo Section - REAL DATA dari BE */}
       <section className="py-8 bg-gradient-to-r from-orange-50 to-red-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Promo Khusus Member</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl p-6 shadow-lg">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-xl font-bold mb-2">Diskon 20% Produk Segar</h3>
-                  <p className="opacity-90">Berlaku untuk semua produk kategori Sayuran & Buah</p>
-                </div>
-                <div className="bg-white text-red-600 font-bold text-lg px-3 py-1 rounded-lg">
-                  20%
-                </div>
-              </div>
-              <div className="border-t border-white/20 pt-4 mt-4">
-                <div className="flex justify-between text-sm">
-                  <span>Berlaku sampai: 31 Okt 2025</span>
-                  <span>Min. pembelian: Rp 100.000</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-6 shadow-lg">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-xl font-bold mb-2">Gratis Ongkir</h3>
-                  <p className="opacity-90">Pengiriman gratis ke seluruh Indonesia</p>
-                </div>
-                <div className="bg-white text-green-600 font-bold text-lg px-3 py-1 rounded-lg">
-                  FREE
-                </div>
-              </div>
-              <div className="border-t border-white/20 pt-4 mt-4">
-                <div className="flex justify-between text-sm">
-                  <span>Berlaku sampai: 15 Nov 2025</span>
-                  <span>Min. pembelian: Rp 150.000</span>
-                </div>
-              </div>
-            </div>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">
+              <Tag className="inline mr-2" size={24} />
+              Promo Spesial
+            </h2>
+            <Link to="/promo">
+              <Button className="bg-red-600 hover:bg-red-700 text-white text-sm">
+                Lihat Semua Promo
+              </Button>
+            </Link>
           </div>
+
+          {loadingDiscounts ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[1, 2].map((i) => (
+                <div key={i} className="bg-white rounded-xl p-6 shadow-lg animate-pulse">
+                  <div className="h-6 bg-gray-200 rounded mb-4 w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2 w-full"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                </div>
+              ))}
+            </div>
+          ) : errorDiscounts ? (
+            <div className="bg-white rounded-xl p-8 text-center shadow-sm">
+              <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
+              <p className="text-red-600">{errorDiscounts}</p>
+            </div>
+          ) : discounts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {discounts.map((discount, index) => (
+                <Link
+                  key={discount.id}
+                  to={`/promo/${discount.id}`}
+                  className={`${
+                    index === 0
+                      ? 'bg-gradient-to-r from-red-500 to-red-600'
+                      : 'bg-gradient-to-r from-green-500 to-green-600'
+                  } text-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">{discount.discount_name}</h3>
+                      <p className="opacity-90 text-sm line-clamp-2">{discount.description}</p>
+                    </div>
+                    <div className="bg-white text-red-600 font-bold text-lg px-3 py-1 rounded-lg flex-shrink-0">
+                      {getDiscountDisplay(discount)}
+                    </div>
+                  </div>
+                  <div className="border-t border-white/20 pt-4 mt-4">
+                    <div className="flex justify-between text-sm flex-wrap gap-2">
+                      <span>Berlaku sampai: {formatDate(discount.end_date)}</span>
+                      <span>Min: {formatCurrency(discount.min_purchase || 0)}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl p-8 text-center shadow-sm">
+              <Tag className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+              <p className="text-gray-600">Belum ada promo aktif saat ini</p>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* Featured Products - REAL DATA dari BE */}
       <section className="py-8">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
               <TrendingUp className="inline mr-2" size={24} />
-              Produk Unggulan Hari Ini
+              Produk Terbaru
             </h2>
             <Link to="/products">
               <Button className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2">
@@ -202,78 +276,103 @@ const Home = () => {
             </Link>
           </div>
 
-          {loading ? (
+          {loadingProducts ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <ProductCardSkeleton count={6} />
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : errorProducts ? (
+            <div className="bg-white rounded-xl p-8 text-center shadow-sm">
+              <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
+              <p className="text-red-600">{errorProducts}</p>
+              <Button 
+                onClick={() => window.location.reload()} 
+                className="mt-4 bg-green-600 hover:bg-green-700 text-white"
+              >
+                Coba Lagi
+              </Button>
             </div>
           ) : featuredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredProducts.map((product) => (
                 <ErrorBoundary key={product.id}>
-                  <ProductCard
-                    product={product}
-                    formatPrice={formatPrice}
-                    onWhatsAppOrder={handleWhatsAppOrder}
-                    onAddToCart={handleAddToCart}
-                  />
+                  <ProductCard product={product} />
                 </ErrorBoundary>
               ))}
             </div>
           ) : (
             <div className="text-center py-12 bg-gray-50 rounded-xl">
               <Package className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-600">Belum ada produk unggulan</p>
+              <p className="text-gray-600">Belum ada produk tersedia</p>
+              <Link to="/products" className="mt-4 inline-block">
+                <Button className="bg-green-600 hover:bg-green-700 text-white">
+                  Refresh Produk
+                </Button>
+              </Link>
             </div>
           )}
         </div>
       </section>
 
-      {/* Categories Quick Access */}
+      {/* Categories - REAL DATA dari BE */}
       <section className="py-8 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Kategori Populer</h2>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { name: 'Sayuran', icon: 'Leaf', count: '15 produk', href: '/products?category=sayuran' },
-              { name: 'Buah', icon: 'Apple', count: '8 produk', href: '/products?category=buah' },
-              { name: 'Daging', icon: 'Beef', count: '6 produk', href: '/products?category=daging' },
-              { name: 'Bumbu', icon: 'Popcorn', count: '5 produk', href: '/products?category=bumbu' }
-            ].map((category) => {
-              const IconComponent = icons[category.icon];
-
-              return (
-                <Link 
-                  key={category.name}
-                  to={category.href}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-300 text-center p-6"
-                >
-                  <IconComponent className="w-10 h-10 text-green-600 mx-auto mb-3" />
-                  <h3 className="font-semibold text-gray-900">{category.name}</h3>
-                  <p className="text-sm text-gray-600">{category.count}</p>
-                </Link>
-              );
-            })}
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Kategori Populer</h2>
+            <Link to="/categories">
+              <Button className="bg-gray-600 hover:bg-gray-700 text-white text-sm">
+                Semua Kategori
+              </Button>
+            </Link>
           </div>
-        </div>
-      </section>
 
-      {/* Recent Activity */}
-      <section className="py-8">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Aktivitas Terakhir</h2>
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="text-center text-gray-500 py-8">
-              <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p className="font-medium">Belum ada aktivitas pembelian</p>
-              <p className="text-sm">Mulai berbelanja untuk melihat riwayat aktivitas Anda</p>
-              <Link to="/products" className="mt-4 inline-block">
-                <Button className="bg-green-600 hover:bg-green-700 text-white">
-                  Mulai Belanja
-                </Button>
-              </Link>
+          {loadingCategories ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-white rounded-xl shadow-sm p-6 animate-pulse">
+                  <div className="w-10 h-10 bg-gray-200 rounded-full mx-auto mb-3"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-2/3 mx-auto"></div>
+                </div>
+              ))}
             </div>
-          </div>
+          ) : errorCategories ? (
+            <div className="bg-white rounded-xl p-8 text-center shadow-sm">
+              <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
+              <p className="text-red-600">{errorCategories}</p>
+            </div>
+          ) : categories.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {categories.map((category, index) => {
+                // Default icons based on category name or index
+                const iconMap = {
+                  0: Leaf,
+                  1: Apple,
+                  2: Beef,
+                  3: Popcorn
+                };
+                const IconComponent = iconMap[index] || Package;
+                
+                return (
+                  <Link 
+                    key={category.id}
+                    to={`/category/${category.id}`}
+                    className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-300 text-center p-6 group"
+                  >
+                    <IconComponent className="w-10 h-10 text-green-600 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                    <h3 className="font-semibold text-gray-900">{category.category_name}</h3>
+                    <p className="text-sm text-gray-600">{category.product_count || 0} produk</p>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-xl">
+              <Package className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+              <p className="text-gray-600">Belum ada kategori tersedia</p>
+            </div>
+          )}
         </div>
       </section>
 
