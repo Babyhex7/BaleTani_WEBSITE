@@ -13,11 +13,13 @@ Semua data di homepage sekarang **fetch dari Backend API real-time**, bukan hard
 ### 🎯 **1. PROMO/DISCOUNT SECTION**
 
 #### Backend API:
+
 ```javascript
-GET /api/public/discounts
+GET / api / public / discounts;
 ```
 
 #### Response Structure:
+
 ```json
 {
   "success": true,
@@ -41,11 +43,12 @@ GET /api/public/discounts
 ```
 
 #### Frontend Implementation:
+
 ```jsx
 // Fetch dari API
 useEffect(() => {
   const fetchDiscounts = async () => {
-    const response = await apiClient.get('/public/discounts');
+    const response = await apiClient.get("/public/discounts");
     setDiscounts(response.data.data.slice(0, 2)); // Ambil 2 promo utama
   };
   fetchDiscounts();
@@ -61,10 +64,11 @@ discounts.map((discount) => (
       <p>Min: Rp {discount.min_purchase}</p>
     </div>
   </Link>
-))
+));
 ```
 
 #### Features:
+
 - ✅ Real-time data dari database
 - ✅ Cache 30 menit di backend (performance)
 - ✅ Loading state dengan skeleton
@@ -79,11 +83,13 @@ discounts.map((discount) => (
 ### 🗂️ **2. KATEGORI SECTION**
 
 #### Backend API:
+
 ```javascript
-GET /api/public/categories
+GET / api / public / categories;
 ```
 
 #### Response Structure:
+
 ```json
 {
   "success": true,
@@ -103,11 +109,12 @@ GET /api/public/categories
 ```
 
 #### Frontend Implementation:
+
 ```jsx
 // Fetch dari API
 useEffect(() => {
   const fetchCategories = async () => {
-    const response = await apiClient.get('/public/categories');
+    const response = await apiClient.get("/public/categories");
     setCategories(response.data.data.slice(0, 4)); // Top 4 categories
   };
   fetchCategories();
@@ -117,7 +124,7 @@ useEffect(() => {
 categories.map((category, index) => {
   const iconMap = { 0: Leaf, 1: Apple, 2: Beef, 3: Popcorn };
   const IconComponent = iconMap[index] || Package;
-  
+
   return (
     <Link to={`/category/${category.id}`}>
       <IconComponent />
@@ -125,10 +132,11 @@ categories.map((category, index) => {
       <p>{category.product_count} produk</p>
     </Link>
   );
-})
+});
 ```
 
 #### Features:
+
 - ✅ Real-time data dari database
 - ✅ Cache 1 jam di backend (jarang berubah)
 - ✅ Loading state dengan skeleton
@@ -143,11 +151,13 @@ categories.map((category, index) => {
 ### 📦 **3. PRODUK UNGGULAN/TERBARU**
 
 #### Backend API:
+
 ```javascript
 GET /api/public/products?sortBy=newest&limit=6&page=1
 ```
 
 #### Response Structure:
+
 ```json
 {
   "success": true,
@@ -193,16 +203,17 @@ GET /api/public/products?sortBy=newest&limit=6&page=1
 ```
 
 #### Frontend Implementation:
+
 ```jsx
 // Fetch dari API
 useEffect(() => {
   const fetchFeaturedProducts = async () => {
-    const response = await apiClient.get('/public/products', {
+    const response = await apiClient.get("/public/products", {
       params: {
-        sortBy: 'newest',
+        sortBy: "newest",
         limit: 6,
-        page: 1
-      }
+        page: 1,
+      },
     });
     setFeaturedProducts(response.data.data.products);
   };
@@ -210,12 +221,11 @@ useEffect(() => {
 }, []);
 
 // Display using ProductCard component
-featuredProducts.map((product) => (
-  <ProductCard product={product} />
-))
+featuredProducts.map((product) => <ProductCard product={product} />);
 ```
 
 #### Features:
+
 - ✅ Real-time data dari database
 - ✅ Cache 10 menit di backend
 - ✅ Sorting by newest
@@ -232,6 +242,7 @@ featuredProducts.map((product) => (
 ## 🎨 UI/UX IMPROVEMENTS
 
 ### Loading States:
+
 ```jsx
 // Promo Skeleton
 <div className="animate-pulse">
@@ -250,6 +261,7 @@ featuredProducts.map((product) => (
 ```
 
 ### Error States:
+
 ```jsx
 // Error dengan icon & retry button
 <div className="bg-white rounded-xl p-8 text-center">
@@ -260,6 +272,7 @@ featuredProducts.map((product) => (
 ```
 
 ### Empty States:
+
 ```jsx
 // Empty dengan icon & CTA
 <div className="text-center py-12 bg-gray-50 rounded-xl">
@@ -274,20 +287,24 @@ featuredProducts.map((product) => (
 ## 🔗 LINK STRUCTURE
 
 ### Quick Actions:
+
 - `/products` → Semua produk
 - `/promo` → Semua promo
 - `/cart` → Keranjang (with cart count from zustand)
 - `/purchase-history` → Riwayat pembelian
 
 ### Promo Cards:
+
 - `/promo/{discount_id}` → Detail promo
 - Shows all products with that discount
 
 ### Category Cards:
+
 - `/category/{category_id}` → Products by category
 - Shows all products in that category
 
 ### Product Cards:
+
 - Uses existing `<ProductCard />` component
 - Link ke `/products/{product_id}`
 - Add to cart functionality
@@ -297,6 +314,7 @@ featuredProducts.map((product) => (
 ## 📱 RESPONSIVE DESIGN
 
 ### Grid System:
+
 ```css
 /* Mobile: 1 column */
 grid-cols-1
@@ -310,6 +328,7 @@ lg:grid-cols-4
 ```
 
 ### Breakpoints:
+
 - Mobile: < 768px → 1 column
 - Tablet: 768px - 1024px → 2 columns
 - Desktop: > 1024px → 3-4 columns
@@ -319,6 +338,7 @@ lg:grid-cols-4
 ## 🚀 PERFORMANCE OPTIMIZATIONS
 
 ### Backend Caching:
+
 ```javascript
 // Categories: 1 jam (jarang berubah)
 CUSTOMER.CATEGORIES → TTL: 3600 detik
@@ -331,6 +351,7 @@ CUSTOMER.PRODUCTS_LIST → TTL: 600 detik
 ```
 
 ### Frontend Optimizations:
+
 - ✅ Lazy loading images (native browser)
 - ✅ Skeleton loaders (perceived performance)
 - ✅ Error boundaries (prevent crash)
@@ -391,6 +412,7 @@ CUSTOMER.PRODUCTS_LIST → TTL: 600 detik
 ### Manual Testing Checklist:
 
 **Promo Section:**
+
 - [ ] Promo tampil dari database real
 - [ ] Loading skeleton muncul saat fetch
 - [ ] Error handling jika API gagal
@@ -398,6 +420,7 @@ CUSTOMER.PRODUCTS_LIST → TTL: 600 detik
 - [ ] Format tanggal & currency benar
 
 **Kategori Section:**
+
 - [ ] Kategori tampil dari database
 - [ ] Product count akurat
 - [ ] Loading skeleton muncul
@@ -405,6 +428,7 @@ CUSTOMER.PRODUCTS_LIST → TTL: 600 detik
 - [ ] Link ke category detail works
 
 **Produk Section:**
+
 - [ ] Produk terbaru tampil (sorted by date)
 - [ ] Discount badge muncul jika ada
 - [ ] Stock indicator benar
@@ -416,6 +440,7 @@ CUSTOMER.PRODUCTS_LIST → TTL: 600 detik
 ## 🔥 NEXT STEPS
 
 ### To Do:
+
 1. ✅ Homepage - **DONE**
 2. ⏳ Test E2E untuk homepage flows
 3. ⏳ Category detail page
@@ -429,6 +454,7 @@ CUSTOMER.PRODUCTS_LIST → TTL: 600 detik
 ## 📸 SCREENSHOTS (Expected)
 
 ### Desktop View:
+
 ```
 +-----------------------------------------------------------+
 |  NAVBAR (with cart count)                                 |
@@ -448,6 +474,7 @@ CUSTOMER.PRODUCTS_LIST → TTL: 600 detik
 ```
 
 ### Mobile View:
+
 ```
 +-------------------------+
 |  NAVBAR                 |
@@ -471,6 +498,7 @@ CUSTOMER.PRODUCTS_LIST → TTL: 600 detik
 ## 🎉 SUMMARY
 
 ### ✅ Implemented:
+
 1. **Real-time data** dari backend API (bukan dummy/hardcoded)
 2. **3 API endpoints** integrated:
    - `/api/public/discounts`
@@ -484,6 +512,7 @@ CUSTOMER.PRODUCTS_LIST → TTL: 600 detik
 8. **Dynamic routing** ke detail pages
 
 ### 🎯 User Experience:
+
 - ✅ Fast initial load (cached data)
 - ✅ Smooth loading animations
 - ✅ Clear error messages
@@ -496,6 +525,7 @@ CUSTOMER.PRODUCTS_LIST → TTL: 600 detik
 **Status: ✅ PRODUCTION READY**
 
 **Cara Test:**
+
 ```bash
 # Terminal 1 - Backend
 cd backend && npm run dev
@@ -508,6 +538,7 @@ http://localhost:5173/
 ```
 
 **Expected Result:**
+
 - Promo cards menampilkan data dari database
 - Kategori cards menampilkan jumlah produk real
 - Produk cards menampilkan 6 produk terbaru

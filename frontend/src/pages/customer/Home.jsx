@@ -1,25 +1,21 @@
 import { useState, useEffect } from 'react';
 import { 
   ShoppingCart, 
-  Heart, 
-  TrendingUp, 
   Package, 
-  Clock, 
+  Tag, 
   ArrowRight, 
-  Leaf, 
-  Apple, 
-  Beef,
-  Popcorn,
-  Tag,
-  AlertCircle
+  Sparkles,
+  TrendingUp,
+  Clock,
+  Star,
+  Zap,
+  AlertCircle,
+  Grid
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
-import productService from '../../services/services_customer/productService';
 import apiClient from '../../utils/apiClient';
-import Button from '../../components/ui/Button';
 import ProductCard from '../../components/ui/ProductCard';
 import ProductCardSkeleton from '../../components/ui/ProductCardSkeleton';
 import ErrorBoundary from '../../components/ErrorBoundary';
@@ -137,115 +133,217 @@ const Home = () => {
     return formatCurrency(discount.discount_value);
   };
 
-  // Icon map untuk kategori
-  const icons = { Leaf, Apple, Beef, Popcorn };
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <Navbar />
 
-      {/* Welcome Section */}
-      <section className="bg-gradient-to-r from-green-600 to-green-700 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                Selamat datang kembali, {user?.name || 'Customer'}!
-              </h1>
-              <p className="text-xl opacity-90 text-green-100">
-                Apa yang ingin Anda beli hari ini?
-              </p>
+      {/* Hero Section - Modern & Clean */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-500 via-green-600 to-green-700 pt-16 pb-24 sm:pt-20 sm:pb-32">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }} />
+        </div>
+
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl">
+            {/* Welcome Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6 sm:mb-8">
+              <Sparkles className="w-4 h-4 text-yellow-300" />
+              <span className="text-sm sm:text-base text-white font-medium">
+                Selamat Datang Kembali
+              </span>
+            </div>
+
+            {/* Main Heading */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight">
+              Halo, <span className="text-yellow-300">{user?.name || 'Customer'}</span>! 👋
+            </h1>
+            <p className="text-lg sm:text-xl md:text-2xl text-green-50 mb-8 sm:mb-10 max-w-2xl leading-relaxed">
+              Dari kebun ke Balé, dari Balé ke rumahmu. Belanja produk segar hari ini!
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link to="/products">
+                <button className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-green-700 font-semibold rounded-xl hover:bg-green-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                  <Package className="w-5 h-5" />
+                  Mulai Belanja
+                </button>
+              </Link>
+              <Link to="/promo">
+                <button className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border-2 border-white/30 hover:bg-white/20 transition-all duration-200 flex items-center justify-center gap-2">
+                  <Tag className="w-5 h-5" />
+                  Lihat Promo
+                </button>
+              </Link>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Quick Actions */}
-      <section className="py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link to="/products" className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-300 text-center p-6">
-              <Package className="w-8 h-8 text-green-600 mx-auto mb-3" />
-              <h3 className="font-semibold">Semua Produk</h3>
-              <p className="text-sm text-gray-600">Lihat katalog lengkap</p>
-            </Link>
-
-            <Link to="/promo" className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-red-300 text-center p-6">
-              <Tag className="w-8 h-8 text-red-600 mx-auto mb-3" />
-              <h3 className="font-semibold">Promo Spesial</h3>
-              <p className="text-sm text-gray-600">Lihat semua promo</p>
-            </Link>
-
-            <Link to="/cart" className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-300 text-center p-6">
-              <ShoppingCart className="w-8 h-8 text-green-600 mx-auto mb-3" />
-              <h3 className="font-semibold">Keranjang Saya</h3>
-              <p className="text-sm text-gray-600">{cartItems?.length || 0} item</p>
-            </Link>
-
-            <Link to="/purchase-history" className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-blue-300 text-center p-6">
-              <Clock className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-              <h3 className="font-semibold">Riwayat</h3>
-              <p className="text-sm text-gray-600">Pesanan saya</p>
-            </Link>
-          </div>
+        {/* Decorative Bottom Wave */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 120" className="w-full h-12 sm:h-16 md:h-20" preserveAspectRatio="none">
+            <path fill="#ffffff" d="M0,64 L48,58.7 C96,53,192,43,288,42.7 C384,43,480,53,576,58.7 C672,64,768,64,864,58.7 C960,53,1056,43,1152,42.7 C1248,43,1344,53,1392,58.7 L1440,64 L1440,120 L0,120 Z"></path>
+          </svg>
         </div>
       </section>
 
-      {/* Promo Section - REAL DATA dari BE */}
-      <section className="py-8 bg-gradient-to-r from-orange-50 to-red-50">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              <Tag className="inline mr-2" size={24} />
-              Promo Spesial
-            </h2>
+      {/* Quick Stats - Floating Cards */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-16 mb-12 sm:mb-16">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+          <Link to="/products" className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-6 transform hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 sm:p-3 bg-green-100 rounded-xl group-hover:bg-green-200 transition-colors">
+                <Package className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+              </div>
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-green-600 group-hover:translate-x-1 transition-all" />
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">Semua Produk</h3>
+            <p className="text-xs sm:text-sm text-gray-600">Belanja sekarang</p>
+          </Link>
+
+          <Link to="/promo" className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-6 transform hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 sm:p-3 bg-red-100 rounded-xl group-hover:bg-red-200 transition-colors">
+                <Tag className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
+              </div>
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">Promo Spesial</h3>
+            <p className="text-xs sm:text-sm text-gray-600">Hemat lebih banyak</p>
+          </Link>
+
+          <Link to="/cart" className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-6 transform hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors">
+                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              </div>
+              <span className="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
+                {cartItems?.length || 0}
+              </span>
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">Keranjang</h3>
+            <p className="text-xs sm:text-sm text-gray-600">{cartItems?.length || 0} item menunggu</p>
+          </Link>
+
+          <Link to="/purchase-history" className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-4 sm:p-6 transform hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 sm:p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
+              </div>
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">Riwayat</h3>
+            <p className="text-xs sm:text-sm text-gray-600">Pesanan saya</p>
+          </Link>
+        </div>
+      </section>
+
+      {/* Promo Section - Modern Design */}
+      <section className="py-12 sm:py-16 lg:py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 sm:mb-12">
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <Tag className="w-6 h-6 text-red-600" />
+                </div>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                  Promo Spesial
+                </h2>
+              </div>
+              <p className="text-gray-600 text-sm sm:text-base">Jangan sampai kehabisan penawaran terbaik!</p>
+            </div>
             <Link to="/promo">
-              <Button className="bg-red-600 hover:bg-red-700 text-white text-sm">
-                Lihat Semua Promo
-              </Button>
+              <button className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2 group">
+                Lihat Semua
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
             </Link>
           </div>
 
+          {/* Promo Cards */}
           {loadingDiscounts ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[1, 2].map((i) => (
-                <div key={i} className="bg-white rounded-xl p-6 shadow-lg animate-pulse">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-2xl p-6 shadow-md animate-pulse">
                   <div className="h-6 bg-gray-200 rounded mb-4 w-3/4"></div>
                   <div className="h-4 bg-gray-200 rounded mb-2 w-full"></div>
-                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
+                  <div className="h-10 bg-gray-200 rounded"></div>
                 </div>
               ))}
             </div>
           ) : errorDiscounts ? (
-            <div className="bg-white rounded-xl p-8 text-center shadow-sm">
-              <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
-              <p className="text-red-600">{errorDiscounts}</p>
+            <div className="bg-white rounded-2xl p-12 text-center shadow-md">
+              <AlertCircle className="w-16 h-16 mx-auto text-red-500 mb-4" />
+              <p className="text-red-600 text-lg">{errorDiscounts}</p>
             </div>
           ) : discounts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {discounts.map((discount, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {discounts.slice(0, 3).map((discount, index) => (
                 <Link
                   key={discount.id}
                   to={`/promo/${discount.id}`}
-                  className={`${
-                    index === 0
-                      ? 'bg-gradient-to-r from-red-500 to-red-600'
-                      : 'bg-gradient-to-r from-green-500 to-green-600'
-                  } text-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}
+                  className="group relative bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 overflow-hidden"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold mb-2">{discount.discount_name}</h3>
-                      <p className="opacity-90 text-sm line-clamp-2">{discount.description}</p>
-                    </div>
-                    <div className="bg-white text-red-600 font-bold text-lg px-3 py-1 rounded-lg flex-shrink-0">
+                  {/* Discount Badge */}
+                  <div className="absolute top-4 right-4 z-10">
+                    <div className="px-4 py-2 bg-red-500 text-white font-bold text-lg rounded-full shadow-lg flex items-center gap-1">
+                      <Zap className="w-4 h-4" />
                       {getDiscountDisplay(discount)}
                     </div>
                   </div>
-                  <div className="border-t border-white/20 pt-4 mt-4">
-                    <div className="flex justify-between text-sm flex-wrap gap-2">
-                      <span>Berlaku sampai: {formatDate(discount.end_date)}</span>
-                      <span>Min: {formatCurrency(discount.min_purchase || 0)}</span>
+
+                  {/* Decorative Element */}
+                  <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-red-500/5 rounded-full group-hover:scale-110 transition-transform duration-500"></div>
+
+                  {/* Content */}
+                  <div className="relative z-10">
+                    <div className="mb-4">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold mb-3">
+                        <Star className="w-3 h-3 fill-red-500" />
+                        Promo Aktif
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-red-600 transition-colors">
+                        {discount.discount_name}
+                      </h3>
+                      <p className="text-gray-600 text-sm line-clamp-2">
+                        {discount.description}
+                      </p>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="border-t border-gray-200 my-4"></div>
+
+                    {/* Details */}
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between text-gray-700">
+                        <span className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-gray-400" />
+                          Berlaku hingga
+                        </span>
+                        <span className="font-semibold">{formatDate(discount.end_date)}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-gray-700">
+                        <span className="flex items-center gap-2">
+                          <ShoppingCart className="w-4 h-4 text-gray-400" />
+                          Min. Pembelian
+                        </span>
+                        <span className="font-semibold">{formatCurrency(discount.min_purchase || 0)}</span>
+                      </div>
+                    </div>
+
+                    {/* CTA */}
+                    <div className="mt-4">
+                      <div className="flex items-center justify-between text-red-600 font-semibold group-hover:text-red-700">
+                        <span>Gunakan Promo</span>
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </div>
                     </div>
                   </div>
                 </Link>
@@ -260,41 +358,50 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Featured Products - REAL DATA dari BE */}
-      <section className="py-8">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              <TrendingUp className="inline mr-2" size={24} />
-              Produk Terbaru
-            </h2>
+      {/* Featured Products - Modern Grid */}
+      <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 sm:mb-12">
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <TrendingUp className="w-6 h-6 text-green-600" />
+                </div>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                  Produk Terbaru
+                </h2>
+              </div>
+              <p className="text-gray-600 text-sm sm:text-base">Produk segar langsung dari kebun</p>
+            </div>
             <Link to="/products">
-              <Button className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2">
+              <button className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2 group">
                 Lihat Semua
-                <ArrowRight size={16} />
-              </Button>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
             </Link>
           </div>
 
+          {/* Products Grid */}
           {loadingProducts ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <ProductCardSkeleton key={i} />
               ))}
             </div>
           ) : errorProducts ? (
-            <div className="bg-white rounded-xl p-8 text-center shadow-sm">
-              <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
-              <p className="text-red-600">{errorProducts}</p>
-              <Button 
+            <div className="bg-white rounded-2xl p-12 text-center shadow-md">
+              <AlertCircle className="w-16 h-16 mx-auto text-red-500 mb-4" />
+              <p className="text-red-600 text-lg mb-4">{errorProducts}</p>
+              <button 
                 onClick={() => window.location.reload()} 
-                className="mt-4 bg-green-600 hover:bg-green-700 text-white"
+                className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-colors"
               >
                 Coba Lagi
-              </Button>
+              </button>
             </div>
           ) : featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {featuredProducts.map((product) => (
                 <ErrorBoundary key={product.id}>
                   <ProductCard product={product} />
@@ -302,73 +409,97 @@ const Home = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
+            <div className="bg-white rounded-2xl p-12 text-center shadow-md">
               <Package className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-600">Belum ada produk tersedia</p>
-              <Link to="/products" className="mt-4 inline-block">
-                <Button className="bg-green-600 hover:bg-green-700 text-white">
+              <p className="text-gray-600 mb-4">Belum ada produk tersedia</p>
+              <Link to="/products">
+                <button className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-colors">
                   Refresh Produk
-                </Button>
+                </button>
               </Link>
             </div>
           )}
         </div>
       </section>
 
-      {/* Categories - REAL DATA dari BE */}
-      <section className="py-8 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Kategori Populer</h2>
+      {/* Categories - Modern Cards */}
+      <section className="py-12 sm:py-16 lg:py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 sm:mb-12">
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Grid className="w-6 h-6 text-blue-600" />
+                </div>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                  Kategori Populer
+                </h2>
+              </div>
+              <p className="text-gray-600 text-sm sm:text-base">Jelajahi produk berdasarkan kategori</p>
+            </div>
             <Link to="/categories">
-              <Button className="bg-gray-600 hover:bg-gray-700 text-white text-sm">
+              <button className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2 group">
                 Semua Kategori
-              </Button>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
             </Link>
           </div>
 
+          {/* Categories Grid */}
           {loadingCategories ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-white rounded-xl shadow-sm p-6 animate-pulse">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full mx-auto mb-3"></div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 animate-pulse">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gray-200 rounded-xl mx-auto mb-3"></div>
                   <div className="h-4 bg-gray-200 rounded mb-2"></div>
                   <div className="h-3 bg-gray-200 rounded w-2/3 mx-auto"></div>
                 </div>
               ))}
             </div>
           ) : errorCategories ? (
-            <div className="bg-white rounded-xl p-8 text-center shadow-sm">
-              <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
-              <p className="text-red-600">{errorCategories}</p>
+            <div className="bg-white rounded-2xl p-12 text-center shadow-md">
+              <AlertCircle className="w-16 h-16 mx-auto text-red-500 mb-4" />
+              <p className="text-red-600 text-lg">{errorCategories}</p>
             </div>
           ) : categories.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {categories.map((category, index) => {
-                // Default icons based on category name or index
-                const iconMap = {
-                  0: Leaf,
-                  1: Apple,
-                  2: Beef,
-                  3: Popcorn
-                };
-                const IconComponent = iconMap[index] || Package;
-                
-                return (
-                  <Link 
-                    key={category.id}
-                    to={`/category/${category.id}`}
-                    className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-300 text-center p-6 group"
-                  >
-                    <IconComponent className="w-10 h-10 text-green-600 mx-auto mb-3 group-hover:scale-110 transition-transform" />
-                    <h3 className="font-semibold text-gray-900">{category.category_name}</h3>
-                    <p className="text-sm text-gray-600">{category.product_count || 0} produk</p>
-                  </Link>
-                );
-              })}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+              {categories.map((category) => (
+                <Link 
+                  key={category.id}
+                  to={`/category/${category.id}`}
+                  className="group relative bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-400 p-4 sm:p-6 text-center overflow-hidden"
+                >
+                  {/* Hover Effect Background */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  {/* Content */}
+                  <div className="relative z-10">
+                    {/* Icon Container */}
+                    <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-green-100 rounded-xl group-hover:bg-green-200 group-hover:scale-110 transition-all duration-300 mb-3">
+                      <Package className="w-6 h-6 sm:w-7 sm:h-7 text-green-600" />
+                    </div>
+                    
+                    {/* Category Name */}
+                    <h3 className="font-bold text-sm sm:text-base text-gray-900 mb-1 line-clamp-2 group-hover:text-green-600 transition-colors">
+                      {category.category_name}
+                    </h3>
+                    
+                    {/* Product Count */}
+                    <p className="text-xs sm:text-sm text-gray-600">
+                      {category.product_count || 0} produk
+                    </p>
+                  </div>
+
+                  {/* Arrow Icon on Hover */}
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ArrowRight className="w-4 h-4 text-green-600" />
+                  </div>
+                </Link>
+              ))}
             </div>
           ) : (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
+            <div className="bg-white rounded-2xl p-12 text-center shadow-md">
               <Package className="w-16 h-16 mx-auto text-gray-300 mb-4" />
               <p className="text-gray-600">Belum ada kategori tersedia</p>
             </div>
