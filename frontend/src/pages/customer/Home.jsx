@@ -415,7 +415,7 @@ const Home = () => {
                   key={category.id}
                   to={`/category/${category.id}`}
                   className="group relative bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-400 p-3 sm:p-4 lg:p-6 text-center overflow-hidden">
-                >
+                
                   {/* Hover Effect Background */}
                   <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   
