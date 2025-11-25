@@ -203,7 +203,7 @@ const ProductCard = ({
     <div 
       onClick={handleCardClick}
       className={`
-        min-w-[46%] sm:min-w-[42%] md:min-w-0
+        w-full
         group 
         bg-white 
         rounded-md 
