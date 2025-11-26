@@ -237,159 +237,146 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section dengan Parallax Effect */}
-      <section className="relative bg-white section-py overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-white to-blue-50 opacity-40"></div>
-        
-        {/* Floating shapes animation */}
-        <motion.div
-          animate={{ 
-            y: [0, -20, 0],
-            rotate: [0, 5, 0]
-          }}
-          transition={{ 
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute top-20 right-20 w-32 h-32 bg-green-200 rounded-full opacity-20 blur-2xl"
-        />
-        <motion.div
-          animate={{ 
-            y: [0, 20, 0],
-            rotate: [0, -5, 0]
-          }}
-          transition={{ 
-            duration: 5,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute bottom-20 left-20 w-40 h-40 bg-blue-200 rounded-full opacity-20 blur-2xl"
-        />
+      {/* Hero Section - Full Width Image dengan Overlay */}
+      <section className="relative min-h-[60vh] md:min-h-[70vh] lg:min-h-[80vh] overflow-hidden">
+        {/* Background Image dengan Overlay */}
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=1200&h=800&fit=crop" 
+            alt="Fresh Organic Vegetables" 
+            className="w-full h-full object-cover"
+          />
+          {/* Gradient Overlay untuk readability */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/40"></div>
+          
+          {/* Subtle pattern overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE2djRoNHYtNGgtNHptLTIgNnY0aDR2LTRoLTR6bS00IDR2NGg0di00aC00em0tMiA2djRoNHYtNGgtNHptLTQgNHY0aDR2LTRoLTR6bS0yIDZ2NGg0di00aC00em0tNCA0djRoNHYtNGgtNHptLTIgNnY0aDR2LTRoLTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30"></div>
+        </div>
 
-        <div className="container-app relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-responsive items-center">
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
+        {/* Content */}
+        <div className="relative z-10 container-app h-full min-h-[60vh] md:min-h-[70vh] lg:min-h-[80vh] flex items-center">
+          <div className="w-full max-w-2xl">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="space-y-8"
+              className="space-y-6 md:space-y-8"
             >
-              <div className="space-y-6">
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3, type: "spring" }}
-                  className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium"
-                >
-                  <Leaf className="w-4 h-4 mr-2" />
-                  Segar Langsung dari Kebun
-                </motion.div>
-                <motion.h1 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4, duration: 0.6 }}
-                  className="heading-hero text-gray-900"
-                >
-                  Belanja Segar & Hemat,{' '}
-                  <motion.span 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
-                    className="text-green-600 inline-block"
-                  >
-                    Langsung dari Kebun
-                  </motion.span>
-                </motion.h1>
-                <motion.p 
+              {/* Badge */}
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2, type: "spring" }}
+                className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-sm font-medium"
+              >
+                <Leaf className="w-4 h-4 mr-2" />
+                100% Produk Organik Segar
+              </motion.div>
+
+              {/* Main Heading */}
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight"
+              >
+                Belanja Sayur & Buah
+                <br />
+                <motion.span 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.9, duration: 0.6 }}
-                  className="text-body text-gray-600"
+                  transition={{ delay: 0.6 }}
+                  className="text-green-400"
                 >
-                  Nikmati produk segar berkualitas premium dengan pengiriman cepat. 
-                  Pesan mudah via WhatsApp, dari kebun ke meja makan Anda.
-                </motion.p>
-              </div>
+                  Segar Setiap Hari
+                </motion.span>
+              </motion.h1>
 
+              {/* Description */}
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7, duration: 0.6 }}
+                className="text-base sm:text-lg md:text-xl text-white/90 max-w-xl leading-relaxed"
+              >
+                Langsung dari kebun ke rumah Anda. Produk segar, bergizi, dan terpercaya dengan pengiriman cepat.
+              </motion.p>
+
+              {/* CTA Buttons */}
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1, duration: 0.6 }}
-                className="stack-mobile gap-3 sm:gap-4"
+                transition={{ delay: 0.8, duration: 0.6 }}
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4"
               >
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button 
-                    size="md" 
-                    className="bg-green-600 hover:bg-green-700 text-white full-mobile btn-touch"
-                    onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
+                    size="lg" 
+                    className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto shadow-xl hover:shadow-2xl"
+                    onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
                   >
+                    <ShoppingBag className="mr-2" size={20} />
                     Belanja Sekarang
-                    <ArrowRight className="ml-1.5 sm:ml-2" size={18} />
                   </Button>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button 
-                    variant="outline" 
-                    size="md" 
-                    className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white full-mobile btn-touch"
+                    size="lg" 
+                    className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white border border-white/30 w-full sm:w-auto"
                     onClick={() => handleWhatsAppOrder('Konsultasi Produk', 0, 'gratis')}
                   >
-                    <MessageCircle className="mr-1.5 sm:mr-2" size={18} />
+                    <MessageCircle className="mr-2" size={20} />
                     Chat WhatsApp
                   </Button>
                 </motion.div>
               </motion.div>
-            </motion.div>
 
-            <motion.div 
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative"
-            >
+              {/* Trust Indicators */}
               <motion.div 
-                whileHover={{ scale: 1.02, rotate: 1 }}
-                transition={{ duration: 0.3 }}
-                className="relative z-10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1, duration: 0.6 }}
+                className="flex flex-wrap items-center gap-6 pt-6"
               >
-                <div className="bg-white p-6 rounded-2xl shadow-lg">
-                  <img 
-                    src="/api/placeholder/600/500" 
-                    alt="Fresh Market Products" 
-                    className="rounded-xl w-full h-auto"
-                  />
+                <div className="flex items-center gap-2 text-white/90">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-sm font-medium">Jaminan Segar</span>
+                </div>
+                <div className="flex items-center gap-2 text-white/90">
+                  <Truck className="w-5 h-5 text-green-400" />
+                  <span className="text-sm font-medium">Gratis Ongkir</span>
+                </div>
+                <div className="flex items-center gap-2 text-white/90">
+                  <Shield className="w-5 h-5 text-green-400" />
+                  <span className="text-sm font-medium">Terpercaya</span>
                 </div>
               </motion.div>
-              {/* Decorative animated elements */}
-              <motion.div 
-                animate={{ 
-                  scale: [1, 1.2, 1],
-                  opacity: [0.6, 0.8, 0.6]
-                }}
-                transition={{ 
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="absolute -top-4 -right-4 w-16 h-16 bg-green-200 rounded-full"
-              />
-              <motion.div 
-                animate={{ 
-                  scale: [1, 1.3, 1],
-                  opacity: [0.5, 0.7, 0.5]
-                }}
-                transition={{ 
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 0.5
-                }}
-                className="absolute -bottom-4 -left-4 w-12 h-12 bg-blue-200 rounded-full"
-              />
             </motion.div>
           </div>
         </div>
+
+        {/* Scroll Indicator */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.2, duration: 0.6 }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 hidden lg:block"
+        >
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="flex flex-col items-center gap-2 text-white/70"
+          >
+            <span className="text-xs uppercase tracking-wider">Scroll</span>
+            <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
+              <motion.div 
+                animate={{ y: [0, 12, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                className="w-1.5 h-1.5 bg-white/70 rounded-full"
+              />
+            </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Statistics Section dengan Counter Animation */}
