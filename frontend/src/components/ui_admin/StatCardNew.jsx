@@ -28,25 +28,25 @@ const StatCardNew = ({
   
   return (
     <div className="admin-stat-card">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="admin-stat-label">{title}</p>
-          <h3 className="admin-stat-value">{value}</h3>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="admin-stat-label truncate" title={title}>{title}</p>
+          <h3 className="admin-stat-value break-words">{value}</h3>
           
           {trend && (
             <div className="admin-stat-trend">
-              <span className={`flex items-center gap-1 ${
+              <span className={`flex items-center gap-1 flex-shrink-0 ${
                 isPositiveTrend ? 'text-green-600' : 'text-red-600'
               }`}>
                 {isPositiveTrend ? (
-                  <ArrowTrendingUpIcon className="w-4 h-4" />
+                  <ArrowTrendingUpIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                 ) : (
-                  <ArrowTrendingDownIcon className="w-4 h-4" />
+                  <ArrowTrendingDownIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                 )}
-                {trend}
+                <span className="whitespace-nowrap">{trend}</span>
               </span>
               {description && (
-                <span className="text-xs text-gray-500">{description}</span>
+                <span className="text-xs text-gray-500 truncate" title={description}>{description}</span>
               )}
             </div>
           )}
@@ -54,7 +54,7 @@ const StatCardNew = ({
 
         {/* Icon */}
         {Icon && (
-          <div className={`admin-stat-icon-wrapper ${iconBgColor}`}>
+          <div className={`admin-stat-icon-wrapper flex-shrink-0 ${iconBgColor}`}>
             <Icon className={`admin-stat-icon ${iconColor}`} />
           </div>
         )}

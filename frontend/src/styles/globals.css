@@ -508,19 +508,21 @@
   /* Stat label (judul) */
   .admin-stat-label {
     @apply text-xs sm:text-sm text-gray-600 font-medium
-           mb-1 sm:mb-2;
+           mb-1 sm:mb-2
+           line-clamp-2;
   }
   
   /* Stat value (angka besar) */
   .admin-stat-value {
     @apply text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900
-           mb-1 sm:mb-2;
+           mb-1 sm:mb-2
+           break-words;
   }
   
   /* Stat trend/caption */
   .admin-stat-trend {
     @apply text-xs sm:text-sm font-medium
-           flex items-center gap-1;
+           flex items-center flex-wrap gap-1;
   }
   
   
