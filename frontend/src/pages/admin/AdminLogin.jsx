@@ -100,14 +100,14 @@ const AdminLogin = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Left Side - Brand Section (Hidden on mobile, visible on lg+) */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 via-primary-500 to-accent-500 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 relative overflow-hidden rounded-tr-[3rem] rounded-br-[3rem]">
         {/* Decorative Elements */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2djRoNHYtNGgtNHptLTIgNnY0aDR2LTRoLTR6bS00IDR2NGg0di00aC00em0tMiA2djRoNHYtNGgtNHptLTQgNHY0aDR2LTRoLTR6bS0yIDZ2NGg0di00aC00em0tNCA0djRoNHYtNGgtNHptLTIgNnY0aDR2LTRoLTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
         
-        <div className="relative z-10 flex flex-col justify-center items-start px-12 xl:px-16 text-white w-full">
+        <div className="relative z-10 flex flex-col justify-center items-start px-12 xl:px-16 text-white w-full pt-20">
           {/* Logo & Brand */}
           <div className="mb-8 animate-scale-in">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 shadow-2xl">
               <Sparkles className="w-8 h-8 text-white" strokeWidth={2.5} />
             </div>
             <h1 className="text-4xl xl:text-5xl font-bold mb-4 leading-tight">
