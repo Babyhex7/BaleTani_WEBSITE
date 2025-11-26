@@ -226,18 +226,18 @@ const CategoryManagement = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-white">
       <AdminSidebarNew />
 
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         <AdminHeaderNew
           title="Category Management"
           subtitle="Kelola kategori produk"
         />
 
-        <div className="p-6">
+        <div className="admin-container">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="admin-three-col admin-section">
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -276,9 +276,9 @@ const CategoryManagement = () => {
           </div>
 
           {/* Main Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="admin-card-compact overflow-hidden p-0">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <h2 className="text-xl font-bold text-gray-900">Daftar Kategori</h2>
 
@@ -293,7 +293,7 @@ const CategoryManagement = () => {
             </div>
 
             {/* Filters */}
-            <div className="p-6 border-b border-gray-200 bg-gray-50">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <div className="relative">
@@ -329,7 +329,7 @@ const CategoryManagement = () => {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
+            <div>
               {loading ? (
                 <div className="flex items-center justify-center py-12">
                   <ArrowPathIcon className="w-8 h-8 text-green-600 animate-spin" />
@@ -352,8 +352,9 @@ const CategoryManagement = () => {
                   </button>
                 </div>
               ) : (
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                <div className="admin-table-wrapper">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Kategori</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deskripsi</th>
@@ -406,6 +407,7 @@ const CategoryManagement = () => {
                     })}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
 

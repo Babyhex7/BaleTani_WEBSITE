@@ -119,16 +119,16 @@ const InventoryReport = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-white">
       <AdminSidebarNew />
 
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         <AdminHeaderNew
           title="Inventory Report"
           subtitle="Laporan stok dan pergerakan inventory"
         />
 
-        <div className="p-6">
+        <div className="admin-container">
           {/* Filters */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
             <div className="p-6 border-b border-gray-200">
@@ -465,7 +465,7 @@ const InventoryReport = () => {
                     Daftar Produk ({reportData.products.length})
                   </h3>
                 </div>
-                <div className="overflow-x-auto">
+                <div>
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
@@ -570,7 +570,7 @@ const InventoryReport = () => {
                       Pergerakan Stok Terkini (50 Terakhir)
                     </h3>
                   </div>
-                  <div className="overflow-x-auto">
+                  <div>
                     <table className="w-full">
                       <thead className="bg-gray-50 border-b border-gray-200">
                         <tr>

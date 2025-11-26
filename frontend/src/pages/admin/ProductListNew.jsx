@@ -308,77 +308,77 @@ const ProductListNew = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-white">
       <AdminSidebarNew />
       
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         <AdminHeaderNew 
           title="Product List" 
           subtitle="Kelola produk dan inventori"
         />
         
-        <div className="p-6">
+        <div className="admin-container">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="admin-stats-grid admin-section">
+            <div className="admin-stat-card">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Produk</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="admin-stat-label">Total Produk</p>
+                  <p className="admin-stat-value">{stats.total}</p>
                 </div>
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <CubeIcon className="w-6 h-6 text-blue-600" />
+                <div className="admin-stat-icon-wrapper bg-blue-100">
+                  <CubeIcon className="admin-stat-icon text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="admin-stat-card">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Produk Aktif</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+                  <p className="admin-stat-label">Produk Aktif</p>
+                  <p className="admin-stat-value text-green-600">{stats.active}</p>
                 </div>
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <CheckCircleIcon className="w-6 h-6 text-green-600" />
+                <div className="admin-stat-icon-wrapper bg-green-100">
+                  <CheckCircleIcon className="admin-stat-icon text-green-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="admin-stat-card">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Stok Rendah</p>
-                  <p className="text-2xl font-bold text-yellow-600">{stats.lowStock}</p>
+                  <p className="admin-stat-label">Stok Rendah</p>
+                  <p className="admin-stat-value text-yellow-600">{stats.lowStock}</p>
                 </div>
-                <div className="p-3 bg-yellow-100 rounded-lg">
-                  <ExclamationCircleIcon className="w-6 h-6 text-yellow-600" />
+                <div className="admin-stat-icon-wrapper bg-yellow-100">
+                  <ExclamationCircleIcon className="admin-stat-icon text-yellow-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="admin-stat-card">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Stok Habis</p>
-                  <p className="text-2xl font-bold text-red-600">{stats.outOfStock}</p>
+                  <p className="admin-stat-label">Stok Habis</p>
+                  <p className="admin-stat-value text-red-600">{stats.outOfStock}</p>
                 </div>
-                <div className="p-3 bg-red-100 rounded-lg">
-                  <ExclamationCircleIcon className="w-6 h-6 text-red-600" />
+                <div className="admin-stat-icon-wrapper bg-red-100">
+                  <ExclamationCircleIcon className="admin-stat-icon text-red-600" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Main Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="admin-card-compact overflow-hidden p-0">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <h2 className="text-xl font-bold text-gray-900">Daftar Produk</h2>
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Daftar Produk</h2>
                 
                 <button
                   onClick={handleCreate}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 text-sm sm:text-base font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-sm hover:shadow-md transition-all duration-200"
                 >
                   <PlusIcon className="w-5 h-5" />
                   Tambah Produk
@@ -387,11 +387,11 @@ const ProductListNew = () => {
             </div>
 
             {/* Filters */}
-            <div className="p-6 border-b border-gray-200 bg-gray-50">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="md:col-span-2">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <div className="flex-1">
                   <div className="relative">
-                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                     <input
                       type="text"
                       placeholder="Cari nama produk..."
@@ -400,19 +400,19 @@ const ProductListNew = () => {
                         setSearchQuery(e.target.value);
                         setCurrentPage(1);
                       }}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
                 </div>
 
-                <div>
+                <div className="w-full sm:w-auto">
                   <select
                     value={filterType}
                     onChange={(e) => {
                       setFilterType(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full sm:w-40 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Semua Tipe</option>
                     <option value="online">Online</option>
@@ -420,14 +420,14 @@ const ProductListNew = () => {
                   </select>
                 </div>
 
-                <div>
+                <div className="w-full sm:w-auto">
                   <select
                     value={filterStatus}
                     onChange={(e) => {
                       setFilterStatus(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full sm:w-40 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Semua Status</option>
                     <option value="active">Aktif</option>
@@ -438,42 +438,43 @@ const ProductListNew = () => {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
+            <div>
               {loading ? (
                 <div className="flex items-center justify-center py-12">
                   <ArrowPathIcon className="w-8 h-8 text-green-600 animate-spin" />
                   <span className="ml-3 text-gray-600">Memuat data...</span>
                 </div>
               ) : error ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <ExclamationCircleIcon className="w-12 h-12 text-red-500 mb-3" />
-                  <p className="text-red-600 font-medium">{error}</p>
-                  <button onClick={fetchProducts} className="mt-4 px-4 py-2 text-sm text-green-600 hover:text-green-700 font-medium">
+                <div className="admin-empty-state">
+                  <ExclamationCircleIcon className="admin-empty-icon text-red-500" />
+                  <p className="admin-empty-text text-red-600">{error}</p>
+                  <button onClick={fetchProducts} className="admin-btn-outline">
                     Coba Lagi
                   </button>
                 </div>
               ) : products.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <CubeIcon className="w-12 h-12 text-gray-400 mb-3" />
-                  <p className="text-gray-600 font-medium">Tidak ada produk</p>
-                  <button onClick={handleCreate} className="mt-4 px-4 py-2 text-sm text-green-600 hover:text-green-700 font-medium">
+                <div className="admin-empty-state">
+                  <CubeIcon className="admin-empty-icon" />
+                  <p className="admin-empty-text">Tidak ada produk</p>
+                  <button onClick={handleCreate} className="admin-btn-primary">
                     + Tambah Produk Pertama
                   </button>
                 </div>
               ) : (
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                <div className="admin-table-wrapper">
+                  <table className="admin-table">
+                  <thead className="admin-table-header">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produk</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kategori</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Harga</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stok</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipe</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                      <th className="admin-table-th">Produk</th>
+                      <th className="admin-table-th">Kategori</th>
+                      <th className="admin-table-th">Harga</th>
+                      <th className="admin-table-th">Stok</th>
+                      <th className="admin-table-th">Status</th>
+                      <th className="admin-table-th">Tipe</th>
+                      <th className="admin-table-th text-right">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="admin-table-body">
                     {products.map((product) => {
                       // Handle both 'id' and 'product_id' field names
                       const productId = product.id || product.product_id;
@@ -481,7 +482,7 @@ const ProductListNew = () => {
                       const categoryName = product.category?.category_name || product.Category?.category_name;
                       
                       return (
-                      <tr key={productId} className="hover:bg-gray-50">
+                      <tr key={productId} className="admin-table-tr">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             {getImageUrl(product) ? (
@@ -505,33 +506,33 @@ const ProductListNew = () => {
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{categoryName || '-'}</td>
-                        <td className="px-6 py-4">
+                        <td className="admin-table-td">{categoryName || '-'}</td>
+                        <td className="admin-table-td">
                           <p className="text-sm font-medium text-gray-900">{formatCurrency(product.selling_price)}</p>
                           {product.discount_price && product.discount_price < product.selling_price && (
                             <p className="text-xs text-green-600">Diskon: {formatCurrency(product.discount_price)}</p>
                           )}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="admin-table-td">
                           {getStockBadge(product.total_stock)}
                         </td>
-                        <td className="px-6 py-4">{getStatusBadge(product.is_active)}</td>
-                        <td className="px-6 py-4">
+                        <td className="admin-table-td">{getStatusBadge(product.is_active)}</td>
+                        <td className="admin-table-td">
                           <span className={`px-3 py-1 text-xs font-medium rounded-full ${
                             product.product_type === 'online' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
                           }`}>
                             {product.product_type}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="admin-table-td text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <button onClick={() => handleView(product)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="View">
+                            <button onClick={() => handleView(product)} className="admin-btn-icon text-blue-600 hover:bg-blue-50" title="View">
                               <EyeIcon className="w-5 h-5" />
                             </button>
-                            <button onClick={() => handleEdit(product)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Edit">
+                            <button onClick={() => handleEdit(product)} className="admin-btn-icon text-green-600 hover:bg-green-50" title="Edit">
                               <PencilIcon className="w-5 h-5" />
                             </button>
-                            <button onClick={() => handleDelete(product)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
+                            <button onClick={() => handleDelete(product)} className="admin-btn-icon text-red-600 hover:bg-red-50" title="Delete">
                               <TrashIcon className="w-5 h-5" />
                             </button>
                           </div>
@@ -541,6 +542,7 @@ const ProductListNew = () => {
                     })}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
 

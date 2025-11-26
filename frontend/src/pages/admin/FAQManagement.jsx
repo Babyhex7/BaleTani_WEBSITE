@@ -189,16 +189,16 @@ const FAQManagement = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-white">
       <AdminSidebarNew />
 
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         <AdminHeaderNew
           title="FAQ Management"
           subtitle="Kelola pertanyaan yang sering ditanyakan"
         />
 
-        <div className="p-6">
+        <div className="admin-container">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -309,7 +309,7 @@ const FAQManagement = () => {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
+            <div>
               {loading ? (
                 <div className="flex items-center justify-center py-12">
                   <ArrowPathIcon className="w-8 h-8 text-gray-400 animate-spin" />

@@ -306,16 +306,16 @@ const DiscountManagement = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-white">
       <AdminSidebarNew />
 
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         <AdminHeaderNew
           title="Discount Management"
           subtitle="Kelola campaign diskon produk"
         />
 
-        <div className="p-6">
+        <div className="admin-container">
           {/* Toast Notification dipindah global di main.jsx */}
 
           {/* Stats Cards */}
@@ -463,7 +463,7 @@ const DiscountManagement = () => {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
+            <div>
               {loading ? (
                 <div className="flex items-center justify-center py-12">
                   <ArrowPathIcon className="w-8 h-8 text-green-600 animate-spin" />

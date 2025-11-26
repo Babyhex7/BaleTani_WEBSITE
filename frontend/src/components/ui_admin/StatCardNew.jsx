@@ -27,15 +27,15 @@ const StatCardNew = ({
   const isPositiveTrend = trendDirection === 'up';
   
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <div className="admin-stat-card">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <h3 className="text-3xl font-bold text-gray-900 mb-2">{value}</h3>
+          <p className="admin-stat-label">{title}</p>
+          <h3 className="admin-stat-value">{value}</h3>
           
           {trend && (
-            <div className="flex items-center gap-2">
-              <span className={`flex items-center gap-1 text-sm font-medium ${
+            <div className="admin-stat-trend">
+              <span className={`flex items-center gap-1 ${
                 isPositiveTrend ? 'text-green-600' : 'text-red-600'
               }`}>
                 {isPositiveTrend ? (
@@ -54,8 +54,8 @@ const StatCardNew = ({
 
         {/* Icon */}
         {Icon && (
-          <div className={`${iconBgColor} p-3 rounded-xl`}>
-            <Icon className={`w-8 h-8 ${iconColor}`} />
+          <div className={`admin-stat-icon-wrapper ${iconBgColor}`}>
+            <Icon className={`admin-stat-icon ${iconColor}`} />
           </div>
         )}
       </div>

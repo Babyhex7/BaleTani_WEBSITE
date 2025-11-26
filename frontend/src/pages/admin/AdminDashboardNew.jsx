@@ -137,11 +137,11 @@ const AdminDashboardNew = () => {
         />
 
         {/* Content */}
-        <div className="flex-1 p-4 md:p-6 bg-gray-50">
+        <div className="admin-container">
 
           {/* Stats Cards - 8 KPIs */}
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+            <div className="admin-stats-grid admin-section">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 animate-pulse">
                   <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
@@ -151,7 +151,7 @@ const AdminDashboardNew = () => {
               ))}
             </div>
           ) : error ? (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 md:mb-6">
+            <div className="admin-section bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-red-600 text-sm">{error}</p>
               <button 
                 onClick={fetchDashboardData}
@@ -163,7 +163,7 @@ const AdminDashboardNew = () => {
           ) : (
             <>
               {/* Row 1: Primary Metrics */}
-              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-4 md:mb-6">
+              <div className="admin-stats-grid admin-section">
                 <StatCardNew
                   title="Pendapatan Hari Ini"
                   value={formatCurrency(stats.totalRevenue)}
@@ -210,7 +210,7 @@ const AdminDashboardNew = () => {
               </div>
 
               {/* Row 2: Action Required Metrics */}
-              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
+              <div className="admin-two-col admin-section">
                 <StatCardNew
                   title="Pengadaan Pending"
                   value={stats.pendingProcurements || 0}
@@ -235,35 +235,35 @@ const AdminDashboardNew = () => {
           )}
 
           {/* Recent Orders & Low Stock - Side by Side */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4 md:mb-6">
+          <div className="admin-two-col admin-section">
             {/* Recent Orders Table */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+            <div className="admin-card-compact overflow-hidden p-0">
               <div className="px-4 md:px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <ShoppingCartIcon className="w-5 h-5 text-purple-600" />
+                    <div className="admin-stat-icon-wrapper bg-purple-100">
+                      <ShoppingCartIcon className="admin-stat-icon text-purple-600" />
                     </div>
-                    <h3 className="text-base md:text-lg font-semibold text-gray-800">
+                    <h3 className="admin-card-title mb-0">
                       Pesanan Terbaru
                     </h3>
                   </div>
                   <Link to="/admin/orders">
-                    <button className="text-xs md:text-sm text-green-600 hover:text-green-700 font-medium">
+                    <button className="admin-btn-sm text-green-600 hover:text-green-700">
                       Lihat Semua →
                     </button>
                   </Link>
                 </div>
               </div>
-              <div className="overflow-x-auto">
+              <div className="admin-table-wrapper">
                 {loadingOrders ? (
                   <div className="p-8 text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-4 border-green-600 border-t-transparent mx-auto"></div>
                   </div>
                 ) : recentOrders.length === 0 ? (
-                  <div className="p-8 text-center text-gray-500">
-                    <ShoppingCartIcon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                    <p className="text-sm">Belum ada pesanan hari ini</p>
+                  <div className="admin-empty-state">
+                    <ShoppingCartIcon className="admin-empty-icon" />
+                    <p className="admin-empty-text">Belum ada pesanan hari ini</p>
                   </div>
                 ) : (
                   <table className="w-full">
@@ -283,12 +283,12 @@ const AdminDashboardNew = () => {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="admin-table-body">
                       {recentOrders.map((order) => {
                         const statusBadge = getStatusBadge(order.payment_status);
                         return (
-                          <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                            <td className="px-4 py-3 whitespace-nowrap">
+                          <tr key={order.id} className="admin-table-tr">
+                            <td className="admin-table-td whitespace-nowrap">
                               <div className="text-sm font-medium text-gray-900">
                                 #{order.id}
                               </div>
@@ -296,7 +296,7 @@ const AdminDashboardNew = () => {
                                 {formatCurrency(order.total_amount)}
                               </div>
                             </td>
-                            <td className="px-4 py-3">
+                            <td className="admin-table-td">
                               <div className="text-sm text-gray-900 truncate max-w-[120px] md:max-w-[200px]">
                                 {order.customer_name || 'Guest'}
                               </div>
@@ -304,13 +304,13 @@ const AdminDashboardNew = () => {
                                 {formatDate(order.created_at).split(',')[0]}
                               </div>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
+                            <td className="admin-table-td whitespace-nowrap hidden md:table-cell">
                               <div className="text-sm font-semibold text-gray-900">
                                 {formatCurrency(order.total_amount)}
                               </div>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge.color}`}>
+                            <td className="admin-table-td whitespace-nowrap">
+                              <span className={`admin-badge ${statusBadge.color}`}>
                                 {statusBadge.label}
                               </span>
                             </td>
@@ -324,59 +324,59 @@ const AdminDashboardNew = () => {
             </div>
 
             {/* Low Stock Products Table */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-              <div className="px-4 md:px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <div className="admin-card-compact overflow-hidden p-0">
+              <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-yellow-100 rounded-lg">
-                      <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" />
+                    <div className="admin-stat-icon-wrapper bg-yellow-100">
+                      <ExclamationTriangleIcon className="admin-stat-icon text-yellow-600" />
                     </div>
-                    <h3 className="text-base md:text-lg font-semibold text-gray-800">
+                    <h3 className="admin-card-title mb-0">
                       Stok Menipis
                     </h3>
                   </div>
                   <Link to="/admin/products">
-                    <button className="text-xs md:text-sm text-green-600 hover:text-green-700 font-medium">
+                    <button className="admin-btn-sm text-green-600 hover:text-green-700">
                       Kelola Stok →
                     </button>
                   </Link>
                 </div>
               </div>
-              <div className="overflow-x-auto">
+              <div className="admin-table-wrapper">
                 {loadingStock ? (
-                  <div className="p-8 text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-4 border-green-600 border-t-transparent mx-auto"></div>
+                  <div className="admin-loading">
+                    <div className="admin-spinner"></div>
                   </div>
                 ) : lowStockProducts.length === 0 ? (
-                  <div className="p-8 text-center text-gray-500">
-                    <CheckCircleIcon className="w-12 h-12 mx-auto mb-3 text-green-300" />
-                    <p className="text-sm">Semua produk stoknya aman</p>
+                  <div className="admin-empty-state">
+                    <CheckCircleIcon className="admin-empty-icon text-green-300" />
+                    <p className="admin-empty-text">Semua produk stoknya aman</p>
                   </div>
                 ) : (
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
+                  <table className="admin-table">
+                    <thead className="admin-table-header">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="admin-table-th">
                           Produk
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                        <th className="admin-table-th hidden md:table-cell">
                           Kategori
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="admin-table-th">
                           Stok
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="admin-table-th">
                           Status
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="admin-table-body">
                       {lowStockProducts.map((product) => {
                         const stockStatus = getStockStatus(product.total_stock);
                         const StatusIcon = stockStatus.icon;
                         return (
-                          <tr key={product.id} className="hover:bg-gray-50 transition-colors">
-                            <td className="px-4 py-3">
+                          <tr key={product.id} className="admin-table-tr">
+                            <td className="admin-table-td">
                               <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-[200px]">
                                 {product.name}
                               </div>
@@ -384,18 +384,18 @@ const AdminDashboardNew = () => {
                                 {product.category}
                               </div>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
+                            <td className="admin-table-td whitespace-nowrap hidden md:table-cell">
                               <div className="text-sm text-gray-600">
                                 {product.category}
                               </div>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap">
+                            <td className="admin-table-td whitespace-nowrap">
                               <div className="text-sm font-semibold text-gray-900">
                                 {product.total_stock} unit
                               </div>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap">
-                              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${stockStatus.color}`}>
+                            <td className="admin-table-td whitespace-nowrap">
+                              <span className={`admin-badge ${stockStatus.color}`}>
                                 <StatusIcon className="w-3 h-3" />
                                 {stockStatus.label}
                               </span>
@@ -411,16 +411,16 @@ const AdminDashboardNew = () => {
           </div>
 
           {/* Quick Actions Panel */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 md:p-6">
+          <div className="admin-card">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <PlusIcon className="w-5 h-5 text-green-600" />
+              <div className="admin-stat-icon-wrapper bg-green-100">
+                <PlusIcon className="admin-stat-icon text-green-600" />
               </div>
-              <h3 className="text-base md:text-lg font-semibold text-gray-800">
+              <h3 className="admin-card-title mb-0">
                 Aksi Cepat
               </h3>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="admin-stats-grid">
               <Link to="/admin/products">
                 <button className="w-full p-3 md:p-4 bg-gray-50 hover:bg-green-50 border border-gray-200 hover:border-green-300 rounded-lg transition-all duration-200 hover:shadow-sm group">
                   <CubeIcon className="w-6 h-6 text-green-600 mx-auto mb-2 group-hover:scale-110 transition-transform" />

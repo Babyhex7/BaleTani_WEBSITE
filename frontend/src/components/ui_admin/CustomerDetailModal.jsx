@@ -191,7 +191,7 @@ const CustomerDetailModal = ({ customer, onClose }) => {
                 <p className="text-gray-500">Belum ada order</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="admin-table-wrapper">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>

@@ -148,16 +148,16 @@ const SalesReport = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-white">
       <AdminSidebarNew />
       
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         <AdminHeaderNew 
           title="Sales Report" 
           subtitle="Analisis dan statistik penjualan"
         />
         
-        <div className="p-6">
+        <div className="admin-container">
           {/* Filters */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
             <div className="p-6 border-b border-gray-200">
@@ -366,7 +366,7 @@ const SalesReport = () => {
                 <div className="p-6 border-b border-gray-200">
                   <h3 className="text-lg font-bold text-gray-900">Top 10 Produk Terlaris</h3>
                 </div>
-                <div className="overflow-x-auto">
+                <div>
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
@@ -418,7 +418,7 @@ const SalesReport = () => {
                     Export PDF
                   </button>
                 </div>
-                <div className="overflow-x-auto">
+                <div>
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
