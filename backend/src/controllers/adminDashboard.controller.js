@@ -1,4 +1,12 @@
-const { User, Customer, Product, Order, Category } = require("../models");
+const {
+  User,
+  Customer,
+  Product,
+  Order,
+  Category,
+  Procurement,
+  ContactMessage,
+} = require("../models");
 const { Op } = require("sequelize");
 
 /**
@@ -29,6 +37,9 @@ const getDashboardStats = async (req, res, next) => {
       ordersLastMonth,
       revenueThisMonth,
       revenueLastMonth,
+      activeProducts,
+      pendingProcurements,
+      unreadMessages,
     ] = await Promise.all([
       // Total orders hari ini
       Order.count({
@@ -103,6 +114,27 @@ const getDashboardStats = async (req, res, next) => {
           },
         },
       }) || 0,
+
+      // Active products count
+      Product.count({
+        where: {
+          is_active: true,
+        },
+      }),
+
+      // Pending procurements
+      Procurement.count({
+        where: {
+          status: "pending",
+        },
+      }),
+
+      // Unread messages
+      ContactMessage.count({
+        where: {
+          status: "pending",
+        },
+      }),
     ]);
 
     // Hitung growth percentage
@@ -123,15 +155,26 @@ const getDashboardStats = async (req, res, next) => {
     res.json({
       success: true,
       data: {
+        // Today's metrics
         totalOrders: totalOrdersToday,
         totalRevenue: totalRevenueToday,
         pendingOrders,
         lowStockItems: lowStockProducts,
+
+        // Overall metrics
         totalCustomers,
+        activeProducts,
+        pendingProcurements,
+        unreadMessages,
+
+        // Monthly growth
         monthlyGrowth: {
           orders: orderGrowth,
           revenue: revenueGrowth,
-          customers: 0, // Bisa ditambahkan jika diperlukan
+          ordersThisMonth,
+          ordersLastMonth,
+          revenueThisMonth,
+          revenueLastMonth,
         },
       },
     });
@@ -150,9 +193,9 @@ const getRecentOrders = async (req, res, next) => {
       order: [["created_at", "DESC"]],
       include: [
         {
-          model: User,
-          as: "user",
-          attributes: ["id", "full_name", "email"],
+          model: Customer,
+          as: "customer",
+          attributes: ["id", "full_name", "phone_number"],
         },
       ],
       attributes: [
@@ -162,13 +205,15 @@ const getRecentOrders = async (req, res, next) => {
         "payment_status",
         "order_status",
         "created_at",
+        "order_type",
       ],
     });
 
     // Format data untuk frontend
     const formattedOrders = recentOrders.map((order) => ({
       id: order.id,
-      customer_name: order.customer_name || order.user?.full_name || "Guest",
+      customer_name:
+        order.customer_name || order.customer?.full_name || "Guest",
       total_amount: parseFloat(order.total_amount),
       payment_status: order.payment_status,
       order_status: order.order_status,

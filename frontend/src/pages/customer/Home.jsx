@@ -236,7 +236,7 @@ const Home = () => {
                   key={discount.id}
                   to={`/promo/${discount.id}`}
                   className="group relative bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 overflow-hidden">
-                >
+                
                   {/* Discount Badge */}
                   <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-10">
                     <div className="px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 lg:py-2 bg-red-500 text-white font-bold text-xs sm:text-sm lg:text-base rounded-full shadow-lg flex items-center gap-1">
