@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { 
   ChartBarIcon,
@@ -29,9 +29,24 @@ const SalesReport = () => {
     order_type: "",
   });
 
+  // Auto-load data saat pertama kali halaman dibuka
+  useEffect(() => {
+    // Delay sedikit untuk mencegah race condition dengan auth check
+    const timer = setTimeout(() => {
+      fetchReport();
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const fetchReport = async () => {
     if (!filters.date_from || !filters.date_to) {
       toast.error("Tanggal awal dan akhir harus diisi");
+      return;
+    }
+
+    // Prevent multiple simultaneous calls
+    if (loading) {
       return;
     }
 
@@ -40,9 +55,12 @@ const SalesReport = () => {
       const response = await reportService.getSalesReport(filters);
       if (response.success) {
         setReportData(response.data);
+        toast.success("Laporan berhasil dimuat");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Gagal memuat laporan");
+      console.error("Error fetching sales report:", error);
+      const errorMsg = error.response?.data?.message || error.message || "Gagal memuat laporan";
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -158,6 +176,16 @@ const SalesReport = () => {
         />
         
         <div className="admin-container">
+          {/* Loading State */}
+          {loading && !reportData && (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <ArrowPathIcon className="w-12 h-12 text-green-600 animate-spin mx-auto mb-4" />
+                <p className="text-gray-600">Memuat laporan penjualan...</p>
+              </div>
+            </div>
+          )}
+
           {/* Filters */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
             <div className="p-6 border-b border-gray-200">

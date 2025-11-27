@@ -36,14 +36,11 @@ const getSalesReport = async (req, res) => {
     }
 
     // Build where clause for orders using model column names
-    // Use `created_at` for date range and `order_status` for status
+    // Use `created_at` for date range. Do not restrict by `order_status`
+    // so the report returns all transactions in the selected period.
     const whereClause = {
       created_at: {
         [Op.between]: [date_from, date_to],
-      },
-      order_status: {
-        // Map legacy/localized statuses to real enum values used in the model
-        [Op.in]: ["completed", "out_for_delivery"],
       },
     };
 
