@@ -140,11 +140,33 @@ async def load_model():
     """Load trained NCB model on startup"""
     global model
     try:
-        logger.info("🔄 Loading NCB model...")
+        logger.info("🔄 Loading NCB model v2...")
         
-        # Load trained model (static method returns new instance)
-        model_path = Path(__file__).parent.parent / "models" / "saved_models" / "ncb_v1"
-        model = NCBModel.load_model(str(model_path))
+        # Load trained model v2 with adaptive learning
+        model_path = Path(__file__).parent.parent / "models" / "saved_models" / "ncb_v2"
+        
+        # Load model config to get embedding_dim
+        config_path = model_path / "model_config.json"
+        if config_path.exists():
+            import json
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+            embedding_dim = config['embedding_dim']
+            logger.info(f"📋 Config loaded - embedding_dim={embedding_dim}")
+        else:
+            # Fallback: read from training_history_v2.json
+            history_path = model_path / "training_history_v2.json"
+            if history_path.exists():
+                import json
+                with open(history_path, 'r') as f:
+                    history = json.load(f)
+                embedding_dim = history['config']['embedding_dim']
+                logger.info(f"📋 Config from history - embedding_dim={embedding_dim}")
+            else:
+                embedding_dim = 32  # Default fallback
+                logger.warning("⚠️ No config found, using default embedding_dim=32")
+        
+        model = NCBModel.load_model(str(model_path), embedding_dim=embedding_dim)
         
         # Safe check for product_ids
         num_products = len(model.similarity_engine.product_ids) if model.similarity_engine.product_ids is not None else 0
@@ -205,7 +227,7 @@ async def health_check():
         status="healthy",
         model_loaded=True,
         total_indexed_products=len(model.similarity_engine.product_ids) if model.similarity_engine.product_ids is not None else 0,
-        model_version="ncb_v1",
+        model_version="ncb_v2",
         uptime_seconds=round(time.time() - start_time, 2)
     )
 

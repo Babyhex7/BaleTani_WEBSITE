@@ -1,0 +1,58 @@
+id,name,category_id,category_name,product_type,selling_price,quantity_info,shelf_life_days,total_stock,description,is_active,created_at
+7a4af2f2-f55b-4300-a4ba-4406efcc350c,Udang sedang 1,660e8400-e29b-41d4-a716-446655440001,Protein Laut,online,65000,kg,3,50,Udang sedang 1 berkualitas tinggi,True,2025-11-01 10:00:00
+b3cc44f1-f3c1-4703-98d8-ac40cb387187,Udang sedang 2,660e8400-e29b-41d4-a716-446655440001,Protein Laut,online,70000,kg,3,45,Udang sedang 2 berkualitas tinggi,True,2025-11-01 10:00:00
+70710b93-2b14-4674-a243-b919d6002c48,Udang besar,660e8400-e29b-41d4-a716-446655440001,Protein Laut,online,85000,kg,3,30,Udang besar berkualitas tinggi,True,2025-11-01 10:00:00
+f3093aaa-5474-468c-9b8d-9ef9a28956b9,Udang kecil,660e8400-e29b-41d4-a716-446655440001,Protein Laut,online,40000,kg,3,60,Udang kecil berkualitas tinggi,True,2025-11-01 10:00:00
+457afb33-6e9d-4ad9-9f4c-b52be26e5f18,Cumi,660e8400-e29b-41d4-a716-446655440001,Protein Laut,online,65000,kg,2,35,Cumi berkualitas tinggi,True,2025-11-01 10:00:00
+8c7b5a2f-1e3d-4f9a-b8c6-3d4e5f6a7b8c,Ikan Kembung,660e8400-e29b-41d4-a716-446655440001,Protein Laut,online,30000,kg,2,50,Ikan Kembung segar,True,2025-11-01 10:00:00
+9d8c6b3e-2f4a-5g0b-c9d7-4e5f6g7c8d9e,Ayam filet,660e8400-e29b-41d4-a716-446655440002,Protein Daging,online,43000,kg,3,40,Ayam filet berkualitas,True,2025-11-01 10:00:00
+0e9d7c4f-3g5b-6h1c-d0e8-5f6g7h8e0f1g,Ceker Ayam,660e8400-e29b-41d4-a716-446655440002,Protein Daging,online,15000,kg,5,60,Ceker Ayam segar,True,2025-11-01 10:00:00
+1f0e8d5g-4h6c-7i2d-e1f9-6g7h8i9f1g2h,Sayap Ayam,660e8400-e29b-41d4-a716-446655440002,Protein Daging,online,35000,kg,3,45,Sayap Ayam segar,True,2025-11-01 10:00:00
+2g1f9e6h-5i7d-8j3e-f2g0-7h8i9j0g2h3i,Ayam potong all part,660e8400-e29b-41d4-a716-446655440002,Protein Daging,online,35000,kg,3,40,Ayam potong all part,True,2025-11-01 10:00:00
+3h2g0f7i-6j8e-9k4f-g3h1-8i9j0k1h3i4j,Telur puyuh,660e8400-e29b-41d4-a716-446655440003,Protein Telur,online,40000,kg,10,80,Telur puyuh segar,True,2025-11-01 10:00:00
+4i3h1g8j-7k9f-0l5g-h4i2-9j0k1l2i4j5k,Ayam utuh,660e8400-e29b-41d4-a716-446655440002,Protein Daging,online,27000,kg,3,35,Ayam utuh berkualitas,True,2025-11-01 10:00:00
+5j4i2h9k-8l0g-1m6h-i5j3-0k1l2m3j5k6l,Sereh,660e8400-e29b-41d4-a716-446655440004,Bumbu & Rempah,online,12000,kg,7,100,Sereh segar,True,2025-11-01 10:00:00
+6k5j3i0l-9m1h-2n7i-j6k4-1l2m3n4k6l7m,Jahe,660e8400-e29b-41d4-a716-446655440004,Bumbu & Rempah,online,32000,kg,14,90,Jahe merah berkualitas,True,2025-11-01 10:00:00
+7l6k4j1m-0n2i-3o8j-k7l5-2m3n4o5l7m8n,Bawal,660e8400-e29b-41d4-a716-446655440001,Protein Laut,online,35000,kg,2,30,Bawal segar,True,2025-11-01 10:00:00
+8m7l5k2n-1o3j-4p9k-l8m6-3n4o5p6m8n9o,Cikur,660e8400-e29b-41d4-a716-446655440004,Bumbu & Rempah,online,50000,kg,14,70,Cikur/Kencur segar,True,2025-11-01 10:00:00
+9n8m6l3o-2p4k-5q0l-m9n7-4o5p6q7n9o0p,Lengkuas,660e8400-e29b-41d4-a716-446655440004,Bumbu & Rempah,online,20000,kg,14,85,Lengkuas segar,True,2025-11-01 10:00:00
+0o9n7m4p-3q5l-6r1m-n0o8-5p6q7r8o0p1q,Koneng,660e8400-e29b-41d4-a716-446655440004,Bumbu & Rempah,online,18000,kg,14,90,Kunyit/Koneng segar,True,2025-11-01 10:00:00
+1p0o8n5q-4r6m-7s2n-o1p9-6q7r8s9p1q2r,Tomat,660e8400-e29b-41d4-a716-446655440005,Sayuran,online,10000,kg,5,120,Tomat merah segar,True,2025-11-01 10:00:00
+2q1p9o6r-5s7n-8t3o-p2q0-7r8s9t0q2r3s,Salam,660e8400-e29b-41d4-a716-446655440004,Bumbu & Rempah,online,500,iket,7,200,Daun Salam segar,True,2025-11-01 10:00:00
+3r2q0p7s-6t8o-9u4p-q3r1-8s9t0u1r3s4t,Daun jeruk,660e8400-e29b-41d4-a716-446655440004,Bumbu & Rempah,online,2000,pak,7,150,Daun jeruk segar,True,2025-11-01 10:00:00
+4s3r1q8t-7u9p-0v5q-r4s2-9t0u1v2s4t5u,Kentang,660e8400-e29b-41d4-a716-446655440005,Sayuran,online,18000,kg,14,100,Kentang berkualitas,True,2025-11-01 10:00:00
+5t4s2r9u-8v0q-1w6r-s5t3-0u1v2w3t5u6v,Pete,660e8400-e29b-41d4-a716-446655440005,Sayuran,online,30000,iket,3,50,Pete segar,True,2025-11-01 10:00:00
+6u5t3s0v-9w1r-2x7s-t6u4-1v2w3x4u6v7w,Apel,660e8400-e29b-41d4-a716-446655440006,Buah,online,30000,kg,14,80,Apel Malang,True,2025-11-01 10:00:00
+7v6u4t1w-0x2s-3y8t-u7v5-2w3x4y5v7w8x,Lemon premium,660e8400-e29b-41d4-a716-446655440006,Buah,online,32000,kg,14,60,Lemon premium import,True,2025-11-01 10:00:00
+8w7v5u2x-1y3t-4z9u-v8w6-3x4y5z6w8x9y,Lemon biasa,660e8400-e29b-41d4-a716-446655440006,Buah,online,20000,kg,14,70,Lemon lokal,True,2025-11-01 10:00:00
+9x8w6v3y-2z4u-5a0v-w9x7-4y5z6a7x9y0z,Salak,660e8400-e29b-41d4-a716-446655440006,Buah,online,10000,kg,7,90,Salak Pondoh,True,2025-11-01 10:00:00
+0y9x7w4z-3a5v-6b1w-x0y8-5z6a7b8y0z1a,Manggis,660e8400-e29b-41d4-a716-446655440006,Buah,online,17000,kg,7,75,Manggis segar,True,2025-11-01 10:00:00
+1z0y8x5a-4b6w-7c2x-y1z9-6a7b8c9z1a2b,Nanas,660e8400-e29b-41d4-a716-446655440006,Buah,online,12000,pcs,7,60,Nanas madu,True,2025-11-01 10:00:00
+2a1z9y6b-5c7x-8d3y-z2a0-7b8c9d0a2b3c,Tongkol,660e8400-e29b-41d4-a716-446655440001,Protein Laut,online,40000,kg,2,35,Ikan Tongkol segar,True,2025-11-01 10:00:00
+3b2a0z7c-6d8y-9e4z-a3b1-8c9d0e1b3c4d,Cengek,660e8400-e29b-41d4-a716-446655440001,Protein Laut,online,75000,kg,2,25,Cengek/Kerang segar,True,2025-11-01 10:00:00
+4c3b1a8d-7e9z-0f5a-b4c2-9d0e1f2c4d5e,Bawang putih,660e8400-e29b-41d4-a716-446655440004,Bumbu & Rempah,online,40000,kg,30,100,Bawang putih lokal,True,2025-11-01 10:00:00
+5d4c2b9e-8f0a-1g6b-c5d3-0e1f2g3d5e6f,Cabe Kriting,660e8400-e29b-41d4-a716-446655440004,Bumbu & Rempah,online,72000,kg,7,60,Cabe Kriting merah,True,2025-11-01 10:00:00
+6e5d3c0f-9g1b-2h7c-d6e4-1f2g3h4e6f7g,Suraung,660e8400-e29b-41d4-a716-446655440004,Bumbu & Rempah,online,15000,iket,5,80,Suraung/Bawang Daun,True,2025-11-01 10:00:00
+7f6e4d1g-0h2c-3i8d-e7f5-2g3h4i5f7g8h,Sledri,660e8400-e29b-41d4-a716-446655440004,Bumbu & Rempah,online,20000,kg,5,70,Seledri segar,True,2025-11-01 10:00:00
+8g7f5e2h-1i3d-4j9e-f8g6-3h4i5j6g8h9i,Wortel,660e8400-e29b-41d4-a716-446655440005,Sayuran,online,14000,kg,14,90,Wortel segar,True,2025-11-01 10:00:00
+9h8g6f3i-2j4e-5k0f-g9h7-4i5j6k7h9i0j,Daun bawang,660e8400-e29b-41d4-a716-446655440004,Bumbu & Rempah,online,12000,kg,5,85,Daun bawang segar,True,2025-11-01 10:00:00
+0i9h7g4j-3k5f-6l1g-h0i8-5j6k7l8i0j1k,Jagung Manis,660e8400-e29b-41d4-a716-446655440005,Sayuran,online,10000,kg,3,70,Jagung Manis segar,True,2025-11-01 10:00:00
+1j0i8h5k-4l6g-7m2h-i1j9-6k7l8m9j1k2l,Jagung Pipilan,660e8400-e29b-41d4-a716-446655440005,Sayuran,online,12000,kg,30,80,Jagung Pipilan kering,True,2025-11-01 10:00:00
+2k1j9i6l-5m7h-8n3i-j2k0-7l8m9n0k2l3m,Jeruk 1 Kg,660e8400-e29b-41d4-a716-446655440006,Buah,online,24000,kg,14,65,Jeruk segar,True,2025-11-01 10:00:00
+3l2k0j7m-6n8i-9o4j-k3l1-8m9n0o1l3m4n,Kacang Hijau,660e8400-e29b-41d4-a716-446655440007,Sembako,online,24000,kg,180,100,Kacang Hijau berkualitas,True,2025-11-01 10:00:00
+4m3l1k8n-7o9j-0p5k-l4m2-9n0o1p2m4n5o,Kacang Kedelai,660e8400-e29b-41d4-a716-446655440007,Sembako,online,14000,kg,180,120,Kacang Kedelai lokal,True,2025-11-01 10:00:00
+5n4m2l9o-8p0k-1q6l-m5n3-0o1p2q3n5o6p,Kacang Tanah,660e8400-e29b-41d4-a716-446655440007,Sembako,online,28000,kg,90,90,Kacang Tanah kupas,True,2025-11-01 10:00:00
+6o5n3m0p-9q1l-2r7m-n6o4-1p2q3r4o6p7q,Kentang Lokal Dieng,660e8400-e29b-41d4-a716-446655440005,Sayuran,online,17000,kg,14,75,Kentang Dieng premium,True,2025-11-01 10:00:00
+7p6o4n1q-0r2m-3s8n-o7p5-2q3r4s5p7q8r,Ketela Pohon,660e8400-e29b-41d4-a716-446655440005,Sayuran,online,5000,pcs,7,100,Ketela Pohon segar,True,2025-11-01 10:00:00
+8q7p5o2r-1s3n-4t9o-p8q6-3r4s5t6q8r9s,Kol Kubis,660e8400-e29b-41d4-a716-446655440005,Sayuran,online,7000,kg,7,95,Kol/Kubis segar,True,2025-11-01 10:00:00
+9r8q6p3s-2t4o-5u0p-q9r7-4s5t6u7r9s0t,Mie Instan,660e8400-e29b-41d4-a716-446655440007,Sembako,online,3000,pcs,180,200,Mie Instan goreng,True,2025-11-01 10:00:00
+0s9r7q4t-3u5p-6v1q-r0s8-5t6u7v8s0t1u,Minyak Goreng Curah,660e8400-e29b-41d4-a716-446655440007,Sembako,online,18000,kg,180,150,Minyak Goreng Curah,True,2025-11-01 10:00:00
+1t0s8r5u-4v6q-7w2r-s1t9-6u7v8w9t1u2v,Minyak Goreng Kemasan,660e8400-e29b-41d4-a716-446655440007,Sembako,online,20000,kg,180,140,Minyak Goreng Kemasan,True,2025-11-01 10:00:00
+2u1t9s6v-5w7r-8x3s-t2u0-7v8w9x0u2v3w,LPG 3KG,660e8400-e29b-41d4-a716-446655440007,Sembako,online,22000,pcs,180,80,LPG 3KG,True,2025-11-01 10:00:00
+3v2u0t7w-6x8s-9y4t-u3v1-8w9x0y1v3w4x,Pisang 1 Kg,660e8400-e29b-41d4-a716-446655440006,Buah,online,24000,kg,7,70,Pisang Cavendish,True,2025-11-01 10:00:00
+4w3v1u8x-7y9t-0z5u-v4w2-9x0y1z2w4x5y,Susu Kental Manis,660e8400-e29b-41d4-a716-446655440007,Sembako,online,12000,pcs,180,130,Susu Kental Manis kaleng,True,2025-11-01 10:00:00
+5x4w2v9y-8z0u-1a6v-w5x3-0y1z2a3x5y6z,Telur Ayam Kampung,660e8400-e29b-41d4-a716-446655440003,Protein Telur,online,3000,pcs,14,150,Telur Ayam Kampung,True,2025-11-01 10:00:00
+6y5x3w0z-9a1v-2b7w-x6y4-1z2a3b4y6z7a,Telur Ayam Ras,660e8400-e29b-41d4-a716-446655440003,Protein Telur,online,29000,kg,14,110,Telur Ayam Ras,True,2025-11-01 10:00:00
+7z6y4x1a-0b2w-3c8x-y7z5-2a3b4c5z7a8b,Tempe 1 Kg,660e8400-e29b-41d4-a716-446655440007,Sembako,online,12000,kg,3,100,Tempe segar,True,2025-11-01 10:00:00
+8a7z5y2b-1c3x-4d9y-z8a6-3b4c5d6a8b9c,Tahu Mentah 1 Kg,660e8400-e29b-41d4-a716-446655440007,Sembako,online,8000,kg,3,120,Tahu putih mentah,True,2025-11-01 10:00:00
+9b8a6z3c-2d4y-5e0z-a9b7-4c5d6e7b9c0d,Tepung Terigu Cakra Kembar,660e8400-e29b-41d4-a716-446655440007,Sembako,online,13000,kg,180,100,Tepung Terigu Cakra Kembar,True,2025-11-01 10:00:00

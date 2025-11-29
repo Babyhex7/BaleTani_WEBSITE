@@ -98,14 +98,22 @@ class DataPreprocessor:
         
         logger.info(f"Transforming {len(products_df)} products")
         
-        # Encode categorical features
-        category_ids = self.category_encoder.transform(
-            products_df['category_name'].fillna('Unknown')
+        # Encode categorical features - handle unseen categories
+        categories = products_df['category_name'].fillna('Unknown')
+        # Map unseen categories to most frequent category
+        known_categories = set(self.category_encoder.classes_)
+        categories_mapped = categories.apply(
+            lambda x: x if x in known_categories else self.category_encoder.classes_[0]
         )
+        category_ids = self.category_encoder.transform(categories_mapped)
         
-        product_type_ids = self.product_type_encoder.transform(
-            products_df['product_type'].fillna('online')
+        # Handle unseen product types
+        product_types = products_df['product_type'].fillna('online')
+        known_types = set(self.product_type_encoder.classes_)
+        product_types_mapped = product_types.apply(
+            lambda x: x if x in known_types else self.product_type_encoder.classes_[0]
         )
+        product_type_ids = self.product_type_encoder.transform(product_types_mapped)
         
         # Normalize numerical features
         prices_normalized = self.price_scaler.transform(
@@ -143,7 +151,7 @@ class DataPreprocessor:
             'price_tiers': price_tiers.values,
             'shelf_life_tiers': shelf_life_tiers.values,
             'product_ids': products_df['id'].values,
-            'product_names': products_df['product_name'].values.tolist()
+            'product_names': products_df['name'].values.tolist()  # Changed from 'product_name' to 'name'
         }
         
         logger.debug(f"✅ Transformed features shape: category_ids={len(category_ids)}")

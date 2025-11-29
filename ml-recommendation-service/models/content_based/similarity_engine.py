@@ -52,7 +52,7 @@ class SimilarityEngine:
         
         self.is_indexed = True
         
-        logger.info(f"✅ Indexed {len(embeddings)} products - embedding_dim={embeddings.shape[1]}")
+        logger.info(f"Indexed {len(embeddings)} products - embedding_dim={embeddings.shape[1]}")
     
     def find_similar(
         self,
