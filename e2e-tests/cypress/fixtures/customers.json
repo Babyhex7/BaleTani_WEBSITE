@@ -1,0 +1,54 @@
+{
+  "validCustomer": {
+    "phone_number": "081234567890",
+    "full_name": "Test Customer",
+    "password": "password123",
+    "address": "Jl. Test No. 123, Jakarta Selatan"
+  },
+  "newCustomer": {
+    "phone_number": "081999888777",
+    "full_name": "New Test Customer",
+    "password": "newpass123",
+    "address": "Jl. Baru No. 456, Bandung"
+  },
+  "invalidCustomers": [
+    {
+      "phone_number": "08123",
+      "full_name": "Short Phone Customer",
+      "password": "password123",
+      "expectedError": "Nomor telepon harus 10-15 digit"
+    },
+    {
+      "phone_number": "081234567890",
+      "full_name": "A",
+      "password": "password123",
+      "expectedError": "Nama lengkap harus 2-100 karakter"
+    },
+    {
+      "phone_number": "081234567890",
+      "full_name": "Weak Password Customer",
+      "password": "123",
+      "expectedError": "Password minimal 6 karakter"
+    },
+    {
+      "phone_number": "abc1234567890",
+      "full_name": "Invalid Phone Format",
+      "password": "password123",
+      "expectedError": "Nomor telepon tidak valid"
+    }
+  ],
+  "testAccounts": [
+    {
+      "phone_number": "081111111111",
+      "password": "test123",
+      "full_name": "Test Account 1",
+      "role": "regular"
+    },
+    {
+      "phone_number": "081222222222",
+      "password": "test123",
+      "full_name": "Test Account 2",
+      "role": "regular"
+    }
+  ]
+}
