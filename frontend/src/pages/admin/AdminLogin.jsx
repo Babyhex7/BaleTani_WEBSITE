@@ -80,11 +80,24 @@ const AdminLogin = () => {
       navigate('/admin/dashboard', { replace: true });
     } catch (error) {
       console.error('[AdminLogin] Login error:', error);
-      toast.error(error.message || 'Login gagal. Silakan coba lagi.');
       
-      if (error.errors) {
+      // Extract error message from backend response
+      let errorMessage = 'Login gagal. Silakan coba lagi.';
+      
+      if (error.response?.data?.message) {
+        // Backend mengirim: { success: false, message: '...' }
+        errorMessage = error.response.data.message;
+      } else if (error.message && error.message !== 'Request failed with status code 401') {
+        // Fallback ke error.message tapi hindari generic axios message
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
+      
+      // Handle specific field validation errors
+      if (error.response?.data?.errors) {
         const fieldErrors = {};
-        error.errors.forEach(err => {
+        error.response.data.errors.forEach(err => {
           if (err.path) {
             fieldErrors[err.path] = err.msg;
           }

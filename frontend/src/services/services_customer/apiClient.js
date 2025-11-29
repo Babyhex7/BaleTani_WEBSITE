@@ -52,10 +52,12 @@ apiClient.interceptors.response.use(
   async (error) => {
     const { response, message, code, config } = error;
 
-    // Initialize retry count per request (not global)
-    if (!config.__retryCount) {
-      config.__retryCount = 0;
-    }
+    // ========================================
+    // NO RETRY for auth endpoints
+    // ========================================
+    const isAuthEndpoint =
+      config?.url?.includes("/auth/login") ||
+      config?.url?.includes("/auth/register");
 
     // ========================================
     // Handle Network Errors (Backend Down/CORS)
@@ -67,30 +69,34 @@ apiClient.interceptors.response.use(
         url: config?.url,
       });
 
-      // ✅ Retry logic untuk network errors (max 3 retries)
-      const shouldRetry =
-        config.__retryCount < 3 &&
-        (code === "ECONNABORTED" ||
-          code === "ERR_NETWORK" ||
-          code === "ETIMEDOUT");
+      // ✅ Retry logic ONLY for non-auth endpoints (max 3 retries)
+      if (!isAuthEndpoint) {
+        if (!config.__retryCount) {
+          config.__retryCount = 0;
+        }
 
-      if (shouldRetry) {
-        config.__retryCount++;
+        const shouldRetry =
+          config.__retryCount < 3 &&
+          (code === "ECONNABORTED" ||
+            code === "ERR_NETWORK" ||
+            code === "ETIMEDOUT");
 
-        console.log(`🔄 Retrying request (${config.__retryCount}/3)...`);
+        if (shouldRetry) {
+          config.__retryCount++;
+          console.log(`🔄 Retrying request (${config.__retryCount}/3)...`);
 
-        // Exponential backoff: 1s, 2s, 3s
-        await new Promise((resolve) =>
-          setTimeout(resolve, 1000 * config.__retryCount)
-        );
+          // Exponential backoff: 1s, 2s, 3s
+          await new Promise((resolve) =>
+            setTimeout(resolve, 1000 * config.__retryCount)
+          );
 
-        return apiClient(config);
+          return apiClient(config);
+        }
       }
 
       // Tampilkan error yang user-friendly
-      debugLog("API:RES", `Network Error after ${retryCount} retries`, {
-        message:
-          "Tidak dapat terhubung ke server. Pastikan backend berjalan di http://localhost:5000",
+      debugLog("API:RES", "Network Error", {
+        message: "Tidak dapat terhubung ke server",
         url: config?.url,
       });
 
@@ -100,9 +106,6 @@ apiClient.interceptors.response.use(
         originalError: error,
       });
     }
-
-    // Reset retry count jika dapat response
-    retryCount = 0;
 
     debugLog(
       "API:RES",

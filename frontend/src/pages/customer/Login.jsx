@@ -140,23 +140,30 @@ const Login = () => {
         debugLog('LOGIN', 'Login failed', { error });
       }
       
-      // Handle rate limit error (429)
-      if (error.code === 'RATE_LIMIT_LOGIN') {
-        const retryMinutes = Math.ceil((error.retryAfter || 900) / 60);
-        toast.error(
-          `Terlalu banyak percobaan login. Silakan coba lagi setelah ${retryMinutes} menit.`,
-          { duration: 6000 }
-        );
-        return;
+      // Extract error message from backend response
+      let errorMessage = 'Login gagal. Silakan coba lagi.';
+      
+      if (error.response?.data?.message) {
+        // Backend mengirim: { success: false, message: '...' }
+        errorMessage = error.response.data.message;
+      } else if (error.message && error.message !== 'Request failed with status code 401') {
+        // Fallback ke error.message tapi hindari generic axios message
+        errorMessage = error.message;
       }
       
-      // Generic error message
-      toast.error(error.message || 'Login gagal. Silakan coba lagi.');
+      // Handle rate limit error (429)
+      if (error.response?.status === 429) {
+        const retryAfter = error.response.data?.retryAfter || 900;
+        const retryMinutes = Math.ceil(retryAfter / 60);
+        errorMessage = `Terlalu banyak percobaan login. Silakan coba lagi setelah ${retryMinutes} menit.`;
+      }
+      
+      toast.error(errorMessage);
       
       // Handle specific field validation errors
-      if (error.errors) {
+      if (error.response?.data?.errors) {
         const fieldErrors = {};
-        error.errors.forEach(err => {
+        error.response.data.errors.forEach(err => {
           if (err.path) {
             fieldErrors[err.path] = err.msg;
           }

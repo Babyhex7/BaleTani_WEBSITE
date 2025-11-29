@@ -79,7 +79,7 @@ exports.getAllFAQs = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "FAQs retrieved successfully",
+      message: "FAQ berhasil diambil",
       data: formattedFaqs,
       pagination: {
         total: count,
@@ -110,7 +110,7 @@ exports.getFAQById = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "FAQ retrieved successfully",
+      message: "FAQ berhasil diambil",
       data: faq,
     });
   } catch (error) {
@@ -273,7 +273,7 @@ exports.getCategoryStats = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Category stats retrieved successfully",
+      message: "Statistik kategori berhasil diambil",
       data: stats,
     });
   } catch (error) {

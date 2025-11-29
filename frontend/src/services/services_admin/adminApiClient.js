@@ -42,11 +42,6 @@ adminApiClient.interceptors.response.use(
   async (error) => {
     const { response, code, config } = error;
 
-    // Initialize retry count per request
-    if (!config.__retryCount) {
-      config.__retryCount = 0;
-    }
-
     console.error("[AdminAPI] Response error:", {
       url: config?.url,
       status: response?.status,
@@ -54,8 +49,19 @@ adminApiClient.interceptors.response.use(
       code,
     });
 
-    // ✅ Retry logic untuk network errors (max 3 retries)
-    if (!response) {
+    // ========================================
+    // NO RETRY for auth endpoints
+    // ========================================
+    const isAuthEndpoint =
+      config?.url?.includes("/auth/login") ||
+      config?.url?.includes("/auth/register");
+
+    // ✅ Retry logic ONLY for non-auth network errors (max 3 retries)
+    if (!response && !isAuthEndpoint) {
+      if (!config.__retryCount) {
+        config.__retryCount = 0;
+      }
+
       const shouldRetry =
         config.__retryCount < 3 &&
         (code === "ECONNABORTED" ||

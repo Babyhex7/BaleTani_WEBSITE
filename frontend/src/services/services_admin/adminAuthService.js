@@ -52,7 +52,10 @@ const adminAuthService = {
       }
     } catch (error) {
       console.error("[AdminAuthService] Login error:", error);
-      throw error.response?.data || error;
+      // Throw error dengan format yang konsisten
+      // Jika error dari backend, gunakan error.response.data
+      // Jika network error, gunakan error.message
+      throw error.response?.data || { message: error.message || "Login gagal" };
     }
   },
 

@@ -8,9 +8,13 @@ const authService = {
         "/customer/auth/register",
         userData
       );
+      // Backend returns: { success: true, message: '...', data: { customer: {...}, token: '...' } }
       return response.data;
     } catch (error) {
-      throw error.response?.data || error;
+      // Throw error dengan format yang konsisten
+      throw (
+        error.response?.data || { message: error.message || "Registrasi gagal" }
+      );
     }
   },
 
@@ -24,7 +28,7 @@ const authService = {
 
       // Debug: log raw response structure
       if (import.meta.env.VITE_DEBUG_AUTH === "true") {
-        // Login successful
+        console.log("[AuthService] Login response:", response.data);
       }
 
       // Backend returns: { success: true, message: '...', data: { customer: {...}, token: '...' } }
@@ -47,7 +51,10 @@ const authService = {
         throw new Error("Response login tidak valid");
       }
     } catch (error) {
-      throw error.response?.data || error;
+      // Throw error dengan format yang konsisten
+      // Jika error dari backend, gunakan error.response.data
+      // Jika network error, gunakan error.message
+      throw error.response?.data || { message: error.message || "Login gagal" };
     }
   },
 
