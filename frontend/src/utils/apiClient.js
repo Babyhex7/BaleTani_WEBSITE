@@ -189,8 +189,8 @@ apiClient.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          // Unauthorized - clear tokens
-          console.log("🔒 Unauthorized - clearing tokens");
+          // Unauthorized - clear tokens (silent, no toast notification)
+          console.log("🔒 Unauthorized - clearing tokens silently");
 
           // Check if this was an admin request
           const isAdminRequest = config?.url?.includes("/admin/");
@@ -199,22 +199,15 @@ apiClient.interceptors.response.use(
             // Clear admin token
             localStorage.removeItem("baletani-admin-storage");
             console.log(
-              "🔒 Cleared admin storage, redirecting to /admin/login"
+              "🔒 Cleared admin storage silently"
             );
-
-            // Redirect to admin login if not already there
-            if (!window.location.pathname.includes("/admin/login")) {
-              window.location.href = "/admin/login";
-            }
+            // Silent logout - no redirect, no toast
           } else {
             // Clear customer token
             localStorage.removeItem("token");
-            console.log("🔒 Cleared customer token, redirecting to /login");
-
-            // Redirect to customer login if not already there
-            if (!window.location.pathname.includes("/login")) {
-              window.location.href = "/login";
-            }
+            localStorage.removeItem("baletani-customer-storage");
+            console.log("🔒 Cleared customer token silently");
+            // Silent logout - no redirect, no toast
           }
           break;
 
