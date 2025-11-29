@@ -198,9 +198,7 @@ apiClient.interceptors.response.use(
           if (isAdminRequest) {
             // Clear admin token
             localStorage.removeItem("baletani-admin-storage");
-            console.log(
-              "🔒 Cleared admin storage silently"
-            );
+            console.log("🔒 Cleared admin storage silently");
             // Silent logout - no redirect, no toast
           } else {
             // Clear customer token
