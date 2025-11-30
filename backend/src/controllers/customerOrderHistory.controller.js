@@ -522,9 +522,14 @@ exports.cancelOrder = async (req, res) => {
  */
 async function calculateCustomerStats(customerId) {
   try {
-    // Total orders
+    // Total orders (exclude cancelled - konsisten dengan profile)
     const totalOrders = await Order.count({
-      where: { customer_id: customerId },
+      where: {
+        customer_id: customerId,
+        order_status: {
+          [Op.ne]: "cancelled",
+        },
+      },
     });
 
     // Total spending (completed orders only)

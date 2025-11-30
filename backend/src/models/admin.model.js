@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 const bcrypt = require("bcryptjs");
+const { normalizePhoneNumber } = require("../utils/phoneHelper");
 
 const Admin = sequelize.define(
   "Admin",
@@ -8,40 +9,40 @@ const Admin = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true
+      primaryKey: true,
     },
     phone_number: {
       type: DataTypes.STRING(20),
       allowNull: false,
-      unique: true
+      unique: true,
     },
     full_name: {
       type: DataTypes.STRING(100),
-      allowNull: false
+      allowNull: false,
     },
     role_id: {
       type: DataTypes.UUID,
-      allowNull: false
+      allowNull: false,
     },
     password_hash: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: false,
     },
     is_active: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true
+      defaultValue: true,
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false
+      allowNull: false,
     },
     updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      allowNull: false
-    }
+      allowNull: false,
     },
+  },
   {
     tableName: "users", // Still use users table
     timestamps: false,
@@ -67,30 +68,10 @@ const Admin = sequelize.define(
         if (admin.changed("phone_number")) {
           admin.phone_number = normalizePhoneNumber(admin.phone_number);
         }
-      }
-    }
+      },
+    },
   }
 );
-
-// Function to normalize phone number
-function normalizePhoneNumber(phoneNumber) {
-  // Remove all non-digit characters
-  let cleaned = phoneNumber.replace(/\D/g, "");
-
-  // Handle different formats
-  if (cleaned.startsWith("0")) {
-    // Convert 08xx to 628xx
-    cleaned = "62" + cleaned.substring(1);
-  } else if (cleaned.startsWith("8")) {
-    // Convert 8xx to 628xx
-    cleaned = "62" + cleaned;
-  } else if (!cleaned.startsWith("62")) {
-    // Add 62 if not present
-    cleaned = "62" + cleaned;
-  }
-
-  return cleaned;
-}
 
 // Instance method to check password
 Admin.prototype.comparePassword = async function (candidatePassword) {

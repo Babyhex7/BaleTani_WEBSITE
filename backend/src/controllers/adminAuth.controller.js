@@ -1,30 +1,20 @@
 const jwt = require("jsonwebtoken");
 const { Admin, Role, Permission } = require("../models");
+const {
+  normalizePhoneNumber,
+  isValidPhoneNumber,
+} = require("../utils/phoneHelper");
 
 /**
  * Admin Authentication Controller
  * Handle login for admin users (using Admin model)
+ *
+ * Security features:
+ * - Phone number validation and normalization
+ * - Generic error messages (prevent user enumeration)
+ * - Audit logging for security monitoring
+ * - Rate limiting (handled by middleware)
  */
-
-// Function to normalize phone number
-function normalizePhoneNumber(phoneNumber) {
-  // Remove all non-digit characters
-  let cleaned = phoneNumber.replace(/\D/g, "");
-
-  // Handle different formats
-  if (cleaned.startsWith("0")) {
-    // Convert 08xx to 628xx
-    cleaned = "62" + cleaned.substring(1);
-  } else if (cleaned.startsWith("8")) {
-    // Convert 8xx to 628xx
-    cleaned = "62" + cleaned;
-  } else if (!cleaned.startsWith("62")) {
-    // Add 62 if not present
-    cleaned = "62" + cleaned;
-  }
-
-  return cleaned;
-}
 
 // Login Admin
 const loginAdmin = async (req, res) => {
@@ -33,14 +23,27 @@ const loginAdmin = async (req, res) => {
 
     // Validate required fields
     if (!phone_number || !password) {
+      console.warn(`[LOGIN FAILED] Missing credentials - IP: ${req.ip}`);
       return res.status(400).json({
         success: false,
         message: "Nomor telepon dan password wajib diisi",
       });
     }
 
+    // Validate phone number format
+    if (!isValidPhoneNumber(phone_number)) {
+      console.warn(
+        `[LOGIN FAILED] Invalid phone format: ${phone_number} - IP: ${req.ip}`
+      );
+      return res.status(400).json({
+        success: false,
+        message: "Format nomor telepon tidak valid",
+      });
+    }
+
     // Normalize phone number before query
     const normalizedPhone = normalizePhoneNumber(phone_number);
+    console.log(`[LOGIN ATTEMPT] Phone: ${normalizedPhone}, IP: ${req.ip}`);
 
     // Find admin with role information
     const admin = await Admin.findOne({
@@ -57,14 +60,20 @@ const loginAdmin = async (req, res) => {
       ],
     });
 
+    // Generic error message for security (prevent user enumeration)
+    const genericError = {
+      success: false,
+      message: "Nomor telepon atau password salah",
+    };
+
     if (!admin) {
-      return res.status(401).json({
-        success: false,
-        message: "Nomor telepon atau password salah",
-      });
+      console.warn(
+        `[LOGIN FAILED] User not found: ${normalizedPhone} - IP: ${req.ip}`
+      );
+      return res.status(401).json(genericError);
     }
 
-    // Check if user has admin role
+    // Check if user has admin role (BEFORE password check for timing attack prevention)
     const adminRoles = [
       "super_admin",
       "super_whatsapp_admin",
@@ -77,19 +86,20 @@ const loginAdmin = async (req, res) => {
     ];
 
     if (!adminRoles.includes(admin.role.role_name)) {
-      return res.status(403).json({
-        success: false,
-        message: "Akses ditolak. Anda bukan admin.",
-      });
+      // SECURITY FIX: Use generic error message (don't reveal user existence)
+      console.warn(
+        `[LOGIN FAILED] Non-admin role attempt: ${normalizedPhone}, Role: ${admin.role.role_name} - IP: ${req.ip}`
+      );
+      return res.status(401).json(genericError);
     }
 
     // Check password
     const isPasswordValid = await admin.comparePassword(password);
     if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: "Nomor telepon atau password salah",
-      });
+      console.warn(
+        `[LOGIN FAILED] Invalid password: ${normalizedPhone} - IP: ${req.ip}`
+      );
+      return res.status(401).json(genericError);
     }
 
     // Generate JWT token
@@ -114,6 +124,11 @@ const loginAdmin = async (req, res) => {
       ],
     });
 
+    // AUDIT LOG: Success login
+    console.log(
+      `[LOGIN SUCCESS] Admin: ${admin.id}, Name: ${admin.full_name}, Role: ${admin.role.role_name} - IP: ${req.ip}`
+    );
+
     res.json({
       success: true,
       message: "Login berhasil",
@@ -126,7 +141,6 @@ const loginAdmin = async (req, res) => {
             id: admin.role.id,
             name: admin.role.role_name,
             description: admin.role.description,
-            level: admin.role.level,
           },
           permissions: role.permissions || [],
         },
@@ -135,9 +149,20 @@ const loginAdmin = async (req, res) => {
     });
   } catch (error) {
     console.error("Login admin error:", error);
+
+    // Handle specific database errors
+    if (error.name === "SequelizeDatabaseError") {
+      return res.status(500).json({
+        success: false,
+        message:
+          "Terjadi kesalahan pada database. Silakan hubungi administrator.",
+      });
+    }
+
+    // Generic server error
     res.status(500).json({
       success: false,
-      message: "Terjadi kesalahan server",
+      message: error.message || "Terjadi kesalahan server",
     });
   }
 };

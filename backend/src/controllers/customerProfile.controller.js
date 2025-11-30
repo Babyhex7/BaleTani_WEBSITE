@@ -29,7 +29,7 @@ const getProfile = async (req, res) => {
       });
     }
 
-    // Hitung statistik order
+    // Hitung statistik order (konsisten dengan order history)
     const totalOrders = await Order.count({
       where: {
         customer_id: customerId,
@@ -39,13 +39,11 @@ const getProfile = async (req, res) => {
       },
     });
 
+    // Total spending HANYA dari order yang completed (konsisten dengan history)
     const totalSpending = await Order.sum("total_amount", {
       where: {
         customer_id: customerId,
-        payment_status: "paid",
-        order_status: {
-          [Op.ne]: "cancelled",
-        },
+        order_status: "completed",
       },
     });
 

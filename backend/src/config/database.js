@@ -13,6 +13,9 @@ const sequelize = new Sequelize(
     dialectOptions: {
       timezone: "+07:00",
       connectTimeout: 60000, // 60 seconds
+      // Keep connection alive untuk prevent MySQL timeout
+      keepAlive: true,
+      keepAliveInitialDelay: 10000, // 10 detik
     },
     logging:
       process.env.NODE_ENV === "development"
@@ -27,15 +30,32 @@ const sequelize = new Sequelize(
             console.log("🔵 SQL:", shortSql);
           }
         : false,
+    // ========================================
+    // CONNECTION POOL CONFIGURATION
+    // ========================================
+    // Optimized untuk handle high traffic & banyak concurrent requests
     pool: {
-      max: 20, // Naik dari 10 ke 20 connections
-      min: 5, // Naik dari 0 ke 5 (always keep minimum connections)
-      acquire: 60000, // Naik dari 30s ke 60s
-      idle: 10000, // Keep at 10s
-      evict: 10000, // Check for idle connections every 10s
+      max: 100, // Maximum 100 connections (naik dari 50)
+      min: 20, // Always keep 20 connections warm (naik dari 10)
+      acquire: 120000, // 120 detik (2 menit) timeout untuk dapat connection
+      idle: 30000, // 30 detik idle sebelum release (naik dari 20)
+      evict: 10000, // Check idle connections setiap 10 detik
+      handleDisconnects: true, // Auto reconnect jika terputus
+      // Validate connection sebelum digunakan
+      validate: (connection) => {
+        try {
+          return (
+            connection &&
+            connection.state !== "disconnected" &&
+            connection.threadId !== undefined
+          ); // MySQL thread check
+        } catch (e) {
+          return false;
+        }
+      },
     },
     retry: {
-      max: 3, // Retry 3 times on connection failure
+      max: 5, // Retry 5 kali jika gagal (naik dari 3)
       backoffBase: 1000,
       backoffExponent: 1.5,
     },
@@ -43,16 +63,74 @@ const sequelize = new Sequelize(
   }
 );
 
-// Test connection
-const testConnection = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log("✅ Database connection has been established successfully.");
-  } catch (error) {
-    console.error("❌ Unable to connect to the database:", error);
-    process.exit(1); // Exit jika database tidak bisa connect
+// Test connection dengan retry logic
+const testConnection = async (retries = 3) => {
+  for (let i = 1; i <= retries; i++) {
+    try {
+      await sequelize.authenticate();
+      console.log("✅ Database connection established successfully.");
+      console.log(
+        `📊 Pool Config: max=${sequelize.config.pool.max}, min=${sequelize.config.pool.min}`
+      );
+      return true;
+    } catch (error) {
+      console.error(
+        `❌ Database connection attempt ${i}/${retries} failed:`,
+        error.message
+      );
+
+      if (i === retries) {
+        console.error(
+          "❌ Unable to connect to database after",
+          retries,
+          "attempts"
+        );
+        console.error("❌ Error details:", error);
+        process.exit(1);
+      }
+
+      // Wait before retry (exponential backoff)
+      const delay = 1000 * Math.pow(2, i - 1);
+      console.log(`⏳ Retrying in ${delay}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
   }
 };
+
+// ========================================
+// Connection Pool Monitoring
+// ========================================
+const getPoolStats = () => {
+  try {
+    const pool = sequelize.connectionManager.pool;
+    if (pool) {
+      return {
+        total: pool._allObjects?.length || 0,
+        available: pool._availableObjects?.length || 0,
+        borrowed:
+          (pool._allObjects?.length || 0) -
+          (pool._availableObjects?.length || 0),
+        max: sequelize.config.pool.max,
+        min: sequelize.config.pool.min,
+      };
+    }
+  } catch (error) {
+    return { error: "Unable to get pool stats" };
+  }
+  return { error: "Pool not initialized" };
+};
+
+// Log pool stats setiap 5 menit (hanya development)
+if (process.env.NODE_ENV === "development") {
+  setInterval(() => {
+    const stats = getPoolStats();
+    if (!stats.error) {
+      console.log(
+        `📊 [DB POOL] Total: ${stats.total}, Available: ${stats.available}, In Use: ${stats.borrowed}/${stats.max}`
+      );
+    }
+  }, 5 * 60 * 1000); // Every 5 minutes
+}
 
 // ========================================
 // Graceful Shutdown Handler
@@ -60,6 +138,14 @@ const testConnection = async () => {
 const gracefulShutdown = async () => {
   console.log("\n⏳ Received shutdown signal, closing database connections...");
   try {
+    // Log final pool stats
+    const stats = getPoolStats();
+    if (!stats.error) {
+      console.log(
+        `📊 [SHUTDOWN] Pool stats: ${stats.total} total, ${stats.borrowed} in use`
+      );
+    }
+
     await sequelize.close();
     console.log("✅ Database connections closed successfully");
     process.exit(0);
@@ -74,4 +160,4 @@ process.on("SIGINT", gracefulShutdown); // Ctrl+C
 process.on("SIGTERM", gracefulShutdown); // Kill command
 process.on("SIGUSR2", gracefulShutdown); // Nodemon restart
 
-module.exports = { sequelize, testConnection };
+module.exports = { sequelize, testConnection, getPoolStats };

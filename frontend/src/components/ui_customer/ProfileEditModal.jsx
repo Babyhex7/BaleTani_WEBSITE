@@ -2,10 +2,12 @@ import { useState } from "react";
 import { XMarkIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { updateProfile } from "../../services/services_customer/profileService";
 import { toast } from "react-hot-toast";
+import useAuthStore from "../../store/store_customer/useAuthStore";
 
 const ProfileEditModal = ({ profile, onClose, onSuccess }) => {
   const [fullName, setFullName] = useState(profile?.full_name || "");
   const [loading, setLoading] = useState(false);
+  const { updateProfile: updateAuthProfile } = useAuthStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,6 +22,9 @@ const ProfileEditModal = ({ profile, onClose, onSuccess }) => {
       const response = await updateProfile({ full_name: fullName.trim() });
       
       if (response.success) {
+        // Update store supaya Navbar langsung update
+        updateAuthProfile({ full_name: fullName.trim() });
+        
         toast.success(response.message || "Profile berhasil diupdate");
         onSuccess();
       }
