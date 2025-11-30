@@ -110,7 +110,7 @@ describe("Customer Authentication Flow", () => {
 
       // Wait for validation error to appear
       cy.wait(500);
-      
+
       // Frontend shows inline error below input
       cy.contains("Nama lengkap minimal 2 karakter").should("be.visible");
     });
@@ -126,7 +126,7 @@ describe("Customer Authentication Flow", () => {
 
       // Wait for validation error
       cy.wait(500);
-      
+
       // Frontend shows inline error below input
       cy.contains("Password minimal 6 karakter").should("be.visible");
     });
@@ -200,8 +200,8 @@ describe("Customer Authentication Flow", () => {
 
     it("should login with valid credentials", () => {
       // Intercept login API
-      cy.intercept('POST', '**/api/customer/auth/login').as('loginRequest');
-      
+      cy.intercept("POST", "**/api/customer/auth/login").as("loginRequest");
+
       // Fill login form
       cy.get('input[name="phoneNumber"]').type(testCustomer.phone_number);
       cy.get('input[name="password"]').type(testCustomer.password);
@@ -210,8 +210,10 @@ describe("Customer Authentication Flow", () => {
       cy.contains("button", "Masuk").click();
 
       // Wait for API response
-      cy.wait('@loginRequest', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
-      
+      cy.wait("@loginRequest", { timeout: 10000 })
+        .its("response.statusCode")
+        .should("eq", 200);
+
       // Verify redirect to /home (as per Login.jsx: navigate('/home'))
       cy.url({ timeout: 15000 }).should("include", "/home");
 
@@ -224,15 +226,17 @@ describe("Customer Authentication Flow", () => {
 
     it("should show error for invalid phone number", () => {
       // Intercept login API
-      cy.intercept('POST', '**/api/customer/auth/login').as('loginRequest');
-      
+      cy.intercept("POST", "**/api/customer/auth/login").as("loginRequest");
+
       cy.get('input[name="phoneNumber"]').type("0899999999");
       cy.get('input[name="password"]').type("wrongpassword");
 
       cy.contains("button", "Masuk").click();
 
       // Wait for API response - should be 401
-      cy.wait('@loginRequest', { timeout: 10000 }).its('response.statusCode').should('eq', 401);
+      cy.wait("@loginRequest", { timeout: 10000 })
+        .its("response.statusCode")
+        .should("eq", 401);
 
       // Should not redirect
       cy.url().should("include", "/login");
@@ -243,39 +247,41 @@ describe("Customer Authentication Flow", () => {
 
     it("should show error for wrong password", () => {
       // Intercept login API
-      cy.intercept('POST', '**/api/customer/auth/login').as('loginRequest');
-      
+      cy.intercept("POST", "**/api/customer/auth/login").as("loginRequest");
+
       cy.get('input[name="phoneNumber"]').type(testCustomer.phone_number);
       cy.get('input[name="password"]').type("wrongpassword123");
 
       cy.contains("button", "Masuk").click();
 
       // Wait for API response - should be 401
-      cy.wait('@loginRequest', { timeout: 10000 }).its('response.statusCode').should('eq', 401);
-      
+      cy.wait("@loginRequest", { timeout: 10000 })
+        .its("response.statusCode")
+        .should("eq", 401);
+
       // Should stay on login page
       cy.url().should("include", "/login");
     });
 
     it("should show validation error for empty fields", () => {
       // Verify inputs exist and are visible
-      cy.get('input[name="phoneNumber"]').should('be.visible');
-      cy.get('input[name="password"]').should('be.visible');
-      
+      cy.get('input[name="phoneNumber"]').should("be.visible");
+      cy.get('input[name="password"]').should("be.visible");
+
       // Try to submit empty form - should not make API call
       cy.contains("button", "Masuk").click();
 
       // Should stay on login page (validation prevents submit)
       cy.url().should("include", "/login");
-      
+
       // Should not be authenticated
       cy.shouldNotBeAuthenticated();
     });
 
     it("should normalize phone number (08xxx to 628xxx)", () => {
       // Intercept login API
-      cy.intercept('POST', '**/api/customer/auth/login').as('loginRequest');
-      
+      cy.intercept("POST", "**/api/customer/auth/login").as("loginRequest");
+
       // Login with 08xxx format
       cy.get('input[name="phoneNumber"]').type("081234567890");
       cy.get('input[name="password"]').type(testCustomer.password);
@@ -283,8 +289,10 @@ describe("Customer Authentication Flow", () => {
       cy.contains("button", "Masuk").click();
 
       // Wait for API response
-      cy.wait('@loginRequest', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
-      
+      cy.wait("@loginRequest", { timeout: 10000 })
+        .its("response.statusCode")
+        .should("eq", 200);
+
       // Should login successfully (backend normalizes it)
       cy.url({ timeout: 15000 }).should("include", "/home");
       cy.shouldBeAuthenticated();
@@ -352,7 +360,7 @@ describe("Customer Authentication Flow", () => {
 
       // Logout via custom command (clears localStorage)
       cy.customerLogout();
-      
+
       // Visit root to trigger redirect
       cy.visit("/");
 
