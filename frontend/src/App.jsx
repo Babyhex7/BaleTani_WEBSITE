@@ -55,7 +55,7 @@ function App() {
         position="top-right"
         reverseOrder={false}
         toastOptions={{
-          // Default options
+          // Default options - 1 detik untuk semua
           duration: 1000,
           style: {
             background: '#0b1220',
@@ -64,8 +64,10 @@ function App() {
             borderRadius: '8px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
+            fontSize: '14px',
+            fontWeight: '500',
           },
-          // Success
+          // Success - 1 detik
           success: {
             duration: 1000,
             iconTheme: {
@@ -78,9 +80,9 @@ function App() {
               border: '1px solid #10b981',
             },
           },
-          // Error
+          // Error - 1 detik
           error: {
-            duration: 2500,
+            duration: 1000,
             iconTheme: {
               primary: '#ef4444',
               secondary: '#0b1220',
@@ -89,6 +91,8 @@ function App() {
               background: '#0b1220',
               color: '#e6f4ea',
               border: '1px solid #ef4444',
+              fontSize: '14px',
+              fontWeight: '500',
             },
           },
         }}

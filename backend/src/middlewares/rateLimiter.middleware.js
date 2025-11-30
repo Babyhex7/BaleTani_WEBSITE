@@ -27,7 +27,7 @@ const rateLimit = require("express-rate-limit");
  */
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Max 5 login attempts
+  max: 10, // Max 10 login attempts (increased for better UX)
   skipSuccessfulRequests: true, // Don't count successful logins
   skipFailedRequests: false, // Count failed attempts
   standardHeaders: true, // Return rate limit info in headers
@@ -38,19 +38,24 @@ const loginLimiter = rateLimit({
       "Terlalu banyak percobaan login. Silakan coba lagi setelah 15 menit.",
     code: "RATE_LIMIT_LOGIN",
   },
-  // Custom key generator - use IP + user identifier if available
+  // Custom key generator - track by phone number only for accurate brute force protection
   keyGenerator: (req) => {
-    // Use phone number if provided for more accurate tracking
+    // Track by phone number only (not IP) to prevent false positives
+    // and enable accurate per-account brute force protection
     const phoneNumber = req.body?.phone_number || req.body?.username;
-    return phoneNumber ? `${req.ip}-${phoneNumber}` : req.ip;
+    return phoneNumber ? `login:${phoneNumber}` : `login:ip:${req.ip}`;
   },
   // Handler when limit exceeded
   handler: (req, res) => {
-    console.warn(`⚠️ Rate limit exceeded for IP: ${req.ip} on ${req.path}`);
+    const phoneNumber =
+      req.body?.phone_number || req.body?.username || "unknown";
+    console.warn(
+      `⚠️ [SECURITY] Login rate limit exceeded - Phone: ${phoneNumber}, IP: ${req.ip}, Path: ${req.path}`
+    );
     res.status(429).json({
       success: false,
       message:
-        "Terlalu banyak percobaan login. Silakan coba lagi setelah 15 menit.",
+        "Terlalu banyak percobaan login gagal. Untuk keamanan akun Anda, silakan coba lagi setelah 15 menit.",
       code: "RATE_LIMIT_LOGIN",
       retryAfter: 15 * 60, // seconds
     });
@@ -70,7 +75,7 @@ const loginLimiter = rateLimit({
  */
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // Max 3 registrations
+  max: 5, // Max 5 registrations (increased from 3)
   skipSuccessfulRequests: true, // Don't count successful registrations
   skipFailedRequests: false, // Count failed attempts
   message: {
@@ -78,12 +83,18 @@ const registerLimiter = rateLimit({
     message: "Terlalu banyak percobaan registrasi. Silakan coba lagi nanti.",
     code: "RATE_LIMIT_REGISTER",
   },
+  keyGenerator: (req) => {
+    // Track by IP for registration to prevent spam
+    return `register:ip:${req.ip}`;
+  },
   handler: (req, res) => {
-    console.warn(`⚠️ Registration rate limit exceeded for IP: ${req.ip}`);
+    console.warn(
+      `⚠️ [SECURITY] Registration rate limit exceeded - IP: ${req.ip}`
+    );
     res.status(429).json({
       success: false,
       message:
-        "Terlalu banyak percobaan registrasi. Silakan coba lagi setelah 1 jam.",
+        "Terlalu banyak percobaan registrasi. Untuk mencegah penyalahgunaan, silakan coba lagi setelah 1 jam.",
       code: "RATE_LIMIT_REGISTER",
       retryAfter: 60 * 60, // seconds
     });

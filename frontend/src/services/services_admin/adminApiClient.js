@@ -42,11 +42,13 @@ adminApiClient.interceptors.response.use(
   async (error) => {
     const { response, code, config } = error;
 
+    // Enhanced error logging
     console.error("[AdminAPI] Response error:", {
       url: config?.url,
       status: response?.status,
       message: response?.data?.message || error.message,
       code,
+      fullError: response?.data,
     });
 
     // ========================================
@@ -83,12 +85,17 @@ adminApiClient.interceptors.response.use(
 
     // Handle 401 - Unauthorized (token expired atau invalid)
     if (response?.status === 401) {
-      console.warn("[AdminAPI] Unauthorized - logging out admin");
-      const { logout } = useAdminStore.getState();
-      logout();
+      console.warn("[AdminAPI] Unauthorized - 401 error");
 
-      // Redirect ke admin login
-      window.location.href = "/admin/login";
+      // Don't auto-redirect if on login page (let the page handle it)
+      const isOnLoginPage = window.location.pathname === "/admin/login";
+
+      if (!isOnLoginPage) {
+        console.warn("[AdminAPI] Auto logout - redirecting to login");
+        const { logout } = useAdminStore.getState();
+        logout();
+        window.location.href = "/admin/login";
+      }
     }
 
     // Handle 403 - Forbidden (tidak punya akses)
@@ -96,6 +103,7 @@ adminApiClient.interceptors.response.use(
       console.warn("[AdminAPI] Forbidden - insufficient permissions");
     }
 
+    // ALWAYS reject the error so catch blocks can handle it
     return Promise.reject(error);
   }
 );

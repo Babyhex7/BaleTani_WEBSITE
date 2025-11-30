@@ -66,6 +66,7 @@ const authenticateAdmin = async (req, res, next) => {
       role: admin.role,
       permissions: admin.role?.permissions || [],
       is_active: admin.is_active,
+      type: "admin", // Distinguish from customer
     };
 
     next();
@@ -135,14 +136,18 @@ const authenticateCustomer = async (req, res, next) => {
       });
     }
 
-    // Set customer info ke req.customer (tanpa role/permissions)
-    req.customer = {
+    // STANDARDIZED: Set customer info ke req.user (consistent with admin)
+    req.user = {
       id: customer.id,
       phone_number: customer.phone_number,
       full_name: customer.full_name,
       address: customer.address,
       is_active: customer.is_active,
+      type: "customer", // Distinguish from admin
     };
+
+    // BACKWARD COMPATIBILITY: Also set req.customer for existing code
+    req.customer = req.user;
 
     next();
   } catch (error) {
