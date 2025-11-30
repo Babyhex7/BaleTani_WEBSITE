@@ -42,14 +42,14 @@ module.exports = (on, config) => {
           "payment_details",
           "orders",
           "carts",
-          "stock_movements",
+          "stock_movements_reporting",
           "procurement_items",
           "procurements",
           "product_images",
-          "discount_products",
+          "product_discounts",
           "products",
           "discounts",
-          "categories",
+          "product_categories",
           "customers",
           "contact_messages",
           "faqs",
@@ -133,49 +133,43 @@ async function seedCategories(connection) {
   const categories = [
     {
       id: "cat-001",
-      name: "Beras & Serealia",
+      category_name: "Beras & Serealia",
       description: "Beras dan biji-bijian berkualitas",
-      image_url: "/uploads/categories/beras.jpg",
       is_active: true,
     },
     {
       id: "cat-002",
-      name: "Sayuran",
+      category_name: "Sayuran",
       description: "Sayuran segar dari petani lokal",
-      image_url: "/uploads/categories/sayuran.jpg",
       is_active: true,
     },
     {
       id: "cat-003",
-      name: "Buah-buahan",
+      category_name: "Buah-buahan",
       description: "Buah segar pilihan",
-      image_url: "/uploads/categories/buah.jpg",
       is_active: true,
     },
     {
       id: "cat-004",
-      name: "Telur & Unggas",
+      category_name: "Telur & Unggas",
       description: "Telur dan produk unggas segar",
-      image_url: "/uploads/categories/telur.jpg",
       is_active: true,
     },
     {
       id: "cat-005",
-      name: "Bumbu Dapur",
+      category_name: "Bumbu Dapur",
       description: "Bumbu dan rempah pilihan",
-      image_url: "/uploads/categories/bumbu.jpg",
       is_active: true,
     },
   ];
 
   for (const category of categories) {
     await connection.query(
-      "INSERT INTO categories (id, name, description, image_url, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
+      "INSERT INTO product_categories (id, category_name, description, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())",
       [
         category.id,
-        category.name,
+        category.category_name,
         category.description,
-        category.image_url,
         category.is_active,
       ]
     );
@@ -192,56 +186,61 @@ async function seedProducts(connection) {
     {
       id: "prod-001",
       name: "Beras Premium 5kg",
-      description: "Beras berkualitas tinggi pilihan",
-      price: 75000,
-      stock: 100,
-      unit: "kg",
+      product_type: "online",
       category_id: "cat-001",
-      image_url: "/uploads/products/beras-premium.jpg",
+      description: "Beras berkualitas tinggi pilihan",
+      selling_price: 75000,
+      quantity_info: "5 kg",
+      shelf_life_days: 365,
+      total_stock: 100,
       is_active: true,
     },
     {
       id: "prod-002",
       name: "Telur Ayam Kampung 10 Butir",
-      description: "Telur segar dari ayam kampung",
-      price: 30000,
-      stock: 50,
-      unit: "pack",
+      product_type: "online",
       category_id: "cat-004",
-      image_url: "/uploads/products/telur-kampung.jpg",
+      description: "Telur segar dari ayam kampung",
+      selling_price: 30000,
+      quantity_info: "10 butir",
+      shelf_life_days: 14,
+      total_stock: 50,
       is_active: true,
     },
     {
       id: "prod-003",
       name: "Sayuran Organik Mix 1kg",
-      description: "Paket sayuran organik segar",
-      price: 25000,
-      stock: 30,
-      unit: "kg",
+      product_type: "online",
       category_id: "cat-002",
-      image_url: "/uploads/products/sayuran-mix.jpg",
+      description: "Paket sayuran organik segar",
+      selling_price: 25000,
+      quantity_info: "1 kg",
+      shelf_life_days: 7,
+      total_stock: 30,
       is_active: true,
     },
     {
       id: "prod-004",
       name: "Jeruk Manis 1kg",
-      description: "Jeruk manis segar",
-      price: 20000,
-      stock: 40,
-      unit: "kg",
+      product_type: "online",
       category_id: "cat-003",
-      image_url: "/uploads/products/jeruk.jpg",
+      description: "Jeruk manis segar",
+      selling_price: 20000,
+      quantity_info: "1 kg",
+      shelf_life_days: 14,
+      total_stock: 40,
       is_active: true,
     },
     {
       id: "prod-005",
       name: "Cabai Merah 500g",
-      description: "Cabai merah segar pilihan",
-      price: 15000,
-      stock: 0, // Out of stock for testing
-      unit: "gram",
+      product_type: "online",
       category_id: "cat-005",
-      image_url: "/uploads/products/cabai.jpg",
+      description: "Cabai merah segar pilihan",
+      selling_price: 15000,
+      quantity_info: "500 gram",
+      shelf_life_days: 7,
+      total_stock: 0, // Out of stock for testing
       is_active: true,
     },
   ];
@@ -249,17 +248,18 @@ async function seedProducts(connection) {
   for (const product of products) {
     await connection.query(
       `INSERT INTO products 
-       (id, name, description, price, stock, unit, category_id, image_url, is_active, created_at, updated_at) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+       (id, name, product_type, category_id, description, selling_price, quantity_info, shelf_life_days, total_stock, is_active, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
       [
         product.id,
         product.name,
-        product.description,
-        product.price,
-        product.stock,
-        product.unit,
+        product.product_type,
         product.category_id,
-        product.image_url,
+        product.description,
+        product.selling_price,
+        product.quantity_info,
+        product.shelf_life_days,
+        product.total_stock,
         product.is_active,
       ]
     );
@@ -349,7 +349,7 @@ async function seedDiscounts(connection) {
 
     // Assign discount to product
     await connection.query(
-      `INSERT INTO discount_products (discount_id, product_id, created_at) 
+      `INSERT INTO product_discounts (discount_id, product_id, created_at) 
        VALUES (?, ?, NOW())`,
       [discount.id, "prod-002"] // Telur Ayam Kampung
     );

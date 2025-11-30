@@ -364,16 +364,18 @@ const ProductDetailPage = () => {
                     </label>
                     <div className="flex items-center gap-3">
                       <button
+                        data-cy="quantity-decrease"
                         onClick={() => handleQuantityChange(-1)}
                         disabled={quantity <= 1}
                         className="btn-touch w-10 h-10 sm:w-12 sm:h-12 rounded-lg border border-gray-300 flex items-center justify-center text-lg font-semibold hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         -
                       </button>
-                      <span className="w-12 sm:w-16 text-center text-base sm:text-lg font-semibold">
+                      <span data-cy="quantity-input" className="w-12 sm:w-16 text-center text-base sm:text-lg font-semibold">
                         {quantity}
                       </span>
                       <button
+                        data-cy="quantity-increase"
                         onClick={() => handleQuantityChange(1)}
                         disabled={quantity >= product.stock}
                         className="btn-touch w-10 h-10 sm:w-12 sm:h-12 rounded-lg border border-gray-300 flex items-center justify-center text-lg font-semibold hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -390,6 +392,7 @@ const ProductDetailPage = () => {
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 mt-auto pt-4 border-t border-gray-100">
                   <button
+                    data-cy="add-to-cart-btn"
                     onClick={handleAddToCart}
                     disabled={product.stock === 0 || isProcessing}
                     className="btn-touch flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-lg bg-green-600 text-white text-sm sm:text-base font-semibold hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"

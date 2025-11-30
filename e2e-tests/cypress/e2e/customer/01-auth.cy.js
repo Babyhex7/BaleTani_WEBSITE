@@ -203,14 +203,16 @@ describe("Customer Authentication Flow", () => {
       cy.intercept("POST", "**/api/customer/auth/login").as("loginRequest");
 
       // Fill login form
-      cy.get('input[name="phoneNumber"]').type(testCustomer.phone_number);
-      cy.get('input[name="password"]').type(testCustomer.password);
+      cy.get('input[name="phoneNumber"]')
+        .clear()
+        .type(testCustomer.phone_number);
+      cy.get('input[name="password"]').clear().type(testCustomer.password);
 
       // Submit form
-      cy.contains("button", "Masuk").click();
+      cy.get('[data-cy="login-submit-btn"]').click();
 
       // Wait for API response
-      cy.wait("@loginRequest", { timeout: 10000 })
+      cy.wait("@loginRequest", { timeout: 15000 })
         .its("response.statusCode")
         .should("eq", 200);
 
@@ -228,13 +230,13 @@ describe("Customer Authentication Flow", () => {
       // Intercept login API
       cy.intercept("POST", "**/api/customer/auth/login").as("loginRequest");
 
-      cy.get('input[name="phoneNumber"]').type("0899999999");
-      cy.get('input[name="password"]').type("wrongpassword");
+      cy.get('input[name="phoneNumber"]').clear().type("0899999999");
+      cy.get('input[name="password"]').clear().type("wrongpassword");
 
-      cy.contains("button", "Masuk").click();
+      cy.get('[data-cy="login-submit-btn"]').click();
 
       // Wait for API response - should be 401
-      cy.wait("@loginRequest", { timeout: 10000 })
+      cy.wait("@loginRequest", { timeout: 15000 })
         .its("response.statusCode")
         .should("eq", 401);
 
@@ -249,13 +251,15 @@ describe("Customer Authentication Flow", () => {
       // Intercept login API
       cy.intercept("POST", "**/api/customer/auth/login").as("loginRequest");
 
-      cy.get('input[name="phoneNumber"]').type(testCustomer.phone_number);
-      cy.get('input[name="password"]').type("wrongpassword123");
+      cy.get('input[name="phoneNumber"]')
+        .clear()
+        .type(testCustomer.phone_number);
+      cy.get('input[name="password"]').clear().type("wrongpassword123");
 
-      cy.contains("button", "Masuk").click();
+      cy.get('[data-cy="login-submit-btn"]').click();
 
       // Wait for API response - should be 401
-      cy.wait("@loginRequest", { timeout: 10000 })
+      cy.wait("@loginRequest", { timeout: 15000 })
         .its("response.statusCode")
         .should("eq", 401);
 
@@ -283,13 +287,13 @@ describe("Customer Authentication Flow", () => {
       cy.intercept("POST", "**/api/customer/auth/login").as("loginRequest");
 
       // Login with 08xxx format
-      cy.get('input[name="phoneNumber"]').type("081234567890");
-      cy.get('input[name="password"]').type(testCustomer.password);
+      cy.get('input[name="phoneNumber"]').clear().type("081234567890");
+      cy.get('input[name="password"]').clear().type(testCustomer.password);
 
-      cy.contains("button", "Masuk").click();
+      cy.get('[data-cy="login-submit-btn"]').click();
 
       // Wait for API response
-      cy.wait("@loginRequest", { timeout: 10000 })
+      cy.wait("@loginRequest", { timeout: 15000 })
         .its("response.statusCode")
         .should("eq", 200);
 

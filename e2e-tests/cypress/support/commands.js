@@ -115,45 +115,55 @@ Cypress.Commands.add("customerLogout", () => {
  */
 
 /**
- * Add product to cart via API
+ * Add product to cart via localStorage (Zustand)
  * @param {string} productId - UUID of product
  * @param {number} quantity - Quantity to add
- * @example cy.addToCart('product-uuid-123', 2)
+ * @example cy.addToCart('prod-001', 2)
  */
 Cypress.Commands.add("addToCart", (productId, quantity = 1) => {
-  cy.window().then((win) => {
-    const storage = JSON.parse(
-      win.localStorage.getItem("baletani-customer-storage") || "{}"
+  return cy.window().then((win) => {
+    // Get current cart from localStorage
+    const cartStorage = JSON.parse(
+      win.localStorage.getItem("baletani-cart") || '{"state":{"items":[]}}'
     );
-    const token = storage.state?.token;
-
-    if (!token) {
-      throw new Error(
-        "❌ No auth token found. Customer must be logged in to add to cart."
-      );
+    
+    const currentItems = cartStorage.state?.items || [];
+    
+    // Mock product data (should match seeded products)
+    const productData = {
+      "prod-001": { id: "prod-001", name: "Beras Premium 5kg", price: 75000, finalPrice: 75000, stock: 100, unit: "5 kg" },
+      "prod-002": { id: "prod-002", name: "Telur Ayam Kampung 10 Butir", price: 30000, finalPrice: 27000, stock: 50, unit: "10 butir", discount: { value: 10, type: "percentage" } },
+      "prod-003": { id: "prod-003", name: "Sayuran Organik Mix 1kg", price: 25000, finalPrice: 25000, stock: 30, unit: "1 kg" },
+      "prod-004": { id: "prod-004", name: "Jeruk Manis 1kg", price: 20000, finalPrice: 20000, stock: 40, unit: "1 kg" },
+      "prod-005": { id: "prod-005", name: "Cabai Merah 500g", price: 15000, finalPrice: 15000, stock: 0, unit: "500 gram" },
+    };
+    
+    const product = productData[productId];
+    if (!product) {
+      cy.log(`❌ Product ${productId} not found in mock data`);
+      return;
     }
-
-    return cy
-      .request({
-        method: "POST",
-        url: `${Cypress.env("API_URL")}/customer/cart`,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: {
-          product_id: productId,
-          quantity: quantity,
-        },
-        failOnStatusCode: false,
-      })
-      .then((response) => {
-        if (response.status === 200 || response.status === 201) {
-          cy.log(`✅ Added ${quantity}x product to cart`);
-        } else {
-          cy.log("❌ Add to cart failed:", response.body.message);
-        }
-        return response;
+    
+    // Check if item already in cart
+    const existingItemIndex = currentItems.findIndex(item => item.id === productId);
+    
+    if (existingItemIndex >= 0) {
+      // Update quantity
+      currentItems[existingItemIndex].quantity += quantity;
+    } else {
+      // Add new item
+      currentItems.push({
+        ...product,
+        quantity: quantity,
+        image: null,
       });
+    }
+    
+    // Update localStorage
+    cartStorage.state.items = currentItems;
+    win.localStorage.setItem("baletani-cart", JSON.stringify(cartStorage));
+    
+    cy.log(`✅ Added ${quantity}x ${product.name} to cart (localStorage)`);
   });
 });
 
@@ -164,7 +174,7 @@ Cypress.Commands.add("addToCart", (productId, quantity = 1) => {
  * @example cy.updateCartItem('cart-item-uuid', 5)
  */
 Cypress.Commands.add("updateCartItem", (cartItemId, quantity) => {
-  cy.window().then((win) => {
+  return cy.window().then((win) => {
     const storage = JSON.parse(
       win.localStorage.getItem("baletani-customer-storage") || "{}"
     );
@@ -184,7 +194,6 @@ Cypress.Commands.add("updateCartItem", (cartItemId, quantity) => {
         if (response.status === 200) {
           cy.log(`✅ Updated cart item quantity to ${quantity}`);
         }
-        return response;
       });
   });
 });
@@ -220,35 +229,14 @@ Cypress.Commands.add("removeFromCart", (cartItemId) => {
 });
 
 /**
- * Clear entire cart via API
+ * Clear entire cart via localStorage
  * @example cy.clearCart()
  */
 Cypress.Commands.add("clearCart", () => {
-  cy.window().then((win) => {
-    const storage = JSON.parse(
-      win.localStorage.getItem("baletani-customer-storage") || "{}"
-    );
-    const token = storage.state?.token;
-
-    if (!token) {
-      cy.log("⚠️ No auth token, skipping cart clear");
-      return;
-    }
-
-    return cy
-      .request({
-        method: "DELETE",
-        url: `${Cypress.env("API_URL")}/customer/cart`,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        failOnStatusCode: false,
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          cy.log("✅ Cart cleared");
-        }
-        return response;
+  return cy.window().then((win) => {
+    const cartStorage = { state: { items: [] }, version: 0 };
+    win.localStorage.setItem("baletani-cart", JSON.stringify(cartStorage));
+    cy.log("✅ Cart cleared (localStorage)");
       });
   });
 });

@@ -87,12 +87,13 @@ const Navbar = () => {
             {/* Cart - Only show if authenticated */}
             {isAuthenticated && (
               <Link 
+                data-cy="cart-icon"
                 to="/cart"
                 className="relative p-2 lg:p-2.5 text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 <ShoppingCart className="w-5 h-5 lg:w-6 lg:h-6" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-accent-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                  <span data-cy="cart-count" className="absolute -top-1 -right-1 bg-accent-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                     {totalItems > 99 ? '99+' : totalItems}
                   </span>
                 )}
@@ -166,12 +167,13 @@ const Navbar = () => {
             {/* Mobile Cart Icon */}
             {isAuthenticated && (
               <Link 
+                data-cy="cart-icon"
                 to="/cart"
                 className="relative p-2 text-gray-700 hover:text-primary-600 active:bg-gray-100 rounded-lg transition-colors"
               >
                 <ShoppingCart className="w-5 h-5" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-accent-500 text-white text-[9px] font-bold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-0.5">
+                  <span data-cy="cart-count" className="absolute -top-0.5 -right-0.5 bg-accent-500 text-white text-[9px] font-bold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-0.5">
                     {totalItems > 99 ? '99+' : totalItems}
                   </span>
                 )}

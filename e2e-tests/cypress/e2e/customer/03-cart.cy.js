@@ -73,8 +73,10 @@ describe("Customer Shopping Cart Flow", () => {
       // Verify on detail page
       cy.url().should("include", "/products/");
 
-      // Set quantity
-      cy.get("[data-cy=quantity-input]").clear().type("3");
+      // Set quantity to 3 using increase button
+      cy.get("[data-cy=quantity-increase]").click();
+      cy.get("[data-cy=quantity-increase]").click();
+      cy.get("[data-cy=quantity-input]").should("contain.text", "3");
 
       // Add to cart
       cy.get("[data-cy=add-to-cart-btn]").click();
@@ -87,7 +89,7 @@ describe("Customer Shopping Cart Flow", () => {
 
       // Verify quantity in cart
       cy.get("[data-cy=cart-item]").should("have.length", 1);
-      cy.get("[data-cy=quantity-input]").should("have.value", "3");
+      cy.get("[data-cy=quantity-input]").should("contain.text", "3");
     });
 
     it("should update quantity if product already in cart", () => {
@@ -114,7 +116,7 @@ describe("Customer Shopping Cart Flow", () => {
 
       // Should have only 1 item with quantity 2
       cy.get("[data-cy=cart-item]").should("have.length", 1);
-      cy.get("[data-cy=quantity-input]").should("have.value", "2");
+      cy.get("[data-cy=quantity-input]").should("contain.text", "2");
     });
 
     it("should add multiple different products to cart", () => {
@@ -158,14 +160,18 @@ describe("Customer Shopping Cart Flow", () => {
       // Go to product detail
       cy.get("[data-cy=product-card]").first().click();
 
-      // Try to set quantity higher than stock
-      cy.get("[data-cy=quantity-input]").clear().type("9999");
-      cy.get("[data-cy=add-to-cart-btn]").click();
+      // Click increase button many times to reach stock limit
+      // The button should become disabled at stock limit
+      for (let i = 0; i < 150; i++) {
+        cy.get("[data-cy=quantity-increase]").then($btn => {
+          if (!$btn.is(':disabled')) {
+            cy.wrap($btn).click();
+          }
+        });
+      }
 
-      // Should show error
-      cy.contains("stok tidak mencukupi", { matchCase: false }).should(
-        "be.visible"
-      );
+      // Verify increase button is disabled at stock limit
+      cy.get("[data-cy=quantity-increase]").should("be.disabled");
     });
   });
 
@@ -258,10 +264,10 @@ describe("Customer Shopping Cart Flow", () => {
       cy.get("[data-cy=cart-item]")
         .first()
         .within(() => {
-          cy.get("[data-cy=quantity-input]").should("have.value", "2");
+          cy.get("[data-cy=quantity-input]").should("contain.text", "2");
           cy.get("[data-cy=quantity-increase]").click();
           cy.wait(500);
-          cy.get("[data-cy=quantity-input]").should("have.value", "3");
+          cy.get("[data-cy=quantity-input]").should("contain.text", "3");
         });
 
       // Verify subtotal updated
@@ -272,24 +278,30 @@ describe("Customer Shopping Cart Flow", () => {
       cy.get("[data-cy=cart-item]")
         .first()
         .within(() => {
-          cy.get("[data-cy=quantity-input]").should("have.value", "2");
+          cy.get("[data-cy=quantity-input]").should("contain.text", "2");
           cy.get("[data-cy=quantity-decrease]").click();
           cy.wait(500);
-          cy.get("[data-cy=quantity-input]").should("have.value", "1");
+          cy.get("[data-cy=quantity-input]").should("contain.text", "1");
         });
     });
 
-    it("should update quantity by typing in input", () => {
+    it("should update quantity using buttons", () => {
       cy.get("[data-cy=cart-item]")
         .first()
         .within(() => {
-          cy.get("[data-cy=quantity-input]").clear().type("5").blur();
+          // Click increase button 3 times (from 2 to 5)
+          cy.get("[data-cy=quantity-increase]").click();
+          cy.wait(200);
+          cy.get("[data-cy=quantity-increase]").click();
+          cy.wait(200);
+          cy.get("[data-cy=quantity-increase]").click();
           cy.wait(500);
+          cy.get("[data-cy=quantity-input]").should("contain.text", "5");
         });
 
-      // Verify updated
+      // Verify updated after reload
       cy.reload();
-      cy.get("[data-cy=quantity-input]").should("have.value", "5");
+      cy.get("[data-cy=quantity-input]").first().should("contain.text", "5");
     });
 
     it("should NOT decrease below 1", () => {
@@ -300,7 +312,7 @@ describe("Customer Shopping Cart Flow", () => {
           cy.wait(500);
           cy.get("[data-cy=quantity-decrease]").click(); // Try to go to 0
           cy.wait(500);
-          cy.get("[data-cy=quantity-input]").should("have.value", "1");
+          cy.get("[data-cy=quantity-input]").should("contain.text", "1");
         });
     });
   });
@@ -444,7 +456,7 @@ describe("Customer Shopping Cart Flow", () => {
 
       // Cart should still have item
       cy.get("[data-cy=cart-item]").should("have.length", 1);
-      cy.get("[data-cy=quantity-input]").should("have.value", "2");
+      cy.get("[data-cy=quantity-input]").should("contain.text", "2");
     });
 
     it("should sync cart across different pages", () => {
@@ -530,3 +542,4 @@ describe("Customer Shopping Cart Flow", () => {
     });
   });
 });
+

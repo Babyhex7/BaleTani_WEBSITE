@@ -220,6 +220,7 @@ const Login = () => {
               required
               autoComplete="tel"
               placeholder="08xx, 62xx, atau +62xx"
+              data-cy="phone-input"
             />
 
             {/* Password field */}
@@ -244,11 +245,13 @@ const Login = () => {
                   placeholder="Masukkan password Anda"
                   required
                   autoComplete="current-password"
+                  data-cy="password-input"
                 />
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 btn-touch"
                   onClick={() => setShowPassword(!showPassword)}
+                  data-cy="toggle-password-btn"
                 >
                   {showPassword ? <EyeOff size={18} className="sm:w-5 sm:h-5" /> : <Eye size={18} className="sm:w-5 sm:h-5" />}
                 </button>
@@ -288,6 +291,7 @@ const Login = () => {
               className="w-full btn-touch"
               loading={isLoading}
               disabled={isLoading}
+              data-cy="login-submit-btn"
             >
               {isLoading ? 'Memproses...' : 'Masuk'}
             </Button>
