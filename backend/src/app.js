@@ -31,7 +31,7 @@ const limiter = rateLimit({
   },
   // Skip static files (uploads, images)
   skip: (req) => {
-    return req.url.startsWith('/uploads/');
+    return req.url.startsWith("/uploads/");
   },
   // Handler untuk rate limit
   handler: (req, res) => {

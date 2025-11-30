@@ -44,9 +44,11 @@ const sequelize = new Sequelize(
       // Validate connection sebelum digunakan
       validate: (connection) => {
         try {
-          return connection && 
-                 connection.state !== 'disconnected' &&
-                 connection.threadId !== undefined; // MySQL thread check
+          return (
+            connection &&
+            connection.state !== "disconnected" &&
+            connection.threadId !== undefined
+          ); // MySQL thread check
         } catch (e) {
           return false;
         }
