@@ -33,10 +33,11 @@
   "author": "BaleTani Team",
   "license": "ISC",
   "devDependencies": {
-    "cypress": "^13.6.0",
     "@faker-js/faker": "^8.3.1",
-    "mysql2": "^3.6.5",
+    "bcryptjs": "^3.0.3",
+    "cypress": "^13.6.0",
     "dotenv": "^16.3.1",
+    "mysql2": "^3.6.5",
     "start-server-and-test": "^2.0.3"
   }
 }

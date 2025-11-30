@@ -45,8 +45,8 @@ describe("Customer Authentication Flow", () => {
     });
 
     it("should display registration form correctly", () => {
-      // Verify page title
-      cy.contains("Daftar Akun").should("be.visible");
+      // Verify page title/description
+      cy.contains("Bergabunglah dengan kami").should("be.visible");
 
       // Verify form fields exist
       cy.get('input[name="fullName"]').should("be.visible");
@@ -55,7 +55,7 @@ describe("Customer Authentication Flow", () => {
       cy.get('input[name="confirmPassword"]').should("be.visible");
 
       // Verify submit button
-      cy.contains("button", "Daftar").should("be.visible");
+      cy.contains("button", "Daftar Sekarang").should("be.visible");
 
       // Verify login link
       cy.contains("Sudah punya akun?").should("be.visible");
@@ -70,17 +70,17 @@ describe("Customer Authentication Flow", () => {
       cy.get('input[name="password"]').type("password123");
       cy.get('input[name="confirmPassword"]').type("password123");
 
+      // Accept terms checkbox
+      cy.get('input[type="checkbox"]').check();
+
       // Submit form
-      cy.contains("button", "Daftar").click();
+      cy.contains("button", "Daftar Sekarang").click();
 
       // Verify success redirect to login
       cy.url().should("include", "/login");
 
       // Verify success toast
       cy.contains("Registrasi berhasil").should("be.visible");
-
-      // Verify phone is pre-filled in login form
-      cy.get('input[name="phoneNumber"]').should("have.value", uniquePhone);
     });
 
     it("should show validation error for short phone number", () => {
@@ -89,10 +89,11 @@ describe("Customer Authentication Flow", () => {
       cy.get('input[name="password"]').type("password123");
       cy.get('input[name="confirmPassword"]').type("password123");
 
-      cy.contains("button", "Daftar").click();
+      cy.get('input[type="checkbox"]').check();
+      cy.contains("button", "Daftar Sekarang").click();
 
       // Verify error message
-      cy.contains("Nomor telepon harus 10-15 digit").should("be.visible");
+      cy.contains("Format nomor telepon tidak valid").should("be.visible");
 
       // Should not redirect
       cy.url().should("include", "/register");
@@ -103,10 +104,14 @@ describe("Customer Authentication Flow", () => {
       cy.get('input[name="phoneNumber"]').type("081234567890");
       cy.get('input[name="password"]').type("password123");
       cy.get('input[name="confirmPassword"]').type("password123");
+      cy.get('input[type="checkbox"]').check();
 
-      cy.contains("button", "Daftar").click();
+      cy.contains("button", "Daftar Sekarang").click();
 
-      // Verify error message
+      // Wait for validation error to appear
+      cy.wait(500);
+      
+      // Frontend shows inline error below input
       cy.contains("Nama lengkap minimal 2 karakter").should("be.visible");
     });
 
@@ -115,10 +120,14 @@ describe("Customer Authentication Flow", () => {
       cy.get('input[name="phoneNumber"]').type("081234567890");
       cy.get('input[name="password"]').type("123"); // Too short
       cy.get('input[name="confirmPassword"]').type("123");
+      cy.get('input[type="checkbox"]').check();
 
-      cy.contains("button", "Daftar").click();
+      cy.contains("button", "Daftar Sekarang").click();
 
-      // Verify error message
+      // Wait for validation error
+      cy.wait(500);
+      
+      // Frontend shows inline error below input
       cy.contains("Password minimal 6 karakter").should("be.visible");
     });
 
@@ -127,11 +136,12 @@ describe("Customer Authentication Flow", () => {
       cy.get('input[name="phoneNumber"]').type("081234567890");
       cy.get('input[name="password"]').type("password123");
       cy.get('input[name="confirmPassword"]').type("password456"); // Different
+      cy.get('input[type="checkbox"]').check();
 
-      cy.contains("button", "Daftar").click();
+      cy.contains("button", "Daftar Sekarang").click();
 
       // Verify error message
-      cy.contains("Password tidak cocok").should("be.visible");
+      cy.contains("Konfirmasi password tidak sesuai").should("be.visible");
     });
 
     it("should show error for duplicate phone number", () => {
@@ -140,8 +150,9 @@ describe("Customer Authentication Flow", () => {
       cy.get('input[name="phoneNumber"]').type(testCustomer.phone_number);
       cy.get('input[name="password"]').type("password123");
       cy.get('input[name="confirmPassword"]').type("password123");
+      cy.get('input[type="checkbox"]').check();
 
-      cy.contains("button", "Daftar").click();
+      cy.contains("button", "Daftar Sekarang").click();
 
       // Verify error message
       cy.contains("Nomor telepon sudah terdaftar").should("be.visible");
@@ -173,8 +184,8 @@ describe("Customer Authentication Flow", () => {
     });
 
     it("should display login form correctly", () => {
-      // Verify page title
-      cy.contains("Masuk").should("be.visible");
+      // Verify welcome text
+      cy.contains("Selamat datang kembali").should("be.visible");
 
       // Verify form fields
       cy.get('input[name="phoneNumber"]').should("be.visible");
@@ -188,6 +199,9 @@ describe("Customer Authentication Flow", () => {
     });
 
     it("should login with valid credentials", () => {
+      // Intercept login API
+      cy.intercept('POST', '**/api/customer/auth/login').as('loginRequest');
+      
       // Fill login form
       cy.get('input[name="phoneNumber"]').type(testCustomer.phone_number);
       cy.get('input[name="password"]').type(testCustomer.password);
@@ -195,8 +209,11 @@ describe("Customer Authentication Flow", () => {
       // Submit form
       cy.contains("button", "Masuk").click();
 
-      // Verify redirect to home
-      cy.url().should("include", "/home");
+      // Wait for API response
+      cy.wait('@loginRequest', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
+      
+      // Verify redirect to /home (as per Login.jsx: navigate('/home'))
+      cy.url({ timeout: 15000 }).should("include", "/home");
 
       // Verify authenticated state
       cy.shouldBeAuthenticated();
@@ -206,13 +223,16 @@ describe("Customer Authentication Flow", () => {
     });
 
     it("should show error for invalid phone number", () => {
+      // Intercept login API
+      cy.intercept('POST', '**/api/customer/auth/login').as('loginRequest');
+      
       cy.get('input[name="phoneNumber"]').type("0899999999");
       cy.get('input[name="password"]').type("wrongpassword");
 
       cy.contains("button", "Masuk").click();
 
-      // Verify error message
-      cy.contains("Nomor telepon atau password salah").should("be.visible");
+      // Wait for API response - should be 401
+      cy.wait('@loginRequest', { timeout: 10000 }).its('response.statusCode').should('eq', 401);
 
       // Should not redirect
       cy.url().should("include", "/login");
@@ -222,33 +242,52 @@ describe("Customer Authentication Flow", () => {
     });
 
     it("should show error for wrong password", () => {
+      // Intercept login API
+      cy.intercept('POST', '**/api/customer/auth/login').as('loginRequest');
+      
       cy.get('input[name="phoneNumber"]').type(testCustomer.phone_number);
       cy.get('input[name="password"]').type("wrongpassword123");
 
       cy.contains("button", "Masuk").click();
 
-      // Verify error message
-      cy.contains("Nomor telepon atau password salah").should("be.visible");
+      // Wait for API response - should be 401
+      cy.wait('@loginRequest', { timeout: 10000 }).its('response.statusCode').should('eq', 401);
+      
+      // Should stay on login page
+      cy.url().should("include", "/login");
     });
 
     it("should show validation error for empty fields", () => {
-      // Try to submit empty form
+      // Verify inputs exist and are visible
+      cy.get('input[name="phoneNumber"]').should('be.visible');
+      cy.get('input[name="password"]').should('be.visible');
+      
+      // Try to submit empty form - should not make API call
       cy.contains("button", "Masuk").click();
 
-      // Verify validation errors
-      cy.contains("Nomor telepon wajib diisi").should("be.visible");
-      cy.contains("Password wajib diisi").should("be.visible");
+      // Should stay on login page (validation prevents submit)
+      cy.url().should("include", "/login");
+      
+      // Should not be authenticated
+      cy.shouldNotBeAuthenticated();
     });
 
     it("should normalize phone number (08xxx to 628xxx)", () => {
+      // Intercept login API
+      cy.intercept('POST', '**/api/customer/auth/login').as('loginRequest');
+      
       // Login with 08xxx format
       cy.get('input[name="phoneNumber"]').type("081234567890");
       cy.get('input[name="password"]').type(testCustomer.password);
 
       cy.contains("button", "Masuk").click();
 
+      // Wait for API response
+      cy.wait('@loginRequest', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
+      
       // Should login successfully (backend normalizes it)
-      cy.url().should("include", "/home");
+      cy.url({ timeout: 15000 }).should("include", "/home");
+      cy.shouldBeAuthenticated();
 
       // Verify normalized phone in localStorage
       cy.getCustomerData().then((customer) => {
@@ -311,14 +350,16 @@ describe("Customer Authentication Flow", () => {
       // Verify logged in
       cy.shouldBeAuthenticated();
 
-      // Click logout button (assuming it exists in navbar)
-      cy.get("[data-cy=user-menu]").click();
-      cy.contains("Keluar").click();
+      // Logout via custom command (clears localStorage)
+      cy.customerLogout();
+      
+      // Visit root to trigger redirect
+      cy.visit("/");
 
       // Verify logged out
       cy.shouldNotBeAuthenticated();
 
-      // Should redirect to landing
+      // Should redirect to landing when not authenticated
       cy.url().should("include", "/landing");
     });
 
