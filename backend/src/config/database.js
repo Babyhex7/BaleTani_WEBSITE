@@ -13,6 +13,9 @@ const sequelize = new Sequelize(
     dialectOptions: {
       timezone: "+07:00",
       connectTimeout: 60000, // 60 seconds
+      // Keep connection alive untuk prevent MySQL timeout
+      keepAlive: true,
+      keepAliveInitialDelay: 10000, // 10 detik
     },
     logging:
       process.env.NODE_ENV === "development"
@@ -30,17 +33,23 @@ const sequelize = new Sequelize(
     // ========================================
     // CONNECTION POOL CONFIGURATION
     // ========================================
-    // Optimized untuk handle banyak concurrent requests
+    // Optimized untuk handle high traffic & banyak concurrent requests
     pool: {
-      max: 50, // Maximum 50 connections (naik dari 20)
-      min: 10, // Always keep 10 connections warm (naik dari 5)
-      acquire: 60000, // 60 detik timeout untuk dapat connection
-      idle: 20000, // 20 detik idle sebelum release (naik dari 10)
+      max: 100, // Maximum 100 connections (naik dari 50)
+      min: 20, // Always keep 20 connections warm (naik dari 10)
+      acquire: 120000, // 120 detik (2 menit) timeout untuk dapat connection
+      idle: 30000, // 30 detik idle sebelum release (naik dari 20)
       evict: 10000, // Check idle connections setiap 10 detik
       handleDisconnects: true, // Auto reconnect jika terputus
       // Validate connection sebelum digunakan
       validate: (connection) => {
-        return connection && connection.state !== "disconnected";
+        try {
+          return connection && 
+                 connection.state !== 'disconnected' &&
+                 connection.threadId !== undefined; // MySQL thread check
+        } catch (e) {
+          return false;
+        }
       },
     },
     retry: {

@@ -24,10 +24,23 @@ app.use(
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 500, // limit each IP to 500 requests per windowMs (naik dari 100)
   message: {
     success: false,
     message: "Too many requests from this IP, please try again later.",
+  },
+  // Skip static files (uploads, images)
+  skip: (req) => {
+    return req.url.startsWith('/uploads/');
+  },
+  // Handler untuk rate limit
+  handler: (req, res) => {
+    console.warn(`⚠️ Rate limit exceeded from IP: ${req.ip}`);
+    res.status(429).json({
+      success: false,
+      message: "Terlalu banyak request. Silakan tunggu beberapa saat.",
+      retryAfter: Math.ceil(req.rateLimit.resetTime / 1000),
+    });
   },
 });
 app.use(limiter);
