@@ -163,8 +163,8 @@ describe("Customer Shopping Cart Flow", () => {
       // Click increase button many times to reach stock limit
       // The button should become disabled at stock limit
       for (let i = 0; i < 150; i++) {
-        cy.get("[data-cy=quantity-increase]").then($btn => {
-          if (!$btn.is(':disabled')) {
+        cy.get("[data-cy=quantity-increase]").then(($btn) => {
+          if (!$btn.is(":disabled")) {
             cy.wrap($btn).click();
           }
         });
@@ -542,4 +542,3 @@ describe("Customer Shopping Cart Flow", () => {
     });
   });
 });
-
