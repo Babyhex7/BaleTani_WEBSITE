@@ -26,7 +26,6 @@ const Home = () => {
   console.log('User data from store:', user);
   
   // State management
-  const [categories, setCategories] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   
   // Pagination states
@@ -34,34 +33,10 @@ const Home = () => {
   const [productPagination, setProductPagination] = useState(null);
   
   // Loading states
-  const [loadingCategories, setLoadingCategories] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(true);
   
   // Error states
-  const [errorCategories, setErrorCategories] = useState(null);
   const [errorProducts, setErrorProducts] = useState(null);
-
-  // Fetch Categories dari API (tanpa pagination, jadi carousel)
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoadingCategories(true);
-        const response = await apiClient.get('/public/categories');
-        
-        if (response.data.success) {
-          setCategories(response.data.data);
-          setErrorCategories(null);
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-        setErrorCategories('Gagal memuat kategori');
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
-    fetchCategories();
-  }, []);
-
 
 
   // Fetch Featured Products dari API dengan Pagination
@@ -220,91 +195,6 @@ const Home = () => {
                   Refresh Produk
                 </button>
               </Link>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Categories - Modern Cards */}
-      <section className="section-py">
-        <div className="container-app">
-          {/* Section Header */}
-          <div className="mb-6 sm:mb-8">
-            <div className="flex items-center justify-between gap-3 mb-1 sm:mb-2">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                  <Grid className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                </div>
-                <h2 className="heading-section text-gray-900">
-                  Kategori Populer
-                </h2>
-              </div>
-              <Link to="/categories">
-                <button className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-600 hover:bg-gray-700 text-white text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 sm:gap-2 group flex-shrink-0">
-                  Semua Kategori
-                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </Link>
-            </div>
-            <p className="text-caption text-gray-600">Jelajahi produk berdasarkan kategori</p>
-          </div>
-
-          {/* Categories Horizontal Scrollable Carousel */}
-          {loadingCategories ? (
-            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="flex-shrink-0 w-32 sm:w-36 lg:w-40 bg-white rounded-2xl shadow-sm p-4 sm:p-6 animate-pulse">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gray-200 rounded-xl mx-auto mb-3"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-2/3 mx-auto"></div>
-                </div>
-              ))}
-            </div>
-          ) : errorCategories ? (
-            <div className="bg-white rounded-2xl p-12 text-center shadow-md">
-              <AlertCircle className="w-16 h-16 mx-auto text-red-500 mb-4" />
-              <p className="text-red-600 text-lg">{errorCategories}</p>
-            </div>
-          ) : categories.length > 0 ? (
-            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-              {categories.map((category) => (
-                <Link 
-                  key={category.id}
-                  to={`/category/${category.id}`}
-                  className="group relative flex-shrink-0 w-32 sm:w-36 lg:w-40 snap-start bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-green-400 p-3 sm:p-4 lg:p-6 text-center overflow-hidden">
-                  
-                    {/* Hover Effect Background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    {/* Content */}
-                    <div className="relative z-10">
-                      {/* Icon Container */}
-                      <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-green-100 rounded-lg sm:rounded-xl group-hover:bg-green-200 group-hover:scale-110 transition-all duration-300 mb-2 sm:mb-3">
-                        <Package className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-green-600" />
-                      </div>
-                      
-                      {/* Category Name */}
-                      <h3 className="font-bold text-sm sm:text-base text-gray-900 mb-1 line-clamp-2 group-hover:text-green-600 transition-colors">
-                        {category.category_name}
-                      </h3>
-                      
-                      {/* Product Count */}
-                      <p className="text-xs sm:text-sm text-gray-600">
-                        {category.product_count || 0} produk
-                      </p>
-                    </div>
-
-                    {/* Arrow Icon on Hover - Hidden on Mobile */}
-                    <div className="hidden sm:block absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ArrowRight className="w-4 h-4 text-green-600" />
-                    </div>
-                  </Link>
-                ))}
-            </div>
-          ) : (
-            <div className="bg-white rounded-2xl p-6 sm:p-8 lg:p-12 text-center shadow-md">
-              <Package className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto text-gray-300 mb-4" />
-              <p className="text-sm sm:text-base text-gray-600">Belum ada kategori tersedia</p>
             </div>
           )}
         </div>

@@ -111,15 +111,15 @@ export const isCurrentlyOpen = () => {
   const day = now.getDay(); // 0 = Sunday, 6 = Saturday
   const hour = now.getHours();
 
-  // Minggu
+  // Minggu (Sunday)
   if (day === 0) {
-    return hour >= 9 && hour < 20;
+    return hour >= 7 && hour < 20;
   }
-  // Sabtu
+  // Sabtu (Saturday)
   if (day === 6) {
     return hour >= 8 && hour < 22;
   }
-  // Senin - Jumat
+  // Senin - Jumat (Monday - Friday)
   return hour >= 8 && hour < 21;
 };
 
