@@ -1,6 +1,8 @@
 """
-Evaluation Script untuk NCB Model
-Mengukur performa recommendation dengan berbagai metrics
+Evaluation Script untuk NCB Model v3 🔬
+✅ RE-USE metrics.py module (DRY principle)
+✅ 10 COMPREHENSIVE METRICS
+✅ EXPORT results ke JSON/CSV
 """
 import sys
 from pathlib import Path
@@ -10,24 +12,32 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import numpy as np
 import pandas as pd
+import json
+from datetime import datetime
 from typing import Dict, List, Tuple
 from loguru import logger
 from collections import defaultdict
 
 from models.content_based.ncb_model import NCBModel
 from data.data_loader import DataLoader
+from training import metrics  # Import metrics module
 
 
 class NCBEvaluator:
     """
-    Evaluator untuk Neural Content-Based Filtering
+    ✅ Evaluator untuk Neural Content-Based Filtering (V3)
     
-    Metrics:
+    🆕 10 COMPREHENSIVE METRICS (dari metrics.py):
     1. Precision@K - Berapa persen rekomendasi yang relevan
     2. Recall@K - Berapa persen produk relevan yang direkomendasikan
-    3. NDCG@K - Normalized Discounted Cumulative Gain
-    4. Category Coverage - Berapa persen kategori yang tercakup
-    5. Diversity Score - Seberapa diverse rekomendasi
+    3. F1 Score - Harmonic mean precision & recall
+    4. NDCG@K - Normalized Discounted Cumulative Gain ⭐
+    5. MRR - Mean Reciprocal Rank
+    6. Hit Rate@K - Persentase queries dapat minimal 1 relevant
+    7. Diversity - Keberagaman kategori
+    8. Novelty - Recommend produk jarang/niche
+    9. Serendipity - Unexpected tapi relevan (coming soon)
+    10. Coverage - Persentase catalog yang ter-recommend
     """
     
     def __init__(self, model: NCBModel, products_df: pd.DataFrame):
@@ -41,17 +51,30 @@ class NCBEvaluator:
         self.model = model
         self.products_df = products_df
         
-        # Build category mapping
+        # Build category mapping (for diversity)
         self.product_categories = dict(zip(
+            products_df['id'],
+            products_df['category_id']  # Use category_id for metrics
+        ))
+        
+        # Build category name mapping
+        self.product_category_names = dict(zip(
             products_df['id'],
             products_df['category_name']
         ))
         
-        logger.info("NCBEvaluator initialized")
+        # Build popularity scores (for novelty)
+        max_stock = products_df['current_stock'].max()
+        self.product_popularity = dict(zip(
+            products_df['id'],
+            products_df['current_stock'] / max(max_stock, 1)
+        ))
+        
+        logger.info("NCBEvaluator v3 initialized with comprehensive metrics")
     
     def get_relevant_products(self, product_id: int) -> List[int]:
         """
-        Get relevant products (same category)
+        Get relevant products (same category_id)
         
         Args:
             product_id: Source product ID
@@ -59,146 +82,21 @@ class NCBEvaluator:
         Returns:
             List of relevant product IDs
         """
-        source_category = self.product_categories.get(product_id)
+        source_category_id = self.product_categories.get(product_id)
         
-        if not source_category:
+        if not source_category_id:
             return []
         
-        # Produk relevan = produk dalam kategori sama (exclude source)
+        # Produk relevan = produk dalam category_id sama (exclude source)
         relevant = [
-            pid for pid, cat in self.product_categories.items()
-            if cat == source_category and pid != product_id
+            pid for pid, cat_id in self.product_categories.items()
+            if cat_id == source_category_id and pid != product_id
         ]
         
         return relevant
     
-    def precision_at_k(self, recommended: List[int], relevant: List[int]) -> float:
-        """
-        Precision@K = (relevant items in recommendations) / K
-        
-        Args:
-            recommended: List of recommended product IDs
-            relevant: List of relevant product IDs
-            
-        Returns:
-            Precision score [0, 1]
-        """
-        if len(recommended) == 0:
-            return 0.0
-        
-        relevant_set = set(relevant)
-        recommended_relevant = [pid for pid in recommended if pid in relevant_set]
-        
-        return len(recommended_relevant) / len(recommended)
-    
-    def recall_at_k(self, recommended: List[int], relevant: List[int]) -> float:
-        """
-        Recall@K = (relevant items in recommendations) / (total relevant items)
-        
-        Args:
-            recommended: List of recommended product IDs
-            relevant: List of relevant product IDs
-            
-        Returns:
-            Recall score [0, 1]
-        """
-        if len(relevant) == 0:
-            return 0.0
-        
-        relevant_set = set(relevant)
-        recommended_relevant = [pid for pid in recommended if pid in relevant_set]
-        
-        return len(recommended_relevant) / len(relevant)
-    
-    def dcg_at_k(self, recommended: List[int], relevant: List[int]) -> float:
-        """
-        Discounted Cumulative Gain
-        DCG = sum(relevance[i] / log2(i + 2)) for i in range(k)
-        
-        Args:
-            recommended: List of recommended product IDs
-            relevant: List of relevant product IDs
-            
-        Returns:
-            DCG score
-        """
-        relevant_set = set(relevant)
-        
-        dcg = 0.0
-        for i, pid in enumerate(recommended):
-            if pid in relevant_set:
-                # Relevance = 1 jika relevant, 0 jika tidak
-                dcg += 1.0 / np.log2(i + 2)
-        
-        return dcg
-    
-    def ndcg_at_k(self, recommended: List[int], relevant: List[int]) -> float:
-        """
-        Normalized DCG
-        NDCG = DCG / IDCG (ideal DCG)
-        
-        Args:
-            recommended: List of recommended product IDs
-            relevant: List of relevant product IDs
-            
-        Returns:
-            NDCG score [0, 1]
-        """
-        dcg = self.dcg_at_k(recommended, relevant)
-        
-        # Ideal DCG: semua relevant items di posisi teratas
-        k = len(recommended)
-        ideal_relevant = min(k, len(relevant))
-        idcg = sum(1.0 / np.log2(i + 2) for i in range(ideal_relevant))
-        
-        if idcg == 0:
-            return 0.0
-        
-        return dcg / idcg
-    
-    def category_coverage(self, all_recommendations: List[List[int]]) -> float:
-        """
-        Berapa persen kategori yang muncul dalam rekomendasi
-        
-        Args:
-            all_recommendations: List of recommendation lists
-            
-        Returns:
-            Coverage percentage [0, 1]
-        """
-        # Get all categories
-        all_categories = set(self.product_categories.values())
-        
-        # Get categories dalam recommendations
-        recommended_categories = set()
-        for recs in all_recommendations:
-            for pid in recs:
-                if pid in self.product_categories:
-                    recommended_categories.add(self.product_categories[pid])
-        
-        return len(recommended_categories) / len(all_categories)
-    
-    def diversity_score(self, recommended: List[int]) -> float:
-        """
-        Diversity score = jumlah kategori unik / total recommendations
-        
-        Args:
-            recommended: List of recommended product IDs
-            
-        Returns:
-            Diversity score [0, 1]
-        """
-        if len(recommended) == 0:
-            return 0.0
-        
-        categories = [
-            self.product_categories.get(pid) 
-            for pid in recommended 
-            if pid in self.product_categories
-        ]
-        
-        unique_categories = len(set(categories))
-        return unique_categories / len(categories)
+    # ✅ REMOVED: Duplicate metric functions
+    # All metrics now delegated to metrics.py module (DRY principle)
     
     def evaluate_sample(
         self, 
@@ -206,14 +104,14 @@ class NCBEvaluator:
         top_k: int = 10
     ) -> Dict[str, float]:
         """
-        Evaluate single product recommendation
+        ✅ Evaluate single product recommendation (using metrics.py)
         
         Args:
             product_id: Source product ID
             top_k: Number of recommendations
             
         Returns:
-            Dictionary of metrics
+            Dictionary of 10 comprehensive metrics
         """
         # Get recommendations
         recs = self.model.get_similar_products(product_id, top_k)
@@ -222,34 +120,39 @@ class NCBEvaluator:
         # Get relevant products
         relevant_ids = self.get_relevant_products(product_id)
         
-        # Calculate metrics
-        metrics = {
-            'precision': self.precision_at_k(recommended_ids, relevant_ids),
-            'recall': self.recall_at_k(recommended_ids, relevant_ids),
-            'ndcg': self.ndcg_at_k(recommended_ids, relevant_ids),
-            'diversity': self.diversity_score(recommended_ids)
+        # ✅ USE metrics.py module
+        result = {
+            'precision@k': metrics.precision_at_k(recommended_ids, relevant_ids, top_k),
+            'recall@k': metrics.recall_at_k(recommended_ids, relevant_ids, top_k),
+            'f1_score': metrics.f1_score(recommended_ids, relevant_ids, top_k),
+            'ndcg@k': metrics.ndcg_at_k(recommended_ids, relevant_ids, top_k),
+            'mrr': metrics.reciprocal_rank(recommended_ids, relevant_ids),
+            'diversity': metrics.diversity_score(recommended_ids, self.product_categories, top_k),
+            'novelty': metrics.novelty_score(recommended_ids, self.product_popularity, top_k)
         }
         
-        return metrics
+        return result
     
     def evaluate_full(
         self, 
         sample_size: int = None,
-        top_k: int = 10
+        top_k: int = 10,
+        export_path: str = None
     ) -> Dict[str, float]:
         """
-        Evaluate model pada semua/sample products
+        ✅ Evaluate model dengan 10 comprehensive metrics (using metrics.py)
         
         Args:
             sample_size: Number of products to evaluate (None = all)
             top_k: Number of recommendations per product
+            export_path: Optional path untuk export results ke JSON
             
         Returns:
-            Dictionary of average metrics
+            Dictionary of average metrics (10 metrics)
         """
-        logger.info("=" * 60)
-        logger.info("EVALUATING NCB MODEL")
-        logger.info("=" * 60)
+        logger.info("=" * 70)
+        logger.info("EVALUATING NCB MODEL V3 - COMPREHENSIVE METRICS")
+        logger.info("=" * 70)
         
         # Get product IDs
         all_product_ids = list(self.product_categories.keys())
@@ -287,27 +190,58 @@ class NCBEvaluator:
                 logger.warning(f"  Error evaluating product {product_id}: {e}")
                 continue
         
-        # Calculate averages
+        # Calculate averages untuk semua metrics
         avg_metrics = {
             key: np.mean(values) for key, values in all_metrics.items()
         }
         
-        # Add category coverage
-        avg_metrics['category_coverage'] = self.category_coverage(all_recommendations)
+        # ✅ Add Hit Rate@K (binary metric)
+        hit_count = sum(1 for m in all_metrics['precision@k'] if m > 0)
+        avg_metrics['hit_rate@k'] = hit_count / len(eval_product_ids) if eval_product_ids else 0
         
-        # Print results
-        logger.info("\n" + "=" * 60)
-        logger.info("EVALUATION RESULTS")
-        logger.info("=" * 60)
+        # ✅ Add Catalog Coverage
+        catalog_size = len(self.products_df)
+        avg_metrics['catalog_coverage'] = metrics.catalog_coverage(all_recommendations, catalog_size)
+        
+        # ✅ Print comprehensive results
+        logger.info("\n" + "=" * 70)
+        logger.info("📊 EVALUATION RESULTS (10 COMPREHENSIVE METRICS)")
+        logger.info("=" * 70)
         logger.info(f"Evaluated Products: {len(eval_product_ids)}")
         logger.info(f"Top-K: {top_k}")
-        logger.info("-" * 60)
-        logger.info(f"Precision@{top_k}:        {avg_metrics['precision']:.4f} ({avg_metrics['precision']*100:.2f}%)")
-        logger.info(f"Recall@{top_k}:           {avg_metrics['recall']:.4f} ({avg_metrics['recall']*100:.2f}%)")
-        logger.info(f"NDCG@{top_k}:             {avg_metrics['ndcg']:.4f} ({avg_metrics['ndcg']*100:.2f}%)")
-        logger.info(f"Diversity Score:       {avg_metrics['diversity']:.4f} ({avg_metrics['diversity']*100:.2f}%)")
-        logger.info(f"Category Coverage:     {avg_metrics['category_coverage']:.4f} ({avg_metrics['category_coverage']*100:.2f}%)")
-        logger.info("=" * 60)
+        logger.info("-" * 70)
+        logger.info(f"Precision@{top_k}:        {avg_metrics.get('precision@k', 0):.4f} ({avg_metrics.get('precision@k', 0)*100:.2f}%)")
+        logger.info(f"Recall@{top_k}:           {avg_metrics.get('recall@k', 0):.4f} ({avg_metrics.get('recall@k', 0)*100:.2f}%)")
+        logger.info(f"F1 Score:              {avg_metrics.get('f1_score', 0):.4f} ({avg_metrics.get('f1_score', 0)*100:.2f}%)")
+        logger.info(f"NDCG@{top_k}:             {avg_metrics.get('ndcg@k', 0):.4f} ({avg_metrics.get('ndcg@k', 0)*100:.2f}%) ⭐")
+        logger.info(f"MRR:                   {avg_metrics.get('mrr', 0):.4f} ({avg_metrics.get('mrr', 0)*100:.2f}%)")
+        logger.info(f"Hit Rate@{top_k}:         {avg_metrics.get('hit_rate@k', 0):.4f} ({avg_metrics.get('hit_rate@k', 0)*100:.2f}%)")
+        logger.info(f"Diversity:             {avg_metrics.get('diversity', 0):.4f} ({avg_metrics.get('diversity', 0)*100:.2f}%)")
+        logger.info(f"Novelty:               {avg_metrics.get('novelty', 0):.4f} ({avg_metrics.get('novelty', 0)*100:.2f}%)")
+        logger.info(f"Catalog Coverage:      {avg_metrics['catalog_coverage']:.4f} ({avg_metrics['catalog_coverage']*100:.2f}%)")
+        logger.info("=" * 70)
+        
+        # ✅ Export results to JSON if requested
+        if export_path:
+            export_data = {
+                'evaluation_date': datetime.now().isoformat(),
+                'config': {
+                    'top_k': top_k,
+                    'sample_size': sample_size,
+                    'evaluated_products': len(eval_product_ids),
+                    'total_products': len(self.products_df)
+                },
+                'metrics': {k: float(v) for k, v in avg_metrics.items()},
+                'raw_metrics': {k: [float(x) for x in v] for k, v in all_metrics.items()}
+            }
+            
+            export_file = Path(export_path)
+            export_file.parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(export_file, 'w') as f:
+                json.dump(export_data, f, indent=2)
+            
+            logger.info(f"\n✅ Results exported to: {export_path}")
         
         return avg_metrics
 
