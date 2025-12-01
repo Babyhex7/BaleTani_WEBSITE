@@ -165,6 +165,11 @@ const SalesReport = () => {
     toast.success("PDF berhasil di-download");
   };
 
+  // Only show completed orders in the detailed sales list
+  const displayedSales = reportData?.detailedSales
+    ? reportData.detailedSales.filter((s) => s.order_status === "completed")
+    : [];
+
   return (
     <div className="flex min-h-screen bg-white">
       <AdminSidebarNew />
@@ -435,7 +440,7 @@ const SalesReport = () => {
                   <div>
                     <h3 className="text-lg font-bold text-gray-900">Daftar Penjualan Detail</h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      Total: {reportData.detailedSales?.length || 0} transaksi
+                      Total: {displayedSales.length} transaksi
                     </p>
                   </div>
                   <button
@@ -463,8 +468,8 @@ const SalesReport = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {reportData.detailedSales && reportData.detailedSales.length > 0 ? (
-                        reportData.detailedSales.map((sale, index) => (
+                      {displayedSales && displayedSales.length > 0 ? (
+                        displayedSales.map((sale, index) => (
                           <tr key={sale.order_id} className="hover:bg-gray-50">
                             <td className="px-6 py-4 font-semibold text-sm text-gray-900">{index + 1}</td>
                             <td className="px-6 py-4">

@@ -490,7 +490,7 @@ const OrderSuccessPage = () => {
             {/* Other Actions - Mobile Responsive */}
             <div className="grid grid-cols-2 gap-3 sm:gap-4 pt-3 sm:pt-4">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/home')}
                 className="btn-touch py-2.5 sm:py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors flex items-center justify-center gap-2 font-medium text-sm sm:text-base"
               >
                 <Home className="w-4 h-4 sm:w-5 sm:h-5" />
