@@ -91,7 +91,7 @@ exports.getAllMessages = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Contact messages retrieved successfully",
+      message: "Pesan kontak berhasil diambil",
       data: formattedMessages,
       pagination: {
         total: count,
@@ -318,7 +318,7 @@ exports.getStatistics = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Statistics retrieved successfully",
+      message: "Statistik berhasil diambil",
       data: {
         total: totalMessages,
         today: messagesToday,

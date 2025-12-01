@@ -52,7 +52,38 @@ const adminAuthService = {
       }
     } catch (error) {
       console.error("[AdminAuthService] Login error:", error);
-      throw error.response?.data || error;
+      console.error("[AdminAuthService] Error response:", error.response?.data);
+      console.error("[AdminAuthService] Error status:", error.response?.status);
+
+      // Enhanced error handling with specific messages
+      if (error.response) {
+        // Server responded with error
+        const errorData = error.response.data;
+        const errorObj = {
+          message: errorData?.message || "Login gagal. Silakan coba lagi.",
+          status: error.response.status,
+          code: errorData?.code || "SERVER_ERROR",
+        };
+        console.log("[AdminAuthService] Throwing error:", errorObj);
+        throw errorObj;
+      } else if (error.request) {
+        // Request made but no response
+        const errorObj = {
+          message:
+            "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+          code: "NETWORK_ERROR",
+        };
+        console.log("[AdminAuthService] Throwing network error:", errorObj);
+        throw errorObj;
+      } else {
+        // Something else happened
+        const errorObj = {
+          message: error.message || "Login gagal",
+          code: "UNKNOWN_ERROR",
+        };
+        console.log("[AdminAuthService] Throwing unknown error:", errorObj);
+        throw errorObj;
+      }
     }
   },
 

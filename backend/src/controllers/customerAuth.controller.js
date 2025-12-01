@@ -1,27 +1,20 @@
 const jwt = require("jsonwebtoken");
 const { Customer } = require("../models");
+const {
+  normalizePhoneNumber,
+  isValidPhoneNumber,
+} = require("../utils/phoneHelper");
 
-// Utility function to normalize phone number to 62 format (consistent with model)
-const normalizePhoneNumber = (phone) => {
-  if (!phone) return phone;
-
-  // Remove all non-digit characters
-  let cleaned = phone.replace(/\D/g, "");
-
-  // Handle different formats
-  if (cleaned.startsWith("0")) {
-    // Convert 08xx to 628xx
-    cleaned = "62" + cleaned.substring(1);
-  } else if (cleaned.startsWith("8")) {
-    // Convert 8xx to 628xx
-    cleaned = "62" + cleaned;
-  } else if (!cleaned.startsWith("62")) {
-    // Add 62 if not present
-    cleaned = "62" + cleaned;
-  }
-
-  return cleaned;
-};
+/**
+ * Customer Authentication Controller
+ * Handle registration and login for customers
+ *
+ * Security features:
+ * - Phone number validation and normalization
+ * - Password hashing (via model hooks)
+ * - Audit logging for security monitoring
+ * - Rate limiting (handled by middleware)
+ */
 
 // Register Customer
 const registerCustomer = async (req, res) => {
@@ -30,14 +23,35 @@ const registerCustomer = async (req, res) => {
 
     // Validate required fields
     if (!phone_number || !full_name || !password) {
+      console.warn(`[REGISTER FAILED] Missing fields - IP: ${req.ip}`);
       return res.status(400).json({
         success: false,
         message: "Nomor telepon, nama lengkap, dan password wajib diisi",
       });
     }
 
+    // Validate phone number format
+    if (!isValidPhoneNumber(phone_number)) {
+      console.warn(
+        `[REGISTER FAILED] Invalid phone format: ${phone_number} - IP: ${req.ip}`
+      );
+      return res.status(400).json({
+        success: false,
+        message: "Format nomor telepon tidak valid",
+      });
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password minimal 6 karakter",
+      });
+    }
+
     // Normalize phone number
     const normalizedPhone = normalizePhoneNumber(phone_number);
+    console.log(`[REGISTER ATTEMPT] Phone: ${normalizedPhone} - IP: ${req.ip}`);
 
     // Check if customer already exists
     const existingCustomer = await Customer.findOne({
@@ -47,6 +61,9 @@ const registerCustomer = async (req, res) => {
     });
 
     if (existingCustomer) {
+      console.warn(
+        `[REGISTER FAILED] Phone already exists: ${normalizedPhone} - IP: ${req.ip}`
+      );
       return res.status(400).json({
         success: false,
         message: "Nomor telepon sudah terdaftar",
@@ -64,7 +81,6 @@ const registerCustomer = async (req, res) => {
     });
 
     // Generate JWT token
-    // FIX: Gunakan userId untuk konsistensi dengan auth middleware
     const token = jwt.sign(
       {
         userId: customer.id,
@@ -72,7 +88,12 @@ const registerCustomer = async (req, res) => {
         type: "customer",
       },
       process.env.JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "7d" } // Changed to 7 days for consistency with admin
+    );
+
+    // AUDIT LOG: Success registration
+    console.log(
+      `[REGISTER SUCCESS] Customer: ${customer.id}, Name: ${customer.full_name} - IP: ${req.ip}`
     );
 
     res.status(201).json({
@@ -105,14 +126,29 @@ const loginCustomer = async (req, res) => {
 
     // Validate required fields
     if (!phone_number || !password) {
+      console.warn(`[LOGIN FAILED] Missing credentials - IP: ${req.ip}`);
       return res.status(400).json({
         success: false,
         message: "Nomor telepon dan password wajib diisi",
       });
     }
 
+    // Validate phone number format
+    if (!isValidPhoneNumber(phone_number)) {
+      console.warn(
+        `[LOGIN FAILED] Invalid phone format: ${phone_number} - IP: ${req.ip}`
+      );
+      return res.status(400).json({
+        success: false,
+        message: "Format nomor telepon tidak valid",
+      });
+    }
+
     // Normalize phone number
     const normalizedPhone = normalizePhoneNumber(phone_number);
+    console.log(
+      `[LOGIN ATTEMPT] Customer - Phone: ${normalizedPhone}, IP: ${req.ip}`
+    );
 
     // Find customer with normalized phone number
     const customer = await Customer.findOne({
@@ -122,24 +158,29 @@ const loginCustomer = async (req, res) => {
       },
     });
 
+    // Generic error message for security
+    const genericError = {
+      success: false,
+      message: "Nomor telepon atau password salah",
+    };
+
     if (!customer) {
-      return res.status(401).json({
-        success: false,
-        message: "Nomor telepon atau password salah",
-      });
+      console.warn(
+        `[LOGIN FAILED] Customer not found: ${normalizedPhone} - IP: ${req.ip}`
+      );
+      return res.status(401).json(genericError);
     }
 
     // Check password
     const isPasswordValid = await customer.comparePassword(password);
     if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: "Nomor telepon atau password salah",
-      });
+      console.warn(
+        `[LOGIN FAILED] Invalid password: ${normalizedPhone} - IP: ${req.ip}`
+      );
+      return res.status(401).json(genericError);
     }
 
     // Generate JWT token
-    // FIX: Gunakan userId untuk konsistensi dengan auth middleware
     const token = jwt.sign(
       {
         userId: customer.id,
@@ -147,7 +188,12 @@ const loginCustomer = async (req, res) => {
         type: "customer",
       },
       process.env.JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "7d" } // Changed to 7 days for consistency
+    );
+
+    // AUDIT LOG: Success login
+    console.log(
+      `[LOGIN SUCCESS] Customer: ${customer.id}, Name: ${customer.full_name} - IP: ${req.ip}`
     );
 
     res.json({

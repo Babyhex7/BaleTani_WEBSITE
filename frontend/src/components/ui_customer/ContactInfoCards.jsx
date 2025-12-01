@@ -8,10 +8,12 @@
  * @component ContactInfoCard
  * @author BaleTani Development Team
  * @created 2025-11-15
+ * @updated 2025-11-30 - Added realtime open/close status
  */
 
+import { useState, useEffect } from 'react';
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
-import { CONTACT_INFO, getWhatsAppURL, getEmailLink, getDirectionURL } from '../../utils/contactConfig';
+import { CONTACT_INFO, getWhatsAppURL, getEmailLink, getDirectionURL, isCurrentlyOpen, getOperationalStatus } from '../../utils/contactConfig';
 
 const ContactInfoCard = ({ title, icon: IconComponent, info, actionButton, bgColor = "bg-green-50", iconBg = "bg-green-100", iconColor = "text-green-600" }) => {
   return (
@@ -50,6 +52,18 @@ const ContactInfoCard = ({ title, icon: IconComponent, info, actionButton, bgCol
 };
 
 const ContactInfoCards = () => {
+  // State untuk status buka/tutup (realtime)
+  const [operationalStatus, setOperationalStatus] = useState(getOperationalStatus());
+
+  // Update status setiap 1 menit
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setOperationalStatus(getOperationalStatus());
+    }, 60000); // Update setiap 1 menit
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
       {/* WhatsApp Card */}
@@ -123,7 +137,7 @@ const ContactInfoCards = () => {
         }
       />
 
-      {/* Operational Hours Card */}
+      {/* Operational Hours Card - Realtime Status */}
       <ContactInfoCard
         title="Jam Operasional"
         icon={Clock}
@@ -137,10 +151,19 @@ const ContactInfoCards = () => {
         ]}
         actionButton={
           <div className="text-center py-2">
-            <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-800 shadow-sm">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-              Buka Sekarang
+            <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold shadow-sm ${
+              operationalStatus.isOpen 
+                ? 'bg-green-100 text-green-800' 
+                : 'bg-red-100 text-red-800'
+            }`}>
+              <div className={`w-2 h-2 rounded-full mr-2 animate-pulse ${
+                operationalStatus.isOpen ? 'bg-green-400' : 'bg-red-400'
+              }`}></div>
+              {operationalStatus.status} Sekarang
             </span>
+            <p className="text-xs text-gray-500 mt-2">
+              {operationalStatus.message}
+            </p>
           </div>
         }
       />

@@ -128,7 +128,7 @@ const getUserById = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Admin user not found",
+        message: "Admin tidak ditemukan",
       });
     }
 
@@ -188,7 +188,7 @@ const createUser = async (req, res, next) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "Admin with this phone number already exists",
+        message: "Admin dengan nomor telepon ini sudah terdaftar",
       });
     }
 
@@ -197,7 +197,7 @@ const createUser = async (req, res, next) => {
     if (!roleExists) {
       return res.status(400).json({
         success: false,
-        message: "Invalid role specified",
+        message: "Role tidak valid",
       });
     }
 
@@ -228,7 +228,7 @@ const createUser = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: "Admin user created successfully",
+      message: "Admin berhasil dibuat",
       data: { user: createdUser },
     });
   } catch (error) {
@@ -243,7 +243,7 @@ const updateUser = async (req, res, next) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: "Validation errors",
+        message: "Error validasi data",
         errors: errors.array(),
       });
     }
@@ -255,7 +255,7 @@ const updateUser = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "User tidak ditemukan",
       });
     }
 
@@ -279,7 +279,7 @@ const updateUser = async (req, res, next) => {
       if (existingUser) {
         return res.status(400).json({
           success: false,
-          message: "Phone number is already taken by another user",
+          message: "Nomor telepon sudah digunakan oleh admin lain",
         });
       }
     }
@@ -304,7 +304,7 @@ const updateUser = async (req, res, next) => {
       if (!roleExists) {
         return res.status(400).json({
           success: false,
-          message: "Invalid role specified",
+          message: "Role tidak valid",
         });
       }
       updateData.role_id = role_id;
@@ -328,7 +328,7 @@ const updateUser = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: "User updated successfully",
+      message: "User berhasil diperbarui",
       data: { user: userData },
     });
   } catch (error) {
@@ -345,7 +345,7 @@ const deleteUser = async (req, res, next) => {
     if (parseInt(id) === req.user.id) {
       return res.status(400).json({
         success: false,
-        message: "You cannot delete your own account",
+        message: "Anda tidak dapat menghapus akun Anda sendiri",
       });
     }
 
@@ -353,7 +353,7 @@ const deleteUser = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "User tidak ditemukan",
       });
     }
 
@@ -361,7 +361,7 @@ const deleteUser = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: "User deleted successfully",
+      message: "User berhasil dihapus",
     });
   } catch (error) {
     next(error);
@@ -379,7 +379,7 @@ const updateUserRole = async (req, res, next) => {
     if (!roleExists) {
       return res.status(400).json({
         success: false,
-        message: "Invalid role specified",
+        message: "Role tidak valid",
       });
     }
 
@@ -387,7 +387,7 @@ const updateUserRole = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "User tidak ditemukan",
       });
     }
 
@@ -395,7 +395,7 @@ const updateUserRole = async (req, res, next) => {
     if (id === req.user.id) {
       return res.status(400).json({
         success: false,
-        message: "You cannot change your own role",
+        message: "Anda tidak dapat mengubah role Anda sendiri",
       });
     }
 
@@ -415,7 +415,7 @@ const updateUserRole = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: "User role updated successfully",
+      message: "Role user berhasil diperbarui",
       data: { user: updatedUser },
     });
   } catch (error) {
@@ -432,7 +432,7 @@ const resetUserPassword = async (req, res, next) => {
     if (!password) {
       return res.status(400).json({
         success: false,
-        message: "Password is required",
+        message: "Password wajib diisi",
       });
     }
 
@@ -440,7 +440,7 @@ const resetUserPassword = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "User tidak ditemukan",
       });
     }
 
@@ -451,7 +451,7 @@ const resetUserPassword = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: "Password reset successfully",
+      message: "Password berhasil direset",
     });
   } catch (error) {
     next(error);
