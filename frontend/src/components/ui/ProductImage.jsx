@@ -102,6 +102,7 @@ const ProductImage = ({
 
   return (
     <div 
+      data-cy="product-image"
       className={`
         relative 
         overflow-hidden 
@@ -152,6 +153,7 @@ const ProductImage = ({
           <div className="absolute top-2 left-2 h-[28px] z-10">
             {discountPercentage > 0 && (
               <div 
+                data-cy="discount-badge"
                 className="
                   bg-red-500 
                   text-white 
@@ -186,6 +188,7 @@ const ProductImage = ({
           <div className="absolute top-2 right-2 h-[28px] max-w-[50%] z-10">
             {category && (
               <div 
+                data-cy="category-badge"
                 className="
                   bg-green-600 
                   text-white 

@@ -301,7 +301,7 @@ const ProductDetailPage = () => {
                 {/* Category Badge */}
                 {product.category && (
                   <div className="mb-3">
-                    <span className="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800">
+                    <span data-cy="category-badge" className="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800">
                       <Tag size={12} className="mr-1 sm:w-3.5 sm:h-3.5" />
                       {product.category.name}
                     </span>
