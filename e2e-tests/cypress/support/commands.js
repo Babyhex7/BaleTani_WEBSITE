@@ -237,7 +237,6 @@ Cypress.Commands.add("clearCart", () => {
     const cartStorage = { state: { items: [] }, version: 0 };
     win.localStorage.setItem("baletani-cart", JSON.stringify(cartStorage));
     cy.log("✅ Cart cleared (localStorage)");
-      });
   });
 });
 

@@ -101,16 +101,17 @@ const CartPage = () => {
                 <ShoppingCart size={40} className="sm:w-12 sm:h-12 text-gray-400" />
               </div>
               <h2 data-cy="empty-cart-message" className="heading-sub sm:heading-card mb-2">
-                Keranjang Anda Kosong
+                Keranjang Anda kosong
               </h2>
               <p className="text-body text-gray-600 mb-6 sm:mb-8">
                 Belum ada produk di keranjang. Yuk, mulai belanja sekarang!
               </p>
               <button
+                data-cy="shop-now-btn"
                 onClick={() => navigate('/products')}
                 className="btn-touch px-6 sm:px-8 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold rounded-lg transition-colors"
               >
-                Lanjut Belanja
+                Belanja Sekarang
               </button>
             </div>
           </div>
@@ -263,10 +264,11 @@ const CartPage = () => {
                 Batal
               </button>
               <button
+                data-cy="confirm-clear-cart"
                 onClick={handleClearCart}
                 className="btn-touch flex-1 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors"
               >
-                Ya, Kosongkan
+                Ya, Hapus Semua
               </button>
             </div>
           </div>
