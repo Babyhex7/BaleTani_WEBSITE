@@ -21,7 +21,7 @@ import ContactForm from '../../components/ui_customer/ContactForm';
 import ContactInfoCards from '../../components/ui_customer/ContactInfoCards';
 import FAQAccordion from '../../components/ui_customer/FAQAccordion';
 import faqService from '../../services/services_customer/faqService';
-import { MAPS_CONFIG } from '../../utils/contactConfig';
+import { MAPS_CONFIG, isCurrentlyOpen } from '../../utils/contactConfig';
 
 const ContactPage = () => {
   const [faqs, setFaqs] = useState([]);
@@ -29,11 +29,23 @@ const ContactPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isLoadingFAQs, setIsLoadingFAQs] = useState(true);
   const [notification, setNotification] = useState(null);
+  const [isStoreOpen, setIsStoreOpen] = useState(isCurrentlyOpen());
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // Fetch FAQs on component mount
   useEffect(() => {
     fetchFAQs();
     fetchFAQCategories();
+  }, []);
+
+  // Update store status every minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+      setIsStoreOpen(isCurrentlyOpen());
+    }, 60000); // Update every 1 minute
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchFAQs = async () => {
@@ -179,9 +191,15 @@ const ContactPage = () => {
                     </div>
                     <span className="text-green-600 font-bold text-lg">07:00 - 20:00</span>
                   </div>
-                  <div className="bg-green-600 text-white rounded-lg p-4 flex items-center justify-center shadow-md mt-6">
+                  <div className={`rounded-lg p-4 flex items-center justify-center shadow-md mt-6 transition-colors duration-300 ${
+                    isStoreOpen 
+                      ? 'bg-green-600 text-white' 
+                      : 'bg-gray-400 text-white'
+                  }`}>
                     <Clock className="w-5 h-5 mr-2" />
-                    <p className="text-base font-bold">Buka Sekarang</p>
+                    <p className="text-base font-bold">
+                      {isStoreOpen ? 'Buka Sekarang' : 'Tutup Sekarang'}
+                    </p>
                   </div>
                 </div>
               </div>
