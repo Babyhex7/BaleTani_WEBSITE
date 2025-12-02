@@ -126,27 +126,65 @@ Cypress.Commands.add("addToCart", (productId, quantity = 1) => {
     const cartStorage = JSON.parse(
       win.localStorage.getItem("baletani-cart") || '{"state":{"items":[]}}'
     );
-    
+
     const currentItems = cartStorage.state?.items || [];
-    
+
     // Mock product data (should match seeded products)
     const productData = {
-      "prod-001": { id: "prod-001", name: "Beras Premium 5kg", price: 75000, finalPrice: 75000, stock: 100, unit: "5 kg" },
-      "prod-002": { id: "prod-002", name: "Telur Ayam Kampung 10 Butir", price: 30000, finalPrice: 27000, stock: 50, unit: "10 butir", discount: { value: 10, type: "percentage" } },
-      "prod-003": { id: "prod-003", name: "Sayuran Organik Mix 1kg", price: 25000, finalPrice: 25000, stock: 30, unit: "1 kg" },
-      "prod-004": { id: "prod-004", name: "Jeruk Manis 1kg", price: 20000, finalPrice: 20000, stock: 40, unit: "1 kg" },
-      "prod-005": { id: "prod-005", name: "Cabai Merah 500g", price: 15000, finalPrice: 15000, stock: 0, unit: "500 gram" },
+      "prod-001": {
+        id: "prod-001",
+        name: "Beras Premium 5kg",
+        price: 75000,
+        finalPrice: 75000,
+        stock: 100,
+        unit: "5 kg",
+      },
+      "prod-002": {
+        id: "prod-002",
+        name: "Telur Ayam Kampung 10 Butir",
+        price: 30000,
+        finalPrice: 27000,
+        stock: 50,
+        unit: "10 butir",
+        discount: { value: 10, type: "percentage" },
+      },
+      "prod-003": {
+        id: "prod-003",
+        name: "Sayuran Organik Mix 1kg",
+        price: 25000,
+        finalPrice: 25000,
+        stock: 30,
+        unit: "1 kg",
+      },
+      "prod-004": {
+        id: "prod-004",
+        name: "Jeruk Manis 1kg",
+        price: 20000,
+        finalPrice: 20000,
+        stock: 40,
+        unit: "1 kg",
+      },
+      "prod-005": {
+        id: "prod-005",
+        name: "Cabai Merah 500g",
+        price: 15000,
+        finalPrice: 15000,
+        stock: 0,
+        unit: "500 gram",
+      },
     };
-    
+
     const product = productData[productId];
     if (!product) {
       cy.log(`❌ Product ${productId} not found in mock data`);
       return;
     }
-    
+
     // Check if item already in cart
-    const existingItemIndex = currentItems.findIndex(item => item.id === productId);
-    
+    const existingItemIndex = currentItems.findIndex(
+      (item) => item.id === productId
+    );
+
     if (existingItemIndex >= 0) {
       // Update quantity
       currentItems[existingItemIndex].quantity += quantity;
@@ -158,11 +196,11 @@ Cypress.Commands.add("addToCart", (productId, quantity = 1) => {
         image: null,
       });
     }
-    
+
     // Update localStorage
     cartStorage.state.items = currentItems;
     win.localStorage.setItem("baletani-cart", JSON.stringify(cartStorage));
-    
+
     cy.log(`✅ Added ${quantity}x ${product.name} to cart (localStorage)`);
   });
 });

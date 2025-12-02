@@ -167,26 +167,31 @@ describe("Customer Shopping Cart Flow", () => {
       cy.wait(1000);
 
       // Read stock value from page
-      cy.contains('Stok:').parent().invoke('text').then((stockText) => {
-        const stock = parseInt(stockText.match(/\d+/)[0]);
-        
-        // Click increase button until we reach stock limit
-        const clickTimes = Math.min(stock, 50); // Limit to avoid infinite loop
-        for (let i = 1; i < clickTimes; i++) {
-          cy.get("[data-cy=quantity-increase]").then(($btn) => {
-            if (!$btn.is(":disabled")) {
-              cy.wrap($btn).click();
-              cy.wait(100);
-            }
-          });
-        }
+      cy.contains("Stok:")
+        .parent()
+        .invoke("text")
+        .then((stockText) => {
+          const stock = parseInt(stockText.match(/\d+/)[0]);
 
-        // Verify that we can't increase beyond stock
-        cy.get("[data-cy=quantity-input]").invoke('text').then((qtyText) => {
-          const currentQty = parseInt(qtyText.trim());
-          expect(currentQty).to.be.at.most(stock);
+          // Click increase button until we reach stock limit
+          const clickTimes = Math.min(stock, 50); // Limit to avoid infinite loop
+          for (let i = 1; i < clickTimes; i++) {
+            cy.get("[data-cy=quantity-increase]").then(($btn) => {
+              if (!$btn.is(":disabled")) {
+                cy.wrap($btn).click();
+                cy.wait(100);
+              }
+            });
+          }
+
+          // Verify that we can't increase beyond stock
+          cy.get("[data-cy=quantity-input]")
+            .invoke("text")
+            .then((qtyText) => {
+              const currentQty = parseInt(qtyText.trim());
+              expect(currentQty).to.be.at.most(stock);
+            });
         });
-      });
     });
   });
 
@@ -278,15 +283,19 @@ describe("Customer Shopping Cart Flow", () => {
     it("should increase quantity using (+) button", () => {
       // Ensure we're testing on desktop viewport
       cy.viewport(1280, 720);
-      
+
       cy.get("[data-cy=cart-item]")
         .first()
         .within(() => {
           // Get all quantity inputs and use the visible one
-          cy.get("[data-cy=quantity-input]").filter(':visible').should("contain.text", "2");
-          cy.get("[data-cy=quantity-increase]").filter(':visible').click();
+          cy.get("[data-cy=quantity-input]")
+            .filter(":visible")
+            .should("contain.text", "2");
+          cy.get("[data-cy=quantity-increase]").filter(":visible").click();
           cy.wait(500);
-          cy.get("[data-cy=quantity-input]").filter(':visible').should("contain.text", "3");
+          cy.get("[data-cy=quantity-input]")
+            .filter(":visible")
+            .should("contain.text", "3");
         });
 
       // Verify cart item still exists
@@ -330,11 +339,15 @@ describe("Customer Shopping Cart Flow", () => {
         .first()
         .within(() => {
           // Decrease to 1
-          cy.get("[data-cy=quantity-decrease]").filter(':visible').click();
+          cy.get("[data-cy=quantity-decrease]").filter(":visible").click();
           cy.wait(500);
-          cy.get("[data-cy=quantity-input]").filter(':visible').should("contain.text", "1");
+          cy.get("[data-cy=quantity-input]")
+            .filter(":visible")
+            .should("contain.text", "1");
           // Verify button is now disabled (can't go below 1)
-          cy.get("[data-cy=quantity-decrease]").filter(':visible').should("be.disabled");
+          cy.get("[data-cy=quantity-decrease]")
+            .filter(":visible")
+            .should("be.disabled");
         });
     });
   });
@@ -356,18 +369,20 @@ describe("Customer Shopping Cart Flow", () => {
       cy.get("[data-cy=cart-item]").should("have.length.at.least", 1);
 
       // Get initial count
-      cy.get("[data-cy=cart-item]").its('length').then((initialCount) => {
-        // Remove first item
-        cy.get("[data-cy=cart-item]")
-          .first()
-          .find("[data-cy=remove-item-btn]")
-          .click();
+      cy.get("[data-cy=cart-item]")
+        .its("length")
+        .then((initialCount) => {
+          // Remove first item
+          cy.get("[data-cy=cart-item]")
+            .first()
+            .find("[data-cy=remove-item-btn]")
+            .click();
 
-        cy.wait(1000);
+          cy.wait(1000);
 
-        // Should have one less item
-        cy.get("[data-cy=cart-item]").should("have.length", initialCount - 1);
-      });
+          // Should have one less item
+          cy.get("[data-cy=cart-item]").should("have.length", initialCount - 1);
+        });
     });
 
     it("should clear entire cart", () => {
@@ -381,7 +396,10 @@ describe("Customer Shopping Cart Flow", () => {
       cy.wait(500);
 
       // Verify empty cart
-      cy.get("[data-cy=empty-cart-message]").should("contain.text", "Keranjang Anda kosong");
+      cy.get("[data-cy=empty-cart-message]").should(
+        "contain.text",
+        "Keranjang Anda kosong"
+      );
       cy.get("[data-cy=cart-item]").should("not.exist");
     });
   });
@@ -397,7 +415,10 @@ describe("Customer Shopping Cart Flow", () => {
       cy.clearCart();
       cy.visit("/products");
       cy.wait(500);
-      cy.get("[data-cy=product-card]").first().find("[data-cy=add-to-cart-btn]").click();
+      cy.get("[data-cy=product-card]")
+        .first()
+        .find("[data-cy=add-to-cart-btn]")
+        .click();
       cy.wait(1500);
 
       cy.visit("/cart");
@@ -408,7 +429,7 @@ describe("Customer Shopping Cart Flow", () => {
         .should("be.visible")
         .invoke("text")
         .should("contain", "Rp");
-      
+
       // Verify it's a reasonable number (just check format, don't validate exact amount)
       cy.get("[data-cy=cart-subtotal]")
         .invoke("text")
@@ -535,7 +556,10 @@ describe("Customer Shopping Cart Flow", () => {
       cy.visit("/cart");
 
       // Verify empty state
-      cy.get("[data-cy=empty-cart-message]").should("contain.text", "Keranjang Anda kosong");
+      cy.get("[data-cy=empty-cart-message]").should(
+        "contain.text",
+        "Keranjang Anda kosong"
+      );
 
       // Verify CTA button exists
       cy.get("[data-cy=shop-now-btn]").should("be.visible");
@@ -572,9 +596,12 @@ describe("Customer Shopping Cart Flow", () => {
     it("should navigate to checkout page", () => {
       // Ensure desktop viewport for visible button
       cy.viewport(1280, 720);
-      
+
       // Click visible checkout button (desktop version in sidebar)
-      cy.get("[data-cy=checkout-btn]").filter(':visible').first().click({ force: true });
+      cy.get("[data-cy=checkout-btn]")
+        .filter(":visible")
+        .first()
+        .click({ force: true });
 
       // Should redirect to checkout
       cy.url().should("include", "/checkout");
