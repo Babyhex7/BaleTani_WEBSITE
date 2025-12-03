@@ -200,6 +200,7 @@ const getRecentOrders = async (req, res, next) => {
       ],
       attributes: [
         "id",
+        "order_number",
         "customer_name",
         "total_amount",
         "payment_status",
@@ -212,6 +213,7 @@ const getRecentOrders = async (req, res, next) => {
     // Format data untuk frontend
     const formattedOrders = recentOrders.map((order) => ({
       id: order.id,
+      order_number: order.order_number || null,
       customer_name:
         order.customer_name || order.customer?.full_name || "Guest",
       total_amount: parseFloat(order.total_amount),
