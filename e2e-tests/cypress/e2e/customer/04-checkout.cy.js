@@ -195,7 +195,7 @@ describe("Customer Checkout Flow", () => {
       // Self pickup - FREE (default state)
       cy.get('input[name="pickup"][value="self_pickup"]').should("be.checked");
       cy.wait(300);
-      
+
       // Check desktop sidebar for GRATIS
       cy.get(".hidden.lg\\:block")
         .contains("Biaya Pengiriman")
@@ -205,7 +205,7 @@ describe("Customer Checkout Flow", () => {
       // Delivery - Rp 10.000
       cy.get('input[name="pickup"][value="delivery"]').click({ force: true });
       cy.wait(500);
-      
+
       // Check desktop sidebar for price
       cy.get(".hidden.lg\\:block")
         .contains("Biaya Pengiriman")
@@ -304,13 +304,15 @@ describe("Customer Checkout Flow", () => {
     beforeEach(() => {
       cy.visit("/checkout");
       cy.intercept("POST", "**/api/customer/orders/create").as("createOrder");
-      
+
       // Debug: Verify token exists in localStorage
       cy.window().then((win) => {
         const storage = win.localStorage.getItem("baletani-customer-storage");
         const parsed = JSON.parse(storage);
-        cy.log(`🔑 Token check: ${parsed?.state?.token ? 'EXISTS' : 'MISSING'}`);
-        expect(parsed?.state?.token, 'Customer token must exist').to.exist;
+        cy.log(
+          `🔑 Token check: ${parsed?.state?.token ? "EXISTS" : "MISSING"}`
+        );
+        expect(parsed?.state?.token, "Customer token must exist").to.exist;
       });
     });
 
