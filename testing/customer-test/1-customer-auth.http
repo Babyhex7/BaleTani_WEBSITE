@@ -19,8 +19,8 @@ POST {{baseUrl}}/api/customer/auth/register
 Content-Type: application/json
 
 {
-  "phone_number": "081234567890",
-  "full_name": "Budi Santoso",
+  "phone_number": "0817266272",
+  "full_name": "Budi Santosa",
   "password": "password123",
   "address": "Jl. Merdeka No. 45, Jakarta Pusat"
 }

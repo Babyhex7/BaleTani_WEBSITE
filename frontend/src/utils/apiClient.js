@@ -95,7 +95,19 @@ apiClient.interceptors.request.use(
       console.error("Error parsing admin storage:", e);
     }
 
-    const customerToken = localStorage.getItem("token");
+    // Get customer token from Zustand persist storage
+    let customerToken = null;
+    try {
+      const customerStorage = localStorage.getItem("baletani-customer-storage");
+      if (customerStorage) {
+        const parsed = JSON.parse(customerStorage);
+        customerToken = parsed?.state?.token;
+      }
+    } catch (e) {
+      console.error("Error parsing customer storage:", e);
+      // Fallback to old token key for backward compatibility
+      customerToken = localStorage.getItem("token");
+    }
 
     // Prioritize admin token for admin routes
     if (isAdminRoute && adminToken) {
