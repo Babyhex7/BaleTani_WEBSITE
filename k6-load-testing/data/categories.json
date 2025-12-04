@@ -1,0 +1,112 @@
+[
+  {
+    "category_id": "fae90337-d07f-4e68-b72a-dd9dda567199",
+    "category_name": "Alat Pertanian",
+    "description": "Peralatan dan perlengkapan untuk kebutuhan pertanian"
+  },
+  {
+    "category_id": "9c8ba67c-c506-11f0-b326-0a0027000015",
+    "category_name": "Bahan Pokok",
+    "description": "Bahan makanan pokok"
+  },
+  {
+    "category_id": "c46902fe-d37c-4e71-843e-6706df175467",
+    "category_name": "Benih Tanaman",
+    "description": "Benih tanaman berkualitas unggul untuk hasil panen maksimal"
+  },
+  {
+    "category_id": "ad44eaf1-0061-4412-b70c-466e3bf91e12",
+    "category_name": "Beras & Pangan Pokok",
+    "description": "Beras premium, organik, dan pangan pokok untuk kebutuhan sehari-hari."
+  },
+  {
+    "category_id": "32a41084-029d-43bb-93f9-b37a1fcf892f",
+    "category_name": "Bonsai",
+    "description": "horrass"
+  },
+  {
+    "category_id": "fb0c679a-9bb4-421d-9972-3c5eae52a2ee",
+    "category_name": "Buah-Buahan",
+    "description": "Buah-buahan segar manis dan bergizi untuk keluarga sehat Anda."
+  },
+  {
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "category_name": "Bumbu & Rempah",
+    "description": "Bumbu dapur lengkap dan rempah-rempah tradisional Indonesia."
+  },
+  {
+    "category_id": "9c8b0287-c506-11f0-b326-0a0027000015",
+    "category_name": "Daging & Unggas",
+    "description": "Daging ayam dan produk unggas"
+  },
+  {
+    "category_id": "d0971e0f-6e9a-4a1c-b277-fa37c3468f58",
+    "category_name": "eca goreng ",
+    "description": "aharo"
+  },
+  {
+    "category_id": "b3529d51-10f9-408f-a1f8-b4b0a4008f15",
+    "category_name": "Hasil Olahan",
+    "description": "Produk olahan dari hasil pertanian berkualitas"
+  },
+  {
+    "category_id": "5b472f55-ee04-4ac2-83a9-2cb56db48fd5",
+    "category_name": "naga",
+    "description": "naga goreng "
+  },
+  {
+    "category_id": "c479ee26-f5f1-4b61-ab39-7748d2135abc",
+    "category_name": "nugget",
+    "description": "enak"
+  },
+  {
+    "category_id": "6c630085-260f-4231-ab9c-0607e8d280e7",
+    "category_name": "Paket Bundling",
+    "description": "Paket hemat untuk kebutuhan harian, mingguan, dan bulanan keluarga."
+  },
+  {
+    "category_id": "9c8ba755-c506-11f0-b326-0a0027000015",
+    "category_name": "Produk Olahan",
+    "description": "Tahu, tempe, dan produk olahan"
+  },
+  {
+    "category_id": "3b34d260-51cc-4762-8cf3-9586f7939872",
+    "category_name": "Produk Organik",
+    "description": "Produk organik bersertifikat, bebas pestisida dan bahan kimia berbahaya."
+  },
+  {
+    "category_id": "880899d4-3423-4c12-be56-bd20a3261c50",
+    "category_name": "Protein Hewani",
+    "description": "Telur, daging ayam, daging sapi, dan ikan segar untuk kebutuhan protein keluarga."
+  },
+  {
+    "category_id": "bfd11b26-151e-457f-a71a-4bd3b017de54",
+    "category_name": "Pupuk Organik",
+    "description": "Pupuk organik ramah lingkungan untuk tanaman lebih sehat"
+  },
+  {
+    "category_id": "9c8b365c-c506-11f0-b326-0a0027000015",
+    "category_name": "Sayuran",
+    "description": "Sayuran segar"
+  },
+  {
+    "category_id": "ff0559a9-83db-41d2-b60f-8c330caf64b0",
+    "category_name": "Sayuran Segar",
+    "description": "Berbagai sayuran segar pilihan langsung dari petani lokal. Kualitas terjamin, harga terjangkau."
+  },
+  {
+    "category_id": "eb689576-6684-4a77-9c5e-eb8bd4e330fb",
+    "category_name": "Sayuran Segar Premium 1761295931872",
+    "description": "Kategori untuk sayuran segar organik premium pilihan terbaik"
+  },
+  {
+    "category_id": "1ce39403-971c-4553-ba52-43394e9f1620",
+    "category_name": "Sayuran Segar Premium 1761296283205",
+    "description": "Kategori untuk sayuran segar organik premium pilihan terbaik"
+  },
+  {
+    "category_id": "9c8a6fbb-c506-11f0-b326-0a0027000015",
+    "category_name": "Seafood & Ikan",
+    "description": "Produk seafood segar (udang, cumi, ikan)"
+  }
+]

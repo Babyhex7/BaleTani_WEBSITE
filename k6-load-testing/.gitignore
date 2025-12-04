@@ -1,0 +1,24 @@
+# Results
+results/*.json
+results/*.html
+results/*.csv
+results/*.txt
+!results/.gitkeep
+
+# Environment
+.env
+
+# Node modules
+node_modules/
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

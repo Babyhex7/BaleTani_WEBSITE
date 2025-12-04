@@ -1,0 +1,702 @@
+[
+  {
+    "customer_id": "87204681-1a0c-43d0-b930-ce5cd412f475",
+    "phone_number": "6281000000001",
+    "name": "Test Customer 1",
+    "address": "Jl. Test No. 1, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "c21a3433-a9cd-4e9c-85b0-e57d5e5eafdd",
+    "phone_number": "6281000000002",
+    "name": "Test Customer 2",
+    "address": "Jl. Test No. 2, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "d00e4ff3-7707-4124-92d9-bcdb68af39aa",
+    "phone_number": "6281000000003",
+    "name": "Test Customer 3",
+    "address": "Jl. Test No. 3, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "a4921e4a-61c3-4d4a-bc08-4b124c83a71e",
+    "phone_number": "6281000000004",
+    "name": "Test Customer 4",
+    "address": "Jl. Test No. 4, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "4ae267df-9140-4ab2-9a43-31cd739ea324",
+    "phone_number": "6281000000005",
+    "name": "Test Customer 5",
+    "address": "Jl. Test No. 5, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "a04bf1fc-6ad4-4b7b-adf1-473c9d747944",
+    "phone_number": "6281000000006",
+    "name": "Test Customer 6",
+    "address": "Jl. Test No. 6, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "c7cd2c3c-8981-4e85-88a6-199c9581bd49",
+    "phone_number": "6281000000007",
+    "name": "Test Customer 7",
+    "address": "Jl. Test No. 7, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "7cd74d68-83bf-4f5c-9fc2-94431dd9282a",
+    "phone_number": "6281000000008",
+    "name": "Test Customer 8",
+    "address": "Jl. Test No. 8, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "71c5252b-8f8a-4daf-9841-99227a7ffa7f",
+    "phone_number": "6281000000009",
+    "name": "Test Customer 9",
+    "address": "Jl. Test No. 9, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "cdeed1ed-1cbf-4731-bb6c-cd5042b02991",
+    "phone_number": "6281000000010",
+    "name": "Test Customer 10",
+    "address": "Jl. Test No. 10, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "5b75c6fc-4dee-4d97-9f11-2c6901964bce",
+    "phone_number": "6281000000011",
+    "name": "Test Customer 11",
+    "address": "Jl. Test No. 11, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "cbeced38-ae67-44b7-b2ed-849ed2f8d8b0",
+    "phone_number": "6281000000012",
+    "name": "Test Customer 12",
+    "address": "Jl. Test No. 12, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "12a27276-0dc2-40dd-bf91-5b55307fc8c2",
+    "phone_number": "6281000000013",
+    "name": "Test Customer 13",
+    "address": "Jl. Test No. 13, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "bfad7d7b-cbba-4bcc-ac92-2177e2ad3747",
+    "phone_number": "6281000000014",
+    "name": "Test Customer 14",
+    "address": "Jl. Test No. 14, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "dab3866d-e519-4b85-ab6b-de99194e3a9d",
+    "phone_number": "6281000000015",
+    "name": "Test Customer 15",
+    "address": "Jl. Test No. 15, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "41b2f641-4bad-4687-97c2-ab546f4231a6",
+    "phone_number": "6281000000016",
+    "name": "Test Customer 16",
+    "address": "Jl. Test No. 16, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "4c32e99a-f405-4906-a207-fe3699ac0d81",
+    "phone_number": "6281000000017",
+    "name": "Test Customer 17",
+    "address": "Jl. Test No. 17, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "f7803e81-a85c-4fc0-afb9-9a345da2118d",
+    "phone_number": "6281000000018",
+    "name": "Test Customer 18",
+    "address": "Jl. Test No. 18, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "a6cd8f39-2eee-4f2a-be95-2b0b65ffa6d6",
+    "phone_number": "6281000000019",
+    "name": "Test Customer 19",
+    "address": "Jl. Test No. 19, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "f668b326-dda3-4889-b844-c4db8267bc4b",
+    "phone_number": "6281000000020",
+    "name": "Test Customer 20",
+    "address": "Jl. Test No. 20, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "3f617274-dd0b-406c-af37-73f9f4697898",
+    "phone_number": "6281000000021",
+    "name": "Test Customer 21",
+    "address": "Jl. Test No. 21, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "e1401c27-da3d-4ed9-a0d9-997c2c66f369",
+    "phone_number": "6281000000022",
+    "name": "Test Customer 22",
+    "address": "Jl. Test No. 22, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "49423f5c-7c53-4908-b550-151d4aff6170",
+    "phone_number": "6281000000023",
+    "name": "Test Customer 23",
+    "address": "Jl. Test No. 23, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "e60068a6-205e-44e4-aefb-ebe542917f7b",
+    "phone_number": "6281000000024",
+    "name": "Test Customer 24",
+    "address": "Jl. Test No. 24, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "bdd52a49-2c23-4857-90df-2be28e040b30",
+    "phone_number": "6281000000025",
+    "name": "Test Customer 25",
+    "address": "Jl. Test No. 25, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "a78be200-7651-47e7-a18e-643ae1798270",
+    "phone_number": "6281000000026",
+    "name": "Test Customer 26",
+    "address": "Jl. Test No. 26, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "4f5a7915-3e5c-4582-ad6e-2082e9ac221f",
+    "phone_number": "6281000000027",
+    "name": "Test Customer 27",
+    "address": "Jl. Test No. 27, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "f7e14279-54a1-4d2c-8677-2e77c981ed57",
+    "phone_number": "6281000000028",
+    "name": "Test Customer 28",
+    "address": "Jl. Test No. 28, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "5506a572-5ca1-41dc-a575-793ef9b6854b",
+    "phone_number": "6281000000029",
+    "name": "Test Customer 29",
+    "address": "Jl. Test No. 29, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "6f7733aa-8c44-4fef-8fd5-e69c9331f992",
+    "phone_number": "6281000000030",
+    "name": "Test Customer 30",
+    "address": "Jl. Test No. 30, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "5606faa2-64aa-4e45-8346-4d613bf4dd51",
+    "phone_number": "6281000000031",
+    "name": "Test Customer 31",
+    "address": "Jl. Test No. 31, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "6500f287-882d-43a9-ab2a-6e93e1ad727e",
+    "phone_number": "6281000000032",
+    "name": "Test Customer 32",
+    "address": "Jl. Test No. 32, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "598328a1-c049-443e-87a0-eb20170495b5",
+    "phone_number": "6281000000033",
+    "name": "Test Customer 33",
+    "address": "Jl. Test No. 33, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "153f3234-dd15-4864-a5e0-801ac37f2033",
+    "phone_number": "6281000000034",
+    "name": "Test Customer 34",
+    "address": "Jl. Test No. 34, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "cfb3c322-f983-45e3-bef3-2201b20d7ef7",
+    "phone_number": "6281000000035",
+    "name": "Test Customer 35",
+    "address": "Jl. Test No. 35, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "8d0fbcb8-9ff1-4a09-a053-6ed03d49e46b",
+    "phone_number": "6281000000036",
+    "name": "Test Customer 36",
+    "address": "Jl. Test No. 36, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "f4aae4a8-97b9-49df-8e4d-756416f2e6c7",
+    "phone_number": "6281000000037",
+    "name": "Test Customer 37",
+    "address": "Jl. Test No. 37, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "6eb45337-9a77-4394-9b72-0a8029f62ecf",
+    "phone_number": "6281000000038",
+    "name": "Test Customer 38",
+    "address": "Jl. Test No. 38, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "80f8c680-2d7a-4092-a907-61ab128592d0",
+    "phone_number": "6281000000039",
+    "name": "Test Customer 39",
+    "address": "Jl. Test No. 39, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "2b614a12-40df-45c6-a320-e1f2203be28b",
+    "phone_number": "6281000000040",
+    "name": "Test Customer 40",
+    "address": "Jl. Test No. 40, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "34c7a702-f5f8-4b58-81ec-50578c039a2c",
+    "phone_number": "6281000000041",
+    "name": "Test Customer 41",
+    "address": "Jl. Test No. 41, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "2e7e16dc-95f7-4dc7-be33-a77b70e1737d",
+    "phone_number": "6281000000042",
+    "name": "Test Customer 42",
+    "address": "Jl. Test No. 42, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "97147c9c-da0f-4bdd-8ce3-800bf598dde1",
+    "phone_number": "6281000000043",
+    "name": "Test Customer 43",
+    "address": "Jl. Test No. 43, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "9c27db3c-0f45-4a03-9cf2-d0ccd43163d7",
+    "phone_number": "6281000000044",
+    "name": "Test Customer 44",
+    "address": "Jl. Test No. 44, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "9a8646d3-372f-4097-8552-8e90c39b77b6",
+    "phone_number": "6281000000045",
+    "name": "Test Customer 45",
+    "address": "Jl. Test No. 45, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "4f1bceb4-33bd-4849-aafa-51363c188a3a",
+    "phone_number": "6281000000046",
+    "name": "Test Customer 46",
+    "address": "Jl. Test No. 46, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "747935dc-bf85-4d88-bc49-de0aaa9de791",
+    "phone_number": "6281000000047",
+    "name": "Test Customer 47",
+    "address": "Jl. Test No. 47, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "1f725825-7128-4e0c-81f7-4c5ec301444b",
+    "phone_number": "6281000000048",
+    "name": "Test Customer 48",
+    "address": "Jl. Test No. 48, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "7d0321a4-8bc2-44f8-a6b0-e0ff8de2cff0",
+    "phone_number": "6281000000049",
+    "name": "Test Customer 49",
+    "address": "Jl. Test No. 49, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "e7700a32-4c33-4855-886b-d38f23572c91",
+    "phone_number": "6281000000050",
+    "name": "Test Customer 50",
+    "address": "Jl. Test No. 50, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "16b76015-8d76-4945-b5e7-c27995243263",
+    "phone_number": "6281000000051",
+    "name": "Test Customer 51",
+    "address": "Jl. Test No. 51, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "98b8e0d1-954d-4b70-9eee-810abdfc0db3",
+    "phone_number": "6281000000052",
+    "name": "Test Customer 52",
+    "address": "Jl. Test No. 52, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "7e87f79d-0ea0-4156-8006-a660904b2f46",
+    "phone_number": "6281000000053",
+    "name": "Test Customer 53",
+    "address": "Jl. Test No. 53, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "9a056cf9-7193-42d6-b8a1-15314da7d6df",
+    "phone_number": "6281000000054",
+    "name": "Test Customer 54",
+    "address": "Jl. Test No. 54, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "750b6b40-a769-4c72-ac8d-e2f112632847",
+    "phone_number": "6281000000055",
+    "name": "Test Customer 55",
+    "address": "Jl. Test No. 55, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "4aa7f5f8-0145-4434-8183-77e9a764c361",
+    "phone_number": "6281000000056",
+    "name": "Test Customer 56",
+    "address": "Jl. Test No. 56, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "2591d693-36c6-4944-b95d-5ba983fc31f8",
+    "phone_number": "6281000000057",
+    "name": "Test Customer 57",
+    "address": "Jl. Test No. 57, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "d2208981-3226-4f24-947f-8d46687e0c64",
+    "phone_number": "6281000000058",
+    "name": "Test Customer 58",
+    "address": "Jl. Test No. 58, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "79a03897-e8bd-4971-aa53-f0d0069a1734",
+    "phone_number": "6281000000059",
+    "name": "Test Customer 59",
+    "address": "Jl. Test No. 59, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "fc9c767a-78bb-4953-9fb0-3ab941ade578",
+    "phone_number": "6281000000060",
+    "name": "Test Customer 60",
+    "address": "Jl. Test No. 60, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "6e870cee-ad48-4ed7-889a-e7d823eb836a",
+    "phone_number": "6281000000061",
+    "name": "Test Customer 61",
+    "address": "Jl. Test No. 61, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "f0435446-1cdc-457b-81ff-3973d64feedb",
+    "phone_number": "6281000000062",
+    "name": "Test Customer 62",
+    "address": "Jl. Test No. 62, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "1c58704c-7ccd-4d14-9f37-4f0d46375ac0",
+    "phone_number": "6281000000063",
+    "name": "Test Customer 63",
+    "address": "Jl. Test No. 63, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "1b3485fa-6de0-43ab-804d-ce32f0c6dfff",
+    "phone_number": "6281000000064",
+    "name": "Test Customer 64",
+    "address": "Jl. Test No. 64, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "e37630ad-8efe-42ae-acb6-d2fb47c01b2b",
+    "phone_number": "6281000000065",
+    "name": "Test Customer 65",
+    "address": "Jl. Test No. 65, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "da26b1b7-fb05-47a3-8de9-56d5f7d893c2",
+    "phone_number": "6281000000066",
+    "name": "Test Customer 66",
+    "address": "Jl. Test No. 66, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "dd479cbe-9747-4483-bf57-f25e307bcf09",
+    "phone_number": "6281000000067",
+    "name": "Test Customer 67",
+    "address": "Jl. Test No. 67, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "559d5e81-b64e-483a-9825-81d9f68be9b2",
+    "phone_number": "6281000000068",
+    "name": "Test Customer 68",
+    "address": "Jl. Test No. 68, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "da456222-4c70-440e-aca1-63f687403476",
+    "phone_number": "6281000000069",
+    "name": "Test Customer 69",
+    "address": "Jl. Test No. 69, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "3ef338a6-6970-41ac-884e-ec94a606a9d8",
+    "phone_number": "6281000000070",
+    "name": "Test Customer 70",
+    "address": "Jl. Test No. 70, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "5cd14de1-3fed-4c5f-8e07-11cd5bfffd6c",
+    "phone_number": "6281000000071",
+    "name": "Test Customer 71",
+    "address": "Jl. Test No. 71, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "0196991c-b09c-4394-a520-00b0c6355804",
+    "phone_number": "6281000000072",
+    "name": "Test Customer 72",
+    "address": "Jl. Test No. 72, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "826bbd76-52b8-40ac-ba99-1237d8ef6763",
+    "phone_number": "6281000000073",
+    "name": "Test Customer 73",
+    "address": "Jl. Test No. 73, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "e7c80237-132c-488c-9d52-aa48c534778b",
+    "phone_number": "6281000000074",
+    "name": "Test Customer 74",
+    "address": "Jl. Test No. 74, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "e2818a87-d005-4ea1-a6f1-3aa47fd17452",
+    "phone_number": "6281000000075",
+    "name": "Test Customer 75",
+    "address": "Jl. Test No. 75, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "b95d17da-098b-464e-8ada-102788c05d05",
+    "phone_number": "6281000000076",
+    "name": "Test Customer 76",
+    "address": "Jl. Test No. 76, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "b23fe4bf-a532-4a2c-b2f4-aa18d307b884",
+    "phone_number": "6281000000077",
+    "name": "Test Customer 77",
+    "address": "Jl. Test No. 77, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "9f8ee879-b215-42a1-9deb-d80f5a847166",
+    "phone_number": "6281000000078",
+    "name": "Test Customer 78",
+    "address": "Jl. Test No. 78, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "63b89e5c-4be8-44db-a51a-5ebce0090f5a",
+    "phone_number": "6281000000079",
+    "name": "Test Customer 79",
+    "address": "Jl. Test No. 79, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "67ed54a0-1ce1-4bb7-8ca8-d2b2735863c6",
+    "phone_number": "6281000000080",
+    "name": "Test Customer 80",
+    "address": "Jl. Test No. 80, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "4634d9d0-f532-4111-8e99-02b44d211022",
+    "phone_number": "6281000000081",
+    "name": "Test Customer 81",
+    "address": "Jl. Test No. 81, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "df2a8e5f-5a56-46a1-ba60-599f6d7c3162",
+    "phone_number": "6281000000082",
+    "name": "Test Customer 82",
+    "address": "Jl. Test No. 82, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "da9d25e6-334c-40f1-9438-91759b616b5b",
+    "phone_number": "6281000000083",
+    "name": "Test Customer 83",
+    "address": "Jl. Test No. 83, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "47d101c6-16b2-4f57-a503-457e1ef0675d",
+    "phone_number": "6281000000084",
+    "name": "Test Customer 84",
+    "address": "Jl. Test No. 84, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "97ba2c62-64d2-49ef-ab47-f0e004d12acd",
+    "phone_number": "6281000000085",
+    "name": "Test Customer 85",
+    "address": "Jl. Test No. 85, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "55beabb3-45f9-46ec-b4cd-ad7ed6c671c8",
+    "phone_number": "6281000000086",
+    "name": "Test Customer 86",
+    "address": "Jl. Test No. 86, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "34f9da94-d9d0-4336-b3df-fa9a7f204ddb",
+    "phone_number": "6281000000087",
+    "name": "Test Customer 87",
+    "address": "Jl. Test No. 87, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "498f7c38-cd45-4650-8471-342b7e629432",
+    "phone_number": "6281000000088",
+    "name": "Test Customer 88",
+    "address": "Jl. Test No. 88, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "18ed4967-3921-431b-8293-e2833820ea09",
+    "phone_number": "6281000000089",
+    "name": "Test Customer 89",
+    "address": "Jl. Test No. 89, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "40193b55-6a92-4c73-b2d4-98072c74b065",
+    "phone_number": "6281000000090",
+    "name": "Test Customer 90",
+    "address": "Jl. Test No. 90, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "44a6084d-f25d-4d50-8217-4835554c645d",
+    "phone_number": "6281000000091",
+    "name": "Test Customer 91",
+    "address": "Jl. Test No. 91, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "f5de325a-4d29-4f66-8e4d-0c277d0d23fc",
+    "phone_number": "6281000000092",
+    "name": "Test Customer 92",
+    "address": "Jl. Test No. 92, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "5ed540c3-df20-42c5-aca3-6f964ffe83be",
+    "phone_number": "6281000000093",
+    "name": "Test Customer 93",
+    "address": "Jl. Test No. 93, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "c2320b7a-3d2a-4de8-bdbf-4e744ebd8b4f",
+    "phone_number": "6281000000094",
+    "name": "Test Customer 94",
+    "address": "Jl. Test No. 94, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "cb086c12-4c18-4dbb-99e2-68f6a9b8079d",
+    "phone_number": "6281000000095",
+    "name": "Test Customer 95",
+    "address": "Jl. Test No. 95, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "46ce25d3-f5b4-42e8-909a-8932728fd61b",
+    "phone_number": "6281000000096",
+    "name": "Test Customer 96",
+    "address": "Jl. Test No. 96, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "4fa6c1d1-140a-4a26-8040-744386ad86e9",
+    "phone_number": "6281000000097",
+    "name": "Test Customer 97",
+    "address": "Jl. Test No. 97, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "f07e392f-a566-4928-9b8d-319b02dffeb0",
+    "phone_number": "6281000000098",
+    "name": "Test Customer 98",
+    "address": "Jl. Test No. 98, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "ef6103d0-ba3a-4c3b-903d-7d153293e033",
+    "phone_number": "6281000000099",
+    "name": "Test Customer 99",
+    "address": "Jl. Test No. 99, Jakarta Selatan",
+    "password": "test123"
+  },
+  {
+    "customer_id": "6463f96d-478d-4d9e-bbbb-ce269f82e775",
+    "phone_number": "6281000000100",
+    "name": "Test Customer 100",
+    "address": "Jl. Test No. 100, Jakarta Selatan",
+    "password": "test123"
+  }
+]

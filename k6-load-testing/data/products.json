@@ -1,0 +1,506 @@
+[
+  {
+    "product_id": "9c8daf88-c506-11f0-b326-0a0027000015",
+    "product_name": "Daun Salam",
+    "price": "500.00",
+    "stock": 200,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Daun salam kering"
+  },
+  {
+    "product_id": "9c8db42a-c506-11f0-b326-0a0027000015",
+    "product_name": "Pete",
+    "price": "30000.00",
+    "stock": 50,
+    "category_id": "9c8b365c-c506-11f0-b326-0a0027000015",
+    "description": "Pete/petai segar"
+  },
+  {
+    "product_id": "9c8da837-c506-11f0-b326-0a0027000015",
+    "product_name": "Ayam Kampung Utuh",
+    "price": "27000.00",
+    "stock": 40,
+    "category_id": "9c8b0287-c506-11f0-b326-0a0027000015",
+    "description": "Ayam kampung utuh"
+  },
+  {
+    "product_id": "9c8db4c8-c506-11f0-b326-0a0027000015",
+    "product_name": "Wortel",
+    "price": "14000.00",
+    "stock": 150,
+    "category_id": "9c8b365c-c506-11f0-b326-0a0027000015",
+    "description": "Wortel segar"
+  },
+  {
+    "product_id": "9c8db13a-c506-11f0-b326-0a0027000015",
+    "product_name": "Bawang Putih",
+    "price": "40000.00",
+    "stock": 100,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Bawang putih"
+  },
+  {
+    "product_id": "9c8da936-c506-11f0-b326-0a0027000015",
+    "product_name": "Telur Ayam Kampung",
+    "price": "3000.00",
+    "stock": 500,
+    "category_id": "9c8b0287-c506-11f0-b326-0a0027000015",
+    "description": "Telur ayam kampung"
+  },
+  {
+    "product_id": "9c8db927-c506-11f0-b326-0a0027000015",
+    "product_name": "Apel",
+    "price": "30000.00",
+    "stock": 100,
+    "category_id": "fb0c679a-9bb4-421d-9972-3c5eae52a2ee",
+    "description": "Apel segar"
+  },
+  {
+    "product_id": "9732a91d-bc0c-4c2f-97dd-9459a160b88a",
+    "product_name": "gai",
+    "price": "90000.00",
+    "stock": 421,
+    "category_id": "880899d4-3423-4c12-be56-bd20a3261c50",
+    "description": "aaa"
+  },
+  {
+    "product_id": "9c8cc803-c506-11f0-b326-0a0027000015",
+    "product_name": "Udang Sedang 1",
+    "price": "65000.00",
+    "stock": 671,
+    "category_id": "9c8a6fbb-c506-11f0-b326-0a0027000015",
+    "description": "Udang segar ukuran sedang pilihan"
+  },
+  {
+    "product_id": "9c8db256-c506-11f0-b326-0a0027000015",
+    "product_name": "Suraung",
+    "price": "15000.00",
+    "stock": 100,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Suraung/daun kemangi"
+  },
+  {
+    "product_id": "9c8dbe97-c506-11f0-b326-0a0027000015",
+    "product_name": "Kacang Kedelai",
+    "price": "14000.00",
+    "stock": 100,
+    "category_id": "9c8ba67c-c506-11f0-b326-0a0027000015",
+    "description": "Kacang kedelai kering"
+  },
+  {
+    "product_id": "9c8dc251-c506-11f0-b326-0a0027000015",
+    "product_name": "Susu Kental Manis",
+    "price": "12000.00",
+    "stock": 200,
+    "category_id": "9c8ba67c-c506-11f0-b326-0a0027000015",
+    "description": "Susu kental manis kaleng"
+  },
+  {
+    "product_id": "9c8da3d0-c506-11f0-b326-0a0027000015",
+    "product_name": "Ayam Filet",
+    "price": "43000.00",
+    "stock": 791,
+    "category_id": "9c8b0287-c506-11f0-b326-0a0027000015",
+    "description": "Daging ayam filet tanpa tulang"
+  },
+  {
+    "product_id": "d7a3f6c7-9be5-4c66-9385-fa8f8ee999c3",
+    "product_name": "eca cukurutut",
+    "price": "55000.00",
+    "stock": 72,
+    "category_id": "ad44eaf1-0061-4412-b70c-466e3bf91e12",
+    "description": null
+  },
+  {
+    "product_id": "9c8dc407-c506-11f0-b326-0a0027000015",
+    "product_name": "Tahu Mentah",
+    "price": "8000.00",
+    "stock": 200,
+    "category_id": "9c8ba755-c506-11f0-b326-0a0027000015",
+    "description": "Tahu mentah segar"
+  },
+  {
+    "product_id": "9c8dabbe-c506-11f0-b326-0a0027000015",
+    "product_name": "Sereh",
+    "price": "12000.00",
+    "stock": 100,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Sereh/serai segar"
+  },
+  {
+    "product_id": "9c8db0a6-c506-11f0-b326-0a0027000015",
+    "product_name": "Cengek",
+    "price": "75000.00",
+    "stock": 50,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Cengek/cengkeh"
+  },
+  {
+    "product_id": "9c8db567-c506-11f0-b326-0a0027000015",
+    "product_name": "Daun Bawang",
+    "price": "12000.00",
+    "stock": 100,
+    "category_id": "9c8b365c-c506-11f0-b326-0a0027000015",
+    "description": "Daun bawang segar"
+  },
+  {
+    "product_id": "9c8d0a8a-c506-11f0-b326-0a0027000015",
+    "product_name": "Udang Sedang 2",
+    "price": "70000.00",
+    "stock": 48009901,
+    "category_id": "9c8a6fbb-c506-11f0-b326-0a0027000015",
+    "description": "Udang segar ukuran sedang premium"
+  },
+  {
+    "product_id": "9c8da62f-c506-11f0-b326-0a0027000015",
+    "product_name": "Sayap Ayam",
+    "price": "35000.00",
+    "stock": 70,
+    "category_id": "9c8b0287-c506-11f0-b326-0a0027000015",
+    "description": "Sayap ayam segar"
+  },
+  {
+    "product_id": "9c8dba63-c506-11f0-b326-0a0027000015",
+    "product_name": "Lemon Biasa",
+    "price": "20000.00",
+    "stock": 80,
+    "category_id": "fb0c679a-9bb4-421d-9972-3c5eae52a2ee",
+    "description": "Lemon lokal"
+  },
+  {
+    "product_id": "9c8dbe00-c506-11f0-b326-0a0027000015",
+    "product_name": "Kacang Hijau",
+    "price": "24000.00",
+    "stock": 100,
+    "category_id": "9c8ba67c-c506-11f0-b326-0a0027000015",
+    "description": "Kacang hijau kering"
+  },
+  {
+    "product_id": "9c8daa1f-c506-11f0-b326-0a0027000015",
+    "product_name": "Telur Ayam Ras",
+    "price": "29000.00",
+    "stock": 300,
+    "category_id": "9c8b0287-c506-11f0-b326-0a0027000015",
+    "description": "Telur ayam ras"
+  },
+  {
+    "product_id": "9c8da525-c506-11f0-b326-0a0027000015",
+    "product_name": "Ceker Ayam",
+    "price": "15000.00",
+    "stock": 100,
+    "category_id": "9c8b0287-c506-11f0-b326-0a0027000015",
+    "description": "Ceker ayam segar"
+  },
+  {
+    "product_id": "9c8db389-c506-11f0-b326-0a0027000015",
+    "product_name": "Kentang",
+    "price": "18000.00",
+    "stock": 200,
+    "category_id": "9c8b365c-c506-11f0-b326-0a0027000015",
+    "description": "Kentang segar"
+  },
+  {
+    "product_id": "9c8da726-c506-11f0-b326-0a0027000015",
+    "product_name": "Ayam Potong (All Part)",
+    "price": "35000.00",
+    "stock": 60,
+    "category_id": "9c8b0287-c506-11f0-b326-0a0027000015",
+    "description": "Ayam potong semua bagian"
+  },
+  {
+    "product_id": "9c8dbc41-c506-11f0-b326-0a0027000015",
+    "product_name": "Nanas",
+    "price": "12000.00",
+    "stock": 80,
+    "category_id": "fb0c679a-9bb4-421d-9972-3c5eae52a2ee",
+    "description": "Nanas segar"
+  },
+  {
+    "product_id": "9c8dab27-c506-11f0-b326-0a0027000015",
+    "product_name": "Telur Puyuh",
+    "price": "40000.00",
+    "stock": 200,
+    "category_id": "9c8b0287-c506-11f0-b326-0a0027000015",
+    "description": "Telur puyuh segar"
+  },
+  {
+    "product_id": "9c8da0a0-c506-11f0-b326-0a0027000015",
+    "product_name": "Bawal",
+    "price": "35000.00",
+    "stock": 341,
+    "category_id": "9c8a6fbb-c506-11f0-b326-0a0027000015",
+    "description": "Ikan bawal segar"
+  },
+  {
+    "product_id": "9c8dc2e7-c506-11f0-b326-0a0027000015",
+    "product_name": "Tepung Terigu Cakra Kembar",
+    "price": "13000.00",
+    "stock": 150,
+    "category_id": "9c8ba67c-c506-11f0-b326-0a0027000015",
+    "description": "Tepung terigu premium"
+  },
+  {
+    "product_id": "33d26296-478d-4a04-8e6e-5ece54e19ba9",
+    "product_name": "owkowkwo",
+    "price": "200000.00",
+    "stock": 6011240,
+    "category_id": "5b472f55-ee04-4ac2-83a9-2cb56db48fd5",
+    "description": null
+  },
+  {
+    "product_id": "9c8d1833-c506-11f0-b326-0a0027000015",
+    "product_name": "Cumi",
+    "price": "65000.00",
+    "stock": 391,
+    "category_id": "9c8a6fbb-c506-11f0-b326-0a0027000015",
+    "description": "Cumi segar"
+  },
+  {
+    "product_id": "9c8da214-c506-11f0-b326-0a0027000015",
+    "product_name": "Tongkol",
+    "price": "40000.00",
+    "stock": 45,
+    "category_id": "9c8a6fbb-c506-11f0-b326-0a0027000015",
+    "description": "Ikan tongkol segar"
+  },
+  {
+    "product_id": "9c8dacfd-c506-11f0-b326-0a0027000015",
+    "product_name": "Cikur",
+    "price": "50000.00",
+    "stock": 60,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Kencur segar"
+  },
+  {
+    "product_id": "9c8db9c8-c506-11f0-b326-0a0027000015",
+    "product_name": "Lemon Premium",
+    "price": "32000.00",
+    "stock": 60,
+    "category_id": "fb0c679a-9bb4-421d-9972-3c5eae52a2ee",
+    "description": "Lemon premium impor"
+  },
+  {
+    "product_id": "9c8dc132-c506-11f0-b326-0a0027000015",
+    "product_name": "Minyak Goreng Kemasan",
+    "price": "20000.00",
+    "stock": 150,
+    "category_id": "9c8ba67c-c506-11f0-b326-0a0027000015",
+    "description": "Minyak goreng kemasan"
+  },
+  {
+    "product_id": "9c8d9e83-c506-11f0-b326-0a0027000015",
+    "product_name": "Ikan Kembung",
+    "price": "30000.00",
+    "stock": 491,
+    "category_id": "9c8a6fbb-c506-11f0-b326-0a0027000015",
+    "description": "Ikan kembung segar"
+  },
+  {
+    "product_id": "03cad760-7152-4669-91fd-46a29f5bd0b8",
+    "product_name": "test disc",
+    "price": "100000.00",
+    "stock": 92991,
+    "category_id": "5b472f55-ee04-4ac2-83a9-2cb56db48fd5",
+    "description": "djdd"
+  },
+  {
+    "product_id": "9c8dac60-c506-11f0-b326-0a0027000015",
+    "product_name": "Jahe",
+    "price": "32000.00",
+    "stock": 80,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Jahe segar"
+  },
+  {
+    "product_id": "9c8d0de4-c506-11f0-b326-0a0027000015",
+    "product_name": "Udang Kecil",
+    "price": "40000.00",
+    "stock": 60,
+    "category_id": "9c8a6fbb-c506-11f0-b326-0a0027000015",
+    "description": "Udang segar ukuran kecil"
+  },
+  {
+    "product_id": "9c8dbce3-c506-11f0-b326-0a0027000015",
+    "product_name": "Jeruk",
+    "price": "24000.00",
+    "stock": 120,
+    "category_id": "fb0c679a-9bb4-421d-9972-3c5eae52a2ee",
+    "description": "Jeruk segar"
+  },
+  {
+    "product_id": "9c8db018-c506-11f0-b326-0a0027000015",
+    "product_name": "Daun Jeruk",
+    "price": "2000.00",
+    "stock": 150,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Daun jeruk segar"
+  },
+  {
+    "product_id": "33f30f59-6c07-46df-b11e-c9c959dd4021",
+    "product_name": "test dics",
+    "price": "100000.00",
+    "stock": 491,
+    "category_id": "880899d4-3423-4c12-be56-bd20a3261c50",
+    "description": "test dics "
+  },
+  {
+    "product_id": "9c8db87c-c506-11f0-b326-0a0027000015",
+    "product_name": "Kol/Kubis",
+    "price": "7000.00",
+    "stock": 150,
+    "category_id": "9c8b365c-c506-11f0-b326-0a0027000015",
+    "description": "Kol/kubis segar"
+  },
+  {
+    "product_id": "9c8dbf32-c506-11f0-b326-0a0027000015",
+    "product_name": "Kacang Tanah",
+    "price": "28000.00",
+    "stock": 80,
+    "category_id": "9c8ba67c-c506-11f0-b326-0a0027000015",
+    "description": "Kacang tanah kupas"
+  },
+  {
+    "product_id": "9c8dc070-c506-11f0-b326-0a0027000015",
+    "product_name": "Minyak Goreng Curah",
+    "price": "18000.00",
+    "stock": 200,
+    "category_id": "9c8ba67c-c506-11f0-b326-0a0027000015",
+    "description": "Minyak goreng curah"
+  },
+  {
+    "product_id": "9c8db744-c506-11f0-b326-0a0027000015",
+    "product_name": "Kentang Lokal Dieng",
+    "price": "17000.00",
+    "stock": 120,
+    "category_id": "9c8b365c-c506-11f0-b326-0a0027000015",
+    "description": "Kentang lokal Dieng premium"
+  },
+  {
+    "product_id": "9c8dad98-c506-11f0-b326-0a0027000015",
+    "product_name": "Lengkuas",
+    "price": "20000.00",
+    "stock": 70,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Lengkuas/laos segar"
+  },
+  {
+    "product_id": "9c8db7eb-c506-11f0-b326-0a0027000015",
+    "product_name": "Ketela Pohon",
+    "price": "5000.00",
+    "stock": 200,
+    "category_id": "9c8b365c-c506-11f0-b326-0a0027000015",
+    "description": "Singkong/ketela pohon"
+  },
+  {
+    "product_id": "9c8dc1c2-c506-11f0-b326-0a0027000015",
+    "product_name": "LPG 3KG",
+    "price": "22000.00",
+    "stock": 100,
+    "category_id": "9c8ba67c-c506-11f0-b326-0a0027000015",
+    "description": "Gas LPG 3kg"
+  },
+  {
+    "product_id": "9c8daef6-c506-11f0-b326-0a0027000015",
+    "product_name": "Tomat",
+    "price": "10000.00",
+    "stock": 150,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Tomat segar"
+  },
+  {
+    "product_id": "449af7b6-ef2c-4b25-a8df-a57463745a0e",
+    "product_name": "test mage",
+    "price": "775900.00",
+    "stock": 2147483647,
+    "category_id": "880899d4-3423-4c12-be56-bd20a3261c50",
+    "description": "aaaa"
+  },
+  {
+    "product_id": "9c8dbd71-c506-11f0-b326-0a0027000015",
+    "product_name": "Pisang",
+    "price": "24000.00",
+    "stock": 150,
+    "category_id": "fb0c679a-9bb4-421d-9972-3c5eae52a2ee",
+    "description": "Pisang segar"
+  },
+  {
+    "product_id": "9c8dbb9e-c506-11f0-b326-0a0027000015",
+    "product_name": "Manggis",
+    "price": "17000.00",
+    "stock": 70,
+    "category_id": "fb0c679a-9bb4-421d-9972-3c5eae52a2ee",
+    "description": "Manggis segar"
+  },
+  {
+    "product_id": "9c8d0c4d-c506-11f0-b326-0a0027000015",
+    "product_name": "Udang Besar",
+    "price": "85000.00",
+    "stock": 30,
+    "category_id": "9c8a6fbb-c506-11f0-b326-0a0027000015",
+    "description": "Udang segar ukuran besar"
+  },
+  {
+    "product_id": "9c8db6b2-c506-11f0-b326-0a0027000015",
+    "product_name": "Jagung Pipilan",
+    "price": "12000.00",
+    "stock": 80,
+    "category_id": "9c8b365c-c506-11f0-b326-0a0027000015",
+    "description": "Jagung pipilan"
+  },
+  {
+    "product_id": "9c8db1c9-c506-11f0-b326-0a0027000015",
+    "product_name": "Cabe Kriting",
+    "price": "72000.00",
+    "stock": 80,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Cabe keriting segar"
+  },
+  {
+    "product_id": "9c8db607-c506-11f0-b326-0a0027000015",
+    "product_name": "Jagung Manis",
+    "price": "10000.00",
+    "stock": 100,
+    "category_id": "9c8b365c-c506-11f0-b326-0a0027000015",
+    "description": "Jagung manis segar"
+  },
+  {
+    "product_id": "9c8dc37c-c506-11f0-b326-0a0027000015",
+    "product_name": "Tempe",
+    "price": "12000.00",
+    "stock": 200,
+    "category_id": "9c8ba755-c506-11f0-b326-0a0027000015",
+    "description": "Tempe segar"
+  },
+  {
+    "product_id": "9c8dbfce-c506-11f0-b326-0a0027000015",
+    "product_name": "Mie Instan",
+    "price": "3000.00",
+    "stock": 500,
+    "category_id": "9c8ba67c-c506-11f0-b326-0a0027000015",
+    "description": "Mie instan"
+  },
+  {
+    "product_id": "9c8db2f8-c506-11f0-b326-0a0027000015",
+    "product_name": "Seledri",
+    "price": "20000.00",
+    "stock": 120,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Seledri segar"
+  },
+  {
+    "product_id": "9c8dbafe-c506-11f0-b326-0a0027000015",
+    "product_name": "Salak",
+    "price": "10000.00",
+    "stock": 100,
+    "category_id": "fb0c679a-9bb4-421d-9972-3c5eae52a2ee",
+    "description": "Salak segar"
+  },
+  {
+    "product_id": "9c8dae50-c506-11f0-b326-0a0027000015",
+    "product_name": "Kunyit",
+    "price": "18000.00",
+    "stock": 80,
+    "category_id": "6a22184b-60cd-4488-8dea-36b120d70f8c",
+    "description": "Kunyit segar"
+  }
+]

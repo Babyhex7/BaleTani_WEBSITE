@@ -1,0 +1,23 @@
+{
+  "name": "k6-load-testing-baletani",
+  "version": "1.0.0",
+  "description": "K6 Load Testing Suite for BaleTani Customer Flow",
+  "scripts": {
+    "generate-data": "node scripts/generate-test-data.js",
+    "test:smoke": "k6 run scenarios/01-smoke-test.js",
+    "test:baseline": "k6 run scenarios/02-baseline-load.js",
+    "test:peak": "k6 run scenarios/03-peak-load.js",
+    "test:stress": "k6 run scenarios/04-stress-test.js",
+    "test:endurance": "k6 run scenarios/05-endurance-test.js",
+    "test:spike": "k6 run scenarios/06-spike-test.js"
+  },
+  "keywords": ["k6", "load-testing", "performance", "baletani"],
+  "author": "BaleTani Team",
+  "license": "MIT",
+  "dependencies": {
+    "mysql2": "^3.6.5",
+    "bcryptjs": "^2.4.3",
+    "uuid": "^9.0.1",
+    "dotenv": "^16.3.1"
+  }
+}
