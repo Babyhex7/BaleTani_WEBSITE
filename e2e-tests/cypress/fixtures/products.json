@@ -1,0 +1,79 @@
+{
+  "validProducts": [
+    {
+      "id": "prod-001",
+      "name": "Beras Premium 5kg",
+      "description": "Beras berkualitas tinggi pilihan terbaik",
+      "price": 75000,
+      "stock": 100,
+      "unit": "kg",
+      "category_id": "cat-001",
+      "category_name": "Beras & Serealia",
+      "image_url": "/uploads/products/beras-premium.jpg",
+      "is_active": true
+    },
+    {
+      "id": "prod-002",
+      "name": "Telur Ayam Kampung 10 Butir",
+      "description": "Telur segar dari ayam kampung berkualitas",
+      "price": 30000,
+      "stock": 50,
+      "unit": "pack",
+      "category_id": "cat-004",
+      "category_name": "Telur & Unggas",
+      "image_url": "/uploads/products/telur-kampung.jpg",
+      "is_active": true,
+      "discount": {
+        "type": "percentage",
+        "value": 10,
+        "discounted_price": 27000
+      }
+    },
+    {
+      "id": "prod-003",
+      "name": "Sayuran Organik Mix 1kg",
+      "description": "Paket sayuran organik segar dari kebun",
+      "price": 25000,
+      "stock": 30,
+      "unit": "kg",
+      "category_id": "cat-002",
+      "category_name": "Sayuran",
+      "image_url": "/uploads/products/sayuran-mix.jpg",
+      "is_active": true
+    },
+    {
+      "id": "prod-004",
+      "name": "Jeruk Manis 1kg",
+      "description": "Jeruk manis segar langsung dari petani",
+      "price": 20000,
+      "stock": 40,
+      "unit": "kg",
+      "category_id": "cat-003",
+      "category_name": "Buah-buahan",
+      "image_url": "/uploads/products/jeruk.jpg",
+      "is_active": true
+    }
+  ],
+  "outOfStockProduct": {
+    "id": "prod-005",
+    "name": "Cabai Merah 500g",
+    "description": "Cabai merah segar pilihan",
+    "price": 15000,
+    "stock": 0,
+    "unit": "gram",
+    "category_id": "cat-005",
+    "category_name": "Bumbu Dapur",
+    "image_url": "/uploads/products/cabai.jpg",
+    "is_active": true
+  },
+  "inactiveProduct": {
+    "id": "prod-006",
+    "name": "Product Tidak Aktif",
+    "description": "Product ini tidak aktif",
+    "price": 10000,
+    "stock": 10,
+    "unit": "kg",
+    "category_id": "cat-001",
+    "is_active": false
+  }
+}

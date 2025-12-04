@@ -28,7 +28,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, disabled = false }) => {
   const subtotal = item.finalPrice * item.quantity;
 
   return (
-    <div className="card-cart-item p-3 sm:p-4">
+    <div data-cy="cart-item" className="card-cart-item p-3 sm:p-4">
       {/* Mobile Layout: Stacked */}
       <div className="flex gap-3 sm:gap-4">
         {/* Product Image - Smaller on mobile */}
@@ -46,7 +46,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, disabled = false }) => {
         {/* Product Info - Full Width on Mobile */}
         <div className="flex-1 min-w-0">
           {/* Name */}
-          <h3 className="font-semibold text-gray-900 text-sm sm:text-base line-clamp-2 mb-1">
+          <h3 data-cy="product-name" className="font-semibold text-gray-900 text-sm sm:text-base line-clamp-2 mb-1">
             {item.name}
           </h3>
           
@@ -59,7 +59,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, disabled = false }) => {
 
           {/* Price - Tokopedia style: big and prominent */}
           <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-            <span className="text-base sm:text-lg font-bold text-green-600">
+            <span data-cy="product-price" className="text-base sm:text-lg font-bold text-green-600">
               {formatPrice(item.finalPrice)}
             </span>
             {hasDiscount && (
@@ -79,16 +79,18 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, disabled = false }) => {
             {/* Quantity Controls - Touch friendly */}
             <div className="flex items-center gap-1.5 sm:gap-2">
               <button
+                data-cy="quantity-decrease"
                 onClick={() => handleQuantityChange(-1)}
                 disabled={disabled || item.quantity <= 1}
                 className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <Minus size={14} className="sm:w-4 sm:h-4" />
               </button>
-              <span className="w-8 sm:w-10 text-center font-semibold text-sm sm:text-base">
+              <span data-cy="quantity-input" className="w-8 sm:w-10 text-center font-semibold text-sm sm:text-base">
                 {item.quantity}
               </span>
               <button
+                data-cy="quantity-increase"
                 onClick={() => handleQuantityChange(1)}
                 disabled={disabled || item.quantity >= item.stock}
                 className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -104,6 +106,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, disabled = false }) => {
 
             {/* Remove Button - Icon only on mobile */}
             <button
+              data-cy="remove-item-btn"
               onClick={() => onRemove(item.id)}
               disabled={disabled}
               className="btn-touch px-2 sm:px-3 py-1.5 text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors disabled:opacity-50"
@@ -121,7 +124,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, disabled = false }) => {
       {/* Subtotal Row - Below on mobile (Tokopedia style) */}
       <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
         <span className="text-xs sm:text-sm text-gray-500">Subtotal</span>
-        <span className="text-base sm:text-lg font-bold text-gray-900">
+        <span data-cy="subtotal" className="text-base sm:text-lg font-bold text-gray-900">
           {formatPrice(subtotal)}
         </span>
       </div>

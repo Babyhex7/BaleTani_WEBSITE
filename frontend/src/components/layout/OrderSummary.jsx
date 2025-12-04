@@ -41,13 +41,13 @@ const OrderSummary = ({
           {/* Subtotal */}
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Subtotal ({totalItems} produk)</span>
-            <span className="font-semibold text-gray-900">{formatPrice(subtotal)}</span>
+            <span data-cy="cart-subtotal" className="font-semibold text-gray-900">{formatPrice(subtotal)}</span>
           </div>
 
           {/* Shipping Cost */}
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Biaya Pengiriman</span>
-            <span className="font-semibold text-green-600">
+            <span data-cy="delivery-fee" className="font-semibold text-green-600">
               {shippingCost === 0 ? 'GRATIS' : formatPrice(shippingCost)}
             </span>
           </div>
@@ -56,7 +56,7 @@ const OrderSummary = ({
           <div className="border-t border-gray-200 pt-4">
             <div className="flex justify-between items-center">
               <span className="text-lg font-semibold text-gray-900">Total</span>
-              <span className="text-2xl font-bold text-green-600">
+              <span data-cy="cart-total" className="text-2xl font-bold text-green-600">
                 {formatPrice(total)}
               </span>
             </div>
@@ -64,6 +64,7 @@ const OrderSummary = ({
 
           {/* Checkout Button */}
           <button
+            data-cy="checkout-btn"
             onClick={onCheckout}
             className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
           >
@@ -121,13 +122,13 @@ const OrderSummary = ({
             {/* Subtotal */}
             <div className="flex justify-between items-center text-sm sm:text-base">
               <span className="text-gray-600">Subtotal ({totalItems} produk)</span>
-              <span className="font-semibold text-gray-900">{formatPrice(subtotal)}</span>
+              <span data-cy="cart-subtotal" className="font-semibold text-gray-900">{formatPrice(subtotal)}</span>
             </div>
 
             {/* Shipping Cost */}
             <div className="flex justify-between items-center text-sm sm:text-base">
               <span className="text-gray-600">Biaya Pengiriman</span>
-              <span className="font-semibold text-green-600">
+              <span data-cy="delivery-fee" className="font-semibold text-green-600">
                 {shippingCost === 0 ? 'GRATIS' : formatPrice(shippingCost)}
               </span>
             </div>
@@ -136,7 +137,7 @@ const OrderSummary = ({
             <div className="border-t border-gray-200 pt-3">
               <div className="flex justify-between items-center">
                 <span className="text-base sm:text-lg font-semibold text-gray-900">Total</span>
-                <span className="text-xl sm:text-2xl font-bold text-green-600">
+                <span data-cy="cart-total" className="text-xl sm:text-2xl font-bold text-green-600">
                   {formatPrice(total)}
                 </span>
               </div>
@@ -153,6 +154,7 @@ const OrderSummary = ({
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-lg z-floating safe-bottom">
           <div className="px-4 py-3">
             <button
+              data-cy="checkout-btn"
               onClick={onCheckout}
               className="btn-touch w-full bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md"
             >

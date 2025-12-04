@@ -1,0 +1,44 @@
+{
+  "categories": [
+    {
+      "id": "cat-001",
+      "name": "Beras & Serealia",
+      "description": "Beras dan biji-bijian berkualitas",
+      "image_url": "/uploads/categories/beras.jpg",
+      "product_count": 5,
+      "is_active": true
+    },
+    {
+      "id": "cat-002",
+      "name": "Sayuran",
+      "description": "Sayuran segar dari petani lokal",
+      "image_url": "/uploads/categories/sayuran.jpg",
+      "product_count": 12,
+      "is_active": true
+    },
+    {
+      "id": "cat-003",
+      "name": "Buah-buahan",
+      "description": "Buah segar pilihan",
+      "image_url": "/uploads/categories/buah.jpg",
+      "product_count": 8,
+      "is_active": true
+    },
+    {
+      "id": "cat-004",
+      "name": "Telur & Unggas",
+      "description": "Telur dan produk unggas segar",
+      "image_url": "/uploads/categories/telur.jpg",
+      "product_count": 4,
+      "is_active": true
+    },
+    {
+      "id": "cat-005",
+      "name": "Bumbu Dapur",
+      "description": "Bumbu dan rempah pilihan",
+      "image_url": "/uploads/categories/bumbu.jpg",
+      "product_count": 15,
+      "is_active": true
+    }
+  ]
+}

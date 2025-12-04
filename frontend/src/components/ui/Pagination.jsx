@@ -49,7 +49,7 @@ const Pagination = ({
   if (!alwaysShow && totalPages <= 1) return null;
 
   return (
-    <div className={`flex flex-col sm:flex-row items-center justify-between gap-4 py-6 ${className}`}>
+    <div data-cy="pagination" className={`flex flex-col sm:flex-row items-center justify-between gap-4 py-6 ${className}`}>
       {showInfo && !compact && (
         <div className="hidden sm:block text-sm text-gray-600">
           Menampilkan <span className="font-semibold text-gray-900">{startItem}</span> -{' '}

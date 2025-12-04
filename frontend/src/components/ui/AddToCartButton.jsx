@@ -165,6 +165,7 @@ const AddToCartButton = ({
 
   return (
     <button
+      data-cy="add-to-cart-btn"
       onClick={(e) => {
         // ✅ CRITICAL FIX: Prevent event bubbling to parent (card navigation)
         e.stopPropagation();

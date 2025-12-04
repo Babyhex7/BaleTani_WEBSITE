@@ -1,0 +1,1933 @@
+﻿
+
+====================================================================================================
+
+  (Run Starting)
+
+  ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+  Γöé Cypress:        13.17.0                                                                        Γöé
+  Γöé Browser:        Electron 118 (headless)                                                        Γöé
+  Γöé Node Version:   v22.14.0 (C:\Program Files\nodejs\node.exe)                                    Γöé
+  Γöé Specs:          1 found (02-products.cy.js)                                                    Γöé
+  Γöé Searched:       C:\Users\mybook_bagas\BaleTani_Web\BaleTani_WEBSITE\e2e-tests\cypress\e2e\cust Γöé
+  Γöé                 omer\02-products.cy.js                                                         Γöé
+  ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+
+
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+                                                                                                    
+  Running:  02-products.cy.js                                                               (1 of 1)
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+≡ƒùä∩╕Å Resetting database...
+  Γ£à Truncated order_status_history
+  Γ£à Truncated order_items
+  Γ£à Truncated payment_details
+  Γ£à Truncated orders
+  Γ£à Truncated carts
+  Γ£à Truncated stock_movements_reporting
+  Γ£à Truncated procurement_items
+  Γ£à Truncated procurements
+  Γ£à Truncated product_images
+  Γ£à Truncated product_discounts
+  Γ£à Truncated products
+  Γ£à Truncated discounts
+  Γ£à Truncated product_categories
+  Γ£à Truncated customers
+  Γ£à Truncated contact_messages
+  Γ£à Truncated faqs
+  Γ£à Truncated soft_delete_logs
+Γ£à Database reset complete
+≡ƒî▒ Seeding database with products data...
+  Γ£à Seeded categories
+  Γ£à Seeded products
+Γ£à Database seeded successfully
+{
+  "stats": {
+    "suites": 11,
+    "tests": 41,
+    "passes": 38,
+    "pending": 0,
+    "failures": 3,
+    "start": "2025-12-02T10:02:47.661Z",
+    "end": "2025-12-02T10:05:27.620Z",
+    "duration": 159959
+  },
+  "tests": [
+    {
+      "title": "should display product page header correctly",
+      "fullTitle": "Product Browsing & Search Flow Product List Display should display product page header correctly",
+      "duration": 4017,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display product grid with products",
+      "fullTitle": "Product Browsing & Search Flow Product List Display should display product grid with products",
+      "duration": 2221,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display product card with all required info",
+      "fullTitle": "Product Browsing & Search Flow Product List Display should display product card with all required info",
+      "duration": 2060,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display product count information",
+      "fullTitle": "Product Browsing & Search Flow Product List Display should display product count information",
+      "duration": 1806,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display sort dropdown",
+      "fullTitle": "Product Browsing & Search Flow Product List Display should display sort dropdown",
+      "duration": 2251,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display category filter sidebar on desktop",
+      "fullTitle": "Product Browsing & Search Flow Category Filter should display category filter sidebar on desktop",
+      "duration": 1677,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display all available categories",
+      "fullTitle": "Product Browsing & Search Flow Category Filter should display all available categories",
+      "duration": 1957,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should filter products by category",
+      "fullTitle": "Product Browsing & Search Flow Category Filter should filter products by category",
+      "duration": 2787,
+      "currentRetry": 2,
+      "err": {
+        "message": "expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to include 'category='",
+        "name": "AssertionError",
+        "stack": "AssertionError: expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to include 'category='\n    at Context.eval (webpack://baletani-e2e-tests/./cypress/e2e/customer/02-products.cy.js:145:44)",
+        "parsedStack": [
+          {
+            "message": "AssertionError: expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to include 'category='",
+            "whitespace": ""
+          },
+          {
+            "function": "Context.eval",
+            "fileUrl": "http://localhost:5173/__cypress/tests?p=cypress\\e2e\\customer\\02-products.cy.js",
+            "originalFile": "webpack://baletani-e2e-tests/./cypress/e2e/customer/02-products.cy.js",
+            "relativeFile": "cypress/e2e/customer/02-products.cy.js",
+            "absoluteFile": "C:\\Users\\mybook_bagas\\BaleTani_Web\\BaleTani_WEBSITE\\e2e-tests/cypress/e2e/customer/02-products.cy.js",
+            "line": 145,
+            "column": 44,
+            "whitespace": "    "
+          }
+        ],
+        "codeFrame": {
+          "line": 145,
+          "column": 45,
+          "originalFile": "cypress/e2e/customer/02-products.cy.js",
+          "relativeFile": "e2e-tests/cypress/e2e/customer/02-products.cy.js",
+          "absoluteFile": "C:\\Users\\mybook_bagas\\BaleTani_Web\\BaleTani_WEBSITE\\e2e-tests/cypress/e2e/customer/02-products.cy.js",
+          "frame": "  143 |       cy.wait(\"@getProducts\", { timeout: 10000 }).then((interception) => {\n  144 |         // Verify API was called with category parameter\n> 145 |         expect(interception.request.url).to.include(\"category=\");\n      |                                             ^\n  146 |       });\n  147 |\n  148 |       // Wait for DOM to update",
+          "language": "js"
+        }
+      }
+    },
+    {
+      "title": "should show category filter tag when applied",
+      "fullTitle": "Product Browsing & Search Flow Category Filter should show category filter tag when applied",
+      "duration": 3601,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should clear category filter",
+      "fullTitle": "Product Browsing & Search Flow Category Filter should clear category filter",
+      "duration": 3748,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display search bar in header",
+      "fullTitle": "Product Browsing & Search Flow Product Search should display search bar in header",
+      "duration": 2148,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should search products by name",
+      "fullTitle": "Product Browsing & Search Flow Product Search should search products by name",
+      "duration": 3324,
+      "currentRetry": 2,
+      "err": {
+        "message": "expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to include 'search='",
+        "name": "AssertionError",
+        "stack": "AssertionError: expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to include 'search='\n    at Context.eval (webpack://baletani-e2e-tests/./cypress/e2e/customer/02-products.cy.js:209:44)",
+        "parsedStack": [
+          {
+            "message": "AssertionError: expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to include 'search='",
+            "whitespace": ""
+          },
+          {
+            "function": "Context.eval",
+            "fileUrl": "http://localhost:5173/__cypress/tests?p=cypress\\e2e\\customer\\02-products.cy.js",
+            "originalFile": "webpack://baletani-e2e-tests/./cypress/e2e/customer/02-products.cy.js",
+            "relativeFile": "cypress/e2e/customer/02-products.cy.js",
+            "absoluteFile": "C:\\Users\\mybook_bagas\\BaleTani_Web\\BaleTani_WEBSITE\\e2e-tests/cypress/e2e/customer/02-products.cy.js",
+            "line": 209,
+            "column": 44,
+            "whitespace": "    "
+          }
+        ],
+        "codeFrame": {
+          "line": 209,
+          "column": 45,
+          "originalFile": "cypress/e2e/customer/02-products.cy.js",
+          "relativeFile": "e2e-tests/cypress/e2e/customer/02-products.cy.js",
+          "absoluteFile": "C:\\Users\\mybook_bagas\\BaleTani_Web\\BaleTani_WEBSITE\\e2e-tests/cypress/e2e/customer/02-products.cy.js",
+          "frame": "  207 |       cy.wait(\"@searchProducts\", { timeout: 10000 }).then((interception) => {\n  208 |         // Verify API was called with search parameter\n> 209 |         expect(interception.request.url).to.include(\"search=\");\n      |                                             ^\n  210 |       });\n  211 |\n  212 |       // Wait for results to render",
+          "language": "js"
+        }
+      }
+    },
+    {
+      "title": "should show empty state for no results",
+      "fullTitle": "Product Browsing & Search Flow Product Search should show empty state for no results",
+      "duration": 4847,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should clear search using X button",
+      "fullTitle": "Product Browsing & Search Flow Product Search should clear search using X button",
+      "duration": 4075,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should combine search with category filter",
+      "fullTitle": "Product Browsing & Search Flow Product Search should combine search with category filter",
+      "duration": 6703,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should sort by newest (default)",
+      "fullTitle": "Product Browsing & Search Flow Product Sorting should sort by newest (default)",
+      "duration": 2006,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should sort by name A-Z",
+      "fullTitle": "Product Browsing & Search Flow Product Sorting should sort by name A-Z",
+      "duration": 2161,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should sort by name Z-A",
+      "fullTitle": "Product Browsing & Search Flow Product Sorting should sort by name Z-A",
+      "duration": 2187,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should sort by price lowest",
+      "fullTitle": "Product Browsing & Search Flow Product Sorting should sort by price lowest",
+      "duration": 2274,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should sort by price highest",
+      "fullTitle": "Product Browsing & Search Flow Product Sorting should sort by price highest",
+      "duration": 3254,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display pagination controls",
+      "fullTitle": "Product Browsing & Search Flow Product Pagination should display pagination controls",
+      "duration": 2109,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should navigate to next page",
+      "fullTitle": "Product Browsing & Search Flow Product Pagination should navigate to next page",
+      "duration": 5360,
+      "currentRetry": 2,
+      "err": {
+        "message": "expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to match /[?&]page=2/",
+        "name": "AssertionError",
+        "stack": "AssertionError: expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to match /[?&]page=2/\n    at Context.eval (webpack://baletani-e2e-tests/./cypress/e2e/customer/02-products.cy.js:387:54)",
+        "parsedStack": [
+          {
+            "message": "AssertionError: expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to match /[?&]page=2/",
+            "whitespace": ""
+          },
+          {
+            "function": "Context.eval",
+            "fileUrl": "http://localhost:5173/__cypress/tests?p=cypress\\e2e\\customer\\02-products.cy.js",
+            "originalFile": "webpack://baletani-e2e-tests/./cypress/e2e/customer/02-products.cy.js",
+            "relativeFile": "cypress/e2e/customer/02-products.cy.js",
+            "absoluteFile": "C:\\Users\\mybook_bagas\\BaleTani_Web\\BaleTani_WEBSITE\\e2e-tests/cypress/e2e/customer/02-products.cy.js",
+            "line": 387,
+            "column": 54,
+            "whitespace": "    "
+          }
+        ],
+        "codeFrame": {
+          "line": 387,
+          "column": 55,
+          "originalFile": "cypress/e2e/customer/02-products.cy.js",
+          "relativeFile": "e2e-tests/cypress/e2e/customer/02-products.cy.js",
+          "absoluteFile": "C:\\Users\\mybook_bagas\\BaleTani_Web\\BaleTani_WEBSITE\\e2e-tests/cypress/e2e/customer/02-products.cy.js",
+          "frame": "  385 |                 (interception) => {\n  386 |                   // Verify API was called with page=2 parameter\n> 387 |                   expect(interception.request.url).to.match(/[?&]page=2/);\n      |                                                       ^\n  388 |                 }\n  389 |               );\n  390 |",
+          "language": "js"
+        }
+      }
+    },
+    {
+      "title": "should navigate to previous page",
+      "fullTitle": "Product Browsing & Search Flow Product Pagination should navigate to previous page",
+      "duration": 5906,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should navigate to product detail",
+      "fullTitle": "Product Browsing & Search Flow Product Detail Page should navigate to product detail",
+      "duration": 2023,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display product detail correctly",
+      "fullTitle": "Product Browsing & Search Flow Product Detail Page should display product detail correctly",
+      "duration": 3715,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display main product image",
+      "fullTitle": "Product Browsing & Search Flow Product Detail Page should display main product image",
+      "duration": 4122,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should navigate back from detail page",
+      "fullTitle": "Product Browsing & Search Flow Product Detail Page should navigate back from detail page",
+      "duration": 3733,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display image navigation arrows on hover",
+      "fullTitle": "Product Browsing & Search Flow Product Image Gallery should display image navigation arrows on hover",
+      "duration": 4149,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display thumbnail images if multiple images exist",
+      "fullTitle": "Product Browsing & Search Flow Product Image Gallery should display thumbnail images if multiple images exist",
+      "duration": 3127,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should change main image when thumbnail clicked",
+      "fullTitle": "Product Browsing & Search Flow Product Image Gallery should change main image when thumbnail clicked",
+      "duration": 3456,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display stock count for available products",
+      "fullTitle": "Product Browsing & Search Flow Stock Availability Display should display stock count for available products",
+      "duration": 3514,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should show 'Habis' for out-of-stock products",
+      "fullTitle": "Product Browsing & Search Flow Stock Availability Display should show 'Habis' for out-of-stock products",
+      "duration": 1781,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should disable quantity controls for out-of-stock",
+      "fullTitle": "Product Browsing & Search Flow Stock Availability Display should disable quantity controls for out-of-stock",
+      "duration": 1853,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display discount badge on product card",
+      "fullTitle": "Product Browsing & Search Flow Discount Badge Display should display discount badge on product card",
+      "duration": 2155,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display original and final price for discounted products",
+      "fullTitle": "Product Browsing & Search Flow Discount Badge Display should display original and final price for discounted products",
+      "duration": 1849,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display discount badge on detail page",
+      "fullTitle": "Product Browsing & Search Flow Discount Badge Display should display discount badge on detail page",
+      "duration": 1727,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display mobile layout correctly",
+      "fullTitle": "Product Browsing & Search Flow Responsive Product Grid should display mobile layout correctly",
+      "duration": 2185,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should open mobile filter modal",
+      "fullTitle": "Product Browsing & Search Flow Responsive Product Grid should open mobile filter modal",
+      "duration": 5620,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should apply filter from mobile modal",
+      "fullTitle": "Product Browsing & Search Flow Responsive Product Grid should apply filter from mobile modal",
+      "duration": 8976,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display tablet layout correctly",
+      "fullTitle": "Product Browsing & Search Flow Responsive Product Grid should display tablet layout correctly",
+      "duration": 2991,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display desktop layout correctly",
+      "fullTitle": "Product Browsing & Search Flow Responsive Product Grid should display desktop layout correctly",
+      "duration": 2176,
+      "currentRetry": 0,
+      "err": {}
+    }
+  ],
+  "pending": [],
+  "failures": [
+    {
+      "title": "should filter products by category",
+      "fullTitle": "Product Browsing & Search Flow Category Filter should filter products by category",
+      "duration": 2699,
+      "currentRetry": 2,
+      "err": {
+        "message": "expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to include 'category='",
+        "name": "AssertionError",
+        "stack": "AssertionError: expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to include 'category='\n    at Context.eval (webpack://baletani-e2e-tests/./cypress/e2e/customer/02-products.cy.js:145:44)",
+        "parsedStack": [
+          {
+            "message": "AssertionError: expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to include 'category='",
+            "whitespace": ""
+          },
+          {
+            "function": "Context.eval",
+            "fileUrl": "http://localhost:5173/__cypress/tests?p=cypress\\e2e\\customer\\02-products.cy.js",
+            "originalFile": "webpack://baletani-e2e-tests/./cypress/e2e/customer/02-products.cy.js",
+            "relativeFile": "cypress/e2e/customer/02-products.cy.js",
+            "absoluteFile": "C:\\Users\\mybook_bagas\\BaleTani_Web\\BaleTani_WEBSITE\\e2e-tests/cypress/e2e/customer/02-products.cy.js",
+            "line": 145,
+            "column": 44,
+            "whitespace": "    "
+          }
+        ],
+        "codeFrame": {
+          "line": 145,
+          "column": 45,
+          "originalFile": "cypress/e2e/customer/02-products.cy.js",
+          "relativeFile": "e2e-tests/cypress/e2e/customer/02-products.cy.js",
+          "absoluteFile": "C:\\Users\\mybook_bagas\\BaleTani_Web\\BaleTani_WEBSITE\\e2e-tests/cypress/e2e/customer/02-products.cy.js",
+          "frame": "  143 |       cy.wait(\"@getProducts\", { timeout: 10000 }).then((interception) => {\n  144 |         // Verify API was called with category parameter\n> 145 |         expect(interception.request.url).to.include(\"category=\");\n      |                                             ^\n  146 |       });\n  147 |\n  148 |       // Wait for DOM to update",
+          "language": "js"
+        }
+      }
+    },
+    {
+      "title": "should search products by name",
+      "fullTitle": "Product Browsing & Search Flow Product Search should search products by name",
+      "duration": 2813,
+      "currentRetry": 2,
+      "err": {
+        "message": "expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to include 'search='",
+        "name": "AssertionError",
+        "stack": "AssertionError: expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to include 'search='\n    at Context.eval (webpack://baletani-e2e-tests/./cypress/e2e/customer/02-products.cy.js:209:44)",
+        "parsedStack": [
+          {
+            "message": "AssertionError: expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to include 'search='",
+            "whitespace": ""
+          },
+          {
+            "function": "Context.eval",
+            "fileUrl": "http://localhost:5173/__cypress/tests?p=cypress\\e2e\\customer\\02-products.cy.js",
+            "originalFile": "webpack://baletani-e2e-tests/./cypress/e2e/customer/02-products.cy.js",
+            "relativeFile": "cypress/e2e/customer/02-products.cy.js",
+            "absoluteFile": "C:\\Users\\mybook_bagas\\BaleTani_Web\\BaleTani_WEBSITE\\e2e-tests/cypress/e2e/customer/02-products.cy.js",
+            "line": 209,
+            "column": 44,
+            "whitespace": "    "
+          }
+        ],
+        "codeFrame": {
+          "line": 209,
+          "column": 45,
+          "originalFile": "cypress/e2e/customer/02-products.cy.js",
+          "relativeFile": "e2e-tests/cypress/e2e/customer/02-products.cy.js",
+          "absoluteFile": "C:\\Users\\mybook_bagas\\BaleTani_Web\\BaleTani_WEBSITE\\e2e-tests/cypress/e2e/customer/02-products.cy.js",
+          "frame": "  207 |       cy.wait(\"@searchProducts\", { timeout: 10000 }).then((interception) => {\n  208 |         // Verify API was called with search parameter\n> 209 |         expect(interception.request.url).to.include(\"search=\");\n      |                                             ^\n  210 |       });\n  211 |\n  212 |       // Wait for results to render",
+          "language": "js"
+        }
+      }
+    },
+    {
+      "title": "should navigate to next page",
+      "fullTitle": "Product Browsing & Search Flow Product Pagination should navigate to next page",
+      "duration": 5669,
+      "currentRetry": 2,
+      "err": {
+        "message": "expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to match /[?&]page=2/",
+        "name": "AssertionError",
+        "stack": "AssertionError: expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to match /[?&]page=2/\n    at Context.eval (webpack://baletani-e2e-tests/./cypress/e2e/customer/02-products.cy.js:387:54)",
+        "parsedStack": [
+          {
+            "message": "AssertionError: expected 'http://localhost:5000/api/public/products?page=1&limit=12&minPrice=0&maxPrice=999999999&sortBy=newest' to match /[?&]page=2/",
+            "whitespace": ""
+          },
+          {
+            "function": "Context.eval",
+            "fileUrl": "http://localhost:5173/__cypress/tests?p=cypress\\e2e\\customer\\02-products.cy.js",
+            "originalFile": "webpack://baletani-e2e-tests/./cypress/e2e/customer/02-products.cy.js",
+            "relativeFile": "cypress/e2e/customer/02-products.cy.js",
+            "absoluteFile": "C:\\Users\\mybook_bagas\\BaleTani_Web\\BaleTani_WEBSITE\\e2e-tests/cypress/e2e/customer/02-products.cy.js",
+            "line": 387,
+            "column": 54,
+            "whitespace": "    "
+          }
+        ],
+        "codeFrame": {
+          "line": 387,
+          "column": 55,
+          "originalFile": "cypress/e2e/customer/02-products.cy.js",
+          "relativeFile": "e2e-tests/cypress/e2e/customer/02-products.cy.js",
+          "absoluteFile": "C:\\Users\\mybook_bagas\\BaleTani_Web\\BaleTani_WEBSITE\\e2e-tests/cypress/e2e/customer/02-products.cy.js",
+          "frame": "  385 |                 (interception) => {\n  386 |                   // Verify API was called with page=2 parameter\n> 387 |                   expect(interception.request.url).to.match(/[?&]page=2/);\n      |                                                       ^\n  388 |                 }\n  389 |               );\n  390 |",
+          "language": "js"
+        }
+      }
+    }
+  ],
+  "passes": [
+    {
+      "title": "should display product page header correctly",
+      "fullTitle": "Product Browsing & Search Flow Product List Display should display product page header correctly",
+      "duration": 4017,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display product grid with products",
+      "fullTitle": "Product Browsing & Search Flow Product List Display should display product grid with products",
+      "duration": 2221,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display product card with all required info",
+      "fullTitle": "Product Browsing & Search Flow Product List Display should display product card with all required info",
+      "duration": 2060,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display product count information",
+      "fullTitle": "Product Browsing & Search Flow Product List Display should display product count information",
+      "duration": 1806,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display sort dropdown",
+      "fullTitle": "Product Browsing & Search Flow Product List Display should display sort dropdown",
+      "duration": 2251,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display category filter sidebar on desktop",
+      "fullTitle": "Product Browsing & Search Flow Category Filter should display category filter sidebar on desktop",
+      "duration": 1677,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display all available categories",
+      "fullTitle": "Product Browsing & Search Flow Category Filter should display all available categories",
+      "duration": 1957,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should show category filter tag when applied",
+      "fullTitle": "Product Browsing & Search Flow Category Filter should show category filter tag when applied",
+      "duration": 3601,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should clear category filter",
+      "fullTitle": "Product Browsing & Search Flow Category Filter should clear category filter",
+      "duration": 3748,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display search bar in header",
+      "fullTitle": "Product Browsing & Search Flow Product Search should display search bar in header",
+      "duration": 2148,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should show empty state for no results",
+      "fullTitle": "Product Browsing & Search Flow Product Search should show empty state for no results",
+      "duration": 4847,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should clear search using X button",
+      "fullTitle": "Product Browsing & Search Flow Product Search should clear search using X button",
+      "duration": 4075,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should combine search with category filter",
+      "fullTitle": "Product Browsing & Search Flow Product Search should combine search with category filter",
+      "duration": 6703,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should sort by newest (default)",
+      "fullTitle": "Product Browsing & Search Flow Product Sorting should sort by newest (default)",
+      "duration": 2006,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should sort by name A-Z",
+      "fullTitle": "Product Browsing & Search Flow Product Sorting should sort by name A-Z",
+      "duration": 2161,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should sort by name Z-A",
+      "fullTitle": "Product Browsing & Search Flow Product Sorting should sort by name Z-A",
+      "duration": 2187,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should sort by price lowest",
+      "fullTitle": "Product Browsing & Search Flow Product Sorting should sort by price lowest",
+      "duration": 2274,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should sort by price highest",
+      "fullTitle": "Product Browsing & Search Flow Product Sorting should sort by price highest",
+      "duration": 3254,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display pagination controls",
+      "fullTitle": "Product Browsing & Search Flow Product Pagination should display pagination controls",
+      "duration": 2109,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should navigate to previous page",
+      "fullTitle": "Product Browsing & Search Flow Product Pagination should navigate to previous page",
+      "duration": 5906,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should navigate to product detail",
+      "fullTitle": "Product Browsing & Search Flow Product Detail Page should navigate to product detail",
+      "duration": 2023,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display product detail correctly",
+      "fullTitle": "Product Browsing & Search Flow Product Detail Page should display product detail correctly",
+      "duration": 3715,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display main product image",
+      "fullTitle": "Product Browsing & Search Flow Product Detail Page should display main product image",
+      "duration": 4122,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should navigate back from detail page",
+      "fullTitle": "Product Browsing & Search Flow Product Detail Page should navigate back from detail page",
+      "duration": 3733,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display image navigation arrows on hover",
+      "fullTitle": "Product Browsing & Search Flow Product Image Gallery should display image navigation arrows on hover",
+      "duration": 4149,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display thumbnail images if multiple images exist",
+      "fullTitle": "Product Browsing & Search Flow Product Image Gallery should display thumbnail images if multiple images exist",
+      "duration": 3127,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should change main image when thumbnail clicked",
+      "fullTitle": "Product Browsing & Search Flow Product Image Gallery should change main image when thumbnail clicked",
+      "duration": 3456,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display stock count for available products",
+      "fullTitle": "Product Browsing & Search Flow Stock Availability Display should display stock count for available products",
+      "duration": 3514,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should show 'Habis' for out-of-stock products",
+      "fullTitle": "Product Browsing & Search Flow Stock Availability Display should show 'Habis' for out-of-stock products",
+      "duration": 1781,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should disable quantity controls for out-of-stock",
+      "fullTitle": "Product Browsing & Search Flow Stock Availability Display should disable quantity controls for out-of-stock",
+      "duration": 1853,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display discount badge on product card",
+      "fullTitle": "Product Browsing & Search Flow Discount Badge Display should display discount badge on product card",
+      "duration": 2155,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display original and final price for discounted products",
+      "fullTitle": "Product Browsing & Search Flow Discount Badge Display should display original and final price for discounted products",
+      "duration": 1849,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display discount badge on detail page",
+      "fullTitle": "Product Browsing & Search Flow Discount Badge Display should display discount badge on detail page",
+      "duration": 1727,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display mobile layout correctly",
+      "fullTitle": "Product Browsing & Search Flow Responsive Product Grid should display mobile layout correctly",
+      "duration": 2185,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should open mobile filter modal",
+      "fullTitle": "Product Browsing & Search Flow Responsive Product Grid should open mobile filter modal",
+      "duration": 5620,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should apply filter from mobile modal",
+      "fullTitle": "Product Browsing & Search Flow Responsive Product Grid should apply filter from mobile modal",
+      "duration": 8976,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display tablet layout correctly",
+      "fullTitle": "Product Browsing & Search Flow Responsive Product Grid should display tablet layout correctly",
+      "duration": 2991,
+      "currentRetry": 0,
+      "err": {}
+    },
+    {
+      "title": "should display desktop layout correctly",
+      "fullTitle": "Product Browsing & Search Flow Responsive Product Grid should display desktop layout correctly",
+      "duration": 2176,
+      "currentRetry": 0,
+      "err": {}
+    }
+  ]
+}
+  (Results)
+
+  ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+  Γöé Tests:        41                                                                               Γöé
+  Γöé Passing:      38                                                                               Γöé
+  Γöé Failing:      3                                                                                Γöé
+  Γöé Pending:      0                                                                                Γöé
+  Γöé Skipped:      0                                                                                Γöé
+  Γöé Screenshots:  9                                                                                Γöé
+  Γöé Video:        true                                                                             Γöé
+  Γöé Duration:     2 minutes, 39 seconds                                                            Γöé
+  Γöé Spec Ran:     02-products.cy.js                                                                Γöé
+  ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+
+
+  (Screenshots)
+
+  -  C:\Users\mybook_bagas\BaleTani_Web\BaleTani_WEBSITE\e2e-tests\cypress\screenshot     (1280x720)
+     s\02-products.cy.js\Product Browsing & Search Flow -- Category Filter -- should                
+     filter products by category (failed).png                                                       
+  -  C:\Users\mybook_bagas\BaleTani_Web\BaleTani_WEBSITE\e2e-tests\cypress\screenshot     (1280x720)
+     s\02-products.cy.js\Product Browsing & Search Flow -- Category Filter -- should                
+     filter products by category (failed) (attempt 2).png                                           
+  -  C:\Users\mybook_bagas\BaleTani_Web\BaleTani_WEBSITE\e2e-tests\cypress\screenshot     (1280x720)
+     s\02-products.cy.js\Product Browsing & Search Flow -- Category Filter -- should                
+     filter products by category (failed) (attempt 3).png                                           
+  -  C:\Users\mybook_bagas\BaleTani_Web\BaleTani_WEBSITE\e2e-tests\cypress\screenshot     (1280x720)
+     s\02-products.cy.js\Product Browsing & Search Flow -- Product Search -- should s               
+     earch products by name (failed).png                                                            
+  -  C:\Users\mybook_bagas\BaleTani_Web\BaleTani_WEBSITE\e2e-tests\cypress\screenshot     (1280x720)
+     s\02-products.cy.js\Product Browsing & Search Flow -- Product Search -- should s               
+     earch products by name (failed) (attempt 2).png                                                
+  -  C:\Users\mybook_bagas\BaleTani_Web\BaleTani_WEBSITE\e2e-tests\cypress\screenshot     (1280x720)
+     s\02-products.cy.js\Product Browsing & Search Flow -- Product Search -- should s               
+     earch products by name (failed) (attempt 3).png                                                
+  -  C:\Users\mybook_bagas\BaleTani_Web\BaleTani_WEBSITE\e2e-tests\cypress\screenshot     (1280x720)
+     s\02-products.cy.js\Product Browsing & Search Flow -- Product Pagination -- shou               
+     ld navigate to next page (failed).png                                                          
+  -  C:\Users\mybook_bagas\BaleTani_Web\BaleTani_WEBSITE\e2e-tests\cypress\screenshot     (1280x720)
+     s\02-products.cy.js\Product Browsing & Search Flow -- Product Pagination -- shou               
+     ld navigate to next page (failed) (attempt 2).png                                              
+  -  C:\Users\mybook_bagas\BaleTani_Web\BaleTani_WEBSITE\e2e-tests\cypress\screenshot     (1280x720)
+     s\02-products.cy.js\Product Browsing & Search Flow -- Product Pagination -- shou               
+     ld navigate to next page (failed) (attempt 3).png                                              
+
+
+  (Video)
+
+  -  Started compressing: Compressing to 32 CRF                                                     
+    Compression progress:  52%
+  -  Finished compressing: 19 seconds                                                
+
+  -  Video output: C:\Users\mybook_bagas\BaleTani_Web\BaleTani_WEBSITE\e2e-tests\cypress\videos\02-products.cy.js.mp4
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+  Γöé ├ù  02-products.cy.js                        02:39       41       38        3        -        - Γöé
+  ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+    ├ù  1 of 1 failed (100%)                     02:39       41       38        3        -        -  
+

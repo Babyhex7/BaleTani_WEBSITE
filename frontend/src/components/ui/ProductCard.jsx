@@ -201,6 +201,7 @@ const ProductCard = ({
   // ========================================
   return (
     <div 
+      data-cy="product-card"
       onClick={handleCardClick}
       className={`
         w-full
@@ -278,6 +279,7 @@ const ProductCard = ({
             - Extra compact di mobile untuk grid 2 kolom
             ======================================== */}
         <h3 
+          data-cy="product-name"
           className="
             text-[10px] 
             xs:text-[11px]
@@ -309,7 +311,7 @@ const ProductCard = ({
             - size: 'sm' untuk mobile, 'md' untuk desktop
             - className: Spacing bottom - compact di mobile
             ======================================== */}
-        <div className="min-h-[52px] sm:min-h-[56px] flex flex-col justify-start">
+        <div data-cy="product-price" className="min-h-[52px] sm:min-h-[56px] flex flex-col justify-start">
           {/* Use displayPercentage (original %) not actual % - seperti Shopee */}
           <ProductPrice 
             finalPrice={finalPrice}
@@ -336,6 +338,7 @@ const ProductCard = ({
             ✅ CRITICAL: stopPropagation untuk prevent bubble ke card onClick
             ======================================== */}
         <AddToCartButton 
+          data-cy="add-to-cart-btn"
           onClick={(e) => {
             // ✅ CRITICAL: Stop propagation agar tidak trigger handleCardClick
             if (e) {

@@ -114,9 +114,10 @@ const ProtectedRoute = ({
       return <Navigate to="/admin/login" state={{ from: location }} replace />;
     }
     
-    // Redirect customer ke customer login
-    console.log('[ProtectedRoute] 🔐 Redirecting to CUSTOMER LOGIN:', redirectTo);
-    return <Navigate to={redirectTo} state={{ from: location }} replace />;
+    // Redirect customer ke customer login WITH returnUrl
+    const returnUrl = `${redirectTo}?returnUrl=${location.pathname}`;
+    console.log('[ProtectedRoute] 🔐 Redirecting to CUSTOMER LOGIN:', returnUrl);
+    return <Navigate to={returnUrl} state={{ from: location }} replace />;
   }
 
   // Jika tidak butuh authentication dan user sudah login, redirect ke dashboard sesuai role

@@ -1,0 +1,43 @@
+{
+  "name": "baletani-e2e-tests",
+  "version": "1.0.0",
+  "description": "End-to-End Testing for BaleTani Web using Cypress",
+  "main": "index.js",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:customer": "cypress run --spec 'cypress/e2e/customer/**/*.cy.js'",
+    "cy:run:auth": "cypress run --spec 'cypress/e2e/customer/01-auth.cy.js'",
+    "cy:run:browsing": "cypress run --spec 'cypress/e2e/customer/02-browsing.cy.js'",
+    "cy:run:cart": "cypress run --spec 'cypress/e2e/customer/03-cart.cy.js'",
+    "cy:run:checkout": "cypress run --spec 'cypress/e2e/customer/04-checkout.cy.js'",
+    "cy:run:order-history": "cypress run --spec 'cypress/e2e/customer/05-order-history.cy.js'",
+    "cy:run:profile": "cypress run --spec 'cypress/e2e/customer/06-profile.cy.js'",
+    "cy:run:contact": "cypress run --spec 'cypress/e2e/customer/07-contact.cy.js'",
+    "cy:run:categories": "cypress run --spec 'cypress/e2e/customer/08-categories.cy.js'",
+    "cy:run:headed": "cypress run --headed",
+    "cy:run:chrome": "cypress run --browser chrome",
+    "cy:run:firefox": "cypress run --browser firefox",
+    "cy:run:edge": "cypress run --browser edge",
+    "test:customer": "start-server-and-test 'cd ../backend && npm run dev' http://localhost:5000 'cd ../frontend && npm run dev' http://localhost:5173 'npm run cy:run:customer'",
+    "test:customer:headed": "start-server-and-test 'cd ../backend && npm run dev' http://localhost:5000 'cd ../frontend && npm run dev' http://localhost:5173 'npm run cy:run:headed'",
+    "test:setup": "node scripts/setup-test-db.js",
+    "test:seed": "node scripts/seed-test-data.js"
+  },
+  "keywords": [
+    "cypress",
+    "e2e",
+    "testing",
+    "baletani"
+  ],
+  "author": "BaleTani Team",
+  "license": "ISC",
+  "devDependencies": {
+    "@faker-js/faker": "^8.3.1",
+    "bcryptjs": "^3.0.3",
+    "cypress": "^13.6.0",
+    "dotenv": "^16.3.1",
+    "mysql2": "^3.6.5",
+    "start-server-and-test": "^2.0.3"
+  }
+}

@@ -100,17 +100,18 @@ const CartPage = () => {
               <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
                 <ShoppingCart size={40} className="sm:w-12 sm:h-12 text-gray-400" />
               </div>
-              <h2 className="heading-sub sm:heading-card mb-2">
-                Keranjang Anda Kosong
+              <h2 data-cy="empty-cart-message" className="heading-sub sm:heading-card mb-2">
+                Keranjang Anda kosong
               </h2>
               <p className="text-body text-gray-600 mb-6 sm:mb-8">
                 Belum ada produk di keranjang. Yuk, mulai belanja sekarang!
               </p>
               <button
+                data-cy="shop-now-btn"
                 onClick={() => navigate('/products')}
                 className="btn-touch px-6 sm:px-8 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold rounded-lg transition-colors"
               >
-                Lanjut Belanja
+                Belanja Sekarang
               </button>
             </div>
           </div>
@@ -142,6 +143,7 @@ const CartPage = () => {
                 <span className="sm:hidden">Keranjang</span>
               </h1>
               <button
+                data-cy="clear-cart-btn"
                 onClick={() => setShowClearModal(true)}
                 className="btn-touch px-3 sm:px-4 text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors"
               >
@@ -166,7 +168,7 @@ const CartPage = () => {
                 </div>
 
                 {/* Cart Items */}
-                <div className="space-y-3 sm:space-y-4">
+                <div data-cy="cart-items-list" className="space-y-3 sm:space-y-4">
                   {items.map((item) => (
                     <CartItem
                       key={item.id}
@@ -180,7 +182,7 @@ const CartPage = () => {
               </div>
 
               {/* Order Summary - Show on mobile below products, hide on desktop */}
-              <div className="lg:hidden">
+              <div data-cy="order-summary-mobile" className="lg:hidden">
                 <OrderSummary
                   totalItems={totalItems}
                   subtotal={totalPrice}
@@ -205,7 +207,7 @@ const CartPage = () => {
             </div>
 
             {/* Right: Order Summary - Sticky on desktop only */}
-            <div className="hidden lg:block lg:col-span-1">
+            <div data-cy="order-summary-desktop" className="hidden lg:block lg:col-span-1">
               <OrderSummary
                 totalItems={totalItems}
                 subtotal={totalPrice}
@@ -262,10 +264,11 @@ const CartPage = () => {
                 Batal
               </button>
               <button
+                data-cy="confirm-clear-cart"
                 onClick={handleClearCart}
                 className="btn-touch flex-1 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors"
               >
-                Ya, Kosongkan
+                Ya, Hapus Semua
               </button>
             </div>
           </div>
