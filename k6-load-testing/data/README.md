@@ -23,6 +23,7 @@ node scripts/generate-test-data.js
 ## Data Format
 
 ### customers.json
+
 ```json
 [
   {
@@ -36,6 +37,7 @@ node scripts/generate-test-data.js
 ```
 
 ### products.json
+
 ```json
 [
   {
@@ -49,6 +51,7 @@ node scripts/generate-test-data.js
 ```
 
 ### categories.json
+
 ```json
 [
   {

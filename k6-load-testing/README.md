@@ -3,6 +3,7 @@
 ## 📋 Overview
 
 Load testing suite menggunakan K6 untuk menguji **Customer Journey** BaleTani E-Commerce Platform:
+
 - Customer Authentication (Register & Login)
 - Product Browsing (Public endpoints)
 - Shopping Cart Operations
@@ -20,6 +21,7 @@ Load testing suite menggunakan K6 untuk menguji **Customer Journey** BaleTani E-
 - ✅ Test recovery dari traffic spike
 
 **Target Performance:**
+
 - Response time p95: <1000ms (normal load)
 - Error rate: <1% (normal), <3% (peak)
 - Database pool: <80% utilization
@@ -84,16 +86,19 @@ k6-load-testing/
 ### 1. Install K6
 
 **Windows (via Chocolatey):**
+
 ```powershell
 choco install k6
 ```
 
 **Windows (Manual):**
+
 1. Download dari: https://github.com/grafana/k6/releases
 2. Extract `k6.exe` ke `C:\k6\`
 3. Add ke PATH: `C:\k6`
 
 **Verify installation:**
+
 ```powershell
 k6 version
 # Output: k6 v0.48.0 (atau lebih baru)
@@ -119,15 +124,15 @@ BEGIN
     DECLARE phone VARCHAR(20);
     DECLARE hashed_pwd VARCHAR(255);
     DECLARE customer_uuid VARCHAR(36);
-    
+
     -- Bcrypt hash untuk "test123" (10 rounds)
     SET hashed_pwd = '$2a$10$X9k3qZJZ0eF.K7LzZzL.1OJ3Y5F3B.Q9x3J3Z0eF.K7LzZzL.1O';
-    
+
     WHILE i <= 100 DO
         -- Generate phone number: 6281000000001 - 6281000000100
         SET phone = CONCAT('628100000', LPAD(i, 4, '0'));
         SET customer_uuid = UUID();
-        
+
         -- Insert if not exists
         INSERT IGNORE INTO customers (
             customer_id,
@@ -146,7 +151,7 @@ BEGIN
             1,
             NOW()
         );
-        
+
         SET i = i + 1;
     END WHILE;
 END$$
@@ -157,8 +162,8 @@ DELIMITER ;
 CALL generate_test_customers();
 
 -- Verify
-SELECT COUNT(*) as total_test_customers 
-FROM customers 
+SELECT COUNT(*) as total_test_customers
+FROM customers
 WHERE phone_number LIKE '628100000%';
 ```
 
@@ -168,24 +173,24 @@ WHERE phone_number LIKE '628100000%';
 // File: scripts/generate-test-data.js
 // Run: node scripts/generate-test-data.js
 
-const mysql = require('mysql2/promise');
-const fs = require('fs');
-const path = require('path');
+const mysql = require("mysql2/promise");
+const fs = require("fs");
+const path = require("path");
 
 const dbConfig = {
-  host: 'localhost',
-  user: 'root',
-  password: '', // Your MySQL password
-  database: 'baletani_db',
+  host: "localhost",
+  user: "root",
+  password: "", // Your MySQL password
+  database: "baletani_db",
 };
 
 async function generateTestData() {
-  console.log('🔄 Connecting to database...');
+  console.log("🔄 Connecting to database...");
   const connection = await mysql.createConnection(dbConfig);
-  
+
   try {
     // 1. Export customers
-    console.log('📦 Exporting customers...');
+    console.log("📦 Exporting customers...");
     const [customers] = await connection.query(`
       SELECT 
         customer_id, 
@@ -197,20 +202,20 @@ async function generateTestData() {
       ORDER BY phone_number
       LIMIT 100
     `);
-    
-    const customersWithPassword = customers.map(c => ({
+
+    const customersWithPassword = customers.map((c) => ({
       ...c,
-      password: 'test123' // Plaintext untuk K6 (akan di-hash oleh backend saat login)
+      password: "test123", // Plaintext untuk K6 (akan di-hash oleh backend saat login)
     }));
-    
+
     fs.writeFileSync(
-      path.join(__dirname, '../data/customers.json'),
+      path.join(__dirname, "../data/customers.json"),
       JSON.stringify(customersWithPassword, null, 2)
     );
     console.log(`✅ Exported ${customers.length} customers`);
-    
+
     // 2. Export products
-    console.log('📦 Exporting products...');
+    console.log("📦 Exporting products...");
     const [products] = await connection.query(`
       SELECT 
         product_id, 
@@ -223,15 +228,15 @@ async function generateTestData() {
       ORDER BY RAND()
       LIMIT 500
     `);
-    
+
     fs.writeFileSync(
-      path.join(__dirname, '../data/products.json'),
+      path.join(__dirname, "../data/products.json"),
       JSON.stringify(products, null, 2)
     );
     console.log(`✅ Exported ${products.length} products`);
-    
+
     // 3. Export categories
-    console.log('📦 Exporting categories...');
+    console.log("📦 Exporting categories...");
     const [categories] = await connection.query(`
       SELECT 
         category_id, 
@@ -241,21 +246,20 @@ async function generateTestData() {
       WHERE is_active = 1
       ORDER BY category_name
     `);
-    
+
     fs.writeFileSync(
-      path.join(__dirname, '../data/categories.json'),
+      path.join(__dirname, "../data/categories.json"),
       JSON.stringify(categories, null, 2)
     );
     console.log(`✅ Exported ${categories.length} categories`);
-    
-    console.log('\n🎉 Test data generation complete!');
-    console.log(`\n📁 Files created in: ${path.join(__dirname, '../data/')}`);
-    console.log('   - customers.json (100 test accounts)');
-    console.log('   - products.json (500 products)');
-    console.log('   - categories.json (all categories)\n');
-    
+
+    console.log("\n🎉 Test data generation complete!");
+    console.log(`\n📁 Files created in: ${path.join(__dirname, "../data/")}`);
+    console.log("   - customers.json (100 test accounts)");
+    console.log("   - products.json (500 products)");
+    console.log("   - categories.json (all categories)\n");
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error("❌ Error:", error.message);
   } finally {
     await connection.end();
   }
@@ -265,6 +269,7 @@ generateTestData();
 ```
 
 **Install dependencies & run:**
+
 ```powershell
 # Install mysql2 jika belum ada
 npm install mysql2
@@ -278,9 +283,10 @@ node scripts/generate-test-data.js
 ## 🎭 Test Scenarios
 
 ### 1️⃣ Smoke Test (Sanity Check)
+
 **File:** `scenarios/01-smoke-test.js`  
 **Duration:** 1 menit  
-**VUs:** 1 user  
+**VUs:** 1 user
 
 ```powershell
 k6 run scenarios/01-smoke-test.js
@@ -291,15 +297,17 @@ k6 run scenarios/01-smoke-test.js
 ---
 
 ### 2️⃣ Baseline Load Test (Normal Traffic)
+
 **File:** `scenarios/02-baseline-load.js`  
 **Duration:** 30 menit  
-**VUs:** 50 concurrent users  
+**VUs:** 50 concurrent users
 
 ```powershell
 k6 run scenarios/02-baseline-load.js
 ```
 
 **Expected Results:**
+
 - ✅ Response time p95 <1000ms
 - ✅ Error rate <1%
 - ✅ Throughput: 50-100 req/s
@@ -307,15 +315,17 @@ k6 run scenarios/02-baseline-load.js
 ---
 
 ### 3️⃣ Peak Load Test (Flash Sale)
+
 **File:** `scenarios/03-peak-load.js`  
 **Duration:** 15 menit  
-**VUs:** 150 concurrent users  
+**VUs:** 150 concurrent users
 
 ```powershell
 k6 run scenarios/03-peak-load.js
 ```
 
 **Expected Results:**
+
 - ✅ Response time p95 <1500ms
 - ✅ Error rate <3%
 - ✅ Throughput: 150-250 req/s
@@ -323,9 +333,10 @@ k6 run scenarios/03-peak-load.js
 ---
 
 ### 4️⃣ Stress Test (Breaking Point)
+
 **File:** `scenarios/04-stress-test.js`  
 **Duration:** 10-15 menit  
-**VUs:** 300+ users (ramp up until failure)  
+**VUs:** 300+ users (ramp up until failure)
 
 ```powershell
 k6 run scenarios/04-stress-test.js
@@ -336,9 +347,10 @@ k6 run scenarios/04-stress-test.js
 ---
 
 ### 5️⃣ Endurance Test (Stability)
+
 **File:** `scenarios/05-endurance-test.js`  
 **Duration:** 4 jam  
-**VUs:** 50 concurrent users (constant)  
+**VUs:** 50 concurrent users (constant)
 
 ```powershell
 k6 run scenarios/05-endurance-test.js
@@ -349,9 +361,10 @@ k6 run scenarios/05-endurance-test.js
 ---
 
 ### 6️⃣ Spike Test (Traffic Surge)
+
 **File:** `scenarios/06-spike-test.js`  
 **Duration:** 20 menit  
-**Pattern:** 20 → 200 → 20 users  
+**Pattern:** 20 → 200 → 20 users
 
 ```powershell
 k6 run scenarios/06-spike-test.js
@@ -411,22 +424,22 @@ k6 run --out json=results/test.json scenarios/02-baseline-load.js
 
 ### Response Time Thresholds
 
-| Scenario | p95 Target | p99 Target | Max |
-|----------|------------|------------|-----|
-| Smoke | <2000ms | <3000ms | <5000ms |
-| Baseline | <1000ms | <2000ms | <3000ms |
-| Peak | <1500ms | <3000ms | <5000ms |
-| Endurance | <1200ms | <2500ms | <4000ms |
+| Scenario  | p95 Target | p99 Target | Max     |
+| --------- | ---------- | ---------- | ------- |
+| Smoke     | <2000ms    | <3000ms    | <5000ms |
+| Baseline  | <1000ms    | <2000ms    | <3000ms |
+| Peak      | <1500ms    | <3000ms    | <5000ms |
+| Endurance | <1200ms    | <2500ms    | <4000ms |
 
 ### Error Rate Thresholds
 
-| Scenario | Max Error Rate |
-|----------|----------------|
-| Smoke | 0% |
-| Baseline | <1% |
-| Peak | <3% |
-| Stress | Document breaking point |
-| Endurance | <0.5% |
+| Scenario  | Max Error Rate          |
+| --------- | ----------------------- |
+| Smoke     | 0%                      |
+| Baseline  | <1%                     |
+| Peak      | <3%                     |
+| Stress    | Document breaking point |
+| Endurance | <0.5%                   |
 
 ### System Resources
 
@@ -482,12 +495,14 @@ k6 run scenarios/02-baseline-load.js
 Folder ini **100% portable** dan bisa dipindah ke repo lain dengan mudah:
 
 ### 1. Copy Entire Folder
+
 ```powershell
 # Copy seluruh folder
 xcopy k6-load-testing C:\path\to\new\repo\k6-load-testing /E /I
 ```
 
 ### 2. Update Environment Variables
+
 ```powershell
 # Edit file .env (if used)
 # Or pass as command line:
@@ -495,12 +510,14 @@ k6 run --env BASE_URL=http://production.com scenarios/02-baseline-load.js
 ```
 
 ### 3. Re-generate Test Data
+
 ```powershell
 # Connect to new database & run
 node scripts/generate-test-data.js
 ```
 
 ### 4. Ready to Run!
+
 ```powershell
 k6 run scenarios/01-smoke-test.js
 ```
@@ -561,11 +578,13 @@ DB_NAME=baletani_db
 ## 📚 Learn More
 
 ### K6 Documentation
+
 - Official Docs: https://k6.io/docs/
 - JavaScript API: https://k6.io/docs/javascript-api/
 - Examples: https://k6.io/docs/examples/
 
 ### K6 Best Practices
+
 1. Use SharedArray untuk test data (memory efficient)
 2. Add tags ke requests untuk filtering
 3. Implement proper think time (sleep)
@@ -577,12 +596,14 @@ DB_NAME=baletani_db
 ## 🆘 Troubleshooting
 
 ### Problem: K6 command not found
+
 ```powershell
 # Solution: Add K6 to PATH
 $env:Path += ";C:\k6"
 ```
 
 ### Problem: Connection refused to localhost:5000
+
 ```powershell
 # Solution: Ensure backend is running
 cd backend
@@ -593,6 +614,7 @@ curl http://localhost:5000/api/health
 ```
 
 ### Problem: Test data tidak ada
+
 ```powershell
 # Solution: Generate test data
 node scripts/generate-test-data.js
@@ -602,6 +624,7 @@ dir data\*.json
 ```
 
 ### Problem: Login gagal (401 Unauthorized)
+
 ```powershell
 # Solution: Check password hash di database
 # Test customers harus punya password: "test123"
@@ -627,6 +650,7 @@ Setelah setup selesai:
 ## 🎉 Ready to Test!
 
 Folder ini sudah siap untuk:
+
 - ✅ Run di local machine
 - ✅ Copy ke repo lain
 - ✅ Run di CI/CD pipeline

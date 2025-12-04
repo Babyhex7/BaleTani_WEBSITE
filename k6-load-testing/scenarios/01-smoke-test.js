@@ -12,42 +12,42 @@
 // CARA RUN:
 // k6 run scenarios/01-smoke-test.js
 
-import http from 'k6/http';
-import { check, sleep } from 'k6';
-import { SharedArray } from 'k6/data';
-import { Rate } from 'k6/metrics';
+import http from "k6/http";
+import { check, sleep } from "k6";
+import { SharedArray } from "k6/data";
+import { Rate } from "k6/metrics";
 
 // Import config
-import { stages } from '../config/stages.js';
-import { thresholds } from '../config/thresholds.js';
-import { endpoints } from '../config/endpoints.js';
+import { stages } from "../config/stages.js";
+import { thresholds } from "../config/thresholds.js";
+import { endpoints } from "../config/endpoints.js";
 
 // Import helpers
-import { loginCustomer, getAuthHeaders } from '../lib/auth.js';
-import { randomItem, thinkTime } from '../lib/helpers.js';
-import { 
-  checkStatus, 
+import { loginCustomer, getAuthHeaders } from "../lib/auth.js";
+import { randomItem, thinkTime } from "../lib/helpers.js";
+import {
+  checkStatus,
   checkLoginSuccess,
-  checkProductListSuccess 
-} from '../lib/checks.js';
+  checkProductListSuccess,
+} from "../lib/checks.js";
 
 // Custom metrics
-const errorRate = new Rate('errors');
+const errorRate = new Rate("errors");
 
 // Load test data
-const customers = new SharedArray('customers', function () {
-  return JSON.parse(open('../data/customers.json'));
+const customers = new SharedArray("customers", function () {
+  return JSON.parse(open("../data/customers.json"));
 });
 
-const products = new SharedArray('products', function () {
-  return JSON.parse(open('../data/products.json'));
+const products = new SharedArray("products", function () {
+  return JSON.parse(open("../data/products.json"));
 });
 
 // Test configuration
 export let options = {
   // 1 VU selama 1 menit
   stages: stages.smoke,
-  
+
   // Thresholds untuk smoke test
   thresholds: thresholds.smoke,
 };
@@ -56,7 +56,7 @@ export let options = {
  * Setup function - dijalankan sekali sebelum test dimulai
  */
 export function setup() {
-  console.log('🧪 Starting Smoke Test...');
+  console.log("🧪 Starting Smoke Test...");
   console.log(`   Base URL: ${endpoints.health}`);
   console.log(`   Duration: 1 minute`);
   console.log(`   VUs: 1\n`);
@@ -70,69 +70,69 @@ export default function () {
   // TEST 1: Health Check
   // ============================================
   let healthRes = http.get(endpoints.health, {
-    tags: { name: 'HealthCheck' },
+    tags: { name: "HealthCheck" },
   });
-  
+
   check(healthRes, {
-    'health: status 200': (r) => r.status === 200,
+    "health: status 200": (r) => r.status === 200,
   }) || errorRate.add(1);
-  
+
   sleep(1);
-  
+
   // ============================================
   // TEST 2: Customer Login
   // ============================================
   const testCustomer = randomItem(customers);
   const token = loginCustomer(
-    endpoints.health.replace('/api/health', ''),
+    endpoints.health.replace("/api/health", ""),
     testCustomer.phone_number,
     testCustomer.password
   );
-  
+
   if (!token) {
     errorRate.add(1);
-    console.error('❌ Smoke test failed at login!');
+    console.error("❌ Smoke test failed at login!");
     return; // Stop jika login gagal
   }
-  
+
   sleep(1);
-  
+
   // ============================================
   // TEST 3: Browse Products (Public)
   // ============================================
   let productsRes = http.get(`${endpoints.public.products}?page=1&limit=12`, {
-    tags: { name: 'BrowseProducts' },
+    tags: { name: "BrowseProducts" },
   });
-  
+
   checkProductListSuccess(productsRes) || errorRate.add(1);
-  
+
   sleep(1);
-  
+
   // ============================================
   // TEST 4: View Product Detail
   // ============================================
   const randomProduct = randomItem(products);
   let productDetailRes = http.get(
     endpoints.public.productDetail(randomProduct.product_id),
-    { tags: { name: 'ProductDetail' } }
+    { tags: { name: "ProductDetail" } }
   );
-  
+
   checkStatus(productDetailRes, 200) || errorRate.add(1);
-  
+
   sleep(1);
-  
+
   // ============================================
   // TEST 5: View Cart (Authenticated)
   // ============================================
   let cartRes = http.get(endpoints.cart.view, {
     headers: getAuthHeaders(token),
-    tags: { name: 'ViewCart' },
+    tags: { name: "ViewCart" },
   });
-  
+
   checkStatus(cartRes, 200) || errorRate.add(1);
-  
+
   sleep(1);
-  
+
   // ============================================
   // TEST 6: Add to Cart (Authenticated)
   // ============================================
@@ -140,29 +140,29 @@ export default function () {
     endpoints.cart.add,
     JSON.stringify({
       product_id: randomProduct.product_id,
-      quantity: 1
+      quantity: 1,
     }),
     {
       headers: getAuthHeaders(token),
-      tags: { name: 'AddToCart' },
+      tags: { name: "AddToCart" },
     }
   );
-  
+
   check(addCartRes, {
-    'add cart: status 201 or 200': (r) => r.status === 201 || r.status === 200,
+    "add cart: status 201 or 200": (r) => r.status === 201 || r.status === 200,
   }) || errorRate.add(1);
-  
+
   sleep(1);
-  
+
   // ============================================
   // TEST 7: View Categories (Public)
   // ============================================
   let categoriesRes = http.get(endpoints.public.categories, {
-    tags: { name: 'BrowseCategories' },
+    tags: { name: "BrowseCategories" },
   });
-  
+
   checkStatus(categoriesRes, 200) || errorRate.add(1);
-  
+
   sleep(1);
 }
 
@@ -170,23 +170,33 @@ export default function () {
  * Teardown function - dijalankan sekali setelah test selesai
  */
 export function teardown(data) {
-  console.log('\n✅ Smoke Test completed!');
-  console.log('   Check results above for any failures\n');
+  console.log("\n✅ Smoke Test completed!");
+  console.log("   Check results above for any failures\n");
 }
 
 /**
  * Handle summary - custom summary output
  */
 export function handleSummary(data) {
-  console.log('📊 SMOKE TEST SUMMARY');
-  console.log('=====================');
+  console.log("📊 SMOKE TEST SUMMARY");
+  console.log("=====================");
   console.log(`Total Requests: ${data.metrics.http_reqs.values.count}`);
-  console.log(`Failed Requests: ${data.metrics.http_req_failed.values.rate * 100}%`);
-  console.log(`Avg Response Time: ${data.metrics.http_req_duration.values.avg.toFixed(2)}ms`);
-  console.log(`p95 Response Time: ${data.metrics.http_req_duration.values['p(95)'].toFixed(2)}ms`);
-  
+  console.log(
+    `Failed Requests: ${data.metrics.http_req_failed.values.rate * 100}%`
+  );
+  console.log(
+    `Avg Response Time: ${data.metrics.http_req_duration.values.avg.toFixed(
+      2
+    )}ms`
+  );
+  console.log(
+    `p95 Response Time: ${data.metrics.http_req_duration.values[
+      "p(95)"
+    ].toFixed(2)}ms`
+  );
+
   return {
-    'stdout': '', // Empty untuk avoid duplicate output
-    'results/smoke-test-summary.json': JSON.stringify(data, null, 2),
+    stdout: "", // Empty untuk avoid duplicate output
+    "results/smoke-test-summary.json": JSON.stringify(data, null, 2),
   };
 }

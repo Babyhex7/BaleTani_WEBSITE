@@ -90,6 +90,7 @@ node scripts/generate-test-data.js
 ```
 
 **Verify files created:**
+
 ```powershell
 dir data\*.json
 ```
@@ -107,6 +108,7 @@ curl http://localhost:5000/api/health
 ```
 
 **Jika backend belum running:**
+
 ```powershell
 cd ..\backend
 npm start
@@ -125,6 +127,7 @@ k6 run scenarios/01-smoke-test.js
 ```
 
 **Expected Output:**
+
 ```
 ✓ health: status 200
 ✓ login: status 200
@@ -148,6 +151,7 @@ k6 run scenarios/02-baseline-load.js
 ```
 
 Test akan run selama **30 menit**. Anda bisa:
+
 - ☕ Ambil kopi
 - 📊 Monitor backend logs
 - 💻 Check database connections
@@ -175,11 +179,13 @@ Setelah test selesai, K6 akan tampilkan summary:
 ### Interpret Results:
 
 ✅ **PASS** jika:
+
 - `http_req_duration p(95)` < 1000ms
 - `http_req_failed` < 1%
 - `checks` > 95%
 
 ⚠️ **PERLU OPTIMASI** jika:
+
 - `http_req_duration p(95)` > 1500ms
 - `http_req_failed` > 3%
 - `checks` < 90%
@@ -189,24 +195,28 @@ Setelah test selesai, K6 akan tampilkan summary:
 ## 📊 Running Other Scenarios
 
 ### **Peak Load Test** (Flash Sale)
+
 ```powershell
 # 150 VUs, 15 menit
 k6 run scenarios/03-peak-load.js
 ```
 
 ### **Stress Test** (Breaking Point)
+
 ```powershell
 # 300+ VUs, find breaking point
 k6 run scenarios/04-stress-test.js
 ```
 
 ### **Endurance Test** (Stability - 4 jam)
+
 ```powershell
 # 50 VUs, 4 jam (run overnight)
 k6 run scenarios/05-endurance-test.js
 ```
 
 ### **Spike Test** (Traffic Surge)
+
 ```powershell
 # 20 → 200 → 20 VUs, recovery test
 k6 run scenarios/06-spike-test.js
@@ -235,6 +245,7 @@ k6 run \
 ## 🔧 Troubleshooting
 
 ### Problem: K6 command not found
+
 ```powershell
 # Solusi: Add K6 ke PATH
 $env:Path += ";C:\k6"
@@ -243,6 +254,7 @@ $env:Path += ";C:\k6"
 ```
 
 ### Problem: Connection refused to localhost:5000
+
 ```powershell
 # Solusi: Start backend
 cd backend
@@ -253,6 +265,7 @@ curl http://localhost:5000/api/health
 ```
 
 ### Problem: Login failed (401 Unauthorized)
+
 ```powershell
 # Solusi: Re-seed test accounts
 node scripts/seed-test-accounts.js
@@ -262,6 +275,7 @@ node scripts/generate-test-data.js
 ```
 
 ### Problem: No test data (customers.json not found)
+
 ```powershell
 # Solusi: Generate test data
 node scripts/generate-test-data.js
@@ -271,6 +285,7 @@ dir data\*.json
 ```
 
 ### Problem: MySQL connection error
+
 ```powershell
 # Check .env file
 # Pastikan DB_HOST, DB_USER, DB_PASSWORD, DB_NAME correct
@@ -284,16 +299,19 @@ mysql -u root -p baletani_db
 ## 🎉 Next Steps After Baseline Test
 
 1. **Analyze Results**
+
    - Review response time (p95, p99)
    - Check error rate
    - Identify slow endpoints
 
 2. **Run Peak Load Test**
+
    - Simulate flash sale
    - Test rate limiting
    - Monitor cache effectiveness
 
 3. **Run Stress Test**
+
    - Find breaking point
    - Document max capacity
    - Identify bottlenecks
@@ -318,6 +336,7 @@ mysql -u root -p baletani_db
 ## 🆘 Need Help?
 
 Check logs untuk error details:
+
 ```powershell
 # Backend logs
 cd backend
