@@ -61,7 +61,7 @@ const Navbar = () => {
                 className="w-12 h-12 sm:w-14 sm:h-14 object-contain flex-shrink-0"
               />
               <div className="flex flex-col">
-                <span className="font-bold text-base sm:text-lg leading-tight text-gray-900">BaleTani</span>
+                <span className="font-bold text-base sm:text-lg leading-tight text-gray-900">balétani</span>
                 <span className="text-[10px] sm:text-xs text-gray-500 leading-none">Fresh Market</span>
               </div>
             </Link>
