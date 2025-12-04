@@ -15,7 +15,7 @@
  */
 export const CONTACT_INFO = {
   whatsapp: import.meta.env.VITE_WHATSAPP_NUMBER || "6281234567890",
-  email: import.meta.env.VITE_EMAIL_SUPPORT || "support@baletani.com",
+  email: import.meta.env.VITE_EMAIL_SUPPORT || "baletaniinfo@gmail.com",
   phone: import.meta.env.VITE_PHONE_NUMBER || "021-12345678",
   address: {
     street:

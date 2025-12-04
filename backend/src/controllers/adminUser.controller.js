@@ -2,6 +2,14 @@ const { Admin, Role } = require("../models");
 const { validationResult } = require("express-validator");
 const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
+const {
+  validateName,
+  validatePassword,
+} = require("../utils/validationHelper");
+const {
+  normalizePhoneNumber,
+  isValidPhoneNumber,
+} = require("../utils/phoneHelper");
 
 /**
  * Admin User Management Controller
@@ -172,13 +180,34 @@ const createUser = async (req, res, next) => {
 
     const { full_name, phone_number, password, role_id, is_active } = req.body;
 
-    // Normalize phone number
-    let normalizedPhone = phone_number;
-    if (phone_number.startsWith("08")) {
-      normalizedPhone = "628" + phone_number.substring(1);
-    } else if (phone_number.startsWith("+62")) {
-      normalizedPhone = "628" + phone_number.substring(3);
+    // Validate full name (NEW: Check for special characters)
+    const nameValidation = validateName(full_name);
+    if (!nameValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: nameValidation.message,
+      });
     }
+
+    // Validate phone number format
+    if (!isValidPhoneNumber(phone_number)) {
+      return res.status(400).json({
+        success: false,
+        message: "Format nomor telepon tidak valid",
+      });
+    }
+
+    // Validate password
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: passwordValidation.message,
+      });
+    }
+
+    // Normalize phone number
+    const normalizedPhone = normalizePhoneNumber(phone_number);
 
     // Check if user already exists
     const existingUser = await Admin.findOne({
@@ -259,15 +288,40 @@ const updateUser = async (req, res, next) => {
       });
     }
 
+    // Validate full name if provided (NEW: Check for special characters)
+    if (full_name) {
+      const nameValidation = validateName(full_name);
+      if (!nameValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: nameValidation.message,
+        });
+      }
+    }
+
+    // Validate phone number format if provided
+    if (phone_number && !isValidPhoneNumber(phone_number)) {
+      return res.status(400).json({
+        success: false,
+        message: "Format nomor telepon tidak valid",
+      });
+    }
+
+    // Validate password if provided
+    if (password) {
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: passwordValidation.message,
+        });
+      }
+    }
+
     // Check if phone number is already taken by another user
     if (phone_number && phone_number !== user.phone_number) {
       // Normalize phone number
-      let normalizedPhone = phone_number;
-      if (phone_number.startsWith("08")) {
-        normalizedPhone = "628" + phone_number.substring(1);
-      } else if (phone_number.startsWith("+62")) {
-        normalizedPhone = "628" + phone_number.substring(3);
-      }
+      const normalizedPhone = normalizePhoneNumber(phone_number);
 
       const existingUser = await Admin.findOne({
         where: {
@@ -289,13 +343,7 @@ const updateUser = async (req, res, next) => {
     if (full_name) updateData.full_name = full_name;
 
     if (phone_number) {
-      let normalizedPhone = phone_number;
-      if (phone_number.startsWith("08")) {
-        normalizedPhone = "628" + phone_number.substring(1);
-      } else if (phone_number.startsWith("+62")) {
-        normalizedPhone = "628" + phone_number.substring(3);
-      }
-      updateData.phone_number = normalizedPhone;
+      updateData.phone_number = normalizePhoneNumber(phone_number);
     }
 
     if (role_id) {

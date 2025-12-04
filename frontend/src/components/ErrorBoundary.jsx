@@ -153,7 +153,7 @@ class ErrorBoundary extends React.Component {
             <p className="mt-6 text-sm text-gray-500">
               Jika masalah terus berlanjut, silakan hubungi{' '}
               <a 
-                href="mailto:support@baletani.com" 
+                href="mailto:baletaniinfo@gmail.com" 
                 className="text-green-600 hover:text-green-700 font-medium"
               >
                 customer support

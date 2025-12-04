@@ -4,6 +4,11 @@ const {
   normalizePhoneNumber,
   isValidPhoneNumber,
 } = require("../utils/phoneHelper");
+const {
+  validateName,
+  validatePassword,
+  validateAddress,
+} = require("../utils/validationHelper");
 
 /**
  * Customer Authentication Controller
@@ -30,6 +35,18 @@ const registerCustomer = async (req, res) => {
       });
     }
 
+    // Validate full name (NEW: Check for special characters)
+    const nameValidation = validateName(full_name);
+    if (!nameValidation.isValid) {
+      console.warn(
+        `[REGISTER FAILED] Invalid name: ${full_name} - IP: ${req.ip}`
+      );
+      return res.status(400).json({
+        success: false,
+        message: nameValidation.message,
+      });
+    }
+
     // Validate phone number format
     if (!isValidPhoneNumber(phone_number)) {
       console.warn(
@@ -41,12 +58,30 @@ const registerCustomer = async (req, res) => {
       });
     }
 
-    // Validate password length
-    if (password.length < 6) {
+    // Validate password
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      console.warn(
+        `[REGISTER FAILED] Invalid password - IP: ${req.ip}`
+      );
       return res.status(400).json({
         success: false,
-        message: "Password minimal 6 karakter",
+        message: passwordValidation.message,
       });
+    }
+
+    // Validate address (optional)
+    if (address) {
+      const addressValidation = validateAddress(address);
+      if (!addressValidation.isValid) {
+        console.warn(
+          `[REGISTER FAILED] Invalid address - IP: ${req.ip}`
+        );
+        return res.status(400).json({
+          success: false,
+          message: addressValidation.message,
+        });
+      }
     }
 
     // Normalize phone number
