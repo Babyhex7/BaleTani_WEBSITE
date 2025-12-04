@@ -303,30 +303,44 @@ function purchaseFlow(baseUrl) {
     // 6. Checkout (create order)
     const checkoutStart = Date.now();
 
-    let checkoutRes = http.post(
-      endpoints.orders.create,
-      JSON.stringify({
-        customer_name: customer.name,
-        customer_phone: customer.phone_number,
-        delivery_method: randomInt(0, 1) === 0 ? "delivery" : "pickup",
-        delivery_address: customer.address || "Jl. Test No. 123, Jakarta",
-        payment_method: "bank_transfer",
-        bank_name: "BCA",
-      }),
-      {
-        headers: getAuthHeaders(token),
-        tags: { name: "Checkout", flow: "purchase" },
+    // Get cart items untuk checkout
+    const cartData = cartFullRes.json("data");
+    const checkoutItems =
+      cartData && cartData.items
+        ? cartData.items.map((item) => ({
+            product_id: item.product_id,
+            quantity: item.quantity,
+          }))
+        : [];
+
+    // Hanya checkout jika ada items
+    if (checkoutItems.length > 0) {
+      let checkoutRes = http.post(
+        endpoints.orders.create,
+        JSON.stringify({
+          customer_name: customer.name,
+          customer_phone: customer.phone_number,
+          delivery_method: randomInt(0, 1) === 0 ? "delivery" : "self_pickup",
+          delivery_address: customer.address || "Jl. Test No. 123, Jakarta",
+          payment_method: "transfer",
+          bank_name: "BCA",
+          items: checkoutItems,
+        }),
+        {
+          headers: getAuthHeaders(token),
+          tags: { name: "Checkout", flow: "purchase" },
+        }
+      );
+
+      const checkoutTime = Date.now() - checkoutStart;
+      checkoutDuration.add(checkoutTime);
+
+      const checkoutSuccess = checkCheckoutSuccess(checkoutRes);
+      if (!checkoutSuccess) {
+        errorRate.add(1);
+      } else {
+        totalOrders.add(1);
       }
-    );
-
-    const checkoutTime = Date.now() - checkoutStart;
-    checkoutDuration.add(checkoutTime);
-
-    const checkoutSuccess = checkCheckoutSuccess(checkoutRes);
-    if (!checkoutSuccess) {
-      errorRate.add(1);
-    } else {
-      totalOrders.add(1);
     }
 
     thinkTime(10, 20); // Setelah checkout, user review confirmation

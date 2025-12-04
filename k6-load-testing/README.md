@@ -280,6 +280,47 @@ node scripts/generate-test-data.js
 
 ---
 
+## ⚡ Penting: Disable Rate Limit untuk Load Testing
+
+**Backend BaleTani memiliki rate limiter untuk security.** Untuk load testing, Anda harus disable rate limit:
+
+### Option 1: Gunakan npm script (Recommended)
+
+```powershell
+# Di folder backend/
+cd ../backend
+npm run dev:no-limit
+```
+
+### Option 2: Manual set environment variable
+
+```powershell
+# Windows PowerShell
+$env:DISABLE_RATE_LIMIT="true"
+cd backend
+npm run dev
+
+# Windows CMD
+set DISABLE_RATE_LIMIT=true
+cd backend
+npm run dev
+```
+
+### Option 3: Edit .env file backend
+
+```env
+# backend/.env
+DISABLE_RATE_LIMIT=true
+```
+
+**⚠️ PENTING:**
+
+- Rate limit harus di-disable sebelum menjalankan test
+- Jika tidak, test akan gagal dengan error 429 "Terlalu banyak request"
+- Jangan lupa **enable kembali** setelah load testing selesai (untuk production)
+
+---
+
 ## 🎭 Test Scenarios
 
 ### 1️⃣ Smoke Test (Sanity Check)

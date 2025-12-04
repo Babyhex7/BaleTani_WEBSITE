@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "dev:no-limit": "set DISABLE_RATE_LIMIT=true&& nodemon src/server.js",
+    "start:no-limit": "set DISABLE_RATE_LIMIT=true&& node src/server.js",
     "migrate": "node run-migration.js",
     "seed": "node seeders/index.js",
     "seed:dev": "nodemon seeders/index.js",

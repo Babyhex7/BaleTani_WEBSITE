@@ -123,7 +123,9 @@ export function checkProductDetailSuccess(response) {
 export function checkCartSuccess(response) {
   return check(response, {
     "cart: status 200": (r) => r.status === 200,
-    "cart: has cart array": (r) => Array.isArray(r.json("cart")),
+    "cart: success true": (r) => r.json("success") === true,
+    "cart: has data.items array": (r) => Array.isArray(r.json("data.items")),
+    "cart: has data.summary": (r) => r.json("data.summary") !== undefined,
   });
 }
 
@@ -149,11 +151,14 @@ export function checkAddToCartSuccess(response) {
 export function checkCheckoutSuccess(response) {
   return check(response, {
     "checkout: status 201": (r) => r.status === 201,
-    "checkout: has order": (r) => r.json("order") !== undefined,
-    "checkout: has order_id": (r) => r.json("order.order_id") !== undefined,
+    "checkout: success true": (r) => r.json("success") === true,
+    "checkout: has data": (r) => r.json("data") !== undefined,
+    "checkout: has order_number": (r) =>
+      r.json("data.order_number") !== undefined,
     "checkout: has total_amount": (r) =>
-      r.json("order.total_amount") !== undefined,
-    "checkout: has status": (r) => r.json("order.order_status") !== undefined,
+      r.json("data.total_amount") !== undefined,
+    "checkout: has order_status": (r) =>
+      r.json("data.order_status") !== undefined,
   });
 }
 

@@ -130,13 +130,21 @@ export const endpoints = {
 // Helper function untuk build URL dengan query params
 // Contoh: buildUrl(endpoints.public.products, { page: 1, limit: 12 })
 export function buildUrl(baseUrl, params = {}) {
-  const url = new URL(baseUrl);
+  const queryParams = [];
   Object.keys(params).forEach((key) => {
     if (params[key] !== undefined && params[key] !== null) {
-      url.searchParams.append(key, params[key]);
+      queryParams.push(
+        `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
+      );
     }
   });
-  return url.toString();
+
+  if (queryParams.length === 0) {
+    return baseUrl;
+  }
+
+  const separator = baseUrl.includes("?") ? "&" : "?";
+  return `${baseUrl}${separator}${queryParams.join("&")}`;
 }
 
 // Helper untuk generate random product ID dari array

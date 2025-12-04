@@ -33,42 +33,44 @@ const noopMiddleware = (req, res, next) => next();
  * - Return 429 status code
  * - DISABLED in test environment
  */
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // Max 10 login attempts (increased for better UX)
-  skipSuccessfulRequests: true, // Don't count successful logins
-  skipFailedRequests: false, // Count failed attempts
-  standardHeaders: true, // Return rate limit info in headers
-  legacyHeaders: false, // Disable X-RateLimit headers
-  message: {
-    success: false,
-    message:
-      "Terlalu banyak percobaan login. Silakan coba lagi setelah 15 menit.",
-    code: "RATE_LIMIT_LOGIN",
-  },
-  // Custom key generator - track by phone number only for accurate brute force protection
-  keyGenerator: (req) => {
-    // Track by phone number only (not IP) to prevent false positives
-    // and enable accurate per-account brute force protection
-    const phoneNumber = req.body?.phone_number || req.body?.username;
-    return phoneNumber ? `login:${phoneNumber}` : `login:ip:${req.ip}`;
-  },
-  // Handler when limit exceeded
-  handler: (req, res) => {
-    const phoneNumber =
-      req.body?.phone_number || req.body?.username || "unknown";
-    console.warn(
-      `⚠️ [SECURITY] Login rate limit exceeded - Phone: ${phoneNumber}, IP: ${req.ip}, Path: ${req.path}`
-    );
-    res.status(429).json({
-      success: false,
-      message:
-        "Terlalu banyak percobaan login gagal. Untuk keamanan akun Anda, silakan coba lagi setelah 15 menit.",
-      code: "RATE_LIMIT_LOGIN",
-      retryAfter: 15 * 60, // seconds
+const loginLimiter = isTestEnv
+  ? noopMiddleware
+  : rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 10, // Max 10 login attempts (increased for better UX)
+      skipSuccessfulRequests: true, // Don't count successful logins
+      skipFailedRequests: false, // Count failed attempts
+      standardHeaders: true, // Return rate limit info in headers
+      legacyHeaders: false, // Disable X-RateLimit headers
+      message: {
+        success: false,
+        message:
+          "Terlalu banyak percobaan login. Silakan coba lagi setelah 15 menit.",
+        code: "RATE_LIMIT_LOGIN",
+      },
+      // Custom key generator - track by phone number only for accurate brute force protection
+      keyGenerator: (req) => {
+        // Track by phone number only (not IP) to prevent false positives
+        // and enable accurate per-account brute force protection
+        const phoneNumber = req.body?.phone_number || req.body?.username;
+        return phoneNumber ? `login:${phoneNumber}` : `login:ip:${req.ip}`;
+      },
+      // Handler when limit exceeded
+      handler: (req, res) => {
+        const phoneNumber =
+          req.body?.phone_number || req.body?.username || "unknown";
+        console.warn(
+          `⚠️ [SECURITY] Login rate limit exceeded - Phone: ${phoneNumber}, IP: ${req.ip}, Path: ${req.path}`
+        );
+        res.status(429).json({
+          success: false,
+          message:
+            "Terlalu banyak percobaan login gagal. Untuk keamanan akun Anda, silakan coba lagi setelah 15 menit.",
+          code: "RATE_LIMIT_LOGIN",
+          retryAfter: 15 * 60, // seconds
+        });
+      },
     });
-  },
-});
 
 /**
  * ========================================
@@ -81,33 +83,36 @@ const loginLimiter = rateLimit({
  * - Max 3 registrations per hour per IP
  * - Prevent spam registrations
  */
-const registerLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // Max 5 registrations (increased from 3)
-  skipSuccessfulRequests: true, // Don't count successful registrations
-  skipFailedRequests: false, // Count failed attempts
-  message: {
-    success: false,
-    message: "Terlalu banyak percobaan registrasi. Silakan coba lagi nanti.",
-    code: "RATE_LIMIT_REGISTER",
-  },
-  keyGenerator: (req) => {
-    // Track by IP for registration to prevent spam
-    return `register:ip:${req.ip}`;
-  },
-  handler: (req, res) => {
-    console.warn(
-      `⚠️ [SECURITY] Registration rate limit exceeded - IP: ${req.ip}`
-    );
-    res.status(429).json({
-      success: false,
-      message:
-        "Terlalu banyak percobaan registrasi. Untuk mencegah penyalahgunaan, silakan coba lagi setelah 1 jam.",
-      code: "RATE_LIMIT_REGISTER",
-      retryAfter: 60 * 60, // seconds
+const registerLimiter = isTestEnv
+  ? noopMiddleware
+  : rateLimit({
+      windowMs: 60 * 60 * 1000, // 1 hour
+      max: 5, // Max 5 registrations (increased from 3)
+      skipSuccessfulRequests: true, // Don't count successful registrations
+      skipFailedRequests: false, // Count failed attempts
+      message: {
+        success: false,
+        message:
+          "Terlalu banyak percobaan registrasi. Silakan coba lagi nanti.",
+        code: "RATE_LIMIT_REGISTER",
+      },
+      keyGenerator: (req) => {
+        // Track by IP for registration to prevent spam
+        return `register:ip:${req.ip}`;
+      },
+      handler: (req, res) => {
+        console.warn(
+          `⚠️ [SECURITY] Registration rate limit exceeded - IP: ${req.ip}`
+        );
+        res.status(429).json({
+          success: false,
+          message:
+            "Terlalu banyak percobaan registrasi. Untuk mencegah penyalahgunaan, silakan coba lagi setelah 1 jam.",
+          code: "RATE_LIMIT_REGISTER",
+          retryAfter: 60 * 60, // seconds
+        });
+      },
     });
-  },
-});
 
 /**
  * ========================================

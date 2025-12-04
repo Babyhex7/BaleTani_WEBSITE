@@ -9,11 +9,47 @@ Panduan cepat untuk mulai load testing dalam **15 menit**!
 - [x] K6 installed (`k6 version`)
 - [x] Node.js installed (`node --version`)
 - [x] MySQL database `baletani_db` running
-- [x] Backend running di `http://localhost:5000`
+- [x] **Backend running TANPA rate limit** ⚠️ (lihat Step 1 di bawah)
 
 ---
 
 ## 📋 Step-by-Step Setup (15 menit)
+
+### **Step 0: PENTING - Start Backend TANPA Rate Limit** (1 menit) ⚠️
+
+**Backend harus berjalan tanpa rate limiter untuk load testing:**
+
+```powershell
+# Navigate ke folder backend
+cd ..\backend
+
+# Start backend dengan rate limit DISABLED
+npm run dev:no-limit
+
+# Output:
+# ✅ Server running on port 5000
+# ⚠️ Rate limiting is DISABLED (for testing only)
+```
+
+**ATAU set environment variable manual:**
+
+```powershell
+# Windows PowerShell
+$env:DISABLE_RATE_LIMIT="true"
+npm run dev
+
+# Windows CMD
+set DISABLE_RATE_LIMIT=true
+npm run dev
+```
+
+**⚠️ Catatan Penting:**
+
+- Tanpa ini, test akan gagal dengan error **429 "Terlalu banyak request"**
+- Setelah load testing selesai, jalankan backend normal lagi: `npm run dev`
+- Rate limit hanya boleh di-disable untuk testing, tidak untuk production!
+
+---
 
 ### **Step 1: Install K6** (2 menit)
 
