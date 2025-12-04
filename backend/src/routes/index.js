@@ -17,6 +17,7 @@ const router = express.Router();
 const adminRoutes = require("./admin");
 const customerRoutes = require("./customer");
 const publicRoutes = require("./public");
+const recommendationRoutes = require("./recommendation.routes");
 
 /**
  * ROUTE REGISTRATION
@@ -34,6 +35,9 @@ router.use("/customer", customerRoutes);
 
 // Public routes - /api/public/*
 router.use("/public", publicRoutes);
+
+// AI Recommendation routes - /api/recommendations/*
+router.use("/recommendations", recommendationRoutes);
 
 /**
  * HEALTH CHECK

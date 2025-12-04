@@ -1,0 +1,21 @@
+id,phone_number,full_name,address,created_at
+612e799f-2782-4b21-ac5c-6ac5bd3b9e8a,081234560001,Customer 1,"Jl. Contoh No. 1, Jakarta",2025-05-27 20:57:07
+da4f4e65-7433-4f4e-84ba-90a9f424ab7f,081234560002,Customer 2,"Jl. Contoh No. 2, Jakarta",2025-03-03 20:57:07
+51e4f36f-1dc4-4382-a0c4-1f6fb0d356a5,081234560003,Customer 3,"Jl. Contoh No. 3, Jakarta",2025-08-08 20:57:07
+fd09d135-3d92-4afa-8f25-362828ce59ea,081234560004,Customer 4,"Jl. Contoh No. 4, Jakarta",2025-06-05 20:57:07
+67e5fd1c-26a2-429b-9994-ba309e43ceee,081234560005,Customer 5,"Jl. Contoh No. 5, Jakarta",2025-06-19 20:57:07
+a280a790-efe9-490b-9be6-7d44e02f828b,081234560006,Customer 6,"Jl. Contoh No. 6, Jakarta",2025-01-23 20:57:07
+19fc1f86-de81-46c8-bb6f-d3570572efa4,081234560007,Customer 7,"Jl. Contoh No. 7, Jakarta",2025-04-07 20:57:07
+aae116d2-7f3c-4a2d-9b6c-9633be3fd127,081234560008,Customer 8,"Jl. Contoh No. 8, Jakarta",2025-01-21 20:57:07
+11e05a0b-c2b5-43f1-80f4-46b547188bb9,081234560009,Customer 9,"Jl. Contoh No. 9, Jakarta",2025-10-28 20:57:07
+ba4010ef-70bf-489b-b893-f0defdb98d05,081234560010,Customer 10,"Jl. Contoh No. 10, Jakarta",2024-12-14 20:57:07
+d05444c6-b8e7-46e9-aec2-6d4dcef2cda5,081234560011,Customer 11,"Jl. Contoh No. 11, Jakarta",2025-08-17 20:57:07
+d47c8b39-984c-426b-903e-aba2ae2c9fb8,081234560012,Customer 12,"Jl. Contoh No. 12, Jakarta",2025-10-26 20:57:07
+991e985c-995f-4d63-817f-81d1ac478e0f,081234560013,Customer 13,"Jl. Contoh No. 13, Jakarta",2025-07-28 20:57:07
+51457108-5651-4917-aef4-01e005360bcb,081234560014,Customer 14,"Jl. Contoh No. 14, Jakarta",2025-02-16 20:57:07
+1ad5e86a-1d26-431f-b684-6478baa5a883,081234560015,Customer 15,"Jl. Contoh No. 15, Jakarta",2025-08-02 20:57:07
+d5cbcd09-6763-416c-b8bd-c5859f32ec8d,081234560016,Customer 16,"Jl. Contoh No. 16, Jakarta",2025-07-24 20:57:07
+339091db-a3ff-477a-b28f-19efbbf5f495,081234560017,Customer 17,"Jl. Contoh No. 17, Jakarta",2024-12-17 20:57:07
+f637fadc-8fdc-4b7d-a0b7-724af70b2565,081234560018,Customer 18,"Jl. Contoh No. 18, Jakarta",2025-03-02 20:57:07
+10437b60-348b-4211-8052-22724becf62a,081234560019,Customer 19,"Jl. Contoh No. 19, Jakarta",2025-02-08 20:57:07
+ff70de0a-9ebe-42db-a040-b1773b1bcfb5,081234560020,Customer 20,"Jl. Contoh No. 20, Jakarta",2025-03-01 20:57:07
