@@ -7,7 +7,7 @@
 
 @baseUrl = http://localhost:5000
 @adminToken = 
-@superAdminToken = 
+@superAdminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjOGRlMmMzNy01ODU5LTQ2ZmQtYmY5Yy05ZDE5YzIwMWNjZGYiLCJ0eXBlIjoiYWRtaW4iLCJpYXQiOjE3NjQ4MjI3ODAsImV4cCI6MTc2NTQyNzU4MH0.QN23JjMcvDfihC5hMiEbguKmiY-H7LbFzk1Je3CdD_8
 @kasirToken = 
 
 ###############################################
@@ -16,12 +16,13 @@
 
 ### TEST 1.1: Login Super Admin - Sukses (Full Access)
 # Expected: 200 OK, return token + admin data with role
+# KREDENSIAL YANG BENAR: 6282111111111 / admin123
 POST {{baseUrl}}/api/admin/auth/login
 Content-Type: application/json
 
 {
-  "phone_number": "081111111111",
-  "password": "superadmin123"
+  "phone_number": "6282111111111",
+  "password": "admin123"
 }
 
 # ✅ Assertions:
