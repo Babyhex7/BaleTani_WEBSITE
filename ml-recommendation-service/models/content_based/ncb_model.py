@@ -314,7 +314,7 @@ class NCBModel:
         
         for sim_id, score in similar:
             recommendations.append({
-                'product_id': int(sim_id),
+                'product_id': sim_id,  # Keep as string (UUID)
                 'product_name': metadata['names'].get(sim_id, 'Unknown'),
                 'category': metadata['categories'].get(sim_id, 'Unknown'),
                 'similarity_score': float(score),
