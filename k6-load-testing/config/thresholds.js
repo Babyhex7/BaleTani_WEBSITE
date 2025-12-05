@@ -20,8 +20,9 @@ export const thresholds = {
     http_req_duration: ["p(95)<1000", "p(99)<2000"],
     // Error rate maksimal 1%
     http_req_failed: ["rate<0.01"],
-    // Minimum throughput 50 requests per detik
-    http_reqs: ["rate>50"],
+    // Minimum throughput 1 requests per detik (realistis dengan think time)
+    // Note: Think time 2-10 detik membuat RPS rendah (by design untuk simulasi real user)
+    http_reqs: ["rate>1"],
   },
 
   // 3. PEAK LOAD - Flash Sale Thresholds
