@@ -360,7 +360,7 @@ function App() {
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
             <p className="text-gray-600 mb-8">Halaman yang Anda cari tidak ditemukan.</p>
-            <a href="/" className="btn-primary">Kembali ke Beranda</a>
+            <a href="/landing" className="btn-primary">Kembali ke Beranda</a>
           </div>
         </div>
       } />

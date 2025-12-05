@@ -5,6 +5,7 @@ import {
   TrashIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import inventoryService from '../../services/services_admin/inventoryService';
 
 /**
  * Modal Form untuk Create & Edit Product
@@ -20,6 +21,8 @@ const ProductFormModal = ({
 }) => {
   // Ensure categories is always an array
   const categoriesList = Array.isArray(categories) ? categories : [];
+  const [allCategories, setAllCategories] = useState(categoriesList);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     product_name: '',
@@ -67,6 +70,27 @@ const ProductFormModal = ({
       resetForm();
     }
   }, [product, mode, isOpen]);
+
+  // Fetch all active categories (not paginated) when modal opens
+  useEffect(() => {
+    const fetchActiveCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        // Request a large limit on page 1 and filter active categories
+        const res = await inventoryService.getCategories({ page: 1, limit: 1000, is_active: true });
+        const cats = res?.data?.categories || res?.categories || res?.data || [];
+        setAllCategories(Array.isArray(cats) ? cats : []);
+      } catch (err) {
+        console.error('Failed to fetch all categories for ProductFormModal', err);
+        // fallback to categories passed via props
+        setAllCategories(categoriesList);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    if (isOpen) fetchActiveCategories();
+  }, [isOpen]);
 
   const resetForm = () => {
     setFormData({
@@ -392,7 +416,10 @@ const ProductFormModal = ({
                     }`}
                   >
                     <option value="">Pilih Kategori</option>
-                    {categoriesList.map(cat => {
+                    {categoriesLoading ? (
+                      <option disabled>Memuat kategori...</option>
+                    ) : (
+                      (allCategories || categoriesList).map(cat => {
                       // Handle both 'id' and 'category_id' field names
                       const catId = cat.id || cat.category_id;
                       const catName = cat.category_name;
@@ -401,7 +428,8 @@ const ProductFormModal = ({
                           {catName}
                         </option>
                       );
-                    })}
+                      })
+                    )}
                   </select>
                   {errors.category_id && (
                     <p className="mt-1 text-sm text-red-500">{errors.category_id}</p>

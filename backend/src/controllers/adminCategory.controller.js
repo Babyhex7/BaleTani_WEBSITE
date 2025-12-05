@@ -413,6 +413,33 @@ const toggleCategoryStatus = async (req, res) => {
   }
 };
 
+/**
+ * GET /api/admin/categories/all
+ * Get all active categories (no pagination) - lightweight fields
+ */
+const getActiveCategoriesAll = async (req, res) => {
+  try {
+    const categories = await Category.findAll({
+      where: { is_active: true },
+      attributes: ["id", "category_name"],
+      order: [["category_name", "ASC"]],
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Active categories retrieved",
+      data: categories,
+    });
+  } catch (error) {
+    console.error("Error fetching active categories:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal mengambil kategori aktif",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAllCategories,
   getCategoryById,
@@ -420,4 +447,5 @@ module.exports = {
   updateCategory,
   deleteCategory,
   toggleCategoryStatus,
+  getActiveCategoriesAll,
 };

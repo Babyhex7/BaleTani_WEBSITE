@@ -31,6 +31,14 @@ router.get(
   categoryController.getAllCategories
 );
 
+// GET /api/admin/categories/all - return all active categories (no pagination)
+router.get(
+  "/all",
+  authenticateAdmin,
+  roleMiddleware(["super_admin", "super_inventory_admin"]),
+  categoryController.getActiveCategoriesAll
+);
+
 /**
  * GET /api/admin/categories/:id
  * Get category detail by ID

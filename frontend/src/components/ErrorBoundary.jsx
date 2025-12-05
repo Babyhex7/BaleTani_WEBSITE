@@ -73,7 +73,7 @@ class ErrorBoundary extends React.Component {
    * Go back to home page
    */
   handleGoHome = () => {
-    window.location.href = '/';
+    window.location.href = '/landing';
   };
 
   render() {

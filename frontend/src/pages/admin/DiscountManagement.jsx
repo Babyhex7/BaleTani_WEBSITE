@@ -577,13 +577,10 @@ const DiscountManagement = () => {
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <button
-                              onClick={() => handleAssignProducts(discount)}
-                              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
-                            >
-                              <CubeIcon className="w-4 h-4" />
-                              {productCount} produk
-                            </button>
+                            <div className="flex items-center gap-1 text-sm text-gray-700">
+                              <CubeIcon className="w-4 h-4 text-gray-500" />
+                              <span className="font-medium">{productCount} produk</span>
+                            </div>
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
@@ -605,6 +602,14 @@ const DiscountManagement = () => {
                           </td>
                           <td className="px-6 py-4 text-right">
                             <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => handleAssignProducts(discount)}
+                                className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg"
+                                title="Tambah produk ke diskon"
+                              >
+                                <PlusIcon className="w-5 h-5" />
+                              </button>
+
                               <button
                                 onClick={() => handleView(discount)}
                                 className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
