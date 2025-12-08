@@ -1,0 +1,792 @@
+================================================================================
+                    PANDUAN PENGGUNAAN BALETANI FRESH MARKET
+                          UNTUK ADMINISTRATOR (ADMIN)
+================================================================================
+
+"Dari kebun ke Bale, dari Bale ke rumahmu"
+
+================================================================================
+                              DAFTAR ISI
+================================================================================
+1. LOGIN ADMIN
+2. DASHBOARD
+3. MANAJEMEN PRODUK
+4. MANAJEMEN KATEGORI
+5. MANAJEMEN DISKON
+6. MANAJEMEN PESANAN (ORDERS)
+7. MANAJEMEN PENGADAAN (PROCUREMENT)
+8. MANAJEMEN CUSTOMER
+9. MANAJEMEN ADMIN
+10. MANAJEMEN FAQ
+11. MANAJEMEN PESAN KONTAK
+12. LAPORAN PENJUALAN
+13. LAPORAN INVENTORI
+14. LOGOUT
+
+================================================================================
+                         STRUKTUR MENU SIDEBAR
+================================================================================
+
+Menu navigasi admin terdapat di sidebar (sisi kiri):
+
+[Ikon Rumah]    Dashboard              --> /admin/dashboard
+
+[Ikon Kubus]    Inventory (submenu)
+                 ├── Product List      --> /admin/products
+                 ├── Stock Overview    --> /admin/stock-overview (Coming Soon)
+                 ├── Discount Management --> /admin/discounts
+                 └── Category Management --> /admin/categories
+
+[Ikon Truk]     Procurement (submenu)
+                 └── Procurement List  --> /admin/procurements
+
+[Ikon Keranjang] Orders                --> /admin/orders
+
+[Ikon Users]    User Management (submenu)
+                 ├── Customer Management --> /admin/customers
+                 └── Admin Management    --> /admin/admins
+
+[Ikon Chat]     Customer Support (submenu)
+                 ├── FAQ Management     --> /admin/faqs
+                 └── Contact Messages   --> /admin/contacts
+
+[Ikon Chart]    Reports & Insights (submenu)
+                 ├── Sales Report       --> /admin/reports/sales
+                 └── Inventory Report   --> /admin/reports/inventory
+
+================================================================================
+1. LOGIN ADMIN
+================================================================================
+
+URL: /admin/login
+
+Langkah-langkah login:
+
+1. Buka halaman /admin/login
+2. Isi formulir login:
+
+   - NOMOR TELEPON
+     * Masukkan nomor telepon admin
+     * Format: bisa langsung tanpa perlu normalisasi
+   
+   - PASSWORD
+     * Masukkan password Anda
+     * Klik ikon mata untuk lihat/sembunyikan password
+
+3. Klik tombol "Masuk"
+4. Jika berhasil, Anda akan diarahkan ke Dashboard Admin
+
+CATATAN KEAMANAN:
+- Rate limiter aktif (mencegah brute force)
+- Token JWT dengan expiry time
+- Auto-logout saat token expired
+
+================================================================================
+2. DASHBOARD
+================================================================================
+
+URL: /admin/dashboard
+
+Dashboard menampilkan ringkasan dan statistik toko secara real-time.
+
+A. STATISTIK UTAMA (8 KARTU STATISTIK)
+--------------------------------------
+
+Baris 1 - Primary Metrics:
+1. Pendapatan Hari Ini - Total revenue dengan trend bulanan
+2. Transaksi Hari Ini  - Jumlah order dengan trend bulanan
+3. Total Pelanggan     - Jumlah customer terdaftar
+4. Produk Aktif        - Jumlah produk siap dijual
+
+Baris 2 - Action Required:
+5. Pengadaan Pending   - Butuh approval
+6. Pembayaran Pending  - Menunggu konfirmasi
+
+B. SECTION PESANAN TERBARU
+--------------------------
+- Menampilkan 5 pesanan terbaru
+- Kolom: Order #, Pelanggan, Total, Status
+- Badge status: Lunas (hijau), Pending (kuning), Gagal (merah), dll
+- Tombol "Lihat Semua →" ke halaman Orders
+
+C. SECTION STOK MENIPIS
+-----------------------
+- Menampilkan 5 produk dengan stok rendah
+- Kolom: Produk, Kategori, Stok, Status
+- Status stok: Kritis (merah), Rendah (kuning), Aman (hijau)
+- Tombol "Kelola Stok →" ke halaman Products
+
+================================================================================
+3. MANAJEMEN PRODUK
+================================================================================
+
+URL: /admin/products
+
+Halaman untuk mengelola semua produk toko.
+
+A. STATISTIK PRODUK (4 KARTU)
+-----------------------------
+1. Total Produk   - Jumlah semua produk
+2. Produk Aktif   - Produk yang aktif dijual
+3. Stok Rendah    - Produk dengan stok <= 10
+4. Stok Habis     - Produk dengan stok 0
+
+B. FILTER DAN PENCARIAN
+-----------------------
+- Search Box      : Cari berdasarkan nama produk
+- Filter Kategori : Pilih kategori tertentu
+- Filter Status   : Aktif / Nonaktif
+- Filter Tipe     : Standar / Paket / Promo
+
+C. TABEL PRODUK
+---------------
+Kolom yang ditampilkan:
+- Gambar    : Thumbnail produk
+- Nama      : Nama produk lengkap
+- Kategori  : Kategori produk
+- Harga     : Harga jual
+- Stok      : Jumlah stok tersedia
+- Status    : Aktif/Nonaktif (badge)
+- Aksi      : View, Edit, Delete
+
+D. OPERASI PRODUK
+-----------------
+
+1. TAMBAH PRODUK BARU
+   - Klik tombol "Tambah Produk" (hijau, pojok kanan atas)
+   - Isi form:
+     * Nama Produk (wajib, min 3 karakter)
+     * Kategori (wajib, pilih dari dropdown)
+     * Tipe Produk (Standar/Paket/Promo)
+     * Harga (wajib, angka)
+     * Stok (wajib, angka)
+     * Satuan (kg, pcs, ikat, dll)
+     * Deskripsi (opsional)
+     * Upload Gambar (JPG/PNG, max 5MB)
+     * Status (toggle Aktif/Nonaktif)
+   - Klik "Simpan"
+
+2. LIHAT DETAIL PRODUK
+   - Klik ikon mata (eye) di kolom aksi
+   - Modal detail akan muncul dengan info lengkap
+
+3. EDIT PRODUK
+   - Klik ikon pensil di kolom aksi
+   - Form edit muncul dengan data pre-filled
+   - Ubah data yang diperlukan
+   - Klik "Simpan"
+
+4. HAPUS PRODUK
+   - Klik ikon tempat sampah di kolom aksi
+   - Konfirmasi akan muncul
+   - Klik "Hapus" untuk konfirmasi
+   - (Soft delete - data tidak benar-benar hilang)
+
+================================================================================
+4. MANAJEMEN KATEGORI
+================================================================================
+
+URL: /admin/categories
+
+Halaman untuk mengelola kategori produk.
+
+A. STATISTIK KATEGORI
+---------------------
+- Total Kategori
+- Kategori Aktif
+- Kategori Nonaktif
+
+B. FILTER DAN PENCARIAN
+-----------------------
+- Search Box    : Cari nama kategori
+- Filter Status : Aktif / Nonaktif
+
+C. TABEL KATEGORI
+-----------------
+Kolom yang ditampilkan:
+- Nama        : Nama kategori
+- Deskripsi   : Deskripsi singkat
+- Jml Produk  : Total produk dalam kategori
+- Status      : Aktif/Nonaktif
+- Aksi        : View, Edit, Delete
+
+D. OPERASI KATEGORI
+-------------------
+
+1. TAMBAH KATEGORI
+   - Klik tombol "Tambah Kategori"
+   - Isi form:
+     * Nama Kategori (wajib, harus unik)
+     * Deskripsi (opsional)
+     * Status (Aktif/Nonaktif)
+   - Klik "Simpan"
+
+2. EDIT KATEGORI
+   - Klik ikon pensil di kolom aksi
+   - Ubah data
+   - Klik "Simpan"
+
+3. HAPUS KATEGORI
+   - Klik ikon tempat sampah
+   - Konfirmasi hapus
+   - CATATAN: Kategori dengan produk tidak bisa dihapus
+
+================================================================================
+5. MANAJEMEN DISKON
+================================================================================
+
+URL: /admin/discounts
+
+Halaman untuk mengelola diskon/promo produk.
+
+A. STATISTIK DISKON
+-------------------
+- Total Diskon
+- Diskon Aktif
+- Diskon Nonaktif
+- Tipe Persentase
+- Tipe Fixed Amount
+
+B. STATUS DISKON
+----------------
+- Active    (Hijau)  : Diskon sedang berlaku
+- Expired   (Merah)  : Diskon sudah berakhir
+- Upcoming  (Biru)   : Diskon belum dimulai
+- Inactive  (Abu)    : Dinonaktifkan manual
+
+C. FILTER DAN PENCARIAN
+-----------------------
+- Search Box    : Cari nama diskon
+- Filter Status : Active / Expired / Upcoming
+- Filter Tipe   : Percentage / Fixed Amount
+
+D. TABEL DISKON
+---------------
+Kolom yang ditampilkan:
+- Nama Diskon   : Nama/judul promo
+- Tipe          : Persentase atau Nominal
+- Nilai         : Besar diskon (% atau Rp)
+- Periode       : Tanggal mulai - selesai
+- Status        : Badge warna
+- Aksi          : View, Edit, Assign Produk, Delete
+
+E. OPERASI DISKON
+-----------------
+
+1. TAMBAH DISKON BARU
+   - Klik tombol "Tambah Diskon"
+   - Isi form:
+     * Nama Diskon (wajib)
+     * Tipe: Percentage (%) atau Fixed Amount (Rp)
+     * Nilai (angka diskon)
+     * Tanggal Mulai (wajib)
+     * Tanggal Selesai (wajib, harus > tanggal mulai)
+     * Status (Aktif/Nonaktif)
+   - Klik "Simpan"
+
+2. ASSIGN PRODUK KE DISKON
+   - Klik ikon kubus di kolom aksi
+   - Modal pilih produk muncul
+   - Centang produk yang ingin didiskon
+   - Bisa search produk
+   - Preview harga asli vs harga setelah diskon
+   - Klik "Simpan"
+
+3. EDIT & HAPUS
+   - Sama seperti kategori
+
+================================================================================
+6. MANAJEMEN PESANAN (ORDERS)
+================================================================================
+
+URL: /admin/orders
+
+Halaman untuk mengelola semua pesanan (online & offline).
+
+A. STATISTIK PESANAN
+--------------------
+- Total Orders
+- Total Revenue
+- Rata-rata Order
+- Pesanan Hari Ini
+
+B. FILTER PESANAN
+-----------------
+- Search Box       : Cari nomor order, nama, telepon
+- Status Order     : Pending, Processing, Completed, Cancelled
+- Status Pembayaran: Pending, Paid, Failed
+- Tipe Order       : Online / Offline
+- Metode Bayar     : Cash, Transfer, QRIS
+- Metode Delivery  : Self Pickup, Delivery
+- Range Tanggal    : Dari - Sampai
+
+C. TABEL PESANAN
+----------------
+Kolom yang ditampilkan:
+- Order #         : Nomor pesanan
+- Tanggal         : Waktu order dibuat
+- Customer        : Nama dan telepon
+- Total           : Total pembayaran
+- Status Order    : Badge status
+- Status Bayar    : Badge status
+- Aksi            : View, Update Status
+
+D. OPERASI PESANAN
+------------------
+
+1. LIHAT DETAIL PESANAN
+   - Klik ikon mata di kolom aksi
+   - Modal detail menampilkan:
+     * Info customer
+     * Daftar produk yang dipesan
+     * Metode pengiriman & alamat
+     * Metode pembayaran
+     * Timeline status pesanan
+
+2. UPDATE STATUS
+   - Klik ikon edit di kolom aksi
+   - Pilih status baru:
+     * pending_payment - Menunggu pembayaran
+     * paid            - Terbayar
+     * processing      - Sedang diproses
+     * ready_for_pickup - Siap diambil
+     * out_for_delivery - Dalam pengiriman
+     * completed       - Selesai
+     * cancelled       - Dibatalkan
+   - Klik "Update"
+
+3. TAMBAH ORDER OFFLINE
+   - Klik tombol "Tambah Order"
+   - Form order offline:
+     * Nama Customer
+     * Nomor Telepon
+     * Pilih Produk & Quantity
+     * Metode Bayar (Cash default)
+   - Klik "Buat Order"
+
+================================================================================
+7. MANAJEMEN PENGADAAN (PROCUREMENT)
+================================================================================
+
+URL: /admin/procurements
+
+Halaman untuk mengelola pengadaan stok barang.
+
+A. STATISTIK PENGADAAN
+----------------------
+- Total Pengadaan
+- Pending    : Menunggu approval
+- Approved   : Sudah disetujui
+- Rejected   : Ditolak
+- Total Amount (Rp)
+
+B. FILTER PENGADAAN
+-------------------
+- Search Box    : Cari nama supplier
+- Status        : Pending / Approved / Rejected
+- Tipe          : Purchase / Return
+- Range Tanggal : Dari - Sampai
+
+C. TABEL PENGADAAN
+------------------
+Kolom yang ditampilkan:
+- ID Pengadaan
+- Tanggal
+- Supplier
+- Total Item
+- Total Amount
+- Status       : Badge warna
+- Aksi         : View, Edit, Approve, Reject, Delete
+
+D. OPERASI PENGADAAN
+--------------------
+
+1. BUAT PENGADAAN BARU
+   - Klik tombol "Tambah Pengadaan"
+   - Isi form:
+     * Nama Supplier (wajib)
+     * Tanggal Pengadaan
+     * Catatan (opsional)
+     * Daftar Item:
+       - Pilih Produk
+       - Quantity
+       - Harga Beli per Unit
+   - Klik "Simpan"
+
+2. APPROVE PENGADAAN
+   - Klik tombol centang hijau
+   - Konfirmasi
+   - Stok produk akan bertambah otomatis
+
+3. REJECT PENGADAAN
+   - Klik tombol silang merah
+   - Konfirmasi
+   - Status berubah jadi Rejected
+
+4. EDIT PENGADAAN
+   - Hanya bisa edit jika status masih PENDING
+   - Pengadaan yang sudah approved/rejected tidak bisa diedit
+
+================================================================================
+8. MANAJEMEN CUSTOMER
+================================================================================
+
+URL: /admin/customers
+
+Halaman untuk mengelola data pelanggan.
+
+A. STATISTIK CUSTOMER
+---------------------
+- Total Customer
+- Customer Aktif
+- Customer Nonaktif
+- Total Pesanan (dari semua customer)
+
+B. FILTER DAN PENCARIAN
+-----------------------
+- Search Box    : Cari nama, telepon, email
+- Filter Status : Aktif / Nonaktif
+
+C. TABEL CUSTOMER
+-----------------
+Kolom yang ditampilkan:
+- Nama          : Nama lengkap
+- Telepon       : Nomor HP
+- Total Order   : Jumlah pesanan
+- Total Spent   : Total belanja
+- Status        : Aktif/Nonaktif
+- Bergabung     : Tanggal register
+- Aksi          : View, Edit, Delete
+
+D. OPERASI CUSTOMER
+-------------------
+
+1. LIHAT DETAIL CUSTOMER
+   - Klik ikon mata
+   - Modal detail menampilkan:
+     * Info profil lengkap
+     * Statistik belanja
+     * Riwayat pesanan
+
+2. EDIT CUSTOMER
+   - Klik ikon pensil
+   - Bisa ubah: Nama, Status (Aktif/Nonaktif)
+   - Tidak bisa ubah nomor telepon
+
+3. HAPUS CUSTOMER
+   - Klik ikon tempat sampah
+   - Soft delete (data tersimpan tapi nonaktif)
+
+================================================================================
+9. MANAJEMEN ADMIN
+================================================================================
+
+URL: /admin/admins
+
+Halaman untuk mengelola akun administrator.
+
+A. STATISTIK ADMIN
+------------------
+- Total Admin
+- Admin Aktif
+- Admin Nonaktif
+- Total Role
+
+B. FILTER DAN PENCARIAN
+-----------------------
+- Search Box    : Cari nama, telepon
+- Filter Role   : Pilih role tertentu
+- Filter Status : Aktif / Nonaktif
+
+C. DAFTAR ROLE YANG TERSEDIA
+----------------------------
+1. super_admin           - Akses penuh semua fitur
+2. super_whatsapp_admin  - Admin WhatsApp dengan akses penuh
+3. super_cashier         - Kasir dengan akses penuh
+4. super_inventory_admin - Admin inventori dengan akses penuh
+5. whatsapp_admin        - Admin WhatsApp standar
+6. cashier               - Kasir standar
+7. finance_admin         - Admin keuangan
+8. inventory_admin       - Admin inventori standar
+
+D. TABEL ADMIN
+--------------
+Kolom yang ditampilkan:
+- Nama      : Nama admin
+- Telepon   : Nomor HP
+- Role      : Role/jabatan
+- Status    : Aktif/Nonaktif
+- Aksi      : View, Edit, Delete
+
+E. OPERASI ADMIN
+----------------
+
+1. TAMBAH ADMIN BARU
+   - Klik tombol "Tambah Admin"
+   - Isi form:
+     * Nama (wajib)
+     * Nomor Telepon (wajib, format valid)
+     * Password (wajib, min 8 karakter)
+     * Role (wajib, pilih dari dropdown)
+     * Status (Aktif/Nonaktif)
+   - Klik "Simpan"
+
+2. EDIT ADMIN
+   - Klik ikon pensil
+   - Bisa ubah: Nama, Role, Status
+   - Password hanya diubah jika diisi field baru
+
+3. HAPUS ADMIN
+   - Klik ikon tempat sampah
+   - Konfirmasi hapus
+   - CATATAN: Tidak bisa hapus diri sendiri
+
+================================================================================
+10. MANAJEMEN FAQ
+================================================================================
+
+URL: /admin/faqs
+
+Halaman untuk mengelola FAQ (Frequently Asked Questions).
+
+A. STATISTIK FAQ
+----------------
+- Total FAQ
+- FAQ Aktif
+- FAQ Nonaktif
+
+B. FILTER DAN PENCARIAN
+-----------------------
+- Search Box      : Cari pertanyaan/jawaban
+- Filter Kategori : Pemesanan, Pembayaran, Pengiriman, dll
+- Filter Status   : Aktif / Nonaktif
+
+C. TABEL FAQ
+------------
+Kolom yang ditampilkan:
+- Pertanyaan    : Teks pertanyaan
+- Kategori      : Kategori FAQ
+- Urutan        : Nomor urut tampil
+- Status        : Aktif/Nonaktif
+- Aksi          : View, Edit, Delete
+
+D. OPERASI FAQ
+--------------
+
+1. TAMBAH FAQ BARU
+   - Klik tombol "Tambah FAQ"
+   - Isi form:
+     * Pertanyaan (wajib)
+     * Jawaban (wajib)
+     * Kategori (wajib)
+     * Urutan (angka untuk sorting)
+     * Status (Aktif/Nonaktif)
+   - Klik "Simpan"
+
+2. EDIT & HAPUS
+   - Sama seperti modul lainnya
+
+================================================================================
+11. MANAJEMEN PESAN KONTAK
+================================================================================
+
+URL: /admin/contacts
+
+Halaman untuk mengelola pesan masuk dari customer.
+
+A. STATISTIK PESAN
+------------------
+- Total Pesan
+- Pending     : Belum diproses
+- Replied     : Sudah dibalas
+- Resolved    : Selesai
+
+B. FILTER DAN PENCARIAN
+-----------------------
+- Search Box    : Cari nama, email, subjek
+- Filter Status : Pending / Replied / Resolved
+
+C. TABEL PESAN
+--------------
+Kolom yang ditampilkan:
+- Pengirim    : Nama dan email
+- Subjek      : Topik pesan
+- Pesan       : Preview isi (truncated)
+- Tanggal     : Waktu dikirim
+- Status      : Badge warna
+- Aksi        : View
+
+D. OPERASI PESAN
+----------------
+
+1. LIHAT DETAIL PESAN
+   - Klik ikon mata
+   - Modal detail menampilkan:
+     * Info pengirim lengkap
+     * Subjek dan isi pesan penuh
+     * Tombol untuk update status
+
+2. UPDATE STATUS
+   - Di modal detail, pilih status baru:
+     * pending  - Belum diproses
+     * read     - Sudah dibaca
+     * replied  - Sudah dibalas (via email/WA manual)
+     * resolved - Selesai
+   - Status otomatis berubah
+
+================================================================================
+12. LAPORAN PENJUALAN
+================================================================================
+
+URL: /admin/reports/sales
+
+Halaman untuk melihat laporan penjualan.
+
+A. FILTER LAPORAN
+-----------------
+- Tanggal Awal   : Pilih tanggal mulai
+- Tanggal Akhir  : Pilih tanggal selesai
+- Group By       : Harian / Mingguan / Bulanan
+- Metode Bayar   : Cash / Transfer / E-wallet
+- Tipe Order     : Online / Offline
+- Tombol "Terapkan Filter" untuk load data
+
+B. RINGKASAN (SUMMARY)
+----------------------
+Kartu statistik:
+- Total Order      : Jumlah pesanan dalam periode
+- Total Pendapatan : Revenue dalam periode
+- Rata-rata Order  : Average order value
+
+C. TABEL DETAIL PENJUALAN
+-------------------------
+Kolom yang ditampilkan:
+- No
+- Nomor Order
+- Tanggal & Waktu
+- Customer (Nama & Telepon)
+- Produk yang dibeli
+- Total
+- Metode Bayar
+- Status
+
+D. EXPORT KE PDF
+----------------
+- Klik tombol "Export PDF"
+- File PDF otomatis terdownload
+- Berisi: Ringkasan + Tabel Detail
+
+================================================================================
+13. LAPORAN INVENTORI
+================================================================================
+
+URL: /admin/reports/inventory
+
+Halaman untuk melihat laporan stok dan pergerakan barang.
+
+A. FILTER LAPORAN
+-----------------
+- Tanggal Awal    : Filter pergerakan dari tanggal
+- Tanggal Akhir   : Filter pergerakan sampai tanggal
+- Kategori        : Pilih kategori produk
+- Tipe Produk     : Standar / Paket / Promo
+- Status Stok     : Out (Habis) / Low (Rendah) / Normal
+
+B. RINGKASAN INVENTORI
+----------------------
+Kartu statistik:
+- Total Produk       : Jumlah semua produk
+- Total Stok         : Jumlah unit semua produk
+- Stok Rendah        : Produk dengan stok <= 10
+- Nilai Inventori    : Total nilai stok (stok x harga)
+
+C. TABEL STOK PRODUK
+--------------------
+Kolom yang ditampilkan:
+- Produk     : Nama produk
+- Kategori   : Kategori
+- Stok       : Jumlah tersedia
+- Status     : Badge (Habis/Rendah/Normal)
+- Harga      : Harga jual
+- Nilai      : Stok x Harga
+
+D. TABEL PERGERAKAN STOK
+------------------------
+Kolom yang ditampilkan:
+- Tanggal
+- Produk
+- Tipe Pergerakan:
+  * Masuk (Pengadaan)   - Stok bertambah
+  * Keluar (Penjualan)  - Stok berkurang
+  * Penyesuaian         - Adjustment manual
+  * Kadaluarsa          - Stok expired
+- Quantity
+- Keterangan
+
+================================================================================
+14. LOGOUT
+================================================================================
+
+Cara logout dari sistem admin:
+
+1. Klik tombol "Logout" di bagian bawah sidebar
+2. Atau klik nama admin di header, lalu pilih "Keluar"
+3. Anda akan diarahkan ke halaman login admin
+
+SETELAH LOGOUT:
+- Token autentikasi dihapus
+- Session berakhir
+- Harus login ulang untuk akses dashboard
+
+================================================================================
+                           TIPS KEAMANAN ADMIN
+================================================================================
+
+1. Jangan share password ke orang lain
+2. Gunakan password yang kuat (kombinasi huruf, angka, simbol)
+3. Logout setelah selesai menggunakan
+4. Jangan akses dashboard di komputer publik/umum
+5. Laporkan jika ada aktivitas mencurigakan ke Super Admin
+
+================================================================================
+                         ROLE & HAK AKSES (RBAC)
+================================================================================
+
+Setiap role memiliki permission berbeda:
+
+SUPER_ADMIN:
+- Akses penuh ke SEMUA fitur
+- Bisa kelola admin lain
+
+INVENTORY_ADMIN:
+- Kelola Produk, Kategori, Diskon
+- Kelola Pengadaan
+- Lihat Laporan Inventori
+
+CASHIER:
+- Kelola Orders (termasuk offline order)
+- Lihat Laporan Penjualan
+
+WHATSAPP_ADMIN:
+- Kelola Orders (update status)
+- Kelola Pesan Kontak
+
+FINANCE_ADMIN:
+- Lihat Dashboard
+- Lihat semua Laporan
+
+================================================================================
+                        BUTUH BANTUAN?
+================================================================================
+
+Jika mengalami kendala:
+1. Hubungi Super Admin
+2. Cek dokumentasi teknis (jika developer)
+3. Restart browser jika ada error tampilan
+4. Clear cache browser jika data tidak update
+
+================================================================================
+                     Terima kasih telah menggunakan
+                       BALETANI ADMIN DASHBOARD
+              "Dari kebun ke Bale, dari Bale ke rumahmu"
+================================================================================

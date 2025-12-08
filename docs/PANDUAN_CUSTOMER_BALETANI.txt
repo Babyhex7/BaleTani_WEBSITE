@@ -1,0 +1,445 @@
+================================================================================
+                    PANDUAN PENGGUNAAN BALETANI FRESH MARKET
+                           UNTUK PELANGGAN (CUSTOMER)
+================================================================================
+
+"Dari kebun ke Bale, dari Bale ke rumahmu"
+
+================================================================================
+                              DAFTAR ISI
+================================================================================
+1. REGISTRASI (DAFTAR AKUN BARU)
+2. LOGIN (MASUK KE AKUN)
+3. MELIHAT PRODUK
+4. MENAMBAH KE KERANJANG
+5. MENGELOLA KERANJANG
+6. PROSES CHECKOUT & PEMESANAN
+7. PEMBAYARAN
+8. RIWAYAT PESANAN
+9. PROFIL PENGGUNA
+10. KONTAK & FAQ
+11. LOGOUT (KELUAR)
+
+================================================================================
+1. REGISTRASI (DAFTAR AKUN BARU)
+================================================================================
+
+Langkah-langkah mendaftar akun Baletani:
+
+1. Buka website Baletani
+2. Klik tombol "Daftar" di pojok kanan atas
+3. Isi formulir pendaftaran:
+
+   - NAMA LENGKAP
+     * Isi dengan nama lengkap Anda
+     * Minimal 2 karakter
+     * Hanya boleh huruf dan spasi
+   
+   - NOMOR TELEPON
+     * Bisa pakai format: 08xx, 62xxx, atau +62xxx
+     * Contoh: 081234567890 atau 6281234567890
+     * Nomor ini akan digunakan untuk login
+   
+   - PASSWORD
+     * Minimal 8 karakter
+     * Akan muncul indikator kekuatan password:
+       - Sangat Lemah (merah)
+       - Lemah (merah muda)
+       - Sedang (kuning)
+       - Kuat (hijau)
+       - Sangat Kuat (hijau tua)
+   
+   - KONFIRMASI PASSWORD
+     * Ketik ulang password yang sama
+
+4. Klik tombol "Daftar"
+5. Jika berhasil, Anda akan diarahkan ke halaman Login
+
+CATATAN:
+- Nomor telepon tidak bisa dipakai 2x (harus unik)
+- Password disimpan dengan aman (terenkripsi)
+
+================================================================================
+2. LOGIN (MASUK KE AKUN)
+================================================================================
+
+Langkah-langkah login:
+
+1. Klik tombol "Masuk" di pojok kanan atas
+2. Isi formulir login:
+
+   - NOMOR TELEPON
+     * Masukkan nomor yang didaftarkan
+     * Format: 08xx, 62xxx, atau +62xxx
+   
+   - PASSWORD
+     * Masukkan password Anda
+     * Klik ikon mata untuk lihat/sembunyikan password
+
+3. Klik tombol "Masuk"
+4. Jika berhasil, Anda akan masuk ke Halaman Beranda
+
+TIPS:
+- Jika lupa password, hubungi admin Baletani via WhatsApp
+
+================================================================================
+3. MELIHAT PRODUK
+================================================================================
+
+Ada beberapa cara melihat produk:
+
+A. HALAMAN BERANDA (setelah login)
+   - Menampilkan produk terbaru
+   - Klik "Lihat Semua" untuk ke katalog lengkap
+
+B. HALAMAN KATALOG PRODUK
+   - Klik menu "Produk" di navbar
+   - Fitur yang tersedia:
+     
+     * PENCARIAN
+       - Ketik nama produk di kotak pencarian
+       - Pencarian otomatis setelah berhenti mengetik
+     
+     * FILTER KATEGORI
+       - Pilih kategori: Sayur, Buah, Bumbu, dll
+       - Klik kategori untuk filter
+     
+     * URUTAN (SORTING)
+       - Terbaru
+       - Harga Terendah
+       - Harga Tertinggi
+       - Nama A-Z
+       - Nama Z-A
+     
+     * RESET FILTER
+       - Klik "Reset" untuk hapus semua filter
+
+C. HALAMAN PROMO
+   - Klik menu "Promo" di navbar
+   - Menampilkan produk dengan diskon aktif
+   - Default urutan: Diskon Terbesar
+
+D. HALAMAN KATEGORI
+   - Klik menu "Kategori" di navbar
+   - Pilih kategori untuk lihat produk di dalamnya
+
+E. DETAIL PRODUK
+   - Klik kartu produk manapun
+   - Informasi yang ditampilkan:
+     * Gambar produk (bisa lebih dari 1)
+     * Nama produk
+     * Harga asli dan harga setelah diskon (jika ada)
+     * Deskripsi produk
+     * Stok tersedia
+     * Tombol untuk pilih jumlah
+
+================================================================================
+4. MENAMBAH KE KERANJANG
+================================================================================
+
+Ada 3 cara menambah produk ke keranjang:
+
+CARA 1: DARI KARTU PRODUK (CEPAT)
+1. Arahkan mouse ke kartu produk (atau tap di HP)
+2. Klik ikon keranjang di pojok kanan bawah kartu
+3. Produk langsung masuk ke keranjang (qty: 1)
+
+CARA 2: DARI HALAMAN DETAIL PRODUK
+1. Buka halaman detail produk
+2. Atur jumlah dengan tombol + dan -
+3. Klik "Tambah ke Keranjang"
+4. Anda tetap di halaman yang sama
+
+CARA 3: BELI LANGSUNG
+1. Dari halaman detail produk
+2. Atur jumlah yang diinginkan
+3. Klik "Beli Langsung"
+4. Produk masuk keranjang + langsung ke halaman keranjang
+
+CATATAN PENTING:
+- Harus LOGIN dulu untuk bisa tambah ke keranjang
+- Jika belum login, akan muncul popup untuk login
+- Tidak bisa tambah melebihi stok yang tersedia
+- Badge angka di ikon keranjang menunjukkan jumlah item
+
+================================================================================
+5. MENGELOLA KERANJANG
+================================================================================
+
+Cara akses: Klik ikon keranjang di navbar
+
+TAMPILAN KERANJANG:
+- Daftar produk yang sudah ditambahkan
+- Gambar, nama, harga masing-masing produk
+- Tombol + dan - untuk ubah jumlah
+- Tombol hapus (ikon tempat sampah) per item
+- Ringkasan total di sebelah kanan
+
+OPERASI YANG BISA DILAKUKAN:
+
+1. UBAH JUMLAH
+   - Klik + untuk tambah
+   - Klik - untuk kurangi
+   - Minimal 1, maksimal sesuai stok
+
+2. HAPUS ITEM
+   - Klik ikon tempat sampah di item
+   - Item langsung terhapus
+
+3. KOSONGKAN KERANJANG
+   - Klik "Kosongkan" di bagian atas
+   - Akan muncul konfirmasi
+   - Semua item akan dihapus
+
+4. LANJUT CHECKOUT
+   - Klik "Lanjut ke Checkout"
+   - Pastikan keranjang tidak kosong
+
+JIKA KERANJANG KOSONG:
+- Akan muncul pesan "Keranjang Anda kosong"
+- Klik "Belanja Sekarang" untuk ke katalog
+
+================================================================================
+6. PROSES CHECKOUT & PEMESANAN
+================================================================================
+
+Langkah-langkah checkout:
+
+1. Dari halaman keranjang, klik "Lanjut ke Checkout"
+
+2. DI HALAMAN CHECKOUT:
+
+   A. CEK DAFTAR PRODUK
+      - Pastikan produk dan jumlah sudah benar
+   
+   B. PILIH METODE PENGAMBILAN
+   
+      * AMBIL SENDIRI (Self Pickup)
+        - Ambil pesanan di toko Baletani
+        - Ongkir: GRATIS (Rp 0)
+      
+      * PENGANTARAN (Delivery)
+        - Dikirim ke alamat Anda
+        - Ongkir: Rp 10.000
+        - WAJIB isi alamat lengkap
+        - Catatan pengiriman (opsional)
+   
+   C. PILIH METODE PEMBAYARAN
+   
+      * QRIS
+        - Bayar dengan e-wallet (GoPay, OVO, Dana, dll)
+        - QR Code akan diberikan admin via WhatsApp
+      
+      * TRANSFER BANK
+        - Pilih bank: BRI, BCA, atau MANDIRI
+        - Nomor rekening akan ditampilkan di pesan WhatsApp
+      
+      * TUNAI (CASH)
+        - Bayar saat pengambilan/pengantaran
+        - Tidak ada batas waktu pembayaran
+
+3. CEK RINGKASAN PEMBAYARAN
+   - Subtotal produk
+   - Ongkos kirim
+   - Total yang harus dibayar
+
+4. KLIK "BUAT PESANAN"
+
+5. OTOMATIS BUKA WHATSAPP
+   - Pesan sudah terisi otomatis
+   - Kirim pesan ke admin Baletani
+   - Tunggu konfirmasi dari admin
+
+6. HALAMAN SUKSES
+   - Menampilkan nomor pesanan
+   - Instruksi pembayaran
+   - Timer 10 menit (untuk Transfer & QRIS)
+
+================================================================================
+7. PEMBAYARAN
+================================================================================
+
+A. TRANSFER BANK
+----------------
+1. Lihat nomor rekening di pesan WhatsApp yang sudah terkirim
+2. Buka aplikasi mobile banking
+3. Transfer ke rekening yang tertera
+4. Nominal HARUS SESUAI PERSIS dengan total pesanan
+5. Screenshot bukti transfer
+6. Kirim bukti ke admin via WhatsApp
+7. Tunggu konfirmasi
+
+BATAS WAKTU: 10 menit dari checkout
+(Pesanan otomatis batal jika tidak dikonfirmasi)
+
+B. QRIS
+-------
+1. Hubungi admin via WhatsApp
+2. Admin akan kirim QR Code atau nomor pembayaran
+3. Scan QR atau masukkan nomor di e-wallet Anda
+4. Bayar sesuai total pesanan
+5. Screenshot bukti
+6. Kirim ke admin via WhatsApp
+7. Tunggu konfirmasi
+
+BATAS WAKTU: 10 menit dari checkout
+(Pesanan otomatis batal jika tidak dikonfirmasi)
+
+C. TUNAI (CASH)
+---------------
+1. TIDAK ADA BATAS WAKTU
+2. Siapkan uang sesuai total
+3. Bayar langsung ke kasir/kurir saat:
+   - Ambil di toko (Self Pickup), atau
+   - Kurir tiba (Delivery)
+
+================================================================================
+8. RIWAYAT PESANAN
+================================================================================
+
+Cara akses:
+- Klik ikon profil di navbar
+- Pilih "Pesanan Saya" atau "Riwayat Pesanan"
+
+TAMPILAN:
+- Ringkasan jumlah pesanan per status
+- Filter berdasarkan status, tanggal, pencarian
+- Daftar kartu pesanan
+
+STATUS PESANAN:
+- Menunggu Pembayaran (oranye) - Belum bayar
+- Terbayar (hijau) - Pembayaran dikonfirmasi
+- Diproses (biru) - Sedang disiapkan
+- Siap Diambil (ungu) - Bisa diambil di toko
+- Dalam Pengiriman (indigo) - Sedang dikirim
+- Selesai (hijau) - Pesanan complete
+- Dibatalkan (merah) - Pesanan batal
+
+FITUR YANG TERSEDIA:
+
+1. LIHAT DETAIL PESANAN
+   - Klik kartu pesanan
+   - Lihat info lengkap: produk, harga, status, timeline
+
+2. PESAN ULANG (REORDER)
+   - Di detail pesanan yang sudah selesai
+   - Klik "Pesan Ulang"
+   - Produk akan ditambahkan ke keranjang
+   - (Hanya produk yang masih ada stoknya)
+
+3. BATALKAN PESANAN
+   - Hanya untuk status "Menunggu Pembayaran"
+   - Klik "Batalkan Pesanan"
+   - Isi alasan pembatalan
+   - Stok akan dikembalikan otomatis
+
+================================================================================
+9. PROFIL PENGGUNA
+================================================================================
+
+Cara akses:
+- Klik ikon profil di navbar
+- Pilih "Profil Saya"
+
+INFORMASI YANG DITAMPILKAN:
+- Avatar dengan inisial nama
+- Badge "Terverifikasi"
+- Nama lengkap
+- Nomor telepon
+- Tanggal bergabung
+- Statistik pesanan
+
+FITUR YANG TERSEDIA:
+
+1. EDIT PROFIL
+   - Klik "Edit Profile"
+   - Bisa ubah: Nama Lengkap
+   - Nomor telepon TIDAK BISA diubah (untuk keamanan)
+   - Klik "Simpan"
+
+2. GANTI PASSWORD
+   - Klik "Ganti Password"
+   - Isi form:
+     * Password lama (wajib benar)
+     * Password baru (minimal 8 karakter)
+     * Konfirmasi password baru
+   - Klik "Simpan Password"
+
+================================================================================
+10. KONTAK & FAQ
+================================================================================
+
+Cara akses: Klik menu "Kontak" di navbar
+
+A. INFORMASI KONTAK
+-------------------
+- Alamat toko Baletani
+- Nomor WhatsApp
+- Email
+- Jam operasional
+- Status BUKA/TUTUP real-time
+- Peta lokasi (Google Maps)
+
+B. KIRIM PESAN KE ADMIN
+-----------------------
+Isi form:
+1. Nama
+2. Email
+3. Nomor Telepon (opsional)
+4. Subjek (pilih kategori)
+5. Pesan
+Klik "Kirim"
+
+C. FAQ (PERTANYAAN UMUM)
+------------------------
+- Klik pertanyaan untuk lihat jawaban
+- Klik lagi untuk tutup
+- Bisa filter berdasarkan kategori:
+  * Pemesanan
+  * Pembayaran
+  * Pengiriman
+  * Produk
+  * Akun
+
+================================================================================
+11. LOGOUT (KELUAR)
+================================================================================
+
+Cara logout:
+1. Klik ikon profil di navbar
+2. Klik "Keluar" atau "Logout"
+3. Anda akan diarahkan ke halaman utama
+
+SETELAH LOGOUT:
+- Token login dihapus
+- Perlu login ulang untuk berbelanja
+- Data keranjang TETAP tersimpan di browser
+- (Keranjang tidak hilang, tapi perlu login untuk checkout)
+
+================================================================================
+                           TIPS KEAMANAN AKUN
+================================================================================
+
+1. Gunakan password yang kuat (kombinasi huruf, angka, simbol)
+2. Jangan bagikan password ke siapapun
+3. Logout setelah menggunakan perangkat bersama/publik
+4. Ganti password secara berkala
+5. Pastikan selalu akses website Baletani yang resmi
+
+================================================================================
+                        BUTUH BANTUAN?
+================================================================================
+
+Jika mengalami kendala:
+1. Hubungi admin via WhatsApp
+2. Kirim pesan melalui halaman Kontak
+3. Siapkan informasi:
+   - Screenshot error (jika ada)
+   - Nomor telepon terdaftar
+   - Nomor pesanan (jika terkait pesanan)
+
+================================================================================
+                     Terima kasih telah berbelanja di
+                         BALETANI FRESH MARKET
+              "Dari kebun ke Bale, dari Bale ke rumahmu"
+================================================================================
