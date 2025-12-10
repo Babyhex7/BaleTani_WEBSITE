@@ -151,7 +151,7 @@ class DataPreprocessor:
             'price_tiers': price_tiers.values,
             'shelf_life_tiers': shelf_life_tiers.values,
             'product_ids': products_df['id'].values,
-            'product_names': products_df['name'].values.tolist()  # Changed from 'product_name' to 'name'
+            'product_names': products_df['product_name'].values.tolist()  # Gunakan 'product_name' untuk CSV
         }
         
         logger.debug(f"✅ Transformed features shape: category_ids={len(category_ids)}")

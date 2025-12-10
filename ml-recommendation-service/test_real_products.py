@@ -17,7 +17,7 @@ def test_with_real_products():
     
     # Load model
     print("\n[1] Loading model...")
-    model = NCBModel.load_model('../models/saved_models/ncb_v4')
+    model = NCBModel.load_model('../models/saved_models/ncb_csv')  # Gunakan model CSV
     print(f"✓ Model loaded: {len(model.similarity_engine.product_ids)} products indexed")
     
     # Gunakan produk yang ada di index model

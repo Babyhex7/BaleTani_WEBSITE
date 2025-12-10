@@ -331,7 +331,7 @@ class NCBModel:
             recommendations.append({
                 'product_id': sim_id,  # Keep as string (UUID)
                 'product_name': get_value(names_data, sim_id, 'Unknown'),
-                'category': get_value(categories_data, sim_id, 'Unknown'),
+                'category_name': get_value(categories_data, sim_id, 'Unknown'),  # Ubah key jadi 'category_name'
                 'similarity_score': float(score),
                 'reason': f"Similarity: {score:.2%}"
             })
@@ -436,15 +436,44 @@ class NCBModel:
         similarity_path = load_path / "similarity_engine.pkl"
         model.similarity_engine = SimilarityEngine.load(str(similarity_path))
         
-        # CRITICAL FIX: Load products_df untuk product lookup
+        # CRITICAL FIX: Load products_df untuk product lookup & metadata
         logger.info("Loading products data for similarity engine...")
         from data.data_loader import DataLoader
         data_loader = DataLoader()
         products_df = data_loader.load_products()
         
-        # Set products_df in similarity engine
+        # Update metadata dengan data yang baru di-load
+        logger.info("Updating product metadata from loaded data...")
+        
+        # Buat mapping product_id -> nama & kategori
+        product_id_to_name = {}
+        product_id_to_category = {}
+        
+        for _, row in products_df.iterrows():
+            pid = row['id']  # Column name di CSV adalah 'id'
+            product_id_to_name[pid] = row['product_name']
+            product_id_to_category[pid] = row['category_name']
+        
+        # Update metadata di similarity engine untuk produk yang ada di index
+        if model.similarity_engine.product_metadata is None:
+            model.similarity_engine.product_metadata = {}
+        
+        # Update hanya produk yang ada di index
+        model.similarity_engine.product_metadata['names'] = {
+            pid: product_id_to_name.get(pid, 'Unknown')
+            for pid in model.similarity_engine.product_ids
+        }
+        model.similarity_engine.product_metadata['categories'] = {
+            pid: product_id_to_category.get(pid, 'Unknown')
+            for pid in model.similarity_engine.product_ids
+        }
+        
+        # Set products_df in similarity engine (backward compatibility)
         model.similarity_engine.products_df = products_df
-        logger.info(f"  ✅ Loaded {len(products_df)} products for lookup")
+        
+        matched_products = sum(1 for pid in model.similarity_engine.product_ids if pid in product_id_to_name)
+        logger.info(f"  ✅ Loaded {len(products_df)} products from CSV")
+        logger.info(f"  ✅ Matched {matched_products}/{len(model.similarity_engine.product_ids)} indexed products with metadata")
         
         model.is_trained = True
         
