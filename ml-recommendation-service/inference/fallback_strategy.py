@@ -113,7 +113,7 @@ class FallbackStrategy:
         for _, row in same_category.head(top_k).iterrows():
             recommendations.append({
                 'product_id': row['id'],
-                'product_name': row['name'],
+                'product_name': row['product_name'],
                 'category_name': row['category_name'],
                 'similarity_score': 0.7,  # Fallback score
                 'percentage': '70.00%',
@@ -167,7 +167,7 @@ class FallbackStrategy:
         for _, row in top_products.iterrows():
             recommendations.append({
                 'product_id': row['id'],
-                'product_name': row['name'],
+                'product_name': row['product_name'],
                 'category_name': row['category_name'],
                 'similarity_score': 0.5,  # Fallback score
                 'percentage': '50.00%',
@@ -207,7 +207,7 @@ class FallbackStrategy:
         for _, row in random_products.iterrows():
             recommendations.append({
                 'product_id': row['id'],
-                'product_name': row['name'],
+                'product_name': row['product_name'],
                 'category_name': row['category_name'],
                 'similarity_score': 0.3,  # Low score untuk random
                 'percentage': '30.00%',
@@ -259,7 +259,7 @@ class FallbackStrategy:
         for _, row in cross_sell.iterrows():
             recommendations.append({
                 'product_id': row['id'],
-                'product_name': row['name'],
+                'product_name': row['product_name'],
                 'category_name': row['category_name'],
                 'similarity_score': 0.6,
                 'percentage': '60.00%',
@@ -310,7 +310,7 @@ class FallbackStrategy:
         for _, row in new_products.iterrows():
             recommendations.append({
                 'product_id': row['id'],
-                'product_name': row['name'],
+                'product_name': row['product_name'],
                 'category_name': row['category_name'],
                 'similarity_score': 0.8,
                 'percentage': '80.00%',

@@ -311,12 +311,27 @@ class NCBModel:
         # Format results
         recommendations = []
         metadata = self.similarity_engine.product_metadata
+        names_data = metadata.get('names', {})
+        categories_data = metadata.get('categories', {})
+        
+        # Handle both dict and array format for metadata (backward compatibility)
+        def get_value(data, product_id, default='Unknown'):
+            if isinstance(data, dict):
+                return data.get(product_id, default)
+            elif isinstance(data, (list, np.ndarray)):
+                # If it's array/list, find index by product_id
+                try:
+                    idx = list(self.similarity_engine.product_ids).index(product_id)
+                    return data[idx]
+                except (ValueError, IndexError):
+                    return default
+            return default
         
         for sim_id, score in similar:
             recommendations.append({
                 'product_id': sim_id,  # Keep as string (UUID)
-                'product_name': metadata['names'].get(sim_id, 'Unknown'),
-                'category': metadata['categories'].get(sim_id, 'Unknown'),
+                'product_name': get_value(names_data, sim_id, 'Unknown'),
+                'category': get_value(categories_data, sim_id, 'Unknown'),
                 'similarity_score': float(score),
                 'reason': f"Similarity: {score:.2%}"
             })
@@ -420,6 +435,16 @@ class NCBModel:
         # Load similarity engine
         similarity_path = load_path / "similarity_engine.pkl"
         model.similarity_engine = SimilarityEngine.load(str(similarity_path))
+        
+        # CRITICAL FIX: Load products_df untuk product lookup
+        logger.info("Loading products data for similarity engine...")
+        from data.data_loader import DataLoader
+        data_loader = DataLoader()
+        products_df = data_loader.load_products()
+        
+        # Set products_df in similarity engine
+        model.similarity_engine.products_df = products_df
+        logger.info(f"  ✅ Loaded {len(products_df)} products for lookup")
         
         model.is_trained = True
         

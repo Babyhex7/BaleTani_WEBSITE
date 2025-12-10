@@ -1,23 +1,23 @@
 ### Test Similar Products (Udang sedang 1)
-GET http://localhost:5000/api/recommendations/similar/7a4af2f2-f55b-4300-a4ba-4406efcc350c?limit=5
+GET http://localhost:3000/api/recommendations/similar/7a4af2f2-f55b-4300-a4ba-4406efcc350c?top_k=5
 
 ### Test Bundle Recommendations (2 Protein Laut products)
-POST http://localhost:5000/api/recommendations/bundle
+POST http://localhost:3000/api/recommendations/bundle
 Content-Type: application/json
 
 {
-  "productIds": [
+  "product_ids": [
     "7a4af2f2-f55b-4300-a4ba-4406efcc350c",
     "b3cc44f1-f3c1-4703-98d8-ac40cb387187"
   ],
-  "limit": 5
+  "top_k": 5
 }
 
 ### Test Trending Products
-GET http://localhost:5000/api/recommendations/trending?limit=10
+GET http://localhost:3000/api/recommendations/trending?top_k=10
 
 ### Test Category Recommendations (Protein Laut)
-GET http://localhost:5000/api/recommendations/category/660e8400-e29b-41d4-a716-446655440001?limit=5&exclude=7a4af2f2-f55b-4300-a4ba-4406efcc350c
+GET http://localhost:3000/api/recommendations/category/660e8400-e29b-41d4-a716-446655440001?top_k=5&exclude=7a4af2f2-f55b-4300-a4ba-4406efcc350c
 
 ### ML Service Health Check
 GET http://localhost:8000/health

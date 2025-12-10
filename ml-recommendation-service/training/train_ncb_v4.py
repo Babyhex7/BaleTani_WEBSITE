@@ -402,7 +402,7 @@ def train_model():
             
             # Save best model
             model_save_path = f"models/saved_models/{CONFIG['model_version']}"
-            model.save(model_save_path)
+            model.save_model(model_save_path)
             logger.info(f"✅ New best model saved! NDCG@{CONFIG['k']}: {best_ndcg:.4f}")
             
         else:
@@ -424,19 +424,18 @@ def train_model():
     
     # Final evaluation on test set
     logger.info("\n📊 Final Evaluation on TEST set...")
-    # Generate embeddings untuk test set
-    test_features = best_model.preprocessor.transform_products(test_df)
-    test_features['tfidf_features'] = best_model.text_extractor.transform(test_features['product_names'])
     
-    # Index test products untuk evaluation
-    test_embeddings = best_model.generate_embeddings(test_features)
-    best_model.similarity_engine.index_products(test_embeddings, test_df['id'].values)
-    best_model.products_df = test_df
+    # Re-index dengan TRAIN data (model should be indexed with train products)
+    train_features = best_model.prepare_data(train_df)
+    train_embeddings = best_model.generate_embeddings(train_features)
+    best_model.similarity_engine.index_products(train_embeddings, train_df['id'].values)
+    best_model.products_df = train_df
     
+    # Now evaluate using test queries
     test_metrics = calculate_validation_metrics(
         model=best_model,
-        train_df=test_df,  # Use test as both for final eval
-        val_df=pd.DataFrame(),  # Empty val
+        train_df=train_df,  # Model indexed with train
+        val_df=test_df,  # Query from test
         k=CONFIG['k'],
         sample_size=50  # More queries untuk final test
     )

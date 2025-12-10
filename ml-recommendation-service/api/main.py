@@ -143,7 +143,7 @@ async def load_model():
         logger.info("🔄 Loading NCB model v2...")
         
         # Load trained model v2 with adaptive learning
-        model_path = Path(__file__).parent.parent / "models" / "saved_models" / "ncb_v2"
+        model_path = Path(__file__).parent.parent / "models" / "saved_models" / "ncb_v4_test"
         
         # Load model config to get embedding_dim
         config_path = model_path / "model_config.json"
@@ -155,7 +155,7 @@ async def load_model():
             logger.info(f"📋 Config loaded - embedding_dim={embedding_dim}")
         else:
             # Fallback: read from training_history_v2.json
-            history_path = model_path / "training_history_v2.json"
+            history_path = model_path / "training_history_v4.json"
             if history_path.exists():
                 import json
                 with open(history_path, 'r') as f:
@@ -227,7 +227,7 @@ async def health_check():
         status="healthy",
         model_loaded=True,
         total_indexed_products=len(model.similarity_engine.product_ids) if model.similarity_engine.product_ids is not None else 0,
-        model_version="ncb_v2",
+        model_version="ncb_v4",
         uptime_seconds=round(time.time() - start_time, 2)
     )
 

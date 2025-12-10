@@ -32,7 +32,7 @@ class Recommender:
     
     def __init__(
         self, 
-        model_path: str = "models/saved_models/ncb_v2",
+        model_path: str = "models/saved_models/ncb_v4_test",
         use_cache: bool = True,
         cache_ttl: int = 3600  # 1 jam
     ):
@@ -79,7 +79,7 @@ class Recommender:
         """
         try:
             logger.info(f"📦 Loading model from {model_path}...")
-            model = NCBModel.load(model_path)
+            model = NCBModel.load_model(model_path)
             logger.info("✅ Model loaded successfully")
             return model
         except Exception as e:
@@ -120,14 +120,33 @@ class Recommender:
         
         try:
             # Generate recommendations dari model
-            recommendations = self.model.recommend(
+            raw_recommendations = self.model.get_similar_products(
                 product_id=product_id,
                 top_k=top_k * 2  # Ambil lebih banyak untuk filtering
             )
             
+            logger.debug(f"Raw recommendations type: {type(raw_recommendations)}, len: {len(raw_recommendations) if isinstance(raw_recommendations, list) else 'N/A'}")
+            if len(raw_recommendations) > 0:
+                logger.debug(f"First rec type: {type(raw_recommendations[0])}, content: {raw_recommendations[0]}")
+            
+            # Enrich dengan product details dari products_df
+            enriched_recs = []
+            for rec in raw_recommendations:
+                # Find product in products_df
+                product_row = self.products_df[self.products_df['id'] == rec['product_id']]
+                if len(product_row) > 0:
+                    product = product_row.iloc[0]
+                    enriched_recs.append({
+                        **rec,  # Keep similarity_score, reason, etc
+                        'category_name': product.get('category_name', rec.get('category')),
+                        'total_stock': int(product.get('total_stock', 0)),
+                        'is_active': bool(product.get('is_active', True)),
+                        'selling_price': float(product.get('selling_price', 0))
+                    })
+            
             # Apply business rules filtering
             filtered_recs = self._apply_business_rules(
-                recommendations,
+                enriched_recs,
                 filter_category=filter_category,
                 min_stock=min_stock,
                 exclude_inactive=exclude_inactive
@@ -136,17 +155,14 @@ class Recommender:
             # Ambil top-K setelah filtering
             final_recs = filtered_recs[:top_k]
             
-            # Format response
-            result = self._format_recommendations(final_recs, product_id)
-            
             # Save to cache
             if self.use_cache:
-                self.cache_manager.set(cache_key, result)
+                self.cache_manager.set(cache_key, final_recs)
             
             computation_time = (time.time() - start_time) * 1000
-            logger.info(f"✅ Generated {len(result)} recommendations for {product_id} ({computation_time:.2f}ms)")
+            logger.info(f"✅ Generated {len(final_recs)} recommendations for {product_id} ({computation_time:.2f}ms)")
             
-            return result, computation_time
+            return final_recs, computation_time
             
         except Exception as e:
             logger.error(f"❌ Error generating recommendations: {e}")
