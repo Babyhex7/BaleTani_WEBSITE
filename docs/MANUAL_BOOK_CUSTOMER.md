@@ -83,7 +83,11 @@ Halaman Landing adalah halaman pertama yang Anda lihat saat mengakses website Ba
 **Fungsi Halaman Landing:**
 
 - Menampilkan informasi umum tentang Balétani Fresh Market
-
+- Menampilkan **Hero Section** dengan pesan utama dan animasi menarik
+- Menampilkan **Produk Unggulan** dengan carousel auto-play yang berganti setiap 5 detik
+- Menampilkan **Daftar Kategori Produk** yang tersedia
+- Menyediakan tombol navigasi ke halaman Login dan Register
+- Menampilkan **Keunggulan Layanan** Balétani (pengiriman cepat, produk segar, dll.)
 
 **Elemen-elemen pada Halaman Landing:**
 
@@ -653,25 +657,28 @@ Pelanggan dapat memilih metode pembayaran:
 
 **Metode Pembayaran Tersedia:**
 
-| No  | Metode        | Keterangan                                      |
-| --- | ------------- | ----------------------------------------------- |
-| 1   | QRIS          | Scan QR code untuk pembayaran digital (default) |
-| 2   | Transfer Bank | Transfer ke rekening Balétani                   |
-| 3   | Tunai         | Bayar saat pengambilan/pengantaran              |
+| No  | Metode        | Keterangan                                 |
+| --- | ------------- | ------------------------------------------ |
+| 1   | Transfer Bank | Transfer ke rekening Balétani (pilih bank) |
+| 2   | QRIS          | Pembayaran via e-wallet dengan QR Code     |
+| 3   | Tunai/Cash    | Bayar saat pengambilan/pengantaran         |
 
 **Jika Memilih Transfer Bank:**
-Muncul pilihan bank:
+Harus pilih bank terlebih dahulu (wajib):
 
 - BRI
 - BCA
 - MANDIRI
 
-Nomor rekening akan ditampilkan di pesan WhatsApp.
+Nomor rekening akan diberikan admin via WhatsApp setelah checkout.
+
+**Jika Memilih QRIS:**
+QR Code atau nomor pembayaran akan diberikan admin via WhatsApp setelah checkout.
 
 **Validasi Pembayaran:**
 
-- QRIS: Langsung proses tanpa field tambahan
-- Transfer: Harus pilih bank terlebih dahulu
+- Transfer: Harus pilih bank terlebih dahulu (wajib)
+- QRIS: Langsung proses, info pembayaran dari admin
 - Tunai: Langsung proses tanpa field tambahan
 
 ---
@@ -702,28 +709,80 @@ Setelah klik **"Buat Pesanan"**, sistem akan:
    Backend membuat URL WhatsApp dengan format pesan:
 
    ```
-   🛒 *PESANAN BARU - BALÉTANI*
+   🛒 *KONFIRMASI PESANAN BALETANI*
 
-   📋 No. Pesanan: ORD-XXXXXX
-   👤 Nama: [Nama Customer]
-   📱 Telepon: [Nomor HP]
+   📋 *Detail Pesanan*
+   No. Order: ORD-XXXXXX
+   Tanggal: [Tanggal Order]
+   Nama: [Nama Customer]
+   No. HP: [Nomor HP]
 
-   📦 Daftar Pesanan:
-   1. [Nama Produk] x [Qty] = Rp XXX
-   2. [Nama Produk] x [Qty] = Rp XXX
+   📦 *Produk yang Dipesan:*
+   1. [Nama Produk]
+      Qty: [X] × Rp XXX = Rp XXX
+   2. [Nama Produk]
+      Qty: [X] × Rp XXX = Rp XXX
 
-   💰 Subtotal: Rp XXX
-   🚚 Ongkir: Rp XXX
-   💵 TOTAL: Rp XXX
+   💰 *Rincian Pembayaran:*
+   Subtotal: Rp XXX
+   Ongkir: Rp XXX
+   ─────────────────
+   *TOTAL: Rp XXX*
 
-   📍 Metode: [Self Pickup/Delivery]
-   📍 Alamat: [Alamat jika delivery]
+   🚚 *Metode Pengiriman:*
+   [Self Pickup / Delivery]
+   Alamat: [Alamat jika delivery]
 
    💳 Pembayaran: [Metode]
-   🏦 Bank: [Nama Bank jika transfer]
-
-   ⏰ Batas Pembayaran: 10 menit
    ```
+
+   **Detail Pesan untuk Setiap Metode Pembayaran:**
+
+   **A. Jika Pilih Transfer Bank:**
+   Pesan akan menampilkan detail rekening:
+
+   ```
+   💳 *Metode Pembayaran:*
+   🏦 Transfer Bank [BRI/BCA/MANDIRI]
+
+   *SILAKAN TRANSFER KE:*
+   Bank: [BRI/BCA/MANDIRI]
+   No. Rek: [Nomor Rekening Toko]
+   a/n: BaleTani Fresh Market
+   Jumlah: Rp XXX
+
+   ⏰ Batas Waktu: [Tanggal & Jam]
+
+   📸 *Setelah transfer, mohon kirim bukti transfer ke nomor ini*
+   ```
+
+   **B. Jika Pilih QRIS:**
+   Pesan akan menampilkan:
+
+   ```
+   💳 *Metode Pembayaran:*
+   📱 QRIS
+   Admin akan mengirimkan QR Code atau nomor pembayaran QRIS
+   ```
+
+   Customer harus menunggu admin memberikan QR Code atau nomor pembayaran.
+
+   **C. Jika Pilih Tunai/Cash:**
+   Pesan akan menampilkan:
+
+   ```
+   💳 *Metode Pembayaran:*
+   💵 Cash (Bayar di Tempat)
+   Pembayaran dilakukan saat pengambilan/pengiriman barang
+   ```
+
+   **Catatan Penting:**
+
+   - Untuk **Transfer Bank**: Nomor rekening langsung ditampilkan di pesan WhatsApp
+   - Untuk **QRIS**: Customer harus menunggu admin memberikan QR Code atau nomor pembayaran
+   - Untuk **Tunai/Cash**: Tidak ada info tambahan, bayar di tempat
+   - Timer pembayaran **HANYA berlaku untuk Transfer Bank dan QRIS** (10 menit)
+   - Pembayaran **Tunai/Cash** tidak ada batas waktu
 
 4. **Redirect ke WhatsApp:**
 
@@ -767,29 +826,57 @@ Halaman konfirmasi bahwa pesanan berhasil dibuat.
 
 **Elemen-elemen Halaman:**
 
-| No  | Elemen              | Keterangan                     |
-| --- | ------------------- | ------------------------------ |
-| 1   | Ikon Sukses         | Checkmark hijau besar          |
-| 2   | Pesan Utama         | "Pesanan Berhasil Dibuat!"     |
-| 3   | Nomor Pesanan       | Contoh: ORD-20251210-XXXXX     |
-| 4   | Instruksi           | Langkah-langkah selanjutnya    |
-| 5   | Timer Pembayaran    | Countdown 10 menit untuk bayar |
-| 6   | Tombol WhatsApp     | Buka WhatsApp lagi jika perlu  |
-| 7   | Tombol Riwayat      | Lihat riwayat pesanan          |
-| 8   | Tombol Belanja Lagi | Kembali ke katalog produk      |
+| No  | Elemen               | Keterangan                                              |
+| --- | -------------------- | ------------------------------------------------------- |
+| 1   | Ikon Sukses          | Checkmark hijau besar                                   |
+| 2   | Pesan Utama          | "Pesanan Berhasil Dibuat!"                              |
+| 3   | Nomor Pesanan        | Contoh: ORD-20251210-XXXXX                              |
+| 4   | Instruksi Pembayaran | Detail pembayaran sesuai metode yang dipilih            |
+| 5   | Timer Pembayaran     | Countdown 10 menit (khusus Transfer & QRIS)             |
+| 6   | Info Pembayaran      | Instruksi untuk menghubungi admin (untuk Transfer/QRIS) |
+| 7   | Tombol WhatsApp      | Buka WhatsApp lagi jika perlu                           |
+| 8   | Tombol Riwayat       | Lihat riwayat pesanan                                   |
+| 9   | Tombol Belanja Lagi  | Kembali ke katalog produk                               |
 
-**Instruksi Pasca-Pesanan:**
+**Instruksi Pembayaran Berdasarkan Metode:**
 
-1. Kirim pesan WhatsApp ke admin Balétani
-2. Lakukan pembayaran sesuai metode yang dipilih
-3. Konfirmasi pembayaran ke admin
-4. Tunggu update status pesanan
-5. Ambil pesanan atau tunggu pengantaran
+**A. Transfer Bank:**
+
+1. Hubungi admin Balétani via WhatsApp untuk info rekening
+2. Admin akan memberikan nomor rekening bank (BRI/BCA/MANDIRI)
+3. Buka aplikasi mobile banking
+4. Transfer ke rekening yang diberikan admin
+5. Nominal harus **SESUAI PERSIS** dengan total pesanan
+6. Screenshot bukti transfer
+7. Kirim bukti ke admin via WhatsApp
+8. Tunggu konfirmasi dari admin
+
+**B. QRIS:**
+
+1. Hubungi admin Balétani via WhatsApp untuk info pembayaran QRIS
+2. Admin akan memberikan QR Code atau nomor untuk pembayaran
+3. Scan QR Code atau gunakan nomor yang diberikan
+4. Masukkan nominal sesuai total pesanan
+5. Konfirmasi pembayaran di aplikasi e-wallet
+6. Screenshot bukti pembayaran
+7. Kirim bukti ke admin via WhatsApp
+8. Tunggu konfirmasi dari admin
+
+**C. Tunai/Cash:**
+
+1. **TIDAK ada timer pembayaran** (bayar di tempat)
+2. Siapkan uang sesuai total pesanan
+3. Datang ke toko untuk ambil barang (Self Pickup)
+4. Atau tunggu kurir datang (Delivery)
+5. Bayar langsung kepada kasir/kurir
 
 **Catatan Penting:**
 
-- Pesanan akan **otomatis dibatalkan** jika tidak dibayar dalam 10 menit
-- Stok akan dikembalikan jika pesanan dibatalkan
+- Timer pembayaran **HANYA untuk Transfer & QRIS** (10 menit)
+- Pembayaran **Tunai/Cash tidak ada batas waktu**
+- Pesanan dengan Transfer/QRIS akan **otomatis dibatalkan** jika tidak dikonfirmasi dalam 10 menit
+- Stok akan dikembalikan otomatis jika pesanan dibatalkan
+- Setelah countdown habis, sistem akan memanggil endpoint cancel otomatis
 
 ---
 
@@ -1208,8 +1295,9 @@ FAQ menampilkan pertanyaan yang sering diajukan.
 
 **Q: Pesanan otomatis dibatalkan**
 
-- Pesanan dibatalkan jika tidak ada konfirmasi pembayaran dalam 10 menit
-- Buat pesanan baru dan segera lakukan pembayaran
+- Pesanan dengan metode **Transfer/QRIS** dibatalkan jika tidak dikonfirmasi dalam 10 menit
+- Pesanan dengan metode **Tunai/Cash** tidak akan dibatalkan otomatis
+- Buat pesanan baru dan segera lakukan pembayaran & konfirmasi ke admin
 
 **Q: Halaman loading terus / blank**
 
@@ -1259,16 +1347,22 @@ Jika mengalami masalah yang tidak dapat diselesaikan:
 
 ### B. Glosarium
 
-| Istilah     | Definisi                                          |
-| ----------- | ------------------------------------------------- |
-| Checkout    | Proses finalisasi pesanan sebelum pembayaran      |
-| Self Pickup | Pengambilan pesanan langsung di toko              |
-| Delivery    | Pengiriman pesanan ke alamat pelanggan            |
-| Cart        | Keranjang belanja untuk menyimpan produk          |
-| Reorder     | Fitur untuk memesan ulang dari pesanan sebelumnya |
-| Pending     | Status menunggu proses/konfirmasi                 |
-| Navbar      | Bar navigasi di bagian atas website               |
-| Toast       | Notifikasi popup yang muncul sementara            |
+| Istilah            | Definisi                                                     |
+| ------------------ | ------------------------------------------------------------ |
+| Checkout           | Proses finalisasi pesanan sebelum pembayaran                 |
+| Self Pickup        | Pengambilan pesanan langsung di toko                         |
+| Delivery           | Pengiriman pesanan ke alamat pelanggan                       |
+| Cart               | Keranjang belanja untuk menyimpan produk                     |
+| Reorder            | Fitur untuk memesan ulang dari pesanan sebelumnya            |
+| Pending            | Status menunggu proses/konfirmasi                            |
+| Navbar             | Bar navigasi di bagian atas website                          |
+| Toast              | Notifikasi popup yang muncul sementara                       |
+| QRIS               | Quick Response Code Indonesian Standard untuk pembayaran     |
+| CustomerLayout     | Wrapper layout dengan Navbar dan Footer untuk halaman publik |
+| Auto-Cancel        | Pembatalan otomatis pesanan setelah timeout pembayaran       |
+| JWT Token          | Token autentikasi untuk sesi login customer                  |
+| Payment Expired At | Waktu kadaluarsa pembayaran (10 menit dari checkout)         |
+| Local Storage      | Penyimpanan browser untuk data keranjang                     |
 
 ### C. Shortcut dan Tips
 
