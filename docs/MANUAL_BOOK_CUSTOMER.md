@@ -950,22 +950,20 @@ Menampilkan kapan pesanan:
 
 Status pesanan ditampilkan dengan badge berwarna:
 
-| Status           | Warna  | Keterangan                |
-| ---------------- | ------ | ------------------------- |
-| pending_payment  | Kuning | Menunggu pembayaran       |
-| pending          | Kuning | Menunggu konfirmasi admin |
-| confirmed        | Biru   | Pembayaran dikonfirmasi   |
-| processing       | Biru   | Pesanan sedang disiapkan  |
-| ready_for_pickup | Ungu   | Siap diambil di toko      |
-| shipped          | Ungu   | Dalam pengiriman          |
-| delivered        | Hijau  | Pesanan sampai            |
-| completed        | Hijau  | Pesanan selesai           |
-| cancelled        | Merah  | Pesanan dibatalkan        |
+| Status           | Warna  | Icon           | Keterangan                       |
+| ---------------- | ------ | -------------- | -------------------------------- |
+| pending_payment  | Orange | 🕐 Clock       | Menunggu pembayaran (24 jam)     |
+| paid             | Hijau  | ✅ CheckCircle | Pembayaran berhasil dikonfirmasi |
+| processing       | Biru   | 📦 Package     | Pesanan sedang disiapkan         |
+| ready_for_pickup | Ungu   | 📦 Package     | Siap diambil di toko             |
+| out_for_delivery | Indigo | 📍 MapPin      | Dalam pengiriman ke alamat       |
+| completed        | Hijau  | ✅ CheckCircle | Pesanan selesai                  |
+| cancelled        | Merah  | ⚠️ AlertCircle | Pesanan dibatalkan               |
 
 **Alur Status Normal:**
 
 ```
-pending_payment → confirmed → processing → ready_for_pickup/shipped → delivered → completed
+pending_payment → paid → processing → ready_for_pickup/out_for_delivery → completed
 ```
 
 ---
