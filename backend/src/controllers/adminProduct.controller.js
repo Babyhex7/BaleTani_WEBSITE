@@ -13,6 +13,9 @@ const {
 const cacheService = require("../cache/cacheService");
 const { PATTERNS } = require("../cache/cacheKeys");
 
+// Import ML webhook service untuk auto-reload model
+const { triggerModelReload } = require("../services/ml-webhook.service");
+
 /**
  * GET /admin/products
  * Get all products with filtering, search, and pagination
@@ -398,6 +401,15 @@ const create = async (req, res) => {
     cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
     cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
 
+    // ========================================
+    // ML MODEL AUTO-RELOAD: Trigger model refresh
+    // ========================================
+    // Setelah produk baru ditambah, reload ML model agar bisa recognize produk baru
+    console.log("[ML MODEL] Triggering model reload for new product");
+    triggerModelReload().catch((err) => {
+      console.error("[ML MODEL] Reload failed (non-blocking):", err.message);
+    });
+
     return res.status(201).json({
       success: true,
       message: "Produk berhasil ditambahkan",
@@ -547,6 +559,16 @@ const update = async (req, res) => {
     cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
     cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
 
+    // ========================================
+    // ML MODEL AUTO-RELOAD: Trigger model refresh
+    // ========================================
+    console.log(
+      `[ML MODEL] Triggering model reload for updated product (ID: ${id})`
+    );
+    triggerModelReload().catch((err) => {
+      console.error("[ML MODEL] Reload failed (non-blocking):", err.message);
+    });
+
     return res.status(200).json({
       success: true,
       message: "Produk berhasil diperbarui",
@@ -613,6 +635,16 @@ const deleteProduct = async (req, res) => {
     // 3. Hapus cache categories (product_count berkurang)
     cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
     cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
+
+    // ========================================
+    // ML MODEL AUTO-RELOAD: Trigger model refresh
+    // ========================================
+    console.log(
+      `[ML MODEL] Triggering model reload after product deletion (ID: ${id})`
+    );
+    triggerModelReload().catch((err) => {
+      console.error("[ML MODEL] Reload failed (non-blocking):", err.message);
+    });
 
     return res.status(200).json({
       success: true,

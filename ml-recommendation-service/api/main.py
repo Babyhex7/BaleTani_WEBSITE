@@ -547,6 +547,85 @@ async def get_category_top_products(
         logger.error(f"Error in get_category_top_products: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===== MODEL MANAGEMENT ENDPOINTS =====
+@app.post("/v1/admin/reload-model")
+async def reload_model():
+    """
+    🔄 Reload model untuk recognize produk baru
+    
+    Call endpoint ini setelah:
+    - Menambah produk baru ke database/CSV
+    - Update data produk existing
+    - Ingin refresh model dengan data terbaru
+    
+    Returns:
+        Status reload dan jumlah produk yang di-index
+    """
+    global model
+    try:
+        start = time.time()
+        logger.info("🔄 Reloading model with latest product data...")
+        
+        model_path = Path(__file__).parent.parent / "models" / "saved_models" / "ncb_v4_test"
+        
+        # Get embedding_dim from config
+        config_path = model_path / "model_config.json"
+        if config_path.exists():
+            import json
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+            embedding_dim = config['embedding_dim']
+        else:
+            embedding_dim = 32
+        
+        # Reload model (akan auto-load CSV terbaru)
+        model = NCBModel.load_model(str(model_path), embedding_dim=embedding_dim)
+        
+        num_products = len(model.similarity_engine.product_ids) if model.similarity_engine.product_ids is not None else 0
+        reload_time = round((time.time() - start) * 1000, 2)
+        
+        logger.info(f"✅ Model reloaded! Now indexing {num_products} products")
+        
+        return {
+            "status": "success",
+            "message": "Model reloaded with latest data",
+            "indexed_products": num_products,
+            "reload_time_ms": reload_time,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Failed to reload model: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Model reload failed: {str(e)}"
+        )
+
+@app.get("/v1/admin/model-status")
+async def get_model_status():
+    """
+    📊 Get status model dan statistik
+    
+    Returns:
+        Informasi model: uptime, jumlah produk, versi, dll
+    """
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+    
+    num_products = len(model.similarity_engine.product_ids) if model.similarity_engine.product_ids is not None else 0
+    
+    return {
+        "status": "active",
+        "model_version": "ncb_v4",
+        "indexed_products": num_products,
+        "embedding_dimension": model.embedding_dim,
+        "uptime_seconds": round(time.time() - start_time, 2),
+        "is_trained": model.is_trained,
+        "data_source": "csv",  # Could be dynamic from settings
+        "last_reload": "on_startup",  # TODO: track last reload time
+        "timestamp": datetime.now().isoformat()
+    }
+
 # ===== ERROR HANDLERS =====
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
@@ -563,9 +642,9 @@ async def global_exception_handler(request, exc):
 # ===== MAIN =====
 if __name__ == "__main__":
     uvicorn.run(
-        "main:app",
+        "api.main:app",
         host="0.0.0.0",
         port=8000,
-        reload=True,
+        reload=False,
         log_level="info"
     )
