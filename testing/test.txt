@@ -10,13 +10,17 @@ testing/
 │   ├── 1-customer-auth.http        (30+ tests) ✅
 │   ├── 2-customer-cart.http        (35+ tests) ✅
 │   └── 3-customer-order.http       (40+ tests) ✅
-└── admin-test/                 # 🔐 Admin API tests
-    ├── 1-admin-auth.http           (35+ tests) ✅
-    ├── 2-admin-products.http       (40+ tests) ✅
-    └── 3-admin-orders.http         (40+ tests) ✅
+├── admin-test/                 # 🔐 Admin API tests
+│   ├── 1-admin-auth.http           (35+ tests) ✅
+│   ├── 2-admin-products.http       (40+ tests) ✅
+│   └── 3-admin-orders.http         (40+ tests) ✅
+└── ai-test/                    # 🤖 AI Recommendation tests
+    └── test_ai_recommendations.http (15+ tests) ✅
+        ├── Similar Products (NCB AI) 
+        └── Bundle Recommendations (NCB AI)
 
 ================================================
-TOTAL: 220+ TEST CASES ✅
+TOTAL: 235+ TEST CASES ✅ (220 BE/FE + 15 AI)
 ================================================
 
 🚀 QUICK START:
@@ -30,11 +34,18 @@ TOTAL: 220+ TEST CASES ✅
 📋 TEST SEQUENCE:
 Customer: auth → cart → order
 Admin: auth → products → orders
+AI: health → similar → bundle
 
 🔑 DEFAULT CREDENTIALS (dari seeder):
 Customer: 081234567890 / password123 (buat sendiri via register)
 Super Admin: 081111111111 / superadmin123
 Kasir: 081222222222 / kasir123
+
+🤖 AI SERVICE:
+ML Service: http://localhost:8000 (FastAPI)
+Backend Proxy: http://localhost:3000/api/recommendations
+Features: Similar Products & Bundle (NCB Neural Network)
+⚠️  Trending/Category = BUKAN AI (dummy sort)
 
 ⚠️ IMPORTANT NOTES:
 - Login pakai NOMOR HP (bukan email!)
@@ -49,8 +60,14 @@ Baca QUICK_START.md untuk panduan cepat!
 
 🎯 PRIORITAS TEST:
 🔴 CRITICAL: customer-auth, customer-cart, customer-order, admin-auth, admin-orders
-🟡 IMPORTANT: admin-products
+🟡 IMPORTANT: admin-products, ai-recommendations (Similar & Bundle)
 🟢 NICE TO HAVE: security, performance, E2E
+
+⚠️ CATATAN PENTING AI:
+- ✅ Similar Products = 100% AI (NCB Model)
+- ✅ Bundle Recommendations = 100% AI (Centroid)
+- ❌ Trending/Category = BUKAN AI (sort by stock)
+- 🎯 FOKUS: Similar & Bundle saja!
 
 ================================================
 STATUS: ✅ READY FOR TESTING

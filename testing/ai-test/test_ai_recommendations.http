@@ -1,0 +1,190 @@
+### ==========================================
+### ✅ AI RECOMMENDATION TESTING (NCB Model)
+### FOKUS: Similar Products & Bundle (REAL AI!)
+### Port: 8000 (ML Service) | 3000 (Backend)
+### ==========================================
+
+### ========== HEALTH CHECK ==========
+
+### 1. ML Service Health Check
+GET http://localhost:8000/health
+Accept: application/json
+
+###
+
+### 2. ML Service Root Info
+GET http://localhost:8000/
+Accept: application/json
+
+###
+
+### ========== 🤖 AI: SIMILAR PRODUCTS (NCB Model) ==========
+### Cara Kerja:
+### 1. Input product → Generate 32D embedding (Neural Network)
+### 2. Cosine similarity dengan semua produk
+### 3. Return top-K most similar products
+
+### 3. Similar Products - Udang Sedang
+# Product ID: 7a4af2f2-f55b-4300-a4ba-4406efcc350c
+# Expected: Cumi-cumi, Ikan Laut, Kerang (protein laut sejenis)
+GET http://localhost:8000/v1/recommendations/similar/7a4af2f2-f55b-4300-a4ba-4406efcc350c?top_k=5
+Accept: application/json
+
+###
+
+### 4. Similar Products - Ayam Kampung
+# Product ID: 70710b93-2b14-4674-a243-b919d6002c48
+# Expected: Ayam lainnya, Daging Unggas (protein daging sejenis)
+GET http://localhost:8000/v1/recommendations/similar/70710b93-2b14-4674-a243-b919d6002c48?top_k=5
+Accept: application/json
+
+###
+
+### 5. Similar Products - Bawang Merah
+# Product ID: 8c7b5a2f-1e3d-4f9a-b8c6-3d4e5f6a7b8c
+# Expected: Bawang Putih, Bumbu lain (kategori sama)
+GET http://localhost:8000/v1/recommendations/similar/8c7b5a2f-1e3d-4f9a-b8c6-3d4e5f6a7b8c?top_k=5
+Accept: application/json
+
+###
+
+### ========== 🤖 AI: BUNDLE RECOMMENDATIONS (NCB Model) ==========
+### Cara Kerja:
+### 1. Input: Multiple products dari cart
+### 2. Generate embeddings untuk semua products
+### 3. Compute CENTROID (average vector)
+### 4. Find products similar to centroid → Pelengkap bundle!
+
+### 6. Bundle - Mix Protein Laut (2 produk seafood)
+# Expected: Produk pelengkap seperti bumbu, sayur pendamping
+POST http://localhost:8000/v1/recommendations/bundle
+Content-Type: application/json
+Accept: application/json
+
+{
+  "product_ids": [
+    "7a4af2f2-f55b-4300-a4ba-4406efcc350c",
+    "b3cc44f1-f3c1-4703-98d8-ac40cb387187"
+  ],
+  "top_k": 5
+}
+
+###
+
+### 7. Bundle - Mix Protein & Bumbu (seafood + spices)
+# Expected: Sayuran, bumbu tambahan, pelengkap masakan
+POST http://localhost:8000/v1/recommendations/bundle
+Content-Type: application/json
+Accept: application/json
+
+{
+  "product_ids": [
+    "7a4af2f2-f55b-4300-a4ba-4406efcc350c",
+    "8c7b5a2f-1e3d-4f9a-b8c6-3d4e5f6a7b8c"
+  ],
+  "top_k": 8
+}
+
+###
+
+### 8. Bundle - Multiple Proteins (3 produk berbeda)
+# Expected: Pelengkap masakan yang cocok untuk berbagai protein
+POST http://localhost:8000/v1/recommendations/bundle
+Content-Type: application/json
+Accept: application/json
+
+{
+  "product_ids": [
+    "7a4af2f2-f55b-4300-a4ba-4406efcc350c",
+    "70710b93-2b14-4674-a243-b919d6002c48",
+    "8c7b5a2f-1e3d-4f9a-b8c6-3d4e5f6a7b8c"
+  ],
+  "top_k": 6
+}
+
+###
+
+### ========== 🔄 VIA BACKEND (Port 3000) ==========
+### Test melalui backend proxy dengan caching
+
+### 9. Similar Products via Backend
+GET http://localhost:3000/api/recommendations/similar/7a4af2f2-f55b-4300-a4ba-4406efcc350c?top_k=5
+Accept: application/json
+
+###
+
+### 10. Bundle Recommendations via Backend
+POST http://localhost:3000/api/recommendations/bundle
+Content-Type: application/json
+Accept: application/json
+
+{
+  "product_ids": [
+    "7a4af2f2-f55b-4300-a4ba-4406efcc350c",
+    "b3cc44f1-f3c1-4703-98d8-ac40cb387187"
+  ],
+  "top_k": 5
+}
+
+###
+
+### ========== 🛠️ ADMIN ENDPOINTS ==========
+
+### 11. Get Model Status
+GET http://localhost:8000/v1/admin/model-status
+Accept: application/json
+
+###
+
+### 12. Reload Model (after adding new products)
+POST http://localhost:8000/v1/admin/reload-model
+Accept: application/json
+
+###
+
+### ========== 🐛 ERROR HANDLING ==========
+
+### 13. Test Invalid Product ID
+GET http://localhost:8000/v1/recommendations/similar/invalid-uuid-format?top_k=5
+Accept: application/json
+
+###
+
+### 14. Test Non-Existent Product
+GET http://localhost:8000/v1/recommendations/similar/00000000-0000-0000-0000-000000000000?top_k=5
+Accept: application/json
+
+###
+
+### 15. Test Empty Bundle
+POST http://localhost:8000/v1/recommendations/bundle
+Content-Type: application/json
+Accept: application/json
+
+{
+  "product_ids": []
+}
+
+###
+
+### ==========================================
+### 📝 PRODUCT IDS REFERENCE (57 Real Products)
+### ==========================================
+###
+### Protein Laut:
+### - 7a4af2f2-f55b-4300-a4ba-4406efcc350c (Udang Sedang)
+### - b3cc44f1-f3c1-4703-98d8-ac40cb387187 (Ikan Segar)
+### - f3093aaa-5474-468c-9b8d-9ef9a28956b9 (Cumi-cumi)
+###
+### Protein Daging:
+### - 70710b93-2b14-4674-a243-b919d6002c48 (Ayam Kampung)
+### - 457afb33-6e9d-4ad9-9f4c-b52be26e5f18 (Daging Sapi)
+###
+### Bumbu & Rempah:
+### - 8c7b5a2f-1e3d-4f9a-b8c6-3d4e5f6a7b8c (Bawang Merah)
+### - 9d8c6b3e-2f4a-5g0b-c9d7-4e5f6g7c8d9e (Bawang Putih)
+###
+### ==========================================
+### 🎯 FOKUS TESTING: Similar & Bundle (100% AI)
+### ⚠️  Trending & Category = BUKAN AI (dummy sort)
+### ==========================================
