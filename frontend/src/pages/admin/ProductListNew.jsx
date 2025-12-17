@@ -270,15 +270,15 @@ const ProductListNew = () => {
     // Get first image from ProductImages or images array
     const images = product.ProductImages || product.images || [];
     if (images.length > 0) {
-      const imageUrl = images[0].image_url;
-      if (imageUrl.startsWith('http')) return imageUrl;
-      return `http://localhost:5000${imageUrl}`;
+      // Use utility function dari imageUtils untuk production-ready URL
+      const { getImageUrl: getImageUrlUtil } = require('../../utils/imageUtils');
+      return getImageUrlUtil(images[0].image_url);
     }
     
     // Fallback to primary_image_url if exists
     if (product.primary_image_url) {
-      if (product.primary_image_url.startsWith('http')) return product.primary_image_url;
-      return `http://localhost:5000${product.primary_image_url}`;
+      const { getImageUrl: getImageUrlUtil } = require('../../utils/imageUtils');
+      return getImageUrlUtil(product.primary_image_url);
     }
     
     return null;
