@@ -77,8 +77,8 @@ const AdminDashboardNew = () => {
 
       setError(null);
     } catch (err) {
-      console.error('Error fetching dashboard data:', err);
-      setError(err.message || 'Gagal memuat data dashboard');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat data dashboard';
+      setError(errorMsg);
     } finally {
       setLoading(false);
       setLoadingOrders(false);

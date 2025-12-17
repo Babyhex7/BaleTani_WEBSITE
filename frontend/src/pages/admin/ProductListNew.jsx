@@ -17,6 +17,7 @@ import DeleteConfirmModal from '../../components/ui_admin/DeleteConfirmModal';
 import Pagination from '../../components/ui_admin/Pagination';
 import inventoryService from '../../services/services_admin/inventoryService';
 import useDebounce from '../../hooks/useDebounce';
+import { getImageUrl as getImageUrlUtil } from '../../utils/imageUtils';
 
 const ProductListNew = () => {
   // State management
@@ -117,8 +118,9 @@ const ProductListNew = () => {
         setError(null);
       }
     } catch (err) {
-      console.error('Error fetching products:', err);
-      setError(err.message || 'Gagal memuat produk');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat produk';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -136,8 +138,9 @@ const ProductListNew = () => {
         setCategories(Array.isArray(categoriesList) ? categoriesList : []);
       }
     } catch (err) {
-      console.error('Error fetching categories:', err);
-      setCategories([]); // Set empty array on error
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat kategori';
+      setCategories([]);
+      toast.error(errorMsg);
     }
   };
 
@@ -164,8 +167,8 @@ const ProductListNew = () => {
         setShowDetailModal(true);
       }
     } catch (err) {
-      console.error('Error viewing product:', err);
-      showNotification('error', err.message || 'Gagal memuat detail produk');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat detail produk';
+      showNotification('error', errorMsg);
     }
   };
 
@@ -186,8 +189,8 @@ const ProductListNew = () => {
         setShowFormModal(true);
       }
     } catch (err) {
-      console.error('Error editing product:', err);
-      showNotification('error', err.message || 'Gagal memuat data produk');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat data produk';
+      showNotification('error', errorMsg);
     }
   };
 
@@ -216,8 +219,8 @@ const ProductListNew = () => {
       await fetchProducts();
       setShowFormModal(false);
     } catch (err) {
-      console.error('Error submitting product:', err);
-      throw new Error(err.message || 'Gagal menyimpan produk');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal menyimpan produk';
+      throw new Error(errorMsg);
     }
   };
 
@@ -242,8 +245,8 @@ const ProductListNew = () => {
       setShowDeleteModal(false);
       setSelectedProduct(null);
     } catch (err) {
-      console.error('Error deleting product:', err);
-      showNotification('error', err.message || 'Gagal menghapus produk');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal menghapus produk';
+      showNotification('error', errorMsg);
     } finally {
       setDeleteLoading(false);
     }
@@ -270,15 +273,12 @@ const ProductListNew = () => {
     // Get first image from ProductImages or images array
     const images = product.ProductImages || product.images || [];
     if (images.length > 0) {
-      const imageUrl = images[0].image_url;
-      if (imageUrl.startsWith('http')) return imageUrl;
-      return `http://localhost:5000${imageUrl}`;
+      return getImageUrlUtil(images[0].image_url);
     }
     
     // Fallback to primary_image_url if exists
     if (product.primary_image_url) {
-      if (product.primary_image_url.startsWith('http')) return product.primary_image_url;
-      return `http://localhost:5000${product.primary_image_url}`;
+      return getImageUrlUtil(product.primary_image_url);
     }
     
     return null;

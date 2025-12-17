@@ -89,8 +89,9 @@ const FAQManagement = () => {
         setError(null);
       }
     } catch (err) {
-      console.error('Error fetching FAQs:', err);
-      setError(err.message || 'Gagal memuat FAQ');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat FAQ';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -111,8 +112,8 @@ const FAQManagement = () => {
         setShowDetailModal(true);
       }
     } catch (err) {
-      console.error('Error viewing FAQ:', err);
-      toast.error(err.message || 'Gagal memuat detail FAQ');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat detail FAQ';
+      toast.error(errorMsg);
     }
   };
 
@@ -125,8 +126,8 @@ const FAQManagement = () => {
         setShowFormModal(true);
       }
     } catch (err) {
-      console.error('Error editing FAQ:', err);
-      toast.error(err.message || 'Gagal memuat data FAQ');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat data FAQ';
+      toast.error(errorMsg);
     }
   };
 

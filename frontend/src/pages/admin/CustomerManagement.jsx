@@ -92,9 +92,9 @@ const CustomerManagement = () => {
         setError(null);
       }
     } catch (err) {
-      console.error('Error fetching customers:', err);
-      setError(err.message || 'Gagal memuat data customer');
-      showNotification('error', 'Gagal memuat data customer');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat data customer';
+      setError(errorMsg);
+      showNotification('error', errorMsg);
     } finally {
       setLoading(false);
     }
@@ -112,8 +112,8 @@ const CustomerManagement = () => {
         setShowDetailModal(true);
       }
     } catch (err) {
-      console.error('Error viewing customer:', err);
-      showNotification('error', err.message || 'Gagal memuat detail customer');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat detail customer';
+      showNotification('error', errorMsg);
     }
   };
 
@@ -128,8 +128,8 @@ const CustomerManagement = () => {
         setShowFormModal(true);
       }
     } catch (err) {
-      console.error('Error editing customer:', err);
-      showNotification('error', err.message || 'Gagal memuat data customer');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat data customer';
+      showNotification('error', errorMsg);
     }
   };
 
@@ -153,8 +153,8 @@ const CustomerManagement = () => {
         setShowFormModal(false);
       }
     } catch (err) {
-      console.error('Error updating customer:', err);
-      throw new Error(err.message || 'Gagal memperbarui data customer');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memperbarui data customer';
+      throw new Error(errorMsg);
     }
   };
 
@@ -173,8 +173,8 @@ const CustomerManagement = () => {
         setSelectedCustomer(null);
       }
     } catch (err) {
-      console.error('Error deleting customer:', err);
-      showNotification('error', err.message || 'Gagal menghapus customer');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal menghapus customer';
+      showNotification('error', errorMsg);
     } finally {
       setDeleteLoading(false);
     }

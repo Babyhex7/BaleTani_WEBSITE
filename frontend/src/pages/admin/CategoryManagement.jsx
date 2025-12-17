@@ -87,8 +87,9 @@ const CategoryManagement = () => {
         setError(null);
       }
     } catch (err) {
-      console.error('Error fetching categories:', err);
-      setError(err.message || 'Gagal memuat kategori');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat kategori';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -117,8 +118,8 @@ const CategoryManagement = () => {
         setShowDetailModal(true);
       }
     } catch (err) {
-      console.error('Error viewing category:', err);
-      showNotification('error', err.message || 'Gagal memuat detail kategori');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat detail kategori';
+      showNotification('error', errorMsg);
     }
   };
 
@@ -139,8 +140,8 @@ const CategoryManagement = () => {
         setShowFormModal(true);
       }
     } catch (err) {
-      console.error('Error editing category:', err);
-      showNotification('error', err.message || 'Gagal memuat data kategori');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal memuat data kategori';
+      showNotification('error', errorMsg);
     }
   };
 
@@ -169,8 +170,8 @@ const CategoryManagement = () => {
       await fetchCategories();
       setShowFormModal(false);
     } catch (err) {
-      console.error('Error submitting category:', err);
-      throw new Error(err.message || 'Gagal menyimpan kategori');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal menyimpan kategori';
+      throw new Error(errorMsg);
     }
   };
 
@@ -195,8 +196,8 @@ const CategoryManagement = () => {
       setShowDeleteModal(false);
       setSelectedCategory(null);
     } catch (err) {
-      console.error('Error deleting category:', err);
-      showNotification('error', err.message || 'Gagal menghapus kategori');
+      const errorMsg = err.response?.data?.message || err.message || 'Gagal menghapus kategori';
+      showNotification('error', errorMsg);
     } finally {
       setDeleteLoading(false);
     }

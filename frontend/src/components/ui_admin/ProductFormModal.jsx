@@ -6,6 +6,7 @@ import {
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import inventoryService from '../../services/services_admin/inventoryService';
+import { getImageUrl, handleImageError } from '../../utils/imageUtils';
 
 /**
  * Modal Form untuk Create & Edit Product
@@ -141,10 +142,10 @@ const ProductFormModal = ({
       return;
     }
 
-    // Validate file sizes (max 2MB per file)
-    const oversizedFiles = files.filter(file => file.size > 2 * 1024 * 1024);
+    // Validate file sizes (max 5MB per file - match backend limit)
+    const oversizedFiles = files.filter(file => file.size > 5 * 1024 * 1024);
     if (oversizedFiles.length > 0) {
-      toast.error('Ukuran file maksimal 2MB per gambar');
+      toast.error('Ukuran file maksimal 5MB per gambar');
       return;
     }
 
@@ -314,8 +315,9 @@ const ProductFormModal = ({
                   {existingImages.map((img) => (
                     <div key={img.image_id} className="relative group">
                       <img
-                        src={img.image_url}
+                        src={getImageUrl(img.image_url)}
                         alt="Product"
+                        onError={(e) => handleImageError(e, 'product')}
                         className="w-full h-24 object-cover rounded-lg border-2 border-gray-300"
                       />
                       <button
@@ -375,7 +377,7 @@ const ProductFormModal = ({
                   <p className="mt-2 text-sm text-red-500">{errors.images}</p>
                 )}
                 <p className="mt-2 text-xs text-gray-500">
-                  Format: JPG, PNG, WEBP. Maksimal 2MB per gambar. Gambar pertama akan menjadi foto utama.
+                  Format: JPG, PNG, WEBP, GIF. Maksimal 5MB per gambar. Gambar pertama akan menjadi foto utama.
                 </p>
               </div>
 
