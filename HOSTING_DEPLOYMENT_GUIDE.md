@@ -1,9 +1,9 @@
 # 🚀 HOSTING & DEPLOYMENT GUIDE - BaleTani Fresh Market
 
 > **Dokumentasi lengkap untuk hosting dan deployment project BaleTani**
-> 
+>
 > **Dibuat**: 17 Desember 2025
-> 
+>
 > **Status**: Production Ready dengan beberapa persiapan
 
 ---
@@ -13,6 +13,7 @@
 ### **Tech Stack yang Digunakan:**
 
 1. **Backend API** (Node.js/Express)
+
    - Runtime: Node.js 18+
    - Framework: Express.js 4.18.2
    - Database: MySQL 8.0
@@ -23,6 +24,7 @@
    - Security: Helmet, CORS, Rate Limiting, CSRF Protection
 
 2. **Frontend** (React + Vite)
+
    - Framework: React 18.2.0
    - Build Tool: Vite 4.4.5
    - UI: Tailwind CSS 3.3.3
@@ -31,6 +33,7 @@
    - Notifications: React Hot Toast
 
 3. **ML Recommendation Service** (Python/FastAPI)
+
    - Framework: FastAPI 0.108.0
    - Server: Uvicorn 0.25.0
    - ML: TensorFlow 2.15.0
@@ -48,6 +51,7 @@
 ### **🥇 OPSI 1: VPS (Virtual Private Server) - RECOMMENDED**
 
 **Provider yang Cocok:**
+
 - DigitalOcean (Droplet)
 - Linode (Akamai)
 - Vultr
@@ -55,6 +59,7 @@
 - Hetzner Cloud
 
 **Spesifikasi Minimum:**
+
 ```
 CPU: 2 vCPU
 RAM: 4 GB (minimal) - 8 GB (recommended)
@@ -64,6 +69,7 @@ OS: Ubuntu 22.04 LTS
 ```
 
 **Estimasi Biaya:**
+
 - DigitalOcean: $24/bulan (4GB RAM, 2 vCPU)
 - Vultr: $24/bulan
 - Hetzner: €8.19/bulan (~$9/bulan) - PALING MURAH
@@ -88,12 +94,14 @@ OS: Ubuntu 22.04 LTS
 **A. Vercel + Railway/Render**
 
 **Setup:**
+
 - **Frontend**: Vercel (Free/Pro)
 - **Backend API**: Railway ($5-20/bulan) atau Render (Free tier available)
 - **MySQL Database**: PlanetScale (Free/Pro) atau Railway
 - **ML Service**: Railway Python Service
 
 **Estimasi Biaya:**
+
 ```
 Vercel Free: $0
 Railway: $10-20/bulan
@@ -118,6 +126,7 @@ Total: $10-20/bulan
 **B. Heroku (Jika Budget Lebih)**
 
 **Setup:**
+
 - Basic Dyno: $7/dyno (backend, frontend, ML)
 - Postgres/MySQL: $9/bulan
 - Total: ~$30/bulan
@@ -127,6 +136,7 @@ Total: $10-20/bulan
 ### **🥉 OPSI 3: Serverless + Managed Services**
 
 **Setup:**
+
 - **Frontend**: Netlify/Vercel
 - **Backend**: AWS Lambda + API Gateway
 - **Database**: AWS RDS MySQL atau Aurora Serverless
@@ -134,6 +144,7 @@ Total: $10-20/bulan
 - **Storage**: AWS S3 untuk uploads
 
 **Estimasi Biaya:**
+
 ```
 AWS Lambda: $5-15/bulan (tergantung traffic)
 RDS MySQL: $15-30/bulan
@@ -160,6 +171,7 @@ Total: $25-50/bulan
 **🎖️ PILIHAN TERBAIK: VPS (DigitalOcean atau Hetzner)**
 
 **Alasan:**
+
 1. ✅ Project memiliki **ML Service** yang butuh resource stabil
 2. ✅ Ada **file uploads** yang perlu storage persistent
 3. ✅ **Background cron jobs** untuk auto-cancel orders
@@ -169,6 +181,7 @@ Total: $25-50/bulan
 7. ✅ Full control untuk **optimization** dan **monitoring**
 
 **Setup Architecture:**
+
 ```
 ┌─────────────────────────────────────────────┐
 │            Domain: baletani.com             │
@@ -200,6 +213,7 @@ Total: $25-50/bulan
 **File yang perlu disiapkan:**
 
 **Backend `.env.production`:**
+
 ```env
 # Environment
 NODE_ENV=production
@@ -231,12 +245,14 @@ TZ=Asia/Jakarta
 ```
 
 **Frontend `.env.production`:**
+
 ```env
 VITE_API_BASE_URL=https://api.baletani.com
 VITE_WHATSAPP_ADMIN_PHONE=6285885725027
 ```
 
 **ML Service `.env.production`:**
+
 ```env
 # Application
 APP_ENV=production
@@ -264,6 +280,7 @@ WORKERS=2
 #### **B. Security Hardening**
 
 **✅ Yang Sudah Ada di Code:**
+
 - ✔️ Helmet.js untuk HTTP headers security
 - ✔️ CORS configuration
 - ✔️ Rate limiting
@@ -275,17 +292,20 @@ WORKERS=2
 **⚠️ Yang Perlu Ditambahkan/Diperbaiki:**
 
 1. **Ganti JWT_SECRET di production**
+
    ```bash
    # Generate strong secret
    openssl rand -base64 64
    ```
 
 2. **Database Password Encryption**
+
    - Jangan hardcode password
    - Gunakan environment variables
    - Pastikan DB user limited privileges
 
 3. **File Upload Validation**
+
    ```javascript
    // File: backend/src/middlewares/upload.middleware.js
    // ✅ Sudah ada validation, tapi perlu verify:
@@ -297,16 +317,18 @@ WORKERS=2
 4. **Add Security Headers**
    ```javascript
    // Tambahkan di backend/src/app.js
-   app.use(helmet({
-     contentSecurityPolicy: {
-       directives: {
-         defaultSrc: ["'self'"],
-         styleSrc: ["'self'", "'unsafe-inline'"],
-         scriptSrc: ["'self'"],
-         imgSrc: ["'self'", "data:", "https:"],
+   app.use(
+     helmet({
+       contentSecurityPolicy: {
+         directives: {
+           defaultSrc: ["'self'"],
+           styleSrc: ["'self'", "'unsafe-inline'"],
+           scriptSrc: ["'self'"],
+           imgSrc: ["'self'", "data:", "https:"],
+         },
        },
-     },
-   }));
+     })
+   );
    ```
 
 ---
@@ -316,23 +338,24 @@ WORKERS=2
 #### **A. Database Migration Script**
 
 **File: `backend/scripts/production-setup.sql`** (BUAT FILE INI)
+
 ```sql
 -- ===================================
 -- PRODUCTION DATABASE SETUP
 -- ===================================
 
 -- 1. Create Production Database
-CREATE DATABASE IF NOT EXISTS baletani_production 
-CHARACTER SET utf8mb4 
+CREATE DATABASE IF NOT EXISTS baletani_production
+CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
 -- 2. Create Database User with Limited Privileges
-CREATE USER IF NOT EXISTS 'baletani_user'@'localhost' 
+CREATE USER IF NOT EXISTS 'baletani_user'@'localhost'
 IDENTIFIED BY 'STRONG_PASSWORD_HERE';
 
 -- 3. Grant Privileges
-GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, INDEX, ALTER 
-ON baletani_production.* 
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, INDEX, ALTER
+ON baletani_production.*
 TO 'baletani_user'@'localhost';
 
 FLUSH PRIVILEGES;
@@ -347,6 +370,7 @@ SELECT User, Host FROM mysql.user WHERE User = 'baletani_user';
 #### **B. Database Backup Strategy**
 
 **File: `backend/scripts/backup-database.sh`** (BUAT FILE INI)
+
 ```bash
 #!/bin/bash
 
@@ -373,6 +397,7 @@ echo "✅ Backup completed: backup_$DATE.sql.gz"
 ```
 
 **Setup Cron untuk Auto Backup:**
+
 ```bash
 # Daily backup at 2 AM
 0 2 * * * /path/to/backend/scripts/backup-database.sh
@@ -381,6 +406,7 @@ echo "✅ Backup completed: backup_$DATE.sql.gz"
 #### **C. Migration Files yang Perlu Dijalankan**
 
 **Urutan Eksekusi:**
+
 1. Run Sequelize sync untuk create tables
 2. Run migration: `add_payment_expiry_fields.sql`
 3. Run migration: `remove_service_fee_column.sql`
@@ -393,6 +419,7 @@ echo "✅ Backup completed: backup_$DATE.sql.gz"
 #### **A. Directory Structure**
 
 **Pastikan directory ada dan permissions benar:**
+
 ```bash
 backend/
 └── public/
@@ -402,6 +429,7 @@ backend/
 ```
 
 **Setup Permissions (di VPS):**
+
 ```bash
 # Set ownership ke user yang run Node.js
 sudo chown -R www-data:www-data /var/www/baletani/backend/public/uploads
@@ -415,44 +443,46 @@ sudo chmod -R 755 /var/www/baletani/backend/public/uploads
 **Jika traffic tinggi, pertimbangkan:**
 
 1. **AWS S3 / DigitalOcean Spaces**
+
    - Upload langsung ke cloud storage
    - Serve via CDN
    - Backup otomatis
 
 2. **Implementation:**
+
    ```javascript
    // File: backend/src/utils/s3Upload.js (BUAT BARU)
-   const AWS = require('aws-sdk');
-   const multer = require('multer');
-   const multerS3 = require('multer-s3');
+   const AWS = require("aws-sdk");
+   const multer = require("multer");
+   const multerS3 = require("multer-s3");
 
    const s3 = new AWS.S3({
      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-     region: process.env.AWS_REGION
+     region: process.env.AWS_REGION,
    });
 
    const upload = multer({
      storage: multerS3({
        s3: s3,
-       bucket: 'baletani-products',
-       acl: 'public-read',
+       bucket: "baletani-products",
+       acl: "public-read",
        metadata: (req, file, cb) => {
-         cb(null, {fieldName: file.fieldname});
+         cb(null, { fieldName: file.fieldname });
        },
        key: (req, file, cb) => {
          const uniqueName = `${Date.now()}-${file.originalname}`;
          cb(null, `products/${uniqueName}`);
-       }
+       },
      }),
      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
      fileFilter: (req, file, cb) => {
-       if (file.mimetype.startsWith('image/')) {
+       if (file.mimetype.startsWith("image/")) {
          cb(null, true);
        } else {
-         cb(new Error('Only images allowed'));
+         cb(new Error("Only images allowed"));
        }
-     }
+     },
    });
 
    module.exports = upload;
@@ -465,51 +495,53 @@ sudo chmod -R 755 /var/www/baletani/backend/public/uploads
 #### **A. Build Configuration**
 
 **File: `frontend/vite.config.js`** - UPDATE
+
 ```javascript
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  
+
   // Build optimizations
   build: {
-    outDir: 'dist',
+    outDir: "dist",
     sourcemap: false, // Disable untuk production
-    minify: 'terser',
+    minify: "terser",
     terserOptions: {
       compress: {
         drop_console: true, // Remove console.log
-        drop_debugger: true
-      }
+        drop_debugger: true,
+      },
     },
     rollupOptions: {
       output: {
         manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['framer-motion', 'lucide-react', 'react-hot-toast'],
-        }
-      }
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "ui-vendor": ["framer-motion", "lucide-react", "react-hot-toast"],
+        },
+      },
     },
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 1000,
   },
 
   // Server configuration untuk development
   server: {
     port: 5173,
     proxy: {
-      '/api': {
-        target: process.env.VITE_API_BASE_URL || 'http://localhost:5000',
+      "/api": {
+        target: process.env.VITE_API_BASE_URL || "http://localhost:5000",
         changeOrigin: true,
-      }
-    }
-  }
-})
+      },
+    },
+  },
+});
 ```
 
 #### **B. Build Commands**
 
 **Update `frontend/package.json`:**
+
 ```json
 {
   "scripts": {
@@ -526,23 +558,25 @@ export default defineConfig({
 #### **C. Performance Optimization**
 
 **File: `frontend/src/main.jsx`** - ADD
+
 ```jsx
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './styles/globals.css'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import "./styles/globals.css";
 
 // Lazy load components untuk code splitting
 // const AdminRoutes = React.lazy(() => import('./pages/admin/...'))
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-)
+  </React.StrictMode>
+);
 ```
 
 **Add Image Optimization:**
+
 ```javascript
 // File: frontend/src/utils/imageUtils.js (UPDATE jika belum ada)
 export const optimizeImage = (url, width = 400) => {
@@ -552,8 +586,8 @@ export const optimizeImage = (url, width = 400) => {
 
 export const lazyLoadConfig = {
   root: null,
-  rootMargin: '50px',
-  threshold: 0.01
+  rootMargin: "50px",
+  threshold: 0.01,
 };
 ```
 
@@ -564,6 +598,7 @@ export const lazyLoadConfig = {
 #### **A. Model Artifacts**
 
 **Pastikan model sudah trained dan file artifacts ada:**
+
 ```
 ml-recommendation-service/
 └── models_artifacts/
@@ -577,6 +612,7 @@ ml-recommendation-service/
 **⚠️ CRITICAL: Jangan commit model files ke Git!**
 
 **File: `.gitignore`** - Verify
+
 ```gitignore
 # ML Models (large files)
 models_artifacts/*.h5
@@ -585,6 +621,7 @@ models_artifacts/*.pkl
 ```
 
 **Cara Deploy Model:**
+
 1. Upload manual via SCP/SFTP ke server
 2. Atau gunakan Git LFS untuk large files
 3. Atau download dari cloud storage saat deployment
@@ -592,6 +629,7 @@ models_artifacts/*.pkl
 #### **B. Production Configuration**
 
 **File: `ml-recommendation-service/config/settings.py`** - UPDATE
+
 ```python
 from pydantic_settings import BaseSettings
 from typing import Optional
@@ -602,34 +640,34 @@ class Settings(BaseSettings):
     app_name: str = "BaleTani ML Recommendation API"
     app_version: str = "1.0.0"
     debug: bool = False  # MUST be False in production
-    
+
     # API Configuration
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     workers: int = 2  # CPU cores - 1
-    
+
     # Database
     db_host: str = "localhost"
     db_port: int = 3306
     db_name: str = "baletani_production"
     db_user: str = "baletani_user"
     db_password: str = ""
-    
+
     # Model Paths
     model_dir: str = "models_artifacts"
-    
+
     # CORS
     allowed_origins: list = [
         "https://baletani.com",
         "https://admin.baletani.com",
         "https://api.baletani.com"
     ]
-    
+
     # Cache (Optional - untuk Redis)
     redis_host: Optional[str] = None
     redis_port: int = 6379
     redis_ttl: int = 3600  # 1 hour
-    
+
     class Config:
         env_file = ".env"
         case_sensitive = False
@@ -640,6 +678,7 @@ settings = Settings()
 #### **C. System Dependencies**
 
 **File: `ml-recommendation-service/requirements-production.txt`** (BUAT BARU)
+
 ```txt
 # Production dependencies (tanpa dev tools)
 fastapi==0.108.0
@@ -688,7 +727,7 @@ server {
     listen 80;
     listen [::]:80;
     server_name baletani.com www.baletani.com api.baletani.com admin.baletani.com;
-    
+
     return 301 https://$server_name$request_uri;
 }
 
@@ -699,41 +738,41 @@ server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
     server_name baletani.com www.baletani.com;
-    
+
     # SSL Configuration (Let's Encrypt)
     ssl_certificate /etc/letsencrypt/live/baletani.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/baletani.com/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;
-    
+
     # Root directory untuk frontend build
     root /var/www/baletani/frontend/dist;
     index index.html;
-    
+
     # Gzip Compression
     gzip on;
     gzip_vary on;
     gzip_min_length 1024;
     gzip_types text/plain text/css text/xml text/javascript application/javascript application/json;
-    
+
     # Security Headers
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-    
+
     # SPA Routing - semua request ke index.html
     location / {
         try_files $uri $uri/ /index.html;
     }
-    
+
     # Static assets caching
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
-    
+
     # Access & Error Logs
     access_log /var/log/nginx/baletani-customer-access.log;
     error_log /var/log/nginx/baletani-customer-error.log;
@@ -746,23 +785,23 @@ server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
     server_name admin.baletani.com;
-    
+
     ssl_certificate /etc/letsencrypt/live/baletani.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/baletani.com/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
-    
+
     root /var/www/baletani/frontend/dist;
     index index.html;
-    
+
     location / {
         try_files $uri $uri/ /index.html;
     }
-    
+
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
-    
+
     access_log /var/log/nginx/baletani-admin-access.log;
     error_log /var/log/nginx/baletani-admin-error.log;
 }
@@ -774,14 +813,14 @@ server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
     server_name api.baletani.com;
-    
+
     ssl_certificate /etc/letsencrypt/live/baletani.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/baletani.com/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
-    
+
     # Client body size untuk file uploads
     client_max_body_size 10M;
-    
+
     # Proxy ke Node.js Backend
     location / {
         proxy_pass http://localhost:5000;
@@ -793,20 +832,20 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
-        
+
         # Timeouts
         proxy_connect_timeout 60s;
         proxy_send_timeout 60s;
         proxy_read_timeout 60s;
     }
-    
+
     # Serve uploaded files directly
     location /uploads/ {
         alias /var/www/baletani/backend/public/uploads/;
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
-    
+
     access_log /var/log/nginx/baletani-api-access.log;
     error_log /var/log/nginx/baletani-api-error.log;
 }
@@ -820,15 +859,15 @@ server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
     server_name ml.baletani.com;
-    
+
     ssl_certificate /etc/letsencrypt/live/baletani.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/baletani.com/privkey.pem;
-    
+
     # Restrict access - hanya dari backend server
     allow 127.0.0.1;
     allow YOUR_BACKEND_SERVER_IP;
     deny all;
-    
+
     location / {
         proxy_pass http://localhost:8000;
         proxy_http_version 1.1;
@@ -836,19 +875,20 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        
+
         # Timeouts untuk ML inference
         proxy_connect_timeout 120s;
         proxy_send_timeout 120s;
         proxy_read_timeout 120s;
     }
-    
+
     access_log /var/log/nginx/baletani-ml-access.log;
     error_log /var/log/nginx/baletani-ml-error.log;
 }
 ```
 
 #### **Enable Site & Reload Nginx:**
+
 ```bash
 # Create symlink
 sudo ln -s /etc/nginx/sites-available/baletani /etc/nginx/sites-enabled/
@@ -886,6 +926,7 @@ sudo certbot renew --dry-run
 ### **8️⃣ PROCESS MANAGER - PM2**
 
 #### **A. Install PM2 Globally:**
+
 ```bash
 npm install -g pm2
 ```
@@ -893,6 +934,7 @@ npm install -g pm2
 #### **B. PM2 Configuration**
 
 **File: `ecosystem.config.js`** (BUAT DI ROOT PROJECT)
+
 ```javascript
 module.exports = {
   apps: [
@@ -900,58 +942,59 @@ module.exports = {
     // BACKEND API
     // ========================================
     {
-      name: 'baletani-backend',
-      cwd: './backend',
-      script: 'src/server.js',
+      name: "baletani-backend",
+      cwd: "./backend",
+      script: "src/server.js",
       instances: 2, // Atau 'max' untuk semua CPU cores
-      exec_mode: 'cluster',
+      exec_mode: "cluster",
       env_production: {
-        NODE_ENV: 'production',
-        PORT: 5000
+        NODE_ENV: "production",
+        PORT: 5000,
       },
-      error_file: './logs/backend-error.log',
-      out_file: './logs/backend-out.log',
-      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      error_file: "./logs/backend-error.log",
+      out_file: "./logs/backend-out.log",
+      log_date_format: "YYYY-MM-DD HH:mm:ss Z",
       merge_logs: true,
-      max_memory_restart: '1G',
+      max_memory_restart: "1G",
       // Auto restart jika crash
       autorestart: true,
       max_restarts: 10,
-      min_uptime: '10s',
+      min_uptime: "10s",
       // Cron restart setiap hari jam 3 pagi (optional)
-      cron_restart: '0 3 * * *',
+      cron_restart: "0 3 * * *",
       // Watch files (disable di production)
       watch: false,
-      ignore_watch: ['node_modules', 'logs', 'public/uploads']
+      ignore_watch: ["node_modules", "logs", "public/uploads"],
     },
 
     // ========================================
     // ML RECOMMENDATION SERVICE
     // ========================================
     {
-      name: 'baletani-ml-service',
-      cwd: './ml-recommendation-service',
-      script: 'python3',
-      args: '-m uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 2',
-      interpreter: 'none', // Karena pakai python command
+      name: "baletani-ml-service",
+      cwd: "./ml-recommendation-service",
+      script: "python3",
+      args: "-m uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 2",
+      interpreter: "none", // Karena pakai python command
       env_production: {
-        APP_ENV: 'production',
-        DEBUG: 'False'
+        APP_ENV: "production",
+        DEBUG: "False",
       },
-      error_file: './logs/ml-error.log',
-      out_file: './logs/ml-out.log',
-      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      error_file: "./logs/ml-error.log",
+      out_file: "./logs/ml-out.log",
+      log_date_format: "YYYY-MM-DD HH:mm:ss Z",
       merge_logs: true,
-      max_memory_restart: '2G',
+      max_memory_restart: "2G",
       autorestart: true,
       max_restarts: 5,
-      min_uptime: '30s'
-    }
-  ]
+      min_uptime: "30s",
+    },
+  ],
 };
 ```
 
 #### **C. PM2 Commands:**
+
 ```bash
 # Start all services
 pm2 start ecosystem.config.js --env production
@@ -988,6 +1031,7 @@ pm2 startup systemd
 ### **9️⃣ MONITORING & LOGGING**
 
 #### **A. PM2 Plus (Optional - Paid)**
+
 - Real-time monitoring
 - Error tracking
 - Performance metrics
@@ -996,6 +1040,7 @@ pm2 startup systemd
 #### **B. Setup Log Rotation**
 
 **File: `/etc/logrotate.d/baletani`** (BUAT DI VPS)
+
 ```bash
 /var/www/baletani/backend/logs/*.log
 /var/www/baletani/ml-recommendation-service/logs/*.log {
@@ -1015,6 +1060,7 @@ pm2 startup systemd
 #### **C. Health Check Endpoints**
 
 **Backend sudah punya:**
+
 ```javascript
 // File: backend/src/routes/health.js
 // GET /api/health
@@ -1022,7 +1068,9 @@ pm2 startup systemd
 ```
 
 **Setup Monitoring:**
+
 1. **UptimeRobot** (Free) - https://uptimerobot.com
+
    - Monitor: https://api.baletani.com/api/health
    - Check interval: 5 minutes
    - Alert via email/SMS jika down
@@ -1148,11 +1196,13 @@ echo "📊 Monitor with: pm2 monit"
 ```
 
 **Make executable:**
+
 ```bash
 chmod +x deploy.sh
 ```
 
 **Usage:**
+
 ```bash
 ./deploy.sh
 ```
@@ -1172,38 +1222,39 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch: # Manual trigger
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 🔄 Checkout code
         uses: actions/checkout@v3
-      
+
       - name: 🔐 Setup SSH
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      
+
       - name: 📂 Add server to known hosts
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
-      
+
       - name: 🚀 Deploy to Server
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
             cd /var/www/baletani
             ./deploy.sh
           EOF
-      
+
       - name: ✅ Deployment Complete
         run: echo "Deployment completed successfully!"
 ```
 
 **Setup GitHub Secrets:**
+
 - `SSH_PRIVATE_KEY`: Private key untuk SSH ke server
 - `SERVER_HOST`: IP atau domain server
 - `SERVER_USER`: Username SSH
@@ -1232,6 +1283,7 @@ APP_ENV=production python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8000
 ### **2. Load Testing**
 
 **Sudah ada K6 setup:**
+
 ```bash
 cd k6-load-testing
 k6 run smoke-test.js
@@ -1240,6 +1292,7 @@ k6 run smoke-test.js
 ### **3. E2E Testing**
 
 **Sudah ada Cypress:**
+
 ```bash
 cd e2e-tests
 npm test
@@ -1268,6 +1321,7 @@ npm test
 ## 🆘 TROUBLESHOOTING
 
 ### **Backend tidak start:**
+
 ```bash
 # Check logs
 pm2 logs baletani-backend
@@ -1280,6 +1334,7 @@ pm2 env 0
 ```
 
 ### **Frontend tidak load:**
+
 ```bash
 # Check Nginx logs
 sudo tail -f /var/log/nginx/baletani-customer-error.log
@@ -1292,6 +1347,7 @@ sudo nginx -t
 ```
 
 ### **ML Service error:**
+
 ```bash
 # Check logs
 pm2 logs baletani-ml-service
@@ -1308,6 +1364,7 @@ python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8000
 ```
 
 ### **Database connection error:**
+
 ```bash
 # Check MySQL service
 sudo systemctl status mysql
@@ -1324,25 +1381,25 @@ SHOW GRANTS FOR 'baletani_user'@'localhost';
 
 ### **Opsi VPS (Recommended):**
 
-| Item | Provider | Spesifikasi | Biaya/Bulan |
-|------|----------|-------------|-------------|
-| **VPS** | Hetzner | 4GB RAM, 2 vCPU, 80GB SSD | $9 USD |
-| **Domain** | Namecheap | .com | $1 USD |
-| **SSL** | Let's Encrypt | Free | $0 |
-| **Backup Storage** | DigitalOcean Spaces | 250GB | $5 USD |
-| **Monitoring** | UptimeRobot | Free plan | $0 |
-| **Total** | | | **~$15 USD/bulan** |
+| Item               | Provider            | Spesifikasi               | Biaya/Bulan        |
+| ------------------ | ------------------- | ------------------------- | ------------------ |
+| **VPS**            | Hetzner             | 4GB RAM, 2 vCPU, 80GB SSD | $9 USD             |
+| **Domain**         | Namecheap           | .com                      | $1 USD             |
+| **SSL**            | Let's Encrypt       | Free                      | $0                 |
+| **Backup Storage** | DigitalOcean Spaces | 250GB                     | $5 USD             |
+| **Monitoring**     | UptimeRobot         | Free plan                 | $0                 |
+| **Total**          |                     |                           | **~$15 USD/bulan** |
 
 ### **Opsi PaaS (Alternative):**
 
-| Item | Provider | Biaya/Bulan |
-|------|----------|-------------|
-| Frontend | Vercel | $0 (Free) |
-| Backend API | Railway | $10-15 |
-| MySQL DB | PlanetScale | $0 (Free tier) |
-| ML Service | Railway | $10 |
-| Domain + SSL | Included | $1 |
-| **Total** | | **~$21-26 USD/bulan** |
+| Item         | Provider    | Biaya/Bulan           |
+| ------------ | ----------- | --------------------- |
+| Frontend     | Vercel      | $0 (Free)             |
+| Backend API  | Railway     | $10-15                |
+| MySQL DB     | PlanetScale | $0 (Free tier)        |
+| ML Service   | Railway     | $10                   |
+| Domain + SSL | Included    | $1                    |
+| **Total**    |             | **~$21-26 USD/bulan** |
 
 ---
 
@@ -1353,6 +1410,7 @@ SHOW GRANTS FOR 'baletani_user'@'localhost';
 **🏆 VPS (Hetzner Cloud) - €8.19/bulan (~$9)**
 
 **Alasan:**
+
 1. ✅ **Paling cost-effective** untuk jangka panjang
 2. ✅ **Full control** untuk optimasi
 3. ✅ **Cocok untuk ML service** yang butuh resource stabil
@@ -1364,6 +1422,7 @@ SHOW GRANTS FOR 'baletani_user'@'localhost';
 ### **📝 Urutan Prioritas Persiapan:**
 
 1. **High Priority (HARUS):**
+
    - ✅ Ganti JWT_SECRET di production
    - ✅ Setup database user dengan limited privileges
    - ✅ Configure .env.production untuk semua services
@@ -1373,6 +1432,7 @@ SHOW GRANTS FOR 'baletani_user'@'localhost';
    - ✅ Setup PM2 untuk process management
 
 2. **Medium Priority (SANGAT DISARANKAN):**
+
    - ✅ Setup automated backups
    - ✅ Configure log rotation
    - ✅ Setup monitoring (UptimeRobot)
@@ -1390,16 +1450,19 @@ SHOW GRANTS FOR 'baletani_user'@'localhost';
 ## 📚 RESOURCES & DOKUMENTASI
 
 ### **VPS Setup Guides:**
+
 - [DigitalOcean Initial Server Setup](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-22-04)
 - [How to Install Node.js on Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-22-04)
 - [How to Install Nginx on Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04)
 
 ### **Deployment Tools:**
+
 - [PM2 Documentation](https://pm2.keymetrics.io/docs/usage/quick-start/)
 - [Nginx Configuration Guide](https://nginx.org/en/docs/)
 - [Let's Encrypt Certbot](https://certbot.eff.org/)
 
 ### **Monitoring:**
+
 - [UptimeRobot](https://uptimerobot.com/)
 - [PM2 Plus](https://pm2.io/)
 
@@ -1408,6 +1471,7 @@ SHOW GRANTS FOR 'baletani_user'@'localhost';
 ## 📞 SUPPORT
 
 Jika ada pertanyaan atau butuh bantuan setup, silakan:
+
 1. Check troubleshooting section di atas
 2. Review logs dengan `pm2 logs`
 3. Check Nginx logs di `/var/log/nginx/`
@@ -1416,5 +1480,4 @@ Jika ada pertanyaan atau butuh bantuan setup, silakan:
 
 **🎉 Good luck dengan deployment BaleTani!**
 
-*Dokumen ini dibuat berdasarkan analisis lengkap codebase project BaleTani Fresh Market.*
-
+_Dokumen ini dibuat berdasarkan analisis lengkap codebase project BaleTani Fresh Market._

@@ -571,8 +571,8 @@ const deleteProduct = async (req, res) => {
     const { id } = req.params;
 
     // Import path dan fs untuk file cleanup
-    const path = require('path');
-    const fs = require('fs');
+    const path = require("path");
+    const fs = require("fs");
 
     // Find product dengan images
     const product = await Product.findOne({
@@ -580,11 +580,11 @@ const deleteProduct = async (req, res) => {
       include: [
         {
           model: ProductImage,
-          as: 'images',
+          as: "images",
           required: false,
-          attributes: ['id', 'image_url']
-        }
-      ]
+          attributes: ["id", "image_url"],
+        },
+      ],
     });
 
     if (!product) {
@@ -600,11 +600,13 @@ const deleteProduct = async (req, res) => {
     // CLEANUP: Delete image files dari disk
     // ========================================
     if (product.images && product.images.length > 0) {
-      console.log(`🗑️ Deleting ${product.images.length} image files for product ${id}`);
-      
+      console.log(
+        `🗑️ Deleting ${product.images.length} image files for product ${id}`
+      );
+
       product.images.forEach((img) => {
-        const filePath = path.join(__dirname, '../../public', img.image_url);
-        
+        const filePath = path.join(__dirname, "../../public", img.image_url);
+
         if (fs.existsSync(filePath)) {
           try {
             fs.unlinkSync(filePath);
