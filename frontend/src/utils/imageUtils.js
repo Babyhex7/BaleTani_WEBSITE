@@ -41,10 +41,18 @@ export const getImageUrl = (imagePath, size = "product") => {
   }
 
   // Construct full URL for uploads
-  const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  // Use VITE_API_BASE_URL (production-ready) or fallback to VITE_API_URL
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 
+                  import.meta.env.VITE_API_URL || 
+                  "http://localhost:5000";
+  
+  // Clean trailing slash from base URL
+  const cleanBase = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
+  
+  // Ensure path starts with /
   const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
 
-  return `${baseURL}${cleanPath}`;
+  return `${cleanBase}${cleanPath}`;
 };
 
 /**
