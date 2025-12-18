@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { getBundleRecommendations } from "../../services/services_customer/recommendationService";
 import ProductCard from "../ui/ProductCard";
 import ProductCardSkeleton from "../ui/ProductCardSkeleton";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 const BundleRecommendations = ({ cartProducts }) => {
   const [recommendations, setRecommendations] = useState([]);
@@ -27,14 +28,13 @@ const BundleRecommendations = ({ cartProducts }) => {
         // Extract product IDs from cart
         const productIds = cartProducts.map((item) => item.id || item.product_id);
 
-        console.log('🛒 Cart items:', cartProducts);
-        console.log('🛒 Fetching bundle recommendations for cart:', productIds);
         const response = await getBundleRecommendations(productIds, 5);
 
-        console.log('📦 Bundle Response:', response);
-
         if (response.success && response.data) {
-          setRecommendations(response.data.recommendations || []);
+          // Backend might return either 'recommendations' or 'bundle_recommendations'
+          const recs = response.data.recommendations || response.data.bundle_recommendations || [];
+          console.log(`✅ Bundle recommendations loaded: ${recs.length} items for ${productIds.length} cart products`);
+          setRecommendations(recs);
         } else if (response.status === 503) {
           // ML service down - hide section silently
           console.warn('⚠️ ML Service unavailable');
@@ -92,30 +92,30 @@ const BundleRecommendations = ({ cartProducts }) => {
           ) : (
             // Actual recommendations
             recommendations.map((rec) => {
-              console.log('🎁 Bundle recommendation item:', rec);
+              // Get primary image or first image or use placeholder
+              const primaryImage = rec.images?.find(img => img.is_primary)?.image_url || 
+                                   rec.images?.[0]?.image_url || 
+                                   'https://via.placeholder.com/400x400/f0f0f0/999999?text=No+Image';
+              
               return (
                 <ProductCard
                   key={rec.product_id}
                   product={{
                     id: rec.product_id,
-                    product_name: rec.product_name,
-                    category_name: rec.category_name,
-                    // Map sesuai response dari ML service yang di-enrich backend
-                    price: rec.price || rec.selling_price || 0,
-                    selling_price: rec.price || rec.selling_price || 0,
-                    finalPrice: rec.final_price || rec.price || rec.selling_price || 0,
-                    quantity_info: rec.quantity_info || "1 unit",
-                    stock: rec.stock || rec.total_stock || 0,
-                    total_stock: rec.stock || rec.total_stock || 0,
-                    // Images handling
-                    images: rec.images || (rec.ProductImages ? rec.ProductImages.map((img) => ({
-                      image_url: img.image_url,
-                      is_primary: img.is_primary,
-                    })) : []),
-                    // Pass through other fields
-                    discount: rec.discount,
-                    is_active: rec.is_active !== false,
+                    name: rec.product_name,  // ProductCard expects 'name'
+                    category: rec.category_name,  // ProductCard expects 'category'
+                    image: primaryImage,  // ProductCard expects single 'image' string
+                    // Pricing
+                    price: rec.selling_price || rec.price || 0,
+                    finalPrice: rec.final_price || rec.selling_price || rec.price || 0,
+                    // Stock
+                    stock: rec.total_stock || rec.stock || 0,
+                    // Other
+                    discount: rec.discount ? {
+                      finalPrice: rec.final_price || rec.selling_price
+                    } : null,
                   }}
+                  formatPrice={formatCurrency}
                   showBadge={true}
                   badgeText="Recommended"
                   badgeColor="bg-gradient-to-r from-green-500 to-blue-500"

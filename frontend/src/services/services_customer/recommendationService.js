@@ -54,21 +54,22 @@ export const getBundleRecommendations = async (productIds, topK = 5) => {
 
 /**
  * Get trending products (popular items)
- * @param {string} category - Optional category filter
  * @param {number} topK - Jumlah products (default: 10)
+ * @param {string} categoryId - Optional category UUID filter
  * @returns {Promise<Object>} Trending products
  */
-export const getTrendingProducts = async (category = null, topK = 10) => {
+export const getTrendingProducts = async (topK = 10, categoryId = null) => {
   try {
     const params = { top_k: topK };
-    if (category) {
-      params.category = category;
+    if (categoryId) {
+      params.category_id = categoryId;
     }
 
     const response = await apiClient.get(`/recommendations/trending`, {
       params,
     });
 
+    console.log("📊 Trending API Response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error getting trending products:", error);

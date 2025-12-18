@@ -19,10 +19,17 @@ const TrendingProducts = ({ limit = 10 }) => {
         setLoading(true);
         setError(null);
 
+        console.log('🔥 Fetching trending products with limit:', limit);
         const response = await getTrendingProducts(limit);
 
+        console.log('🔥 Trending API Response (full):', response);
+        console.log('🔥 Trending Response.data:', response.data);
+        console.log('🔥 Trending products array:', response.data?.trending_products);
+
         if (response.success && response.data) {
-          setTrendingProducts(response.data.trending_products || []);
+          const trending = response.data.trending_products || [];
+          console.log('🔥 Final trending products to display:', trending);
+          setTrendingProducts(trending);
         }
       } catch (err) {
         console.error("Error fetching trending products:", err);

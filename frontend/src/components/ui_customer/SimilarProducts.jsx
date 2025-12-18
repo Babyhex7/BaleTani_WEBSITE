@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { getSimilarProducts } from "../../services/services_customer/recommendationService";
 import ProductCard from "../ui/ProductCard";
 import ProductCardSkeleton from "../ui/ProductCardSkeleton";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 const SimilarProducts = ({ productId, category }) => {
   const [recommendations, setRecommendations] = useState([]);
@@ -21,15 +22,12 @@ const SimilarProducts = ({ productId, category }) => {
         setLoading(true);
         setError(null);
 
-        console.log(`🔍 Fetching similar products for: ${productId}`);
         const response = await getSimilarProducts(productId, 5);
-
-        console.log('📦 Similar Products Response:', response);
 
         if (response.success && response.data) {
           // ML service response structure: { product_id, product_name, recommendations: [...] }
           const recs = response.data.recommendations || [];
-          console.log('📦 Parsed recommendations:', recs);
+          console.log(`✅ Similar products loaded: ${recs.length} items for product ${productId}`);
           setRecommendations(recs);
         } else if (response.status === 404 || response.status === 503) {
           // ML service down or product not found - hide section silently
@@ -87,30 +85,30 @@ const SimilarProducts = ({ productId, category }) => {
           ) : (
             // Actual recommendations
             recommendations.map((rec) => {
-              console.log('🔍 Recommendation item:', rec);
+              // Get primary image or first image or use placeholder
+              const primaryImage = rec.images?.find(img => img.is_primary)?.image_url || 
+                                   rec.images?.[0]?.image_url || 
+                                   'https://via.placeholder.com/400x400/f0f0f0/999999?text=No+Image';
+              
               return (
                 <ProductCard
                   key={rec.product_id}
                   product={{
                     id: rec.product_id,
-                    product_name: rec.product_name,
-                    category_name: rec.category_name,
-                    // Map sesuai response dari ML service yang di-enrich backend
-                    price: rec.price || rec.selling_price || 0,
-                    selling_price: rec.price || rec.selling_price || 0,
-                    finalPrice: rec.final_price || rec.price || rec.selling_price || 0,
-                    quantity_info: rec.quantity_info || "1 unit",
-                    stock: rec.stock || rec.total_stock || 0,
-                    total_stock: rec.stock || rec.total_stock || 0,
-                    // Images handling
-                    images: rec.images || (rec.ProductImages ? rec.ProductImages.map((img) => ({
-                      image_url: img.image_url,
-                      is_primary: img.is_primary,
-                    })) : []),
-                    // Pass through other fields
-                    discount: rec.discount,
-                    is_active: rec.is_active !== false,
+                    name: rec.product_name,  // ProductCard expects 'name'
+                    category: rec.category_name,  // ProductCard expects 'category'
+                    image: primaryImage,  // ProductCard expects single 'image' string
+                    // Pricing
+                    price: rec.selling_price || rec.price || 0,
+                    finalPrice: rec.final_price || rec.selling_price || rec.price || 0,
+                    // Stock
+                    stock: rec.total_stock || rec.stock || 0,
+                    // Other
+                    discount: rec.discount ? {
+                      finalPrice: rec.final_price || rec.selling_price
+                    } : null,
                   }}
+                  formatPrice={formatCurrency}
                   showBadge={true}
                   badgeText={`${Math.round((rec.similarity_score || 0) * 100)}% Match`}
                   badgeColor="bg-purple-500"

@@ -78,8 +78,12 @@ const getSimilarProducts = async (productId, topK = 10) => {
       }
     );
 
+    console.log('📥 [SIMILAR] ML Service response:', JSON.stringify(response.data, null, 2));
+
     // Enrich recommendations dengan data lengkap dari database
     const enrichedData = await enrichRecommendations(response.data);
+
+    console.log('📤 [SIMILAR] Enriched data:', JSON.stringify(enrichedData, null, 2));
 
     setCache(cacheKey, enrichedData, CACHE_TTL);
 
@@ -95,17 +99,22 @@ const getSimilarProducts = async (productId, topK = 10) => {
  */
 const enrichRecommendations = async (mlResponse) => {
   try {
-    const Product = require("../models/Product");
+    const { Product } = require("../models");
     const { Op } = require("sequelize");
 
     const recommendations =
       mlResponse.recommendations || mlResponse.bundle_recommendations || [];
+    
+    console.log('🔍 [ENRICH] Starting enrichment for', recommendations.length, 'recommendations');
+    
     if (recommendations.length === 0) {
+      console.log('⚠️ [ENRICH] No recommendations to enrich');
       return mlResponse;
     }
 
     // Extract product IDs
     const productIds = recommendations.map((rec) => rec.product_id);
+    console.log('🔍 [ENRICH] Product IDs to fetch:', productIds);
 
     // Fetch full product data dari database
     const products = await Product.findAll({
@@ -113,67 +122,121 @@ const enrichRecommendations = async (mlResponse) => {
         id: { [Op.in]: productIds },
         is_active: true,
       },
+      attributes: [
+        'id', 
+        'name', 
+        'description', 
+        'selling_price', 
+        'quantity_info', 
+        'total_stock', 
+        'is_active',
+        'category_id'
+      ],
       include: [
-        { association: "Category", attributes: ["id", "category_name"] },
-        {
-          association: "ProductImages",
-          attributes: ["id", "image_url", "is_primary"],
+        { 
+          association: "category",  // Lowercase sesuai definition di models/index.js
+          attributes: ["id", "category_name"],
+          required: false
         },
         {
-          association: "ProductDiscount",
+          association: "images",  // Lowercase sesuai definition di models/index.js
+          attributes: ["id", "image_url", "is_primary"],
+          required: false
+        },
+        {
+          association: "productDiscounts",  // Plural sesuai definition
           attributes: ["id", "discount_id", "discounted_price"],
+          required: false,
+          include: [{
+            association: "discount",
+            attributes: ["id", "discount_name", "is_active", "start_date", "end_date"],
+            required: false
+          }]
         },
       ],
     });
+
+    console.log('✅ [ENRICH] Found', products.length, 'products from database');
+    if (products.length > 0) {
+      const sampleProduct = products[0].toJSON();
+      console.log('📦 [ENRICH] Sample raw product from DB:');
+      console.log('  - name:', sampleProduct.name);
+      console.log('  - selling_price:', sampleProduct.selling_price);
+      console.log('  - total_stock:', sampleProduct.total_stock);
+      console.log('  - category:', sampleProduct.category?.category_name);
+      console.log('  - images count:', sampleProduct.images?.length || 0);
+      console.log('  - discounts count:', sampleProduct.productDiscounts?.length || 0);
+    }
 
     // Create map untuk quick lookup
     const productMap = new Map(products.map((p) => [p.id, p]));
 
     // Enrich recommendations dengan data dari database
-    const enriched = recommendations.map((rec) => {
+    const enriched = recommendations.map((rec, index) => {
       const product = productMap.get(rec.product_id);
       if (!product) {
+        console.warn(`⚠️ [ENRICH] Product not found in DB: ${rec.product_id}`);
         return rec; // Product not found, return original
       }
 
-      return {
+      // Get active discount if exists
+      const activeDiscount = product.productDiscounts?.find(pd => {
+        const discount = pd.discount;
+        if (!discount) return false;
+        const now = new Date();
+        return discount.is_active && 
+               new Date(discount.start_date) <= now && 
+               new Date(discount.end_date) >= now;
+      });
+
+      const enrichedProduct = {
         ...rec,
-        // Product info
-        product_name: product.product_name,
+        // Product info (field name di DB adalah 'name', bukan 'product_name')
+        product_name: product.name || product.product_name,
         description: product.description,
-        category_name: product.Category?.category_name || rec.category_name,
-        // Pricing
-        price: parseFloat(product.price) || 0,
-        selling_price: parseFloat(product.price) || 0,
-        final_price: product.ProductDiscount?.discounted_price || product.price,
-        // Stock & quantity
-        stock: product.stock || 0,
-        total_stock: product.stock || 0,
+        category_name: product.category?.category_name || rec.category_name,
+        // Pricing (field di DB adalah 'selling_price', bukan 'price')
+        price: parseFloat(product.selling_price) || 0,
+        selling_price: parseFloat(product.selling_price) || 0,
+        final_price: activeDiscount?.discounted_price || product.selling_price,
+        // Stock & quantity (field di DB adalah 'total_stock', bukan 'stock')
+        stock: product.total_stock || 0,
+        total_stock: product.total_stock || 0,
         quantity_info: product.quantity_info || "1 unit",
         // Images
         images:
-          product.ProductImages?.map((img) => ({
+          product.images?.map((img) => ({
             id: img.id,
             image_url: img.image_url,
             is_primary: img.is_primary,
           })) || [],
         // Other fields
         is_active: product.is_active,
-        discount: product.ProductDiscount
+        discount: activeDiscount
           ? {
-              discounted_price: product.ProductDiscount.discounted_price,
+              discounted_price: activeDiscount.discounted_price,
             }
           : null,
       };
+
+      if (index === 0) {
+        console.log('📦 [ENRICH] Sample enriched product:', JSON.stringify(enrichedProduct, null, 2));
+      }
+
+      return enrichedProduct;
     });
 
+    console.log('✅ [ENRICH] Successfully enriched', enriched.length, 'products');
+
+    // Return consistent structure - always use 'recommendations' as the main field
     return {
       ...mlResponse,
       recommendations: enriched,
-      bundle_recommendations: enriched,
     };
   } catch (error) {
     logger.error(`Error enriching recommendations: ${error.message}`);
+    console.error('❌ [ENRICH] Error details:', error);
+    console.error('❌ [ENRICH] Stack:', error.stack);
     // Return original data jika enrichment gagal
     return mlResponse;
   }

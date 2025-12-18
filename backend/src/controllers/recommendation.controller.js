@@ -40,6 +40,15 @@ const getSimilarProducts = async (req, res) => {
       topK
     );
 
+    console.log(
+      "🔍 [SIMILAR API] Result from service:",
+      JSON.stringify(result, null, 2)
+    );
+    console.log(
+      "🔍 [SIMILAR API] Recommendations count:",
+      result.recommendations?.length || 0
+    );
+
     return res.status(200).json({
       success: true,
       data: result,
@@ -110,6 +119,15 @@ const getBundleRecommendations = async (req, res) => {
       topK
     );
 
+    console.log(
+      "📦 [BUNDLE API] Result from service:",
+      JSON.stringify(result, null, 2)
+    );
+    console.log(
+      "📦 [BUNDLE API] Recommendations count:",
+      result.recommendations?.length || 0
+    );
+
     return res.status(200).json({
       success: true,
       data: result,
@@ -134,6 +152,8 @@ const getBundleRecommendations = async (req, res) => {
  */
 const getTrendingProducts = async (req, res) => {
   try {
+    console.log("🔥 [TRENDING API] Request received");
+    console.log("🔥 [TRENDING API] Query params:", req.query);
     const { category_id } = req.query;
     const topK = parseInt(req.query.top_k) || 12;
 
@@ -162,6 +182,15 @@ const getTrendingProducts = async (req, res) => {
     const result = await recommendationService.getTrendingProducts(
       category_id,
       topK
+    );
+
+    console.log(
+      "🔥 [TRENDING API] Result from service:",
+      JSON.stringify(result, null, 2)
+    );
+    console.log(
+      "🔥 [TRENDING API] Trending products count:",
+      result.trending_products?.length || 0
     );
 
     return res.status(200).json({
