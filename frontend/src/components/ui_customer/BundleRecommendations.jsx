@@ -25,16 +25,33 @@ const BundleRecommendations = ({ cartProducts }) => {
         setError(null);
 
         // Extract product IDs from cart
-        const productIds = cartProducts.map((item) => item.product_id || item.id);
+        const productIds = cartProducts.map((item) => item.id || item.product_id);
 
+        console.log('🛒 Cart items:', cartProducts);
+        console.log('🛒 Fetching bundle recommendations for cart:', productIds);
         const response = await getBundleRecommendations(productIds, 5);
+
+        console.log('📦 Bundle Response:', response);
 
         if (response.success && response.data) {
           setRecommendations(response.data.recommendations || []);
+        } else if (response.status === 503) {
+          // ML service down - hide section silently
+          console.warn('⚠️ ML Service unavailable');
+          setRecommendations([]);
+          setError(null);
         }
       } catch (err) {
         console.error("Error fetching bundle recommendations:", err);
-        setError("Gagal memuat rekomendasi bundling");
+        
+        // Check if it's 503 (ML service down) - hide silently
+        if (err.response?.status === 503) {
+          console.warn('⚠️ ML Service unavailable - hiding bundle recommendations');
+          setRecommendations([]);
+          setError(null); // Don't show error
+        } else {
+          setError("Gagal memuat rekomendasi bundling");
+        }
       } finally {
         setLoading(false);
       }
@@ -74,29 +91,37 @@ const BundleRecommendations = ({ cartProducts }) => {
             ))
           ) : (
             // Actual recommendations
-            recommendations.map((product) => (
-              <ProductCard
-                key={product.product_id}
-                product={{
-                  id: product.product_id,
-                  product_name: product.product_name,
-                  category_name: product.category_name,
-                  selling_price: product.selling_price || 0,
-                  quantity_info: product.quantity_info || "1 unit",
-                  total_stock: product.total_stock || 0,
-                  images:
-                    product.images ||
-                    (product.ProductImages &&
-                      product.ProductImages.map((img) => ({
-                        image_url: img.image_url,
-                        is_primary: img.is_primary,
-                      }))),
-                }}
-                showBadge={true}
-                badgeText="Recommended"
-                badgeColor="bg-gradient-to-r from-green-500 to-blue-500"
-              />
-            ))
+            recommendations.map((rec) => {
+              console.log('🎁 Bundle recommendation item:', rec);
+              return (
+                <ProductCard
+                  key={rec.product_id}
+                  product={{
+                    id: rec.product_id,
+                    product_name: rec.product_name,
+                    category_name: rec.category_name,
+                    // Map sesuai response dari ML service yang di-enrich backend
+                    price: rec.price || rec.selling_price || 0,
+                    selling_price: rec.price || rec.selling_price || 0,
+                    finalPrice: rec.final_price || rec.price || rec.selling_price || 0,
+                    quantity_info: rec.quantity_info || "1 unit",
+                    stock: rec.stock || rec.total_stock || 0,
+                    total_stock: rec.stock || rec.total_stock || 0,
+                    // Images handling
+                    images: rec.images || (rec.ProductImages ? rec.ProductImages.map((img) => ({
+                      image_url: img.image_url,
+                      is_primary: img.is_primary,
+                    })) : []),
+                    // Pass through other fields
+                    discount: rec.discount,
+                    is_active: rec.is_active !== false,
+                  }}
+                  showBadge={true}
+                  badgeText="Recommended"
+                  badgeColor="bg-gradient-to-r from-green-500 to-blue-500"
+                />
+              );
+            })
           )}
         </div>
 

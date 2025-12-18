@@ -11,6 +11,7 @@ import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import LoginModal from '../../components/ui/LoginModal';
 import Button from '../../components/ui/Button';
+import SimilarProducts from '../../components/ui_customer/SimilarProducts';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
 import useAddToCart from '../../hooks/hook_customer/useAddToCart'; // ✅ Import hook
@@ -426,6 +427,14 @@ const ProductDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* AI Similar Products Recommendations */}
+      {product && (
+        <SimilarProducts 
+          productId={product.id} 
+          category={product.category_name}
+        />
+      )}
 
       {/* Login Modal */}
       <LoginModal 

@@ -104,59 +104,91 @@ Accept: application/json
 
 ###
 
-### ========== 🔄 VIA BACKEND (Port 3000) ==========
+### ========== 🔄 VIA BACKEND (Port 5000) ==========
 ### Test melalui backend proxy dengan caching
 
 ### 9. Similar Products via Backend
-GET http://localhost:3000/api/recommendations/similar/7a4af2f2-f55b-4300-a4ba-4406efcc350c?top_k=5
+GET http://localhost:5000/api/recommendations/similar/7a4af2f2-f55b-4300-a4ba-4406efcc350c?top_k=5
 Accept: application/json
 
 ###
 
-### 10. Bundle Recommendations via Backend
-POST http://localhost:3000/api/recommendations/bundle
+### 10. Bundle Recommendations via Backend (productIds format)
+POST http://localhost:5000/api/recommendations/bundle?top_k=5
 Content-Type: application/json
 Accept: application/json
 
 {
-  "product_ids": [
+  "productIds": [
     "7a4af2f2-f55b-4300-a4ba-4406efcc350c",
     "b3cc44f1-f3c1-4703-98d8-ac40cb387187"
-  ],
-  "top_k": 5
+  ]
 }
+
+###
+
+### 11. Bundle via Backend - Cache Test (run twice to see cache hit)
+POST http://localhost:5000/api/recommendations/bundle?top_k=8
+Content-Type: application/json
+Accept: application/json
+
+{
+  "productIds": [
+    "7a4af2f2-f55b-4300-a4ba-4406efcc350c",
+    "70710b93-2b14-4674-a243-b919d6002c48",
+    "8c7b5a2f-1e3d-4f9a-b8c6-3d4e5f6a7b8c"
+  ]
+}
+
+###
+
+### 12. Trending Products via Backend
+GET http://localhost:5000/api/recommendations/trending?top_k=10
+Accept: application/json
 
 ###
 
 ### ========== 🛠️ ADMIN ENDPOINTS ==========
 
-### 11. Get Model Status
+### 13. Get Model Status (ML Service)
 GET http://localhost:8000/v1/admin/model-status
 Accept: application/json
 
 ###
 
-### 12. Reload Model (after adding new products)
+### 14. Reload Model (after adding new products)
 POST http://localhost:8000/v1/admin/reload-model
+Accept: application/json
+
+###
+
+### 15. Get Model Status via Backend
+GET http://localhost:5000/api/recommendations/admin/model-status
+Accept: application/json
+
+###
+
+### 16. Reload Model via Backend
+POST http://localhost:5000/api/recommendations/admin/reload
 Accept: application/json
 
 ###
 
 ### ========== 🐛 ERROR HANDLING ==========
 
-### 13. Test Invalid Product ID
+### 17. Test Invalid Product ID
 GET http://localhost:8000/v1/recommendations/similar/invalid-uuid-format?top_k=5
 Accept: application/json
 
 ###
 
-### 14. Test Non-Existent Product
+### 18. Test Non-Existent Product
 GET http://localhost:8000/v1/recommendations/similar/00000000-0000-0000-0000-000000000000?top_k=5
 Accept: application/json
 
 ###
 
-### 15. Test Empty Bundle
+### 19. Test Empty Bundle
 POST http://localhost:8000/v1/recommendations/bundle
 Content-Type: application/json
 Accept: application/json
@@ -164,6 +196,23 @@ Accept: application/json
 {
   "product_ids": []
 }
+
+###
+
+### 20. Test Bundle with Invalid UUID
+POST http://localhost:5000/api/recommendations/bundle
+Content-Type: application/json
+Accept: application/json
+
+{
+  "productIds": ["invalid-uuid", "also-invalid"]
+}
+
+###
+
+### 21. Test ML Service Down (stop ML service first)
+GET http://localhost:5000/api/recommendations/similar/7a4af2f2-f55b-4300-a4ba-4406efcc350c?top_k=5
+Accept: application/json
 
 ###
 
@@ -187,4 +236,96 @@ Accept: application/json
 ### ==========================================
 ### 🎯 FOKUS TESTING: Similar & Bundle (100% AI)
 ### ⚠️  Trending & Category = BUKAN AI (dummy sort)
+### ==========================================
+
+### ========== 🧪 INTEGRATION TEST (FE → BE → ML) ==========
+### Test full flow dari Frontend
+
+### 22. Test Flow: Cart → Bundle Recommendations
+# Step 1: Login as customer (get token)
+# Step 2: Add products to cart
+# Step 3: Get cart contents
+# Step 4: Cart page will auto-call bundle recommendations
+# Expected: BundleRecommendations component shows 5 recommended products
+
+### Manual Test in Browser:
+# 1. http://localhost:5173 (Frontend)
+# 2. Login as customer
+# 3. Add 2-3 products to cart
+# 4. Go to cart page
+# 5. See "🎁 Lengkapi Belanjaan Anda" section
+# 6. Check Browser Console for API calls:
+#    - POST /api/recommendations/bundle
+#    - Response with recommendations array
+
+###
+
+### 23. Test Product Detail Page → Similar Products
+# URL: http://localhost:5173/products/:productId
+# Expected: Section "Produk Serupa" atau similar recommendations
+# API Call: GET /api/recommendations/similar/:productId
+
+###
+
+### ========== 📊 PERFORMANCE TEST ==========
+
+### 24. Bundle - Large Cart (10 products - max limit)
+POST http://localhost:8000/v1/recommendations/bundle?top_k=10
+Content-Type: application/json
+Accept: application/json
+
+{
+  "product_ids": [
+    "7a4af2f2-f55b-4300-a4ba-4406efcc350c",
+    "b3cc44f1-f3c1-4703-98d8-ac40cb387187",
+    "70710b93-2b14-4674-a243-b919d6002c48",
+    "8c7b5a2f-1e3d-4f9a-b8c6-3d4e5f6a7b8c",
+    "f3093aaa-5474-468c-9b8d-9ef9a28956b9",
+    "457afb33-6e9d-4ad9-9f4c-b52be26e5f18",
+    "9d8c6b3e-2f4a-5g0b-c9d7-4e5f6g7c8d9e",
+    "1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
+    "2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q",
+    "3c4d5e6f-7g8h-9i0j-1k2l-3m4n5o6p7q8r"
+  ]
+}
+
+###
+
+### 25. Cache Performance Test (run 3x to see improvement)
+# Run 1: from_cache = false (hit ML service)
+# Run 2: from_cache = true (fast cache hit)
+# Run 3: from_cache = true (fast cache hit)
+GET http://localhost:5000/api/recommendations/similar/7a4af2f2-f55b-4300-a4ba-4406efcc350c?top_k=5
+Accept: application/json
+
+###
+
+### ==========================================
+### ✅ EXPECTED RESULTS
+### ==========================================
+###
+### ✅ Similar Products:
+### - similarity_score > 0.5 (50%+)
+### - Same or related category
+### - Similar price range
+### - computation_time_ms < 200ms (indexed)
+### - computation_time_ms < 800ms (on-the-fly)
+###
+### ✅ Bundle Recommendations:
+### - Products NOT in input bundle
+### - Complementary products (different category)
+### - similarity_score to centroid > 0.5
+### - computation_time_ms < 500ms
+###
+### ✅ Caching:
+### - First call: from_cache = false
+### - Second call: from_cache = true
+### - Response time < 10ms for cache hit
+###
+### ✅ Error Handling:
+### - 404: Product not found
+### - 400: Invalid input format
+### - 503: ML service unavailable
+### - Fallback strategies active
+###
 ### ==========================================

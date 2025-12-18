@@ -78,12 +78,104 @@ const getSimilarProducts = async (productId, topK = 10) => {
       }
     );
 
-    setCache(cacheKey, response.data, CACHE_TTL);
+    // Enrich recommendations dengan data lengkap dari database
+    const enrichedData = await enrichRecommendations(response.data);
 
-    return { ...response.data, from_cache: false };
+    setCache(cacheKey, enrichedData, CACHE_TTL);
+
+    return { ...enrichedData, from_cache: false };
   } catch (error) {
     logger.error(`Error getting similar products: ${error.message}`);
     throw handleMLServiceError(error);
+  }
+};
+
+/**
+ * Enrich recommendations dengan data lengkap dari database
+ */
+const enrichRecommendations = async (mlResponse) => {
+  try {
+    const Product = require("../models/Product");
+    const { Op } = require("sequelize");
+
+    const recommendations =
+      mlResponse.recommendations || mlResponse.bundle_recommendations || [];
+    if (recommendations.length === 0) {
+      return mlResponse;
+    }
+
+    // Extract product IDs
+    const productIds = recommendations.map((rec) => rec.product_id);
+
+    // Fetch full product data dari database
+    const products = await Product.findAll({
+      where: {
+        id: { [Op.in]: productIds },
+        is_active: true,
+      },
+      include: [
+        { association: "Category", attributes: ["id", "category_name"] },
+        {
+          association: "ProductImages",
+          attributes: ["id", "image_url", "is_primary"],
+        },
+        {
+          association: "ProductDiscount",
+          attributes: ["id", "discount_id", "discounted_price"],
+        },
+      ],
+    });
+
+    // Create map untuk quick lookup
+    const productMap = new Map(products.map((p) => [p.id, p]));
+
+    // Enrich recommendations dengan data dari database
+    const enriched = recommendations.map((rec) => {
+      const product = productMap.get(rec.product_id);
+      if (!product) {
+        return rec; // Product not found, return original
+      }
+
+      return {
+        ...rec,
+        // Product info
+        product_name: product.product_name,
+        description: product.description,
+        category_name: product.Category?.category_name || rec.category_name,
+        // Pricing
+        price: parseFloat(product.price) || 0,
+        selling_price: parseFloat(product.price) || 0,
+        final_price: product.ProductDiscount?.discounted_price || product.price,
+        // Stock & quantity
+        stock: product.stock || 0,
+        total_stock: product.stock || 0,
+        quantity_info: product.quantity_info || "1 unit",
+        // Images
+        images:
+          product.ProductImages?.map((img) => ({
+            id: img.id,
+            image_url: img.image_url,
+            is_primary: img.is_primary,
+          })) || [],
+        // Other fields
+        is_active: product.is_active,
+        discount: product.ProductDiscount
+          ? {
+              discounted_price: product.ProductDiscount.discounted_price,
+            }
+          : null,
+      };
+    });
+
+    return {
+      ...mlResponse,
+      recommendations: enriched,
+      bundle_recommendations: enriched,
+    };
+  } catch (error) {
+    logger.error(`Error enriching recommendations: ${error.message}`);
+    // Return original data jika enrichment gagal
+    return mlResponse;
   }
 };
 
@@ -112,9 +204,12 @@ const getBundleRecommendations = async (productIds, topK = 8) => {
       { params: { top_k: topK } }
     );
 
-    setCache(cacheKey, response.data, CACHE_TTL);
+    // Enrich recommendations dengan data lengkap dari database
+    const enrichedData = await enrichRecommendations(response.data);
 
-    return { ...response.data, from_cache: false };
+    setCache(cacheKey, enrichedData, CACHE_TTL);
+
+    return { ...enrichedData, from_cache: false };
   } catch (error) {
     logger.error(`Error getting bundle recommendations: ${error.message}`);
     throw handleMLServiceError(error);

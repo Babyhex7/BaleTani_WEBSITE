@@ -11,6 +11,7 @@ import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import CartItem from '../../components/layout/CartItem';
 import OrderSummary from '../../components/layout/OrderSummary';
+import BundleRecommendations from '../../components/ui_customer/BundleRecommendations';
 import useAuthStore from '../../store/store_customer/useAuthStore';
 import useCartStore from '../../store/store_customer/useCartStore';
 
@@ -193,6 +194,13 @@ const CartPage = () => {
                   showInfoCards={false}
                 />
               </div>
+
+              {/* AI Bundle Recommendations - Show after cart items */}
+              {items.length > 0 && (
+                <div className="lg:col-span-3">
+                  <BundleRecommendations cartProducts={items} />
+                </div>
+              )}
 
               {/* Continue Shopping Button - Desktop only */}
               <div className="hidden lg:block">

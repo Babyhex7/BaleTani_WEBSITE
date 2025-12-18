@@ -14,7 +14,7 @@ import apiClient from "../../utils/apiClient";
 export const getSimilarProducts = async (productId, topK = 5) => {
   try {
     const response = await apiClient.get(
-      `/api/recommendations/similar/${productId}`,
+      `/recommendations/similar/${productId}`,
       {
         params: { top_k: topK },
       }
@@ -36,7 +36,7 @@ export const getSimilarProducts = async (productId, topK = 5) => {
 export const getBundleRecommendations = async (productIds, topK = 5) => {
   try {
     const response = await apiClient.post(
-      `/api/recommendations/bundle`,
+      `/recommendations/bundle`,
       {
         productIds: productIds,
       },
@@ -65,7 +65,7 @@ export const getTrendingProducts = async (category = null, topK = 10) => {
       params.category = category;
     }
 
-    const response = await apiClient.get(`/api/recommendations/trending`, {
+    const response = await apiClient.get(`/recommendations/trending`, {
       params,
     });
 
@@ -82,7 +82,7 @@ export const getTrendingProducts = async (category = null, topK = 10) => {
  */
 export const reloadMLModel = async () => {
   try {
-    const response = await apiClient.post(`/api/recommendations/admin/reload`);
+    const response = await apiClient.post(`/recommendations/admin/reload`);
     return response.data;
   } catch (error) {
     console.error("Error reloading ML model:", error);
@@ -96,9 +96,7 @@ export const reloadMLModel = async () => {
  */
 export const getMLModelStatus = async () => {
   try {
-    const response = await apiClient.get(
-      `/api/recommendations/admin/model-status`
-    );
+    const response = await apiClient.get(`/recommendations/admin/model-status`);
     return response.data;
   } catch (error) {
     console.error("Error getting ML model status:", error);

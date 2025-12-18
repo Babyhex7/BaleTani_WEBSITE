@@ -21,14 +21,32 @@ const SimilarProducts = ({ productId, category }) => {
         setLoading(true);
         setError(null);
 
+        console.log(`🔍 Fetching similar products for: ${productId}`);
         const response = await getSimilarProducts(productId, 5);
 
+        console.log('📦 Similar Products Response:', response);
+
         if (response.success && response.data) {
-          setRecommendations(response.data.recommendations || []);
+          // ML service response structure: { product_id, product_name, recommendations: [...] }
+          const recs = response.data.recommendations || [];
+          console.log('📦 Parsed recommendations:', recs);
+          setRecommendations(recs);
+        } else if (response.status === 404 || response.status === 503) {
+          // ML service down or product not found - hide section silently
+          console.warn('⚠️ ML Service unavailable or product not found');
+          setRecommendations([]);
         }
       } catch (err) {
         console.error("Error fetching recommendations:", err);
-        setError("Gagal memuat rekomendasi produk");
+        
+        // Check if it's a 404 or 503 - hide section silently
+        if (err.response?.status === 404 || err.response?.status === 503) {
+          console.warn('⚠️ ML Service unavailable - hiding recommendations');
+          setRecommendations([]);
+          setError(null); // Don't show error message
+        } else {
+          setError("Gagal memuat rekomendasi produk");
+        }
       } finally {
         setLoading(false);
       }
@@ -68,29 +86,37 @@ const SimilarProducts = ({ productId, category }) => {
             ))
           ) : (
             // Actual recommendations
-            recommendations.map((product) => (
-              <ProductCard
-                key={product.product_id}
-                product={{
-                  id: product.product_id,
-                  product_name: product.product_name,
-                  category_name: product.category_name,
-                  selling_price: product.selling_price || 0,
-                  quantity_info: product.quantity_info || "1 unit",
-                  total_stock: product.total_stock || 0,
-                  images:
-                    product.images ||
-                    (product.ProductImages &&
-                      product.ProductImages.map((img) => ({
-                        image_url: img.image_url,
-                        is_primary: img.is_primary,
-                      }))),
-                }}
-                showBadge={true}
-                badgeText={`${Math.round(product.similarity_score * 100)}% Match`}
-                badgeColor="bg-purple-500"
-              />
-            ))
+            recommendations.map((rec) => {
+              console.log('🔍 Recommendation item:', rec);
+              return (
+                <ProductCard
+                  key={rec.product_id}
+                  product={{
+                    id: rec.product_id,
+                    product_name: rec.product_name,
+                    category_name: rec.category_name,
+                    // Map sesuai response dari ML service yang di-enrich backend
+                    price: rec.price || rec.selling_price || 0,
+                    selling_price: rec.price || rec.selling_price || 0,
+                    finalPrice: rec.final_price || rec.price || rec.selling_price || 0,
+                    quantity_info: rec.quantity_info || "1 unit",
+                    stock: rec.stock || rec.total_stock || 0,
+                    total_stock: rec.stock || rec.total_stock || 0,
+                    // Images handling
+                    images: rec.images || (rec.ProductImages ? rec.ProductImages.map((img) => ({
+                      image_url: img.image_url,
+                      is_primary: img.is_primary,
+                    })) : []),
+                    // Pass through other fields
+                    discount: rec.discount,
+                    is_active: rec.is_active !== false,
+                  }}
+                  showBadge={true}
+                  badgeText={`${Math.round((rec.similarity_score || 0) * 100)}% Match`}
+                  badgeColor="bg-purple-500"
+                />
+              );
+            })
           )}
         </div>
 
