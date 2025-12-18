@@ -1,12 +1,14 @@
 const { Op } = require("sequelize");
-const Order = require("../models/order.model");
-const OrderItem = require("../models/orderItem.model");
-const PaymentDetail = require("../models/paymentDetail.model");
-const OrderStatusHistory = require("../models/orderStatusHistory.model");
-const Product = require("../models/product.model");
-const ProductImage = require("../models/productImage.model");
-const Customer = require("../models/customer.model");
-const Cart = require("../models/cart.model");
+const {
+  Order,
+  OrderItem,
+  PaymentDetail,
+  OrderStatusHistory,
+  Product,
+  ProductImage,
+  Customer,
+  Cart,
+} = require("../models");
 
 /**
  * Get customer order history with filters, search, and pagination

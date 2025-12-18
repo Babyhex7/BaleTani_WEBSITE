@@ -5,6 +5,7 @@
 
 const axios = require("axios");
 const logger = require("../utils/logger");
+const CacheService = require("../cache/cacheService");
 
 // Configuration
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:8000";
@@ -20,34 +21,22 @@ const mlClient = axios.create({
   },
 });
 
-// Cache storage (in-memory - untuk production pakai Redis)
-const cache = new Map();
+// Use centralized cache service
+const cacheService = new CacheService();
 
 /**
  * Cache helper functions
  */
 const getCacheKey = (endpoint, params) => {
-  return `${endpoint}:${JSON.stringify(params)}`;
+  return `ml:${endpoint}:${JSON.stringify(params)}`;
 };
 
 const getFromCache = (key) => {
-  const cached = cache.get(key);
-  if (!cached) return null;
-
-  const isExpired = Date.now() > cached.expiry;
-  if (isExpired) {
-    cache.delete(key);
-    return null;
-  }
-
-  return cached.data;
+  return cacheService.get(key);
 };
 
 const setCache = (key, data, ttl = CACHE_TTL) => {
-  cache.set(key, {
-    data,
-    expiry: Date.now() + ttl * 1000,
-  });
+  cacheService.set(key, data, ttl);
 };
 
 /**
@@ -62,7 +51,7 @@ const getSimilarProducts = async (productId, topK = 10) => {
     const cacheKey = getCacheKey("similar", { productId, topK });
     const cached = getFromCache(cacheKey);
 
-    if (cached) {
+    if (cached !== undefined) {
       logger.debug(`Cache HIT for similar products: ${productId}`);
       return { ...cached, from_cache: true };
     }
@@ -284,7 +273,7 @@ const getBundleRecommendations = async (productIds, topK = 8) => {
     const cacheKey = getCacheKey("bundle", { productIds, topK });
     const cached = getFromCache(cacheKey);
 
-    if (cached) {
+    if (cached !== undefined) {
       logger.debug(`Cache HIT for bundle recommendations`);
       return { ...cached, from_cache: true };
     }
@@ -321,7 +310,7 @@ const getTrendingProducts = async (categoryId = null, topK = 12) => {
     const cacheKey = getCacheKey("trending", { categoryId, topK });
     const cached = getFromCache(cacheKey);
 
-    if (cached) {
+    if (cached !== undefined) {
       logger.debug(`Cache HIT for trending products`);
       return { ...cached, from_cache: true };
     }
@@ -357,7 +346,7 @@ const getCategoryTopProducts = async (categoryId, topK = 10) => {
     const cacheKey = getCacheKey("category", { categoryId, topK });
     const cached = getFromCache(cacheKey);
 
-    if (cached) {
+    if (cached !== undefined) {
       logger.debug(`Cache HIT for category top products: ${categoryId}`);
       return { ...cached, from_cache: true };
     }
