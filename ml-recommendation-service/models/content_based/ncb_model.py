@@ -472,8 +472,15 @@ class NCBModel:
         model.similarity_engine.products_df = products_df
         
         matched_products = sum(1 for pid in model.similarity_engine.product_ids if pid in product_id_to_name)
-        logger.info(f"  ✅ Loaded {len(products_df)} products from CSV")
+        
+        # Detect data source for logging
+        data_source = "database" if hasattr(data_loader, 'data_source') and data_loader.data_source == "mysql" else "CSV"
+        logger.info(f"  ✅ Loaded {len(products_df)} products from {data_source}")
         logger.info(f"  ✅ Matched {matched_products}/{len(model.similarity_engine.product_ids)} indexed products with metadata")
+        
+        if matched_products == 0:
+            logger.warning(f"  ⚠️ No products matched! Model was trained with different product IDs.")
+            logger.warning(f"  💡 Recommendations will use on-the-fly encoding for new products.")
         
         model.is_trained = True
         

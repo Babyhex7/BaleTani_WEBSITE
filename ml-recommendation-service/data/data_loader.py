@@ -156,96 +156,142 @@ class DataLoader:
         logger.debug(f"Loaded {len(df)} customers from CSV")
         return df
     
-    # === MYSQL LOADING METHODS (untuk future implementation) ===
+    # === MYSQL LOADING METHODS ===
     
     def _load_products_from_mysql(self) -> pd.DataFrame:
         """
-        Load products dari MySQL database
-        
-        Query dari tabel: products + categories + product_discounts (optional)
+        Load products dari MySQL database real-time
+        Schema matches BaleTani production database
         """
-        from config.database import get_db
-        from sqlalchemy import text
+        from config.database import engine
+        
+        if engine is None:
+            raise RuntimeError("Database not initialized. Call init_database() first.")
         
         query = """
         SELECT 
-            p.id as product_id,
-            p.name,
-            c.name as category,
-            p.selling_price as price,
-            p.quantity_info as unit,
-            p.current_stock as stock,
+            p.id,
+            p.name as product_name,
+            c.category_name,
+            p.category_id,
+            p.product_type,
+            p.selling_price,
+            p.quantity_info,
+            p.shelf_life_days,
+            p.total_stock,
             p.description,
             p.is_active,
-            p.created_at
+            p.created_at,
+            p.updated_at
         FROM products p
         LEFT JOIN product_categories c ON p.category_id = c.id
         WHERE p.is_active = 1
+        ORDER BY p.created_at DESC
         """
         
-        db = next(get_db())
-        df = pd.read_sql(query, db.bind)
-        db.close()
-        
-        logger.debug(f"Loaded {len(df)} products from MySQL")
-        return df
+        try:
+            with engine.connect() as conn:
+                df = pd.read_sql(query, conn)
+            
+            # Ensure proper data types
+            df['id'] = df['id'].astype(str)
+            df['category_id'] = df['category_id'].astype(str)
+            df['selling_price'] = df['selling_price'].astype(float)
+            df['shelf_life_days'] = df['shelf_life_days'].astype(int)
+            df['total_stock'] = df['total_stock'].astype(int)
+            df['is_active'] = df['is_active'].astype(bool)
+            df['created_at'] = pd.to_datetime(df['created_at'])
+            
+            logger.info(f"✅ Loaded {len(df)} products from MySQL database")
+            return df
+        except Exception as e:
+            logger.error(f"❌ Failed to load products from MySQL: {e}")
+            raise
     
     def _load_orders_from_mysql(self) -> pd.DataFrame:
         """
-        Load orders dari MySQL database
-        
-        Query dari tabel: orders + order_items
+        Load orders dari MySQL database (last 90 days for trending/popular analysis)
+        Schema matches BaleTani production database
         """
-        from config.database import get_db
-        from sqlalchemy import text
+        from config.database import engine
+        
+        if engine is None:
+            raise RuntimeError("Database not initialized. Call init_database() first.")
         
         query = """
         SELECT 
             o.id as order_id,
+            o.order_number,
             o.customer_id,
+            o.created_at as order_date,
+            o.order_status,
             oi.product_id,
             oi.quantity,
-            oi.subtotal as total_price,
-            o.created_at as order_date,
-            o.order_status
+            oi.final_price as unit_price,
+            oi.subtotal as total_price
         FROM orders o
         JOIN order_items oi ON o.id = oi.order_id
-        WHERE o.order_status IN ('completed', 'paid')
-        AND o.deleted_at IS NULL
+        WHERE o.order_status = 'completed'
+        AND o.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
+        ORDER BY o.created_at DESC
         """
         
-        db = next(get_db())
-        df = pd.read_sql(query, db.bind)
-        db.close()
-        
-        logger.debug(f"Loaded {len(df)} order items from MySQL")
-        return df
+        try:
+            with engine.connect() as conn:
+                df = pd.read_sql(query, conn)
+            
+            # Ensure proper data types
+            df['order_id'] = df['order_id'].astype(str)
+            df['order_number'] = df['order_number'].astype(str)
+            df['customer_id'] = df['customer_id'].astype(str)
+            df['product_id'] = df['product_id'].astype(str)
+            df['quantity'] = df['quantity'].astype(float)  # decimal in DB
+            df['unit_price'] = df['unit_price'].astype(float)
+            df['total_price'] = df['total_price'].astype(float)
+            df['order_date'] = pd.to_datetime(df['order_date'])
+            
+            logger.info(f"✅ Loaded {len(df)} order items from MySQL database")
+            return df
+        except Exception as e:
+            logger.error(f"❌ Failed to load orders from MySQL: {e}")
+            raise
     
     def _load_customers_from_mysql(self) -> pd.DataFrame:
         """
         Load customers dari MySQL database
-        
-        Query dari tabel: customers
+        Schema matches BaleTani production database
         """
-        from config.database import get_db
+        from config.database import engine
+        
+        if engine is None:
+            raise RuntimeError("Database not initialized. Call init_database() first.")
         
         query = """
         SELECT 
-            id as customer_id,
+            id,
             phone_number,
             full_name,
             address,
             created_at
         FROM customers
         WHERE is_active = 1
+        ORDER BY created_at DESC
         """
         
-        db = next(get_db())
-        df = pd.read_sql(query, db.bind)
-        db.close()
-        
-        logger.debug(f"Loaded {len(df)} customers from MySQL")
-        return df
+        try:
+            with engine.connect() as conn:
+                df = pd.read_sql(query, conn)
+            
+            # Ensure proper data types
+            df['id'] = df['id'].astype(str)
+            df['phone_number'] = df['phone_number'].astype(str)
+            df['created_at'] = pd.to_datetime(df['created_at'])
+            
+            logger.info(f"✅ Loaded {len(df)} customers from MySQL database")
+            return df
+        except Exception as e:
+            logger.error(f"❌ Failed to load customers from MySQL: {e}")
+            raise
     
     # === HELPER METHODS ===
     

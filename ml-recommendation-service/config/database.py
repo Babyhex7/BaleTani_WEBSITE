@@ -1,8 +1,8 @@
 """
-Database configuration untuk MySQL connection (future use)
-Saat ini menggunakan CSV, tapi siap untuk migrasi ke MySQL
+Database configuration untuk MySQL connection
+Support untuk real-time data loading dari production database
 """
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config.settings import settings
@@ -22,23 +22,42 @@ def init_database():
     global engine, SessionLocal
     
     if settings.data_source == "mysql":
-        # Create engine dengan connection pooling
-        engine = create_engine(
-            settings.mysql_url,
-            pool_pre_ping=True,  # Check connection health
-            pool_size=10,  # Max 10 connections
-            max_overflow=20,  # Max 30 total connections
-            echo=settings.debug  # Log SQL queries jika debug=True
-        )
-        
-        # Create session factory
-        SessionLocal = sessionmaker(
-            autocommit=False,
-            autoflush=False,
-            bind=engine
-        )
-        
-        print(f"✅ Database connected: {settings.mysql_host}")
+        try:
+            print(f"🔄 Connecting to MySQL database: {settings.mysql_host}:{settings.mysql_port}/{settings.mysql_database}")
+            
+            # Create engine dengan connection pooling
+            engine = create_engine(
+                settings.mysql_url,
+                pool_pre_ping=True,  # Check connection health
+                pool_size=settings.mysql_pool_size,
+                max_overflow=settings.mysql_max_overflow,
+                pool_recycle=3600,  # Recycle connections after 1 hour
+                echo=False  # Disable SQL query logging
+            )
+            
+            # Test connection dengan SQLAlchemy 2.0 syntax
+            with engine.connect() as conn:
+                result = conn.execute(text("SELECT 1 as test"))
+                test_value = result.scalar()
+                if test_value != 1:
+                    raise Exception("Database test query failed")
+            
+            # Create session factory
+            SessionLocal = sessionmaker(
+                autocommit=False,
+                autoflush=False,
+                bind=engine
+            )
+            
+            print(f"✅ Database connected successfully: {settings.mysql_host}")
+            print(f"📊 Pool size: {settings.mysql_pool_size}, Max overflow: {settings.mysql_max_overflow}")
+            
+        except Exception as e:
+            print(f"❌ Failed to connect to database: {e}")
+            print(f"⚠️  Falling back to CSV mode")
+            settings.data_source = "csv"
+            engine = None
+            SessionLocal = None
     else:
         print("ℹ️  Using CSV data source, database not initialized")
 

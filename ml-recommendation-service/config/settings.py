@@ -30,12 +30,15 @@ class Settings(BaseSettings):
     data_source: Literal["csv", "mysql"] = "csv"
     csv_data_path: str = "./data/raw"
     
-    # === MYSQL DATABASE (untuk production) ===
+    # === MYSQL DATABASE ===
     mysql_host: str = "localhost"
     mysql_port: int = 3306
-    mysql_user: str = "baletani_user"
-    mysql_password: str = "password"
+    mysql_user: str = "root"
+    mysql_password: str = ""
     mysql_database: str = "baletani_db"
+    mysql_charset: str = "utf8mb4"
+    mysql_pool_size: int = 10
+    mysql_max_overflow: int = 20
     
     # === REDIS CACHE ===
     redis_host: str = "localhost"
@@ -76,7 +79,7 @@ class Settings(BaseSettings):
     @property
     def mysql_url(self) -> str:
         """Generate MySQL connection URL untuk SQLAlchemy"""
-        return f"mysql+pymysql://{self.mysql_user}:{self.mysql_password}@{self.mysql_host}:{self.mysql_port}/{self.mysql_database}"
+        return f"mysql+pymysql://{self.mysql_user}:{self.mysql_password}@{self.mysql_host}:{self.mysql_port}/{self.mysql_database}?charset={self.mysql_charset}"
     
     @property
     def redis_url(self) -> str:

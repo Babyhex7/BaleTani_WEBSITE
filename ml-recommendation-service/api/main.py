@@ -140,7 +140,20 @@ async def load_model():
     """Load trained NCB model on startup"""
     global model
     try:
-        logger.info("🔄 Loading NCB model v2...")
+        logger.info("🚀 Starting BaleTani ML Recommendation Service...")
+        
+        # Initialize database connection if using MySQL
+        from config.database import init_database
+        logger.info(f"📊 Data source: {settings.data_source}")
+        
+        if settings.data_source == "mysql":
+            logger.info("🔄 Initializing MySQL database connection...")
+            init_database()
+            logger.info("✅ Database connection initialized")
+        else:
+            logger.info("📄 Using CSV data source")
+        
+        logger.info("🔄 Loading NCB model...")
         
         # Load trained model v2 with adaptive learning
         model_path = Path(__file__).parent.parent / "models" / "saved_models" / "ncb_v4_test"
@@ -269,18 +282,64 @@ async def get_similar_products(
         if product_info is None:
             raise HTTPException(status_code=404, detail=f"Product {product_id} not found")
         
-        # Find similar products using similarity engine directly with UUID
-        similar_results = model.similarity_engine.find_similar(
-            product_id=product_id,
-            top_k=top_k + 1,  # +1 to exclude self
-            exclude_self=True
-        )
-        
-        if not similar_results:
-            raise HTTPException(
-                status_code=404, 
-                detail=f"No recommendations available for product {product_id}"
+        # Check if product exists in index
+        if product_id in model.similarity_engine.product_ids:
+            # Product ada di index - pakai index langsung (fast)
+            logger.info(f"✅ Product {product_id} found in index")
+            similar_results = model.similarity_engine.find_similar(
+                product_id=product_id,
+                top_k=top_k + 1,  # +1 to exclude self
+                exclude_self=True
             )
+        else:
+            # Product BARU - encode on-the-fly
+            logger.info(f"🆕 Product {product_id} NOT in index - encoding on-the-fly...")
+            
+            # Encode produk baru menggunakan trained encoder
+            try:
+                # Prepare product DataFrame untuk encoding
+                import pandas as pd
+                import tensorflow as tf
+                product_df = pd.DataFrame([product_info])
+                
+                # Encode menggunakan preprocessor dan encoder dari model
+                features_dict = model.preprocessor.transform_products(product_df)
+                text_features = model.text_extractor.transform([product_info['product_name']])
+                features_dict['text_features'] = text_features
+                
+                # Convert to TensorFlow tensors
+                # Note: Rename keys to match encoder expectations (singular names)
+                key_mapping = {
+                    'category_ids': 'category_id',
+                    'product_type_ids': 'product_type_id',
+                    'prices_normalized': 'price_normalized',
+                    'stocks_normalized': 'stock_normalized',
+                    'price_tiers': 'price_tier',
+                    'shelf_life_tiers': 'shelf_life_tier',
+                    'text_features': 'tfidf_features'  # Encoder expects tfidf_features
+                }
+                
+                batch_inputs = {}
+                for k, v in features_dict.items():
+                    if k in ['product_ids', 'product_names']:  # Exclude non-numeric fields
+                        continue
+                    # Use mapped key name if exists, otherwise use original
+                    key_name = key_mapping.get(k, k)
+                    batch_inputs[key_name] = tf.constant(v) if not isinstance(v, tf.Tensor) else v
+                
+                # Get embedding dari encoder
+                product_embedding = model.encoder(batch_inputs, training=False).numpy()
+                
+                # Find similar products by embedding
+                similar_results = model.similarity_engine.find_similar_by_embedding(
+                    query_embedding=product_embedding[0],
+                    top_k=top_k
+                )
+                
+                logger.info(f"✅ On-the-fly encoding successful - found {len(similar_results)} similar products")
+            except Exception as e:
+                logger.error(f"❌ On-the-fly encoding failed: {e}")
+                raise HTTPException(status_code=500, detail=f"Failed to encode product: {str(e)}")
         
         # Format recommendations
         recommendations = []
@@ -288,6 +347,32 @@ async def get_similar_products(
             rec_info = data_loader.get_product_by_id(rec_id)
             if rec_info:
                 recommendations.append(format_recommendation(rec_id, score, rec_info))
+        
+        # Fallback: Jika tidak ada recommendations atau semua filtered out
+        if len(recommendations) == 0:
+            logger.warning(f"No matching recommendations found, using fallback strategy...")
+            # Gunakan same-category products sebagai fallback
+            products_df = data_loader.load_products()
+            product_category = product_info.get('category_name')
+            
+            # Get same category products
+            same_category = products_df[
+                (products_df['category_name'] == product_category) & 
+                (products_df['id'] != product_id) &
+                (products_df['is_active'] == True)
+            ].head(top_k)
+            
+            for _, row in same_category.iterrows():
+                recommendations.append({
+                    'product_id': row['id'],
+                    'product_name': row['product_name'],
+                    'category_name': row['category_name'],
+                    'similarity_score': 0.85,  # Default similarity for same category
+                    'percentage': '85%',
+                    'reason': f'Produk sejenis dalam kategori {product_category}'
+                })
+            
+            logger.info(f"✅ Fallback: Returned {len(recommendations)} same-category products")
         
         computation_time = (time.time() - start) * 1000  # Convert to ms
         
