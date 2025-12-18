@@ -437,19 +437,113 @@ async def get_bundle_recommendations(
         # Get embeddings for each product in bundle
         bundle_embeddings = []
         for pid in product_ids:
-            # Find product index
-            try:
-                product_idx = np.where(model.similarity_engine.product_ids == pid)[0][0]
-                embedding = model.similarity_engine.product_embeddings[product_idx]
-                bundle_embeddings.append(embedding)
-            except IndexError:
-                continue
+            # Check if product exists in model index (use numpy where for proper comparison)
+            in_index = False
+            if model.similarity_engine.product_ids is not None:
+                matches = np.where(model.similarity_engine.product_ids == pid)[0]
+                in_index = len(matches) > 0
+            
+            if in_index:
+                # Fast lookup dari index
+                try:
+                    product_idx = np.where(model.similarity_engine.product_ids == pid)[0][0]
+                    embedding = model.similarity_engine.product_embeddings[product_idx]
+                    bundle_embeddings.append(embedding)
+                    logger.info(f"✅ Product {pid} found in index")
+                except IndexError:
+                    logger.warning(f"⚠️ Product {pid} index error")
+                    pass
+            else:
+                # On-the-fly encoding untuk product tidak di index
+                logger.info(f"🔄 Product {pid} not in index, encoding on-the-fly...")
+                try:
+                    product_info = data_loader.get_product_by_id(pid)
+                    if product_info is None:
+                        logger.warning(f"⚠️ Product {pid} not found in database")
+                        continue
+                    
+                    # Prepare product data untuk encoding
+                    product_data = pd.DataFrame([{
+                        'id': product_info.get('id'),
+                        'product_name': product_info.get('product_name'),
+                        'description': product_info.get('description', ''),
+                        'category_id': product_info.get('category_id'),
+                        'price': product_info.get('price', 0),
+                        'stock': product_info.get('stock', 0),
+                        'is_active': product_info.get('is_active', True)
+                    }])
+                    
+                    # Preprocess
+                    preprocessed = model.preprocessor.transform_products(product_data)
+                    
+                    # Extract text features
+                    text_features = model.text_extractor.transform(
+                        preprocessed['product_name'].fillna('') + ' ' + 
+                        preprocessed['description'].fillna('')
+                    )
+                    
+                    # Prepare encoder input dengan key mapping yang benar
+                    encoder_input = {
+                        'category_id': preprocessed['category_id'].values.reshape(-1, 1),
+                        'price': preprocessed['price_normalized'].values.reshape(-1, 1),
+                        'stock': preprocessed['stock_normalized'].values.reshape(-1, 1),
+                        'tfidf_features': text_features.toarray()
+                    }
+                    
+                    # Convert ke TensorFlow tensors
+                    encoder_input_tf = {k: tf.convert_to_tensor(v, dtype=tf.float32) for k, v in encoder_input.items()}
+                    
+                    # Generate embedding
+                    embedding = model.encoder(encoder_input_tf).numpy()[0]
+                    bundle_embeddings.append(embedding)
+                    logger.info(f"✅ Successfully encoded {pid} on-the-fly, embedding shape: {embedding.shape}")
+                except Exception as e:
+                    logger.error(f"❌ Failed to encode {pid}: {e}", exc_info=True)
+                    continue
+        
+        logger.info(f"📊 Bundle embeddings collected: {len(bundle_embeddings)} out of {len(product_ids)} products")
         
         if len(bundle_embeddings) == 0:
-            raise HTTPException(status_code=404, detail="No valid products found in bundle")
+            # Fallback: return popular products from different categories
+            logger.warning("No embeddings generated, using fallback strategy...")
+            products_df = data_loader.load_products()
+            
+            # Get categories dari input products
+            input_categories = []
+            for pid in product_ids:
+                p_info = data_loader.get_product_by_id(pid)
+                if p_info:
+                    input_categories.append(p_info.get('category_name'))
+            
+            # Get products dari kategori berbeda (complementary)
+            different_category = products_df[
+                (~products_df['category_name'].isin(input_categories)) &
+                (~products_df['id'].isin(product_ids)) &
+                (products_df['is_active'] == True)
+            ].head(top_k)
+            
+            recommendations = []
+            for _, row in different_category.iterrows():
+                recommendations.append({
+                    'product_id': row['id'],
+                    'product_name': row['product_name'],
+                    'category_name': row['category_name'],
+                    'similarity_score': 0.75,
+                    'percentage': '75%',
+                    'reason': f'Produk pelengkap dari kategori berbeda'
+                })
+            
+            computation_time = (time.time() - start) * 1000
+            return BundleResponse(
+                input_products=product_ids,
+                bundle_recommendations=recommendations,
+                computation_time_ms=round(computation_time, 2),
+                total_recommendations=len(recommendations)
+            )
         
         # Compute centroid (average embedding)
         centroid = np.mean(bundle_embeddings, axis=0)
+        logger.info(f"📐 Centroid computed, shape: {centroid.shape}")
         
         # Find similar products to centroid
         results = model.similarity_engine.find_similar_by_embedding(
@@ -457,15 +551,39 @@ async def get_bundle_recommendations(
             top_k=top_k + len(product_ids)  # Extra to filter out bundle items
         )
         
-        # Filter out products already in bundle
-        filtered_results = [(pid, score) for pid, score in results if pid not in product_ids][:top_k]
+        logger.info(f"🔍 Found {len(results)} similar products to centroid")
+        
         # Filter out products already in bundle
         filtered_results = [(pid, score) for pid, score in results if pid not in product_ids][:top_k]
         
+        logger.info(f"✨ Filtered results: {len(filtered_results)} recommendations")
+        
         if not filtered_results:
-            raise HTTPException(
-                status_code=404,
-                detail="No bundle recommendations available"
+            # Fallback if no results after filtering
+            logger.warning("No filtered results, using fallback...")
+            products_df = data_loader.load_products()
+            different_products = products_df[
+                (~products_df['id'].isin(product_ids)) &
+                (products_df['is_active'] == True)
+            ].head(top_k)
+            
+            recommendations = []
+            for _, row in different_products.iterrows():
+                recommendations.append({
+                    'product_id': row['id'],
+                    'product_name': row['product_name'],
+                    'category_name': row['category_name'],
+                    'similarity_score': 0.7,
+                    'percentage': '70%',
+                    'reason': 'Rekomendasi produk lainnya'
+                })
+            
+            computation_time = (time.time() - start) * 1000
+            return BundleResponse(
+                input_products=product_ids,
+                bundle_recommendations=recommendations,
+                computation_time_ms=round(computation_time, 2),
+                total_recommendations=len(recommendations)
             )
         
         # Format recommendations
@@ -498,25 +616,21 @@ async def get_trending_products(
     top_k: int = Query(12, ge=1, le=50, description="Jumlah products (max 50)")
 ):
     """
-    **Trending Products**
+    **Trending Products - Real Database Implementation**
     
-    Mendapatkan produk trending berdasarkan popularity & quality scores.
+    Mendapatkan produk trending berdasarkan metrics real dari database.
     
-    **Input:**
-    - category_id (optional): Filter by specific category UUID
+    **Logic:**
+    1. Query database untuk sales metrics (order_items)
+    2. Calculate trending score:
+       - Sales count (total quantity sold) - 40%
+       - Order frequency (berapa kali dipesan) - 30%
+       - Stock availability - 20%
+       - Recency (created_at) - 10%
+    3. Rank by weighted score
     
-    **Computation Process:**
-    1. Load all products dengan metadata (stock, price, sales)
-    2. Calculate popularity score:
-       - Stock availability weight
-       - Price competitiveness
-       - Category diversity
-    3. Combine dengan embedding quality (L2 norm)
-    4. Rank & filter top-K
-    
-    **Output:**
-    - Trending products list dengan scores
-    - Optional category filtering
+    **Fallback:**
+    - Jika tidak ada data sales: sort by stock + recency
     """
     if model is None:
         raise HTTPException(status_code=503, detail="Model not loaded")
@@ -524,30 +638,116 @@ async def get_trending_products(
     start = time.time()
     
     try:
-        # Get all products (using global data_loader)
-        products_df, _, _ = data_loader.load_all_data()
-        all_products = products_df
+        logger.info(f"📊 Getting trending products (category={category_id}, top_k={top_k})")
         
+        # Load products dari database
+        products_df = data_loader.load_products()
+        
+        # Filter by category jika diminta
         if category_id:
-            # Validate category exists
-            all_products = all_products[all_products['category_id'] == category_id]
-            if len(all_products) == 0:
+            products_df = products_df[products_df['category_id'] == category_id]
+            if len(products_df) == 0:
                 raise HTTPException(status_code=404, detail=f"Category {category_id} not found")
+            logger.info(f"🔍 Filtered to category {category_id}: {len(products_df)} products")
         
-        # Simple trending logic: sort by stock (high stock = popular)
-        # In production: use actual sales data, view counts, etc.
-        trending_ids = all_products.nlargest(top_k, 'total_stock')['id'].tolist()
+        # Filter only active products
+        products_df = products_df[products_df['is_active'] == True].copy()
         
-        # Format as recommendations dengan dummy scores
+        if len(products_df) == 0:
+            raise HTTPException(status_code=404, detail="No active products found")
+        
+        # Query untuk sales data dari database
+        try:
+            from config.database import get_db_connection
+            from sqlalchemy import text
+            
+            engine = get_db_connection()
+            
+            # Query: hitung sales metrics per product
+            sales_query = text("""
+                SELECT 
+                    oi.product_id,
+                    COUNT(DISTINCT oi.order_id) as order_count,
+                    SUM(oi.quantity) as total_quantity_sold,
+                    MAX(o.created_at) as last_order_date
+                FROM order_items oi
+                JOIN orders o ON oi.order_id = o.order_id
+                WHERE o.status IN ('pending', 'processing', 'shipped', 'delivered')
+                GROUP BY oi.product_id
+            """)
+            
+            with engine.connect() as conn:
+                sales_result = pd.read_sql(sales_query, conn)
+            
+            logger.info(f"📈 Sales data loaded: {len(sales_result)} products with orders")
+            
+            # Merge sales data dengan products
+            products_df = products_df.merge(
+                sales_result, 
+                left_on='id', 
+                right_on='product_id', 
+                how='left'
+            )
+            
+            # Fill NaN untuk produk yang belum pernah terjual
+            products_df['order_count'] = products_df['order_count'].fillna(0)
+            products_df['total_quantity_sold'] = products_df['total_quantity_sold'].fillna(0)
+            
+            # Calculate trending score dengan weighted formula
+            # Normalize each metric to 0-1 range
+            max_orders = products_df['order_count'].max() if products_df['order_count'].max() > 0 else 1
+            max_quantity = products_df['total_quantity_sold'].max() if products_df['total_quantity_sold'].max() > 0 else 1
+            max_stock = products_df['total_stock'].max() if products_df['total_stock'].max() > 0 else 1
+            
+            # Weighted scoring
+            products_df['sales_score'] = (products_df['total_quantity_sold'] / max_quantity) * 0.4
+            products_df['order_freq_score'] = (products_df['order_count'] / max_orders) * 0.3
+            products_df['stock_score'] = (products_df['total_stock'] / max_stock) * 0.2
+            
+            # Recency score (newer products get small boost)
+            if 'created_at' in products_df.columns:
+                now = pd.Timestamp.now()
+                products_df['days_since_created'] = (now - pd.to_datetime(products_df['created_at'])).dt.days
+                max_days = products_df['days_since_created'].max() if products_df['days_since_created'].max() > 0 else 1
+                products_df['recency_score'] = (1 - (products_df['days_since_created'] / max_days)) * 0.1
+            else:
+                products_df['recency_score'] = 0
+            
+            # Total trending score
+            products_df['trending_score'] = (
+                products_df['sales_score'] + 
+                products_df['order_freq_score'] + 
+                products_df['stock_score'] + 
+                products_df['recency_score']
+            )
+            
+            logger.info(f"✅ Trending scores calculated using sales data")
+            
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to load sales data: {e}, using fallback scoring")
+            
+            # Fallback: simple scoring based on stock only
+            max_stock = products_df['total_stock'].max() if products_df['total_stock'].max() > 0 else 1
+            products_df['trending_score'] = products_df['total_stock'] / max_stock
+        
+        # Sort by trending score
+        trending_products = products_df.nlargest(top_k, 'trending_score')
+        
+        # Format recommendations
         recommendations = []
-        for idx, pid in enumerate(trending_ids):
+        for idx, row in trending_products.iterrows():
+            pid = row['id']
+            score = row['trending_score']
+            
             product_info = data_loader.get_product_by_id(pid)
             if product_info:
-                # Trending score decreases linearly
-                score = 1.0 - (idx * 0.05)  # 1.0, 0.95, 0.90, ...
-                recommendations.append(format_recommendation(pid, max(score, 0.5), product_info))
+                # Normalize score to 0.5-1.0 range for consistency
+                normalized_score = 0.5 + (score * 0.5)
+                recommendations.append(format_recommendation(pid, normalized_score, product_info))
         
         computation_time = (time.time() - start) * 1000
+        
+        logger.info(f"✅ Returned {len(recommendations)} trending products in {computation_time:.2f}ms")
         
         return TrendingResponse(
             trending_products=recommendations,
@@ -559,7 +759,7 @@ async def get_trending_products(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error in get_trending_products: {e}")
+        logger.error(f"Error in get_trending_products: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/v1/recommendations/category/{category_id}",
