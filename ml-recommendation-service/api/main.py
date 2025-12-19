@@ -14,6 +14,8 @@ import logging
 from typing import List, Optional
 from datetime import datetime
 import numpy as np
+import pandas as pd
+import tensorflow as tf
 
 from fastapi import FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -457,6 +459,9 @@ async def get_bundle_recommendations(
                 # On-the-fly encoding untuk product tidak di index
                 logger.info(f"🔄 Product {pid} not in index, encoding on-the-fly...")
                 try:
+                    import pandas as pd  # Import untuk on-the-fly encoding
+                    import tensorflow as tf
+                    
                     product_info = data_loader.get_product_by_id(pid)
                     if product_info is None:
                         logger.warning(f"⚠️ Product {pid} not found in database")
