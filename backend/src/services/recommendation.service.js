@@ -22,7 +22,7 @@ const mlClient = axios.create({
 });
 
 // Use centralized cache service
-const cacheService = new CacheService();
+const cacheService = CacheService;
 
 /**
  * Cache helper functions
