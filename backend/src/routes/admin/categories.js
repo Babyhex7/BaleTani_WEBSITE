@@ -4,6 +4,7 @@ const {
   authenticateAdmin,
   roleMiddleware,
 } = require("../../middlewares/auth.middleware");
+const { uploadCategory, handleMulterError } = require("../../middlewares/upload.middleware");
 const categoryController = require("../../controllers/adminCategory.controller");
 
 /**
@@ -53,26 +54,42 @@ router.get(
 
 /**
  * POST /api/admin/categories
- * Create new category
+ * Create new category with optional image upload
  * Access: super_admin, super_inventory_admin
  */
 router.post(
   "/",
   authenticateAdmin,
   roleMiddleware(["super_admin", "super_inventory_admin"]),
+  uploadCategory.single("category_image"),
+  handleMulterError,
   categoryController.createCategory
 );
 
 /**
  * PUT /api/admin/categories/:id
- * Update category
+ * Update category with optional image upload
  * Access: super_admin, super_inventory_admin
  */
 router.put(
   "/:id",
   authenticateAdmin,
   roleMiddleware(["super_admin", "super_inventory_admin"]),
+  uploadCategory.single("category_image"),
+  handleMulterError,
   categoryController.updateCategory
+);
+
+/**
+ * DELETE /api/admin/categories/:id/image
+ * Delete category image only
+ * Access: super_admin, super_inventory_admin
+ */
+router.delete(
+  "/:id/image",
+  authenticateAdmin,
+  roleMiddleware(["super_admin", "super_inventory_admin"]),
+  categoryController.deleteCategoryImage
 );
 
 /**

@@ -30,7 +30,6 @@ router.get("/", async (req, res) => {
       environment: process.env.NODE_ENV || "development",
     });
   } catch (error) {
-    console.error("❌ Health check failed:", error);
     res.status(503).json({
       success: false,
       message: "Server is unhealthy",

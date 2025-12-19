@@ -332,6 +332,7 @@ const CategoryPage = () => {
                 .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                 .map((category) => {
               const IconComponent = getCategoryIcon(category.category_name);
+              const hasImage = category.category_image;
               
               return (
                 <div
@@ -339,12 +340,28 @@ const CategoryPage = () => {
                   onClick={() => handleCategoryClick(category.id)}
                   className="card-promo group cursor-pointer"
                 >
-                  {/* Card Content */}
                   <div className="p-4 sm:p-6 flex flex-col h-full">
-                    {/* Icon */}
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
-                      <IconComponent className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
-                    </div>
+                    {/* Image or Icon */}
+                    {hasImage ? (
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 overflow-hidden rounded-2xl group-hover:scale-110 transition-transform duration-300">
+                        <img
+                          src={`${import.meta.env.VITE_STATIC_BASE_URL}${category.category_image}`}
+                          alt={category.category_name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                        <div className="hidden w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl items-center justify-center">
+                          <IconComponent className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <IconComponent className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
+                      </div>
+                    )}
 
                     {/* Category Name */}
                     <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-2 group-hover:text-green-600 transition-colors duration-200">

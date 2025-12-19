@@ -89,7 +89,7 @@ const getAllCategories = async (req, res) => {
         },
       ],
       order: [[sort_by, sort_order]],
-      attributes: ["id", "category_name", "description", "created_at"],
+      attributes: ["id", "category_name", "description", "category_image", "created_at"],
     });
 
     // Format response with product count
@@ -97,6 +97,7 @@ const getAllCategories = async (req, res) => {
       id: category.id,
       category_name: category.category_name,
       description: category.description,
+      category_image: category.category_image,
       product_count: category.products ? category.products.length : 0,
       created_at: category.created_at,
     }));

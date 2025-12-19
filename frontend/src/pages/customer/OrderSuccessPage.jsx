@@ -49,7 +49,6 @@ const OrderSuccessPage = () => {
 
     // Skip countdown untuk cash payment
     if (isCashPayment) {
-      console.log(`[COUNTDOWN SUCCESS] Order ${orderData.order_number} - CASH payment, no countdown needed`);
       return;
     }
 
@@ -57,7 +56,6 @@ const OrderSuccessPage = () => {
     const paymentExpiredAt = orderData.payment_expired_at || orderData.payment?.expired_at;
     
     if (!paymentExpiredAt) {
-      console.log(`[COUNTDOWN SUCCESS] Order ${orderData.order_number} - No payment_expired_at, skipping countdown`);
       return;
     }
 
@@ -71,9 +69,7 @@ const OrderSuccessPage = () => {
       if (diff <= 0) {
         setIsExpired(true);
         setTimeRemaining(null);
-        console.log(`[COUNTDOWN SUCCESS] Order ${orderData.order_number} - EXPIRED!`);
         
-        // 🔥 TRIGGER MANUAL CANCEL KE BACKEND
         triggerManualCancel();
         
         return null;
@@ -102,11 +98,9 @@ const OrderSuccessPage = () => {
     return () => clearInterval(interval);
   }, [orderData]);
 
-  // 🔥 FUNCTION: Trigger manual cancel ke backend saat countdown habis
+  // Trigger manual cancel ke backend saat countdown habis
   const triggerManualCancel = async () => {
     try {
-      console.log(`[MANUAL CANCEL] Triggering cancel for order: ${orderData.order_number}`);
-      
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/customer/orders/${orderData.id}/manual-cancel`,
         {
@@ -119,13 +113,8 @@ const OrderSuccessPage = () => {
       );
 
       const data = await response.json();
-      console.log('[MANUAL CANCEL] Response:', data);
-      
-      if (data.success) {
-        console.log('[MANUAL CANCEL] ✅ Order cancelled successfully');
-      }
     } catch (error) {
-      console.error('[MANUAL CANCEL] ❌ Failed:', error);
+      console.error('Failed to cancel expired order:', error);
     }
   };
 
