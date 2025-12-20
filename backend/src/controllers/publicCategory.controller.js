@@ -88,7 +88,13 @@ const getAllCategories = async (req, res) => {
         },
       ],
       order: [[sort_by, sort_order]],
-      attributes: ["id", "category_name", "description", "category_image", "created_at"],
+      attributes: [
+        "id",
+        "category_name",
+        "description",
+        "category_image",
+        "created_at",
+      ],
     });
 
     // Format response with product count
