@@ -61,7 +61,6 @@ const getAllCategories = async (req, res) => {
     // ========================================
     // STEP 2: Cache MISS - Query Database
     // ========================================
-    console.log("[DB QUERY] Categories - Cache miss, querying database...");
 
     // Build where clause
     const whereClause = {

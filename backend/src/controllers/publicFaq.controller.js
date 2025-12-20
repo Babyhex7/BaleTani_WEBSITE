@@ -20,15 +20,12 @@ const cacheService = require("../cache/cacheService");
  */
 exports.getActiveFAQs = async (req, res, next) => {
   try {
-    console.log("🔍 [PUBLIC FAQ] getActiveFAQs called");
     const { category = "", search = "" } = req.query;
     const cacheKey = `public_faqs_${category}_${search}`;
-    console.log("📋 [PUBLIC FAQ] Query params:", { category, search });
 
     // Check cache
     const cachedData = cacheService.get(cacheKey);
     if (cachedData) {
-      console.log("✅ [PUBLIC FAQ] Returning cached data");
       return res.status(200).json({
         success: true,
         message: "FAQs retrieved successfully (from cache)",
@@ -40,7 +37,6 @@ exports.getActiveFAQs = async (req, res, next) => {
     const whereClause = {
       is_active: true,
     };
-    console.log("🔍 [PUBLIC FAQ] Building where clause...");
 
     // Category filter
     if (category) {
@@ -54,8 +50,6 @@ exports.getActiveFAQs = async (req, res, next) => {
         { answer: { [Op.like]: `%${search}%` } },
       ];
     }
-
-    console.log("🔍 [PUBLIC FAQ] Where clause:", whereClause);
     const faqs = await FAQ.findAll({
       where: whereClause,
       attributes: ["id", "question", "answer", "category", "order_number"],
@@ -64,7 +58,6 @@ exports.getActiveFAQs = async (req, res, next) => {
         ["created_at", "DESC"],
       ],
     });
-    console.log(`✅ [PUBLIC FAQ] Found ${faqs.length} FAQs`);
 
     // Group by category
     const groupedFAQs = faqs.reduce((acc, faq) => {
@@ -84,7 +77,6 @@ exports.getActiveFAQs = async (req, res, next) => {
     // Cache for 1 hour
     cacheService.set(cacheKey, result, 3600);
 
-    console.log("📤 [PUBLIC FAQ] Sending response with", faqs.length, "FAQs");
     res.status(200).json({
       success: true,
       message: "FAQs retrieved successfully",
