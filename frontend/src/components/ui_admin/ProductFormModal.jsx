@@ -61,8 +61,6 @@ const ProductFormModal = ({
       const productName = product.name || product.product_name;
       const productImages = product.ProductImages || product.images || [];
       
-      console.log('🔄 Initializing form with product:', productName, 'Images:', productImages.length);
-      
       setFormData({
         product_name: productName || '',
         description: product.description || '',
@@ -182,17 +180,14 @@ const ProductFormModal = ({
   };
 
   const removeExistingImage = (imageId) => {
-    console.log('🗑️ Removing image:', imageId);
     // Remove dari UI
     setExistingImages(prev => {
       const updated = prev.filter(img => img.id !== imageId);
-      console.log('📸 Remaining images:', updated.length);
       return updated;
     });
     // Track untuk dihapus di backend
     setDeletedImageIds(prev => {
       const updated = [...prev, imageId];
-      console.log('🗑️ Deleted IDs:', updated);
       return updated;
     });
   };
@@ -259,12 +254,6 @@ const ProductFormModal = ({
         }
       });
       
-      // Debug: Log FormData contents
-      console.log('FormData to submit:');
-      for (let pair of submitData.entries()) {
-        console.log(pair[0] + ': ' + pair[1]);
-      }
-      
       // Append new images
       images.forEach((file) => {
         submitData.append('images', file);
@@ -273,7 +262,6 @@ const ProductFormModal = ({
       // Untuk edit mode, kirim image IDs yang dihapus
       if (mode === 'edit' && deletedImageIds.length > 0) {
         submitData.append('deleted_image_ids', JSON.stringify(deletedImageIds));
-        console.log('Deleted image IDs:', deletedImageIds);
       }
       
       await onSubmit(submitData);

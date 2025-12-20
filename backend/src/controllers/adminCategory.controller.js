@@ -270,7 +270,6 @@ const updateCategory = async (req, res) => {
         );
         if (fs.existsSync(oldImagePath)) {
           fs.unlinkSync(oldImagePath);
-          console.log("[CATEGORY UPDATE] Deleted old image:", oldImagePath);
         }
       }
       updateData.category_image = null;
@@ -286,7 +285,6 @@ const updateCategory = async (req, res) => {
         );
         if (fs.existsSync(oldImagePath)) {
           fs.unlinkSync(oldImagePath);
-          console.log("[CATEGORY UPDATE] Replaced old image:", oldImagePath);
         }
       }
       updateData.category_image = `/uploads/categories/${req.file.filename}`;

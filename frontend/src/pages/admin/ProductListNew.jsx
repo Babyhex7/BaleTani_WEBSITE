@@ -129,12 +129,10 @@ const ProductListNew = () => {
   const fetchCategories = async () => {
     try {
       const data = await inventoryService.getCategories();
-      console.log('Categories Response:', data); // Debug log
       
       if (data.success) {
         // Handle response structure: data.data.categories or data.data
         const categoriesList = data.data.categories || data.data || [];
-        console.log('Categories array:', categoriesList); // Debug log
         setCategories(Array.isArray(categoriesList) ? categoriesList : []);
       }
     } catch (err) {

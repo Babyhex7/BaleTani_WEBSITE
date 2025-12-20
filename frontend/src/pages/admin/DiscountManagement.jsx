@@ -92,10 +92,6 @@ const DiscountManagement = () => {
 
       if (data.success) {
         const discountsList = data.data.discounts || [];
-        
-        console.log('📊 Discount Pagination Data:', data.data.pagination);
-        console.log('📊 Total Pages:', data.data.pagination?.total_pages);
-        console.log('📊 Total Items:', data.data.pagination?.total_items);
 
         setDiscounts(discountsList);
         setTotalPages(data.data.pagination?.total_pages || 1);

@@ -121,7 +121,6 @@ const sanitizeSQLInput = (str) => {
 const sanitizeBody = (req, res, next) => {
   if (req.body && typeof req.body === "object") {
     req.body = sanitizeObject(req.body);
-    console.log("✅ Request body sanitized");
   }
   next();
 };
@@ -136,7 +135,6 @@ const sanitizeBody = (req, res, next) => {
 const sanitizeQuery = (req, res, next) => {
   if (req.query && typeof req.query === "object") {
     req.query = sanitizeObject(req.query);
-    console.log("✅ Query params sanitized");
   }
   next();
 };
@@ -165,7 +163,6 @@ const sanitizeInput = (req, res, next) => {
     req.params = sanitizeObject(req.params);
   }
 
-  console.log("✅ All input sanitized:", req.method, req.path);
   next();
 };
 
