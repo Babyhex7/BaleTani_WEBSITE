@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
+import customerOrderService from '../../services/services_customer/customerOrderService';
 
 const OrderSuccessPage = () => {
   const navigate = useNavigate();
@@ -28,6 +29,10 @@ const OrderSuccessPage = () => {
   // State untuk countdown timer
   const [timeRemaining, setTimeRemaining] = useState(null);
   const [isExpired, setIsExpired] = useState(false);
+  
+  // State untuk order status (untuk polling)
+  const [currentOrderStatus, setCurrentOrderStatus] = useState(orderData?.order_status);
+  const [currentPaymentStatus, setCurrentPaymentStatus] = useState(orderData?.payment_status);
 
   useEffect(() => {
     // Redirect jika tidak ada order data
@@ -35,6 +40,59 @@ const OrderSuccessPage = () => {
       navigate('/');
     }
   }, [orderData, navigate]);
+
+  // Polling untuk check status order (setiap 10 detik)
+  useEffect(() => {
+    if (!orderData?.id) return;
+
+    // Skip polling jika order sudah paid/completed/cancelled
+    const skipStatuses = ['paid', 'completed', 'cancelled'];
+    if (skipStatuses.includes(currentOrderStatus) || skipStatuses.includes(currentPaymentStatus)) {
+      return;
+    }
+
+    const checkOrderStatus = async () => {
+      try {
+        const result = await customerOrderService.getOrderStatus(orderData.id);
+        
+        if (result.success && result.data) {
+          const newOrderStatus = result.data.order_status;
+          const newPaymentStatus = result.data.payment_status;
+          
+          // Update status jika berubah
+          if (newOrderStatus !== currentOrderStatus) {
+            setCurrentOrderStatus(newOrderStatus);
+            console.log(`[ORDER STATUS UPDATED] ${currentOrderStatus} → ${newOrderStatus}`);
+          }
+          
+          if (newPaymentStatus !== currentPaymentStatus) {
+            setCurrentPaymentStatus(newPaymentStatus);
+            console.log(`[PAYMENT STATUS UPDATED] ${currentPaymentStatus} → ${newPaymentStatus}`);
+          }
+
+          // Stop countdown jika sudah paid/completed
+          if (newPaymentStatus === 'paid' || newOrderStatus === 'paid' || newOrderStatus === 'completed') {
+            setTimeRemaining(null);
+            setIsExpired(false);
+          }
+        }
+      } catch (error) {
+        console.error('[POLLING ERROR]', error);
+        // Silent fail - polling akan retry di interval berikutnya
+      }
+    };
+
+    // Check pertama kali setelah 5 detik
+    const initialTimeout = setTimeout(checkOrderStatus, 5000);
+
+    // Polling setiap 10 detik
+    const pollingInterval = setInterval(checkOrderStatus, 10000);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(pollingInterval);
+    };
+  }, [orderData, currentOrderStatus, currentPaymentStatus]);
 
   // Countdown timer untuk pending_payment orders
   useEffect(() => {
@@ -44,12 +102,18 @@ const OrderSuccessPage = () => {
       return;
     }
 
+    // Stop countdown jika status sudah paid/completed
+    if (currentPaymentStatus === 'paid' || currentOrderStatus === 'paid' || currentOrderStatus === 'completed') {
+      setTimeRemaining(null);
+      setIsExpired(false);
+      return;
+    }
+
     const paymentMethod = orderData.payment_method?.toLowerCase();
     const isCashPayment = paymentMethod === 'cash' || paymentMethod === 'tunai';
 
     // Skip countdown untuk cash payment
     if (isCashPayment) {
-      console.log(`[COUNTDOWN SUCCESS] Order ${orderData.order_number} - CASH payment, no countdown needed`);
       return;
     }
 
@@ -57,7 +121,6 @@ const OrderSuccessPage = () => {
     const paymentExpiredAt = orderData.payment_expired_at || orderData.payment?.expired_at;
     
     if (!paymentExpiredAt) {
-      console.log(`[COUNTDOWN SUCCESS] Order ${orderData.order_number} - No payment_expired_at, skipping countdown`);
       return;
     }
 
@@ -71,9 +134,7 @@ const OrderSuccessPage = () => {
       if (diff <= 0) {
         setIsExpired(true);
         setTimeRemaining(null);
-        console.log(`[COUNTDOWN SUCCESS] Order ${orderData.order_number} - EXPIRED!`);
         
-        // 🔥 TRIGGER MANUAL CANCEL KE BACKEND
         triggerManualCancel();
         
         return null;
@@ -100,13 +161,11 @@ const OrderSuccessPage = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [orderData]);
+  }, [orderData, currentOrderStatus, currentPaymentStatus]);
 
-  // 🔥 FUNCTION: Trigger manual cancel ke backend saat countdown habis
+  // Trigger manual cancel ke backend saat countdown habis
   const triggerManualCancel = async () => {
     try {
-      console.log(`[MANUAL CANCEL] Triggering cancel for order: ${orderData.order_number}`);
-      
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/customer/orders/${orderData.id}/manual-cancel`,
         {
@@ -119,13 +178,8 @@ const OrderSuccessPage = () => {
       );
 
       const data = await response.json();
-      console.log('[MANUAL CANCEL] Response:', data);
-      
-      if (data.success) {
-        console.log('[MANUAL CANCEL] ✅ Order cancelled successfully');
-      }
     } catch (error) {
-      console.error('[MANUAL CANCEL] ❌ Failed:', error);
+      console.error('Failed to cancel expired order:', error);
     }
   };
 
@@ -149,6 +203,16 @@ const OrderSuccessPage = () => {
       case 'bank_transfer':
         // Jika ada payment detail dengan VA
         if (orderData.payment) {
+          const expiredDate = new Date(orderData.payment_expired_at || orderData.payment.expired_at);
+          const formattedExpiry = expiredDate.toLocaleString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          });
+          
           return {
             title: `Transfer Bank - ${orderData.payment.bank}`,
             instructions: [
@@ -156,7 +220,7 @@ const OrderSuccessPage = () => {
               `Rekening Transfer: ${orderData.payment.virtual_account}`,
               `a/n: ${orderData.payment.account_name}`,
               `Nominal: ${formatCurrency(orderData.total_amount)}`,
-              'Transfer sebelum: ' + new Date(orderData.payment.expired_at).toLocaleString('id-ID'),
+              `Transfer sebelum: ${formattedExpiry}`,
               'Setelah transfer, konfirmasi ke admin via WhatsApp',
             ],
           };
@@ -173,9 +237,12 @@ const OrderSuccessPage = () => {
         return {
           title: 'QRIS',
           instructions: [
-            'Scan QR Code berikut untuk pembayaran',
+            'Tekan tombol "Kirim Pesanan via WhatsApp" di bawah',
+            'Admin akan mengirimkan QR Code pembayaran',
             `Nominal: ${formatCurrency(orderData.total_amount)}`,
-            'Setelah pembayaran, konfirmasi ke admin via WhatsApp',
+            'Scan QR Code yang dikirim admin',
+            'Selesaikan pembayaran',
+            'Kirim bukti dan konfirmasi setelah berhasil',
           ],
         };
       case 'tunai':
@@ -212,37 +279,99 @@ const OrderSuccessPage = () => {
     if (orderData.whatsapp?.url) {
       window.open(orderData.whatsapp.url, '_blank');
     } else {
-      // Fallback ke message lama
+      // Fallback ke message lama jika backend tidak generate WhatsApp message
       const adminPhone = '6285885725027'; // Nomor dari .env
       
-      let message = `*KONFIRMASI PESANAN BALETANI*\n\n`;
+      let message = `🛒 *KONFIRMASI PESANAN BALETANI*\n\n`;
+      message += `📋 *Detail Pesanan*\n`;
       message += `Order Number: *${orderData.order_number}*\n`;
       message += `Nama: ${orderData.customer_name}\n`;
       message += `Telepon: ${orderData.customer_phone}\n\n`;
       
-      message += `*Detail Pesanan:*\n`;
+      message += `📦 *Produk yang Dipesan:*\n`;
       orderData.items.forEach((item, index) => {
         message += `${index + 1}. ${item.product_name}\n`;
-        message += `   ${item.quantity} x ${formatCurrency(item.final_price)} = ${formatCurrency(item.subtotal)}\n`;
+        message += `   ${item.quantity} × ${formatCurrency(item.final_price)} = ${formatCurrency(item.subtotal)}\n`;
       });
       
-      message += `\n*Ringkasan:*\n`;
+      message += `\n💰 *Rincian Pembayaran:*\n`;
       message += `Subtotal: ${formatCurrency(orderData.item_subtotal)}\n`;
       message += `Ongkir: ${formatCurrency(orderData.delivery_fee)}\n`;
+      message += `─────────────────\n`;
       message += `*TOTAL: ${formatCurrency(orderData.total_amount)}*\n\n`;
       
-      message += `Metode Pengiriman: ${orderData.delivery_method === 'delivery' ? 'Delivery' : 'Ambil di Toko'}\n`;
+      message += `🚚 *Metode Pengiriman:*\n`;
+      message += `${orderData.delivery_method === 'delivery' ? '🏠 Delivery/Antar' : '🏪 Ambil Sendiri (Self Pickup)'}\n`;
       if (orderData.delivery_address) {
         message += `Alamat: ${orderData.delivery_address}\n`;
       }
+      message += `\n`;
       
-      message += `Metode Pembayaran: ${paymentInfo.title}\n\n`;
+      message += `💳 *Metode Pembayaran:*\n`;
       
-      if (orderData.payment_method !== 'cash') {
-        message += `Saya akan segera melakukan pembayaran.\n`;
+      // Bank Transfer
+      if (orderData.payment_method === 'transfer' || orderData.payment_method === 'bank_transfer') {
+        if (orderData.payment) {
+          message += `🏦 Transfer Bank ${orderData.payment.bank}\n\n`;
+          message += `*SILAKAN TRANSFER KE:*\n`;
+          message += `Bank: ${orderData.payment.bank}\n`;
+          message += `No. Rek: ${orderData.payment.virtual_account}\n`;
+          message += `a/n: ${orderData.payment.account_name}\n`;
+          message += `Jumlah: ${formatCurrency(orderData.total_amount)}\n\n`;
+          
+          if (orderData.payment_expired_at) {
+            const expiredDate = new Date(orderData.payment_expired_at);
+            const formattedExpiry = expiredDate.toLocaleString('id-ID', {
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              timeZone: 'Asia/Jakarta'
+            });
+            message += `⏰ *Selesaikan pembayaran sebelum:*\n`;
+            message += `${formattedExpiry}\n`;
+            message += `_(10 menit dari sekarang)_\n\n`;
+          }
+          
+          message += `📸 *Setelah transfer, mohon kirim bukti transfer ke nomor ini*\n\n`;
+        }
+      }
+      // QRIS
+      else if (orderData.payment_method === 'qris') {
+        message += `📱 QRIS\n\n`;
+        message += `*CARA PEMBAYARAN:*\n`;
+        message += `1️⃣ Admin akan mengirimkan QR Code pembayaran ke nomor ini\n`;
+        message += `2️⃣ Scan QR Code yang dikirim admin\n`;
+        message += `3️⃣ Selesaikan pembayaran dengan nominal yang tertera\n`;
+        message += `4️⃣ Kirim bukti pembayaran dan konfirmasi setelah berhasil\n\n`;
+        message += `Jumlah: ${formatCurrency(orderData.total_amount)}\n\n`;
+        
+        if (orderData.payment_expired_at) {
+          const expiredDate = new Date(orderData.payment_expired_at);
+          const formattedExpiry = expiredDate.toLocaleString('id-ID', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Asia/Jakarta'
+          });
+          message += `⏰ *Selesaikan pembayaran sebelum:*\n`;
+          message += `${formattedExpiry}\n`;
+          message += `_(10 menit dari sekarang)_\n\n`;
+        }
+      }
+      // Cash
+      else if (orderData.payment_method === 'cash' || orderData.payment_method === 'tunai') {
+        message += `💵 Cash (Bayar di Tempat)\n`;
+        message += `Pembayaran dilakukan saat pengambilan/pengiriman barang\n`;
+        message += `Jumlah: ${formatCurrency(orderData.total_amount)}\n`;
+        message += `💡 Siapkan uang pas untuk mempermudah transaksi\n\n`;
       }
       
-      message += `Terima kasih! 🌾`;
+      message += `Terima kasih sudah berbelanja di *BaleTani Fresh Market*! 🌿✨\n`;
+      message += `\n_Pesan otomatis dari sistem BaleTani_`;
 
       const whatsappUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, '_blank');
@@ -271,35 +400,50 @@ const OrderSuccessPage = () => {
 
             {/* Countdown Timer - HANYA untuk Transfer/QRIS (yang ada payment_expired_at) */}
             {/* TIDAK muncul untuk Cash/COD karena bayar di tempat */}
-            {orderData.payment_expired_at && timeRemaining && (
+            {/* TIDAK muncul jika sudah paid/completed */}
+            {currentPaymentStatus === 'paid' || currentOrderStatus === 'paid' || currentOrderStatus === 'completed' ? (
               <div className="mt-6">
-                {(
-                  <div className="bg-red-600 rounded-lg shadow-lg p-6">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                      {/* Timer */}
-                      <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-red-700 rounded-lg flex items-center justify-center">
-                          <Clock className="w-8 h-8 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-white text-sm font-medium mb-1">Selesaikan pembayaran dalam:</p>
-                          <p className="text-white text-4xl font-bold">
-                            {String(timeRemaining.minutes).padStart(2, '0')}:{String(timeRemaining.seconds).padStart(2, '0')}
-                          </p>
-                        </div>
+                <div className="bg-green-600 rounded-lg shadow-lg p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-green-700 rounded-lg flex items-center justify-center">
+                      <CheckCircle className="w-10 h-10 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-white text-xl font-bold mb-2">Pembayaran Dikonfirmasi!</h3>
+                      <p className="text-green-100">
+                        Admin telah mengkonfirmasi pembayaran Anda. Pesanan sedang diproses.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : orderData.payment_expired_at && timeRemaining ? (
+              <div className="mt-6">
+                <div className="bg-red-600 rounded-lg shadow-lg p-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    {/* Timer */}
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 bg-red-700 rounded-lg flex items-center justify-center">
+                        <Clock className="w-8 h-8 text-white" />
                       </div>
-
-                      {/* Info */}
-                      <div className="text-center sm:text-right">
-                        <p className="text-white text-sm">
-                          Pesanan akan dibatalkan otomatis<br />jika tidak dibayar
+                      <div>
+                        <p className="text-white text-sm font-medium mb-1">Selesaikan pembayaran dalam:</p>
+                        <p className="text-white text-4xl font-bold">
+                          {String(timeRemaining.minutes).padStart(2, '0')}:{String(timeRemaining.seconds).padStart(2, '0')}
                         </p>
                       </div>
                     </div>
+
+                    {/* Info */}
+                    <div className="text-center sm:text-right">
+                      <p className="text-white text-sm">
+                        Pesanan akan dibatalkan otomatis<br />jika tidak dibayar
+                      </p>
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
-            )}
+            ) : null}
 
             {/* Expired Notice - HANYA untuk order yang expired */}
             {orderData.payment_expired_at && isExpired && (
@@ -435,7 +579,7 @@ const OrderSuccessPage = () => {
                       </p>
                     </div>
 
-                    {orderData.payment.expired_at && (
+                    {(orderData.payment_expired_at || orderData.payment.expired_at) && (
                       <div className="bg-yellow-50 border border-yellow-300 rounded p-3">
                         <div className="flex items-start gap-2">
                           <Clock className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
@@ -444,9 +588,13 @@ const OrderSuccessPage = () => {
                               Selesaikan pembayaran sebelum:
                             </p>
                             <p className="font-semibold text-yellow-900 text-sm sm:text-base">
-                              {new Date(orderData.payment.expired_at).toLocaleString('id-ID', {
-                                dateStyle: 'full',
-                                timeStyle: 'short'
+                              {new Date(orderData.payment_expired_at || orderData.payment.expired_at).toLocaleString('id-ID', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
                               })}
                             </p>
                           </div>

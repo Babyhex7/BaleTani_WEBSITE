@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Facebook, Instagram, MessageCircle } from 'lucide-react';
+import logoBaletani from '../../assets/img/baletani_white.png';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -33,12 +34,14 @@ const Footer = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {/* Brand Section */}
             <div className="space-y-3 sm:space-y-4">
-              <div className="flex items-center gap-2">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-base sm:text-lg">B</span>
-                </div>
+              <div className="flex items-center gap-3">
+                <img 
+                  src={logoBaletani} 
+                  alt="BaleTani Logo" 
+                  className="h-12 sm:h-14 w-auto object-contain"
+                />
                 <div className="flex flex-col">
-                  <span className="font-bold text-base sm:text-lg leading-tight">BaleTani</span>
+                  <span className="font-bold text-base sm:text-lg leading-tight">balétani</span>
                   <span className="text-xs text-gray-400 leading-none">Fresh Market</span>
                 </div>
               </div>
@@ -110,10 +113,10 @@ const Footer = () => {
                 <div className="flex items-center gap-2.5 sm:gap-3">
                   <Mail size={16} className="text-primary-400 flex-shrink-0" />
                   <a 
-                    href="mailto:info@baletani.com" 
+                    href="mailto:baletaniinfo@gmail.com" 
                     className="text-caption text-gray-300 hover:text-primary-400 transition-colors"
                   >
-                    info@baletani.com
+                    baletaniinfo@gmail.com
                   </a>
                 </div>
               </div>

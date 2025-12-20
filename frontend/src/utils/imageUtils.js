@@ -41,10 +41,23 @@ export const getImageUrl = (imagePath, size = "product") => {
   }
 
   // Construct full URL for uploads
-  const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  // Use VITE_STATIC_BASE_URL for static files (tanpa /api)
+  // Fallback: strip /api dari VITE_API_BASE_URL jika VITE_STATIC_BASE_URL tidak ada
+  let baseURL = import.meta.env.VITE_STATIC_BASE_URL;
+
+  if (!baseURL) {
+    // Fallback: gunakan VITE_API_BASE_URL dan remove /api suffix
+    baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+    baseURL = baseURL.replace(/\/api\/?$/, "");
+  }
+
+  // Clean trailing slash from base URL
+  const cleanBase = baseURL.endsWith("/") ? baseURL.slice(0, -1) : baseURL;
+
+  // Ensure path starts with /
   const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
 
-  return `${baseURL}${cleanPath}`;
+  return `${cleanBase}${cleanPath}`;
 };
 
 /**

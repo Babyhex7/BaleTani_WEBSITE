@@ -9,6 +9,57 @@ const Customer = require("../models/customer.model");
 const Cart = require("../models/cart.model");
 
 /**
+ * Get order status (for polling in Order Success Page)
+ * GET /api/customer/orders/:id/status
+ */
+exports.getOrderStatus = async (req, res) => {
+  try {
+    const customerId = req.customer.id;
+    const { id } = req.params;
+
+    const order = await Order.findOne({
+      where: {
+        id: id,
+        customer_id: customerId,
+      },
+      attributes: [
+        "id",
+        "order_number",
+        "order_status",
+        "payment_status",
+        "payment_expired_at",
+        "updated_at",
+      ],
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order tidak ditemukan",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        id: order.id,
+        order_number: order.order_number,
+        order_status: order.order_status,
+        payment_status: order.payment_status,
+        payment_expired_at: order.payment_expired_at,
+        updated_at: order.updated_at,
+      },
+    });
+  } catch (error) {
+    console.error("[GET ORDER STATUS ERROR]", error);
+    return res.status(500).json({
+      success: false,
+      message: "Gagal mengambil status order",
+    });
+  }
+};
+
+/**
  * Get customer order history with filters, search, and pagination
  * GET /api/customer/orders
  */

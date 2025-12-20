@@ -3,7 +3,7 @@
  * Handles all product-related API calls for customer side
  */
 
-import apiClient from "./apiClient";
+import apiClient from "../../utils/apiClient";
 
 const productService = {
   /**

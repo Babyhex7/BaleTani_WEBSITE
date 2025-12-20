@@ -99,8 +99,8 @@ const AdminFormModal = ({ isOpen, admin, roles = [], isEditMode = false, onClose
     if (!isEditMode) {
       if (!formData.password) {
         newErrors.password = 'Password wajib diisi';
-      } else if (formData.password.length < 6) {
-        newErrors.password = 'Password minimal 6 karakter';
+      } else if (formData.password.length < 8) {
+        newErrors.password = 'Password minimal 8 karakter';
       }
 
       if (!formData.password_confirmation) {
@@ -111,8 +111,8 @@ const AdminFormModal = ({ isOpen, admin, roles = [], isEditMode = false, onClose
     } else {
       // Untuk edit mode, hanya validasi jika password diisi
       if (formData.password) {
-        if (formData.password.length < 6) {
-          newErrors.password = 'Password minimal 6 karakter';
+        if (formData.password.length < 8) {
+          newErrors.password = 'Password minimal 8 karakter';
         }
         if (formData.password !== formData.password_confirmation) {
           newErrors.password_confirmation = 'Password tidak cocok';
@@ -318,7 +318,8 @@ const AdminFormModal = ({ isOpen, admin, roles = [], isEditMode = false, onClose
                     className={`block w-full pr-10 py-2 border ${
                       errors.password ? 'border-red-300' : 'border-gray-300'
                     } rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500`}
-                    placeholder={isEditMode ? 'Kosongkan jika tidak ingin mengubah' : 'Minimal 6 karakter'}
+                    placeholder={isEditMode ? 'Kosongkan jika tidak ingin mengubah' : 'Minimal 8 karakter'}
+                    minLength={8}
                   />
                   <button
                     type="button"
@@ -397,7 +398,7 @@ const AdminFormModal = ({ isOpen, admin, roles = [], isEditMode = false, onClose
                   <div className="text-sm text-blue-800">
                     <p className="font-medium mb-1">Informasi Penting:</p>
                     <ul className="list-disc list-inside space-y-1 text-xs">
-                      <li>Password minimal 6 karakter</li>
+                      <li>Password minimal 8 karakter</li>
                       <li>Nomor telepon akan digunakan untuk login</li>
                       <li>Pilih role sesuai dengan tanggung jawab admin</li>
                       {isEditMode && (

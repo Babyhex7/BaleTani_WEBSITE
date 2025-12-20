@@ -485,6 +485,24 @@ const update = async (req, res) => {
       updated_at: new Date(),
     });
 
+    // Handle deleted images if provided
+    if (req.body.deleted_image_ids) {
+      try {
+        const deletedIds = JSON.parse(req.body.deleted_image_ids);
+        if (Array.isArray(deletedIds) && deletedIds.length > 0) {
+          console.log("[UPDATE PRODUCT] Deleting images:", deletedIds);
+          await ProductImage.destroy({
+            where: {
+              id: deletedIds,
+              product_id: product.id, // Ensure images belong to this product
+            },
+          });
+        }
+      } catch (err) {
+        console.error("[UPDATE PRODUCT] Error parsing deleted_image_ids:", err);
+      }
+    }
+
     // Handle new image uploads if files are provided
     if (req.files && req.files.length > 0) {
       // Get current max display_order
@@ -570,9 +588,21 @@ const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Find product
+    // Import path dan fs untuk file cleanup
+    const path = require("path");
+    const fs = require("fs");
+
+    // Find product dengan images
     const product = await Product.findOne({
       where: { id: id },
+      include: [
+        {
+          model: ProductImage,
+          as: "images",
+          required: false,
+          attributes: ["id", "image_url"],
+        },
+      ],
     });
 
     if (!product) {
@@ -584,12 +614,36 @@ const deleteProduct = async (req, res) => {
 
     const productName = product.name;
 
+    // ========================================
+    // CLEANUP: Delete image files dari disk
+    // ========================================
+    if (product.images && product.images.length > 0) {
+      console.log(
+        `🗑️ Deleting ${product.images.length} image files for product ${id}`
+      );
+
+      product.images.forEach((img) => {
+        const filePath = path.join(__dirname, "../../public", img.image_url);
+
+        if (fs.existsSync(filePath)) {
+          try {
+            fs.unlinkSync(filePath);
+            console.log(`✅ Deleted image file: ${img.image_url}`);
+          } catch (err) {
+            console.error(`❌ Error deleting file ${filePath}:`, err.message);
+          }
+        } else {
+          console.log(`⚠️ File not found (skipping): ${filePath}`);
+        }
+      });
+    }
+
     // Delete related ProductDiscount entries first
     await ProductDiscount.destroy({
       where: { product_id: id },
     });
 
-    // Delete product images
+    // Delete product images from database
     await ProductImage.destroy({
       where: { product_id: id },
     });

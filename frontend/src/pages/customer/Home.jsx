@@ -22,9 +22,6 @@ const Home = () => {
   const { user } = useAuthStore();
   const { cart: cartItems } = useCartStore();
   
-  // Debug: Check user data
-  console.log('User data from store:', user);
-  
   // State management
   const [featuredProducts, setFeaturedProducts] = useState([]);
   

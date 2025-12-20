@@ -67,7 +67,6 @@ const useAdminStore = create(
       },
 
       logout: () => {
-        console.log("[AdminStore] Logout");
         set({
           admin: null,
           token: null,

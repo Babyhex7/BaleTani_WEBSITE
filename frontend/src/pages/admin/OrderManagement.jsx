@@ -125,8 +125,9 @@ const OrderManagement = () => {
         setTotalItems(response.data.pagination.total_items);
       }
     } catch (err) {
-      console.error("Error fetching orders:", err);
-      setError(err.response?.data?.message || "Gagal memuat data orders");
+      const errorMsg = err.response?.data?.message || err.message || "Gagal memuat data orders";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -147,7 +148,8 @@ const OrderManagement = () => {
         setStatistics(response.data);
       }
     } catch (err) {
-      console.error("Error fetching statistics:", err);
+      const errorMsg = err.response?.data?.message || err.message || "Gagal memuat statistik";
+      toast.error(errorMsg);
     }
   };
 

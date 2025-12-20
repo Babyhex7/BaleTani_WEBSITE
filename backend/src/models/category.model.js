@@ -18,6 +18,11 @@ const Category = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true
     },
+    category_image: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      comment: 'Path to category image file'
+    },
     is_active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true

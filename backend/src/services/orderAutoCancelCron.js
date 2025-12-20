@@ -7,13 +7,9 @@ const { Order, Product, OrderItem, OrderStatusHistory } = require("../models");
 const { Op } = require("sequelize");
 const { sequelize } = require("../config/database");
 const { getWIBDate } = require("../utils/dateHelper");
+const logger = require("../utils/logger");
 
-// CONFIG: Timeout pembayaran - 10 MENIT (PRODUCTION)
-const PAYMENT_TIMEOUT_MS = 10 * 60 * 1000; // 10 menit
-
-console.log(
-  `[AUTO-CANCEL] Payment timeout: ${PAYMENT_TIMEOUT_MS / 60000} menit`
-);
+const PAYMENT_TIMEOUT_MS = 10 * 60 * 1000;
 
 /**
  * Auto-cancel expired orders
@@ -45,14 +41,11 @@ const autoCancelExpiredOrders = async () => {
     });
 
     if (expiredOrders.length === 0) {
-      console.log("[AUTO-CANCEL] ✓ Tidak ada order expired");
       await transaction.commit();
       return { success: true, cancelledCount: 0 };
     }
 
-    console.log(
-      `[AUTO-CANCEL] Ditemukan ${expiredOrders.length} order expired`
-    );
+    logger.info(`[AUTO-CANCEL] Found ${expiredOrders.length} expired orders`);
 
     let cancelledCount = 0;
 
@@ -87,9 +80,6 @@ const autoCancelExpiredOrders = async () => {
                 },
                 { transaction }
               );
-              console.log(
-                `  → Stock ${product.name} dikembalikan: +${item.quantity}`
-              );
             }
           }
         }
@@ -107,13 +97,10 @@ const autoCancelExpiredOrders = async () => {
           { transaction }
         );
 
-        console.log(
-          `[AUTO-CANCEL] ✓ Order ${order.order_number} dibatalkan (expired)`
-        );
         cancelledCount++;
       } catch (error) {
-        console.error(
-          `[AUTO-CANCEL] ✗ Error cancel order ${order.order_number}:`,
+        logger.error(
+          `[AUTO-CANCEL] Error cancel order ${order.order_number}:`,
           error.message
         );
         // Continue dengan order berikutnya
@@ -121,7 +108,7 @@ const autoCancelExpiredOrders = async () => {
     }
 
     await transaction.commit();
-    console.log(`[AUTO-CANCEL] ✓ Berhasil cancel ${cancelledCount} order`);
+    logger.info(`[AUTO-CANCEL] Cancelled ${cancelledCount} orders`);
 
     return {
       success: true,
@@ -130,7 +117,7 @@ const autoCancelExpiredOrders = async () => {
     };
   } catch (error) {
     await transaction.rollback();
-    console.error("[AUTO-CANCEL] ✗ Error:", error.message);
+    logger.error("[AUTO-CANCEL] Error:", error.message);
     return { success: false, error: error.message };
   }
 };
@@ -139,12 +126,9 @@ const autoCancelExpiredOrders = async () => {
  * Start cron job
  */
 const startAutoCancelCron = () => {
-  // Interval: 30 detik (lebih responsive untuk production)
-  const CRON_INTERVAL_MS = 30 * 1000; // 30 detik
+  const CRON_INTERVAL_MS = 30 * 1000;
 
-  console.log(
-    `[AUTO-CANCEL] Cron job dimulai, interval: ${CRON_INTERVAL_MS / 1000} detik`
-  );
+  logger.info(`[AUTO-CANCEL] Cron job started, interval: ${CRON_INTERVAL_MS / 1000}s`);
 
   // Jalankan pertama kali setelah 10 detik
   setTimeout(() => {
@@ -165,7 +149,7 @@ const startAutoCancelCron = () => {
 const stopAutoCancelCron = (intervalId) => {
   if (intervalId) {
     clearInterval(intervalId);
-    console.log("[AUTO-CANCEL] Cron job dihentikan");
+    logger.info("[AUTO-CANCEL] Cron job stopped");
   }
 };
 

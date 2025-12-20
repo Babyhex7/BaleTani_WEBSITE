@@ -17,6 +17,7 @@ import AdminSidebarNew from "../../components/layout_admin/AdminSidebarNew";
 import AdminHeaderNew from "../../components/layout_admin/AdminHeaderNew";
 import reportService from "../../services/services_admin/reportService";
 import inventoryService from "../../services/services_admin/inventoryService";
+import { getImageUrl } from "../../utils/imageUtils";
 
 const InventoryReport = () => {
   const [loading, setLoading] = useState(false);
@@ -499,11 +500,7 @@ const InventoryReport = () => {
                             <div className="flex items-center gap-3">
                               {product.image_url ? (
                                 <img
-                                  src={
-                                    product.image_url.startsWith("http")
-                                      ? product.image_url
-                                      : `http://localhost:5000${product.image_url}`
-                                  }
+                                src={getImageUrl(product.image_url)}
                                   alt={product.name}
                                   className="w-10 h-10 rounded-lg object-cover border"
                                 />

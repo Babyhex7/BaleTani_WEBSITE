@@ -3,7 +3,7 @@
  * API calls untuk public discount endpoints
  */
 
-import apiClient from "./apiClient";
+import apiClient from "../../utils/apiClient";
 
 const discountService = {
   /**

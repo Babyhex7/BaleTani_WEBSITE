@@ -18,13 +18,6 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { login, setLoading } = useAdminStore();
 
-  // Test toast on component mount
-  useEffect(() => {
-    console.log('[AdminLogin] Component mounted');
-    console.log('[AdminLogin] Toast available:', typeof toast);
-    console.log('[AdminLogin] Toast.error available:', typeof toast.error);
-  }, []);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -75,9 +68,6 @@ const AdminLogin = () => {
       const response = await adminAuthService.login(loginData);
       
       // response berisi { admin, token, permissions, message }
-      console.log('[AdminLogin] Login response:', response);
-      console.log('[AdminLogin] Permissions count:', response.permissions?.length || 0);
-      
       // Save ke admin store dengan permissions
       login(response.admin, response.token, response.permissions || []);
       
@@ -101,32 +91,23 @@ const AdminLogin = () => {
       // Priority 1: Check if error has message property (from adminAuthService)
       if (error.message) {
         errorMessage = error.message;
-        console.log('[AdminLogin] Using error.message:', errorMessage);
       }
       // Priority 2: Check backend response
       else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
-        console.log('[AdminLogin] Using error.response.data.message:', errorMessage);
       }
       // Priority 3: Check error code
       else if (error.code === 'NETWORK_ERROR') {
         errorMessage = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
-        console.log('[AdminLogin] Using NETWORK_ERROR message');
       }
       // Priority 4: Check if it's a timeout
       else if (error.code === 'ECONNABORTED') {
         errorMessage = 'Request timeout. Server terlalu lama merespons.';
-        console.log('[AdminLogin] Using timeout message');
       }
       
       // ALWAYS show toast with error message
-      console.log('[AdminLogin] ===== CALLING TOAST.ERROR =====');
-      console.log('[AdminLogin] Toast message:', errorMessage);
-      console.log('[AdminLogin] Toast function:', typeof toast.error);
-      
       try {
         toast.error(errorMessage);
-        console.log('[AdminLogin] ✅ Toast.error called successfully');
       } catch (toastError) {
         console.error('[AdminLogin] ❌ Toast.error failed:', toastError);
       }

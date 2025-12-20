@@ -8,8 +8,9 @@
 
 const { Op } = require("sequelize");
 const { Category, Product } = require("../models");
+const fs = require("fs");
+const path = require("path");
 
-// Import cache service dan cache keys untuk invalidation
 const cacheService = require("../cache/cacheService");
 const { PATTERNS } = require("../cache/cacheKeys");
 
@@ -47,34 +48,36 @@ const getAllCategories = async (req, res) => {
     // Calculate offset
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    // Get categories with product count
+    // Get categories
     const { count, rows: categories } = await Category.findAndCountAll({
       where: whereClause,
-      include: [
-        {
-          model: Product,
-          as: "products",
-          attributes: ["id"],
-          where: { is_active: true },
-          required: false,
-        },
-      ],
       limit: parseInt(limit),
       offset: offset,
       order: [[sort_by, sort_order]],
-      distinct: true,
     });
 
-    // Format response with product count
-    const formattedCategories = categories.map((category) => ({
-      id: category.id,
-      category_name: category.category_name,
-      description: category.description,
-      is_active: category.is_active,
-      product_count: category.products ? category.products.length : 0,
-      created_at: category.created_at,
-      updated_at: category.updated_at,
-    }));
+    // Get product counts separately for each category
+    const categoriesWithCount = await Promise.all(
+      categories.map(async (category) => {
+        const productCount = await Product.count({
+          where: {
+            category_id: category.id,
+            is_active: true,
+          },
+        });
+
+        return {
+          id: category.id,
+          category_name: category.category_name,
+          description: category.description,
+          category_image: category.category_image,
+          is_active: category.is_active,
+          product_count: productCount,
+          created_at: category.created_at,
+          updated_at: category.updated_at,
+        };
+      })
+    );
 
     const totalPages = Math.ceil(count / parseInt(limit));
 
@@ -82,7 +85,7 @@ const getAllCategories = async (req, res) => {
       success: true,
       message: "Kategori berhasil diambil",
       data: {
-        categories: formattedCategories,
+        categories: categoriesWithCount,
         pagination: {
           current_page: parseInt(page),
           total_pages: totalPages,
@@ -109,13 +112,11 @@ const getCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const category = await Category.findOne({
-      where: { id },
+    const category = await Category.findByPk(id, {
       include: [
         {
           model: Product,
           as: "products",
-          // where clause cleaned,
           required: false,
           attributes: [
             "id",
@@ -142,6 +143,7 @@ const getCategoryById = async (req, res) => {
         id: category.id,
         category_name: category.category_name,
         description: category.description,
+        category_image: category.category_image,
         is_active: category.is_active,
         product_count: category.products ? category.products.length : 0,
         products: category.products || [],
@@ -167,7 +169,6 @@ const createCategory = async (req, res) => {
   try {
     const { category_name, description, is_active = true } = req.body;
 
-    // Validation
     if (!category_name) {
       return res.status(400).json({
         success: false,
@@ -175,7 +176,6 @@ const createCategory = async (req, res) => {
       });
     }
 
-    // Check if category name already exists
     const existingCategory = await Category.findOne({
       where: {
         category_name,
@@ -189,21 +189,19 @@ const createCategory = async (req, res) => {
       });
     }
 
-    // Create category
-    const newCategory = await Category.create({
+    // Handle image upload
+    const categoryData = {
       category_name,
       description,
       is_active,
-    });
+    };
 
-    // ========================================
-    // CACHE INVALIDATION: Hapus cache categories
-    // ========================================
-    console.log(
-      "[CACHE INVALIDATION] Category created - Clearing categories cache"
-    );
+    if (req.file) {
+      categoryData.category_image = `/uploads/categories/${req.file.filename}`;
+    }
 
-    // Hapus cache categories (customer & admin)
+    const newCategory = await Category.create(categoryData);
+
     cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
     cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
 
@@ -231,10 +229,7 @@ const updateCategory = async (req, res) => {
     const { id } = req.params;
     const { category_name, description, is_active } = req.body;
 
-    // Find category
-    const category = await Category.findOne({
-      where: { id },
-    });
+    const category = await Category.findByPk(id);
 
     if (!category) {
       return res.status(404).json({
@@ -243,7 +238,6 @@ const updateCategory = async (req, res) => {
       });
     }
 
-    // Check if new name already exists (exclude current category)
     if (category_name && category_name !== category.category_name) {
       const existingCategory = await Category.findOne({
         where: {
@@ -260,27 +254,46 @@ const updateCategory = async (req, res) => {
       }
     }
 
-    // Update category
     const updateData = {};
     if (category_name !== undefined) updateData.category_name = category_name;
     if (description !== undefined) updateData.description = description;
     if (is_active !== undefined) updateData.is_active = is_active;
-    updateData.updated_at = new Date();
+
+    // Handle image removal if remove_image flag is set
+    if (req.body.remove_image === "true") {
+      // Delete old image if exists
+      if (category.category_image) {
+        const oldImagePath = path.join(
+          __dirname,
+          "../../public",
+          category.category_image
+        );
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+      updateData.category_image = null;
+    }
+    // Handle new image upload
+    else if (req.file) {
+      // Delete old image if exists
+      if (category.category_image) {
+        const oldImagePath = path.join(
+          __dirname,
+          "../../public",
+          category.category_image
+        );
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+      updateData.category_image = `/uploads/categories/${req.file.filename}`;
+    }
 
     await category.update(updateData);
 
-    // ========================================
-    // CACHE INVALIDATION: Hapus cache categories & products
-    // ========================================
-    console.log(
-      `[CACHE INVALIDATION] Category updated (ID: ${id}) - Clearing cache`
-    );
-
-    // 1. Hapus cache categories
     cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
     cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
-
-    // 2. Hapus cache products (karena category_name mungkin berubah)
     cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
     cacheService.delPattern(PATTERNS.ADMIN_PRODUCTS);
 
@@ -307,7 +320,6 @@ const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Find category
     const category = await Category.findOne({
       where: { id },
     });
@@ -319,7 +331,6 @@ const deleteCategory = async (req, res) => {
       });
     }
 
-    // Check if category has products
     const productCount = await Product.count({
       where: {
         category_id: id,
@@ -333,19 +344,22 @@ const deleteCategory = async (req, res) => {
       });
     }
 
+    // Delete image file if exists
+    if (category.category_image) {
+      const imagePath = path.join(
+        __dirname,
+        "../../public",
+        category.category_image
+      );
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+
     const categoryName = category.category_name;
 
-    // Hard delete
     await category.destroy();
 
-    // ========================================
-    // CACHE INVALIDATION: Hapus cache categories
-    // ========================================
-    console.log(
-      `[CACHE INVALIDATION] Category deleted (ID: ${id}) - Clearing cache`
-    );
-
-    // Hapus cache categories (customer & admin)
     cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
     cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
 
@@ -413,11 +427,102 @@ const toggleCategoryStatus = async (req, res) => {
   }
 };
 
+/**
+ * GET /api/admin/categories/all
+ * Get all active categories (no pagination) - lightweight fields
+ */
+const getActiveCategoriesAll = async (req, res) => {
+  try {
+    const categories = await Category.findAll({
+      where: { is_active: true },
+      attributes: ["id", "category_name"],
+      order: [["category_name", "ASC"]],
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Active categories retrieved",
+      data: categories,
+    });
+  } catch (error) {
+    console.error("Error fetching active categories:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal mengambil kategori aktif",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * DELETE /api/admin/categories/:id/image
+ * Delete category image only
+ */
+const deleteCategoryImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const category = await Category.findOne({
+      where: { id },
+    });
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Kategori tidak ditemukan",
+      });
+    }
+
+    if (!category.category_image) {
+      return res.status(400).json({
+        success: false,
+        message: "Kategori tidak memiliki gambar",
+      });
+    }
+
+    // Delete image file
+    const imagePath = path.join(
+      __dirname,
+      "../../public",
+      category.category_image
+    );
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
+
+    // Update category to remove image reference
+    await category.update({
+      category_image: null,
+      updated_at: new Date(),
+    });
+
+    cacheService.delPattern(PATTERNS.CUSTOMER_CATEGORIES);
+    cacheService.delPattern(PATTERNS.ADMIN_CATEGORIES);
+    cacheService.delPattern(PATTERNS.CUSTOMER_PRODUCTS);
+    cacheService.delPattern(PATTERNS.ADMIN_PRODUCTS);
+
+    res.status(200).json({
+      success: true,
+      message: "Gambar kategori berhasil dihapus",
+      data: category,
+    });
+  } catch (error) {
+    console.error("Error deleting category image:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal menghapus gambar kategori",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAllCategories,
   getCategoryById,
   createCategory,
   updateCategory,
   deleteCategory,
+  deleteCategoryImage,
   toggleCategoryStatus,
+  getActiveCategoriesAll,
 };

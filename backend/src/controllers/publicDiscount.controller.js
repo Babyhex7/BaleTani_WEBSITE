@@ -32,8 +32,6 @@ const { CUSTOMER } = require("../cache/cacheKeys");
  */
 exports.getAllDiscounts = async (req, res) => {
   try {
-    console.log("🎁 [PUBLIC DISCOUNTS] Request received"); // Debug log
-
     // ========================================
     // STEP 1: Check Cache
     // ========================================
@@ -54,8 +52,6 @@ exports.getAllDiscounts = async (req, res) => {
     // ========================================
     // STEP 2: Cache MISS - Query Database
     // ========================================
-    console.log(`[CACHE MISS] ❌ Key: ${cacheKey} - Data tidak ada di cache`);
-    console.log("[DB QUERY] Discounts - Cache miss, querying database...");
 
     // Get active discounts only
     const currentDate = new Date();

@@ -286,10 +286,10 @@ const createOrder = async (req, res) => {
 
     // Set payment expiry time
     // Cash TIDAK ada expired time karena bayar di tempat (tidak bisa auto-cancel)
-    const PAYMENT_TIMEOUT_MS = 10 * 60 * 1000; // 10 menit
+    const PAYMENT_TIMEOUT_MS = 10 * 60 * 1000; // 10 menit dari sekarang
 
     const paymentExpiredAt =
-      payment_method !== "cash"
+      payment_method !== "cash" && payment_method !== "tunai"
         ? new Date(Date.now() + PAYMENT_TIMEOUT_MS)
         : null; // Cash tidak perlu expired time (tidak akan auto-cancel)
 
@@ -297,7 +297,7 @@ const createOrder = async (req, res) => {
       console.log(
         `[CREATE ORDER] Payment timeout: ${
           PAYMENT_TIMEOUT_MS / 60000
-        } menit, expired at: ${paymentExpiredAt}`
+        } menit, expired at: ${paymentExpiredAt.toISOString()}`
       );
     } else {
       console.log(
@@ -518,13 +518,34 @@ const createOrder = async (req, res) => {
       waMessage += `No. Rek: ${createdOrder.payment.virtual_account}\n`;
       waMessage += `a/n: ${createdOrder.payment.account_name}\n`;
       waMessage += `Jumlah: ${formatRupiah(responseData.total_amount)}\n\n`;
-      waMessage += `⏰ Batas Waktu: ${formatDate(
-        createdOrder.payment.expired_at
-      )}\n\n`;
+
+      // Gunakan payment_expired_at dari order (bukan payment.expired_at)
+      if (responseData.payment_expired_at) {
+        waMessage += `⏰ *Selesaikan pembayaran sebelum:*\n`;
+        waMessage += `${formatDate(responseData.payment_expired_at)}\n`;
+        waMessage += `_(10 menit dari sekarang)_\n\n`;
+      }
+
       waMessage += `📸 *Setelah transfer, mohon kirim bukti transfer ke nomor ini*\n\n`;
-    } else if (payment_method === "cash") {
+    } else if (payment_method === "qris") {
+      waMessage += `📱 QRIS\n\n`;
+      waMessage += `*CARA PEMBAYARAN:*\n`;
+      waMessage += `1️⃣ Admin akan mengirimkan QR Code pembayaran ke nomor ini\n`;
+      waMessage += `2️⃣ Scan QR Code yang dikirim admin\n`;
+      waMessage += `3️⃣ Selesaikan pembayaran dengan nominal yang tertera\n`;
+      waMessage += `4️⃣ Kirim bukti pembayaran dan konfirmasi setelah berhasil\n\n`;
+      waMessage += `Jumlah: ${formatRupiah(responseData.total_amount)}\n\n`;
+
+      if (responseData.payment_expired_at) {
+        waMessage += `⏰ *Selesaikan pembayaran sebelum:*\n`;
+        waMessage += `${formatDate(responseData.payment_expired_at)}\n`;
+        waMessage += `_(10 menit dari sekarang)_\n\n`;
+      }
+    } else if (payment_method === "cash" || payment_method === "tunai") {
       waMessage += `💵 Cash (Bayar di Tempat)\n`;
-      waMessage += `Pembayaran dilakukan saat pengambilan/pengiriman barang\n\n`;
+      waMessage += `Pembayaran dilakukan saat pengambilan/pengiriman barang\n`;
+      waMessage += `Jumlah: ${formatRupiah(responseData.total_amount)}\n`;
+      waMessage += `💡 Siapkan uang pas untuk mempermudah transaksi\n\n`;
     }
 
     waMessage += `Terima kasih sudah berbelanja di *BaleTani Fresh Market*! 🌿✨\n`;

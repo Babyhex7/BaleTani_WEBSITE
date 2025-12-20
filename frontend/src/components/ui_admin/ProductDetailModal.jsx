@@ -11,6 +11,7 @@ import {
   XCircleIcon,
   PhotoIcon
 } from '@heroicons/react/24/outline';
+import { getImageUrl, handleImageError } from '../../utils/imageUtils';
 
 /**
  * Modal untuk melihat detail produk (Read-only)
@@ -31,13 +32,6 @@ const ProductDetailModal = ({
   const productName = product.name || product.product_name;
   const categoryName = category.category_name;
   const hasImages = images.length > 0;
-
-  // Helper function to get full image URL
-  const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-product.png';
-    if (imageUrl.startsWith('http')) return imageUrl;
-    return `http://localhost:5000${imageUrl}`;
-  };
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);

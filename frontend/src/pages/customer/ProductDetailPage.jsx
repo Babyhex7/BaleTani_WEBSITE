@@ -45,29 +45,6 @@ const ProductDetailPage = () => {
         const response = await productService.getProductDetail(id);
         
         if (response.success) {
-          console.log('✅ Product Detail API Response:', response);
-          console.log('📦 Full Product Data:', JSON.stringify(response.data, null, 2));
-          
-          console.log('🔍 DEBUG - Price Info:', {
-            price: response.data.price,
-            finalPrice: response.data.finalPrice,
-            hasPriceDifference: response.data.finalPrice < response.data.price
-          });
-          
-          if (response.data.discount) {
-            console.log('💰 Discount Info:', {
-              type: response.data.discount.type,
-              value: response.data.discount.value,
-              percentage: response.data.discount.percentage,
-              maxDiscount: response.data.discount.maxDiscount,
-              originalPrice: response.data.discount.originalPrice,
-              finalPrice: response.data.discount.finalPrice,
-              savings: response.data.discount.savings,
-              savingsPercentage: response.data.discount.savingsPercentage
-            });
-          } else {
-            console.log('⚠️ NO DISCOUNT OBJECT IN RESPONSE!');
-          }
           setProduct(response.data);
         }
       } catch (error) {
@@ -195,16 +172,6 @@ const ProductDetailPage = () => {
     originalPrice,      // ✅ Harga asli
     savingsAmount       // ✅ Jumlah hemat (Rp)
   } = calculateDiscount(product);
-  
-  // ✅ DEBUG: Log hasil calculation untuk troubleshooting
-  console.log('🔥 ProductDetail - Discount Calculation:', {
-    hasDiscount,
-    displayPercentage,
-    finalPrice,
-    originalPrice,
-    savingsAmount,
-    rawProductDiscount: product?.discount
-  });
 
   return (
     <>

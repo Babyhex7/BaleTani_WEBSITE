@@ -363,7 +363,7 @@ testing/
 
 ### Contact:
 
-- 📧 Email: support@baletani.com
+- 📧 Email: baletaniinfo@gmail.com
 - 📱 WhatsApp: 085885725027
 - 🌐 Website: https://baletani.com
 

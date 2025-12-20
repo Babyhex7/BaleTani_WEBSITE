@@ -185,6 +185,9 @@ const UserManagement = () => {
       // await deleteUser(selectedUser.id);
       setUsers(prev => prev.filter(u => u.id !== selectedUser.id));
       setTotalItems(prev => prev - 1);
+      setShowDeleteModal(false);
+      // Optional: Show success message
+      console.log(`User ${selectedUser.full_name} berhasil dihapus`);
     } catch (err) {
       setError('Gagal menghapus pengguna');
     }
@@ -448,8 +451,8 @@ const UserManagement = () => {
           isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
           onConfirm={confirmDelete}
-          title="Hapus Pengguna"
-          message={`Apakah Anda yakin ingin menghapus pengguna "${selectedUser?.full_name}"? Tindakan ini tidak dapat dibatalkan.`}
+          title="Hapus Akun Admin"
+          message={`Apakah Anda yakin ingin menghapus akun admin "${selectedUser?.full_name}"? Akun akan dihapus dan tidak bisa dipulihkan. Tindakan ini tidak dapat dibatalkan.`}
           confirmText="Hapus"
           type="danger"
         />
@@ -488,18 +491,54 @@ const UserModal = ({ isOpen, onClose, user, isEdit, onSave }) => {
     }
   }, [user, isEdit, isOpen]);
 
+  const [validationError, setValidationError] = useState('');
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setValidationError('');
 
     try {
+      // Validasi field wajib
       if (!formData.full_name || !formData.email || (!isEdit && !formData.password)) {
         throw new Error('Semua field wajib diisi');
+      }
+
+      // Validasi nama - hanya huruf, angka, spasi, titik, underscore
+      const nameRegex = /^[\p{L}\d\s._]+$/u;
+      if (!nameRegex.test(formData.full_name.trim())) {
+        throw new Error('Nama hanya boleh berisi huruf, angka, spasi, titik, dan underscore. Karakter spesial tidak diperbolehkan');
+      }
+
+      // Validasi panjang nama
+      if (formData.full_name.trim().length < 3) {
+        throw new Error('Nama minimal 3 karakter');
+      }
+
+      if (formData.full_name.trim().length > 50) {
+        throw new Error('Nama maksimal 50 karakter');
+      }
+
+      // Validasi spasi di awal/akhir
+      if (formData.full_name !== formData.full_name.trim()) {
+        throw new Error('Nama tidak boleh dimulai atau diakhiri dengan spasi');
+      }
+
+      // Validasi password (jika ada)
+      if (formData.password) {
+        if (formData.password.length < 8) {
+          throw new Error('Password minimal 8 karakter');
+        }
+
+        if (formData.password.length > 100) {
+          throw new Error('Password maksimal 100 karakter');
+        }
       }
 
       await onSave(formData);
     } catch (err) {
       console.error('Error saving user:', err);
+      setValidationError(err.message || 'Terjadi kesalahan saat menyimpan data');
     } finally {
       setIsSubmitting(false);
     }
@@ -521,6 +560,13 @@ const UserModal = ({ isOpen, onClose, user, isEdit, onSave }) => {
       size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Validation Error Alert */}
+        {validationError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+            <p className="text-sm">{validationError}</p>
+          </div>
+        )}
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Nama Lengkap <span className="text-red-500">*</span>
@@ -531,9 +577,14 @@ const UserModal = ({ isOpen, onClose, user, isEdit, onSave }) => {
             value={formData.full_name}
             onChange={handleChange}
             className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
-            placeholder="Masukkan nama lengkap"
+            placeholder="Masukkan nama lengkap (min 3 karakter)"
             required
+            minLength={3}
+            maxLength={50}
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Hanya huruf, angka, spasi, titik (.), dan underscore (_)
+          </p>
         </div>
 
         <div>
@@ -562,9 +613,14 @@ const UserModal = ({ isOpen, onClose, user, isEdit, onSave }) => {
             value={formData.password}
             onChange={handleChange}
             className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
-            placeholder="Masukkan password"
+            placeholder="Masukkan password (min 8 karakter)"
             required={!isEdit}
+            minLength={8}
+            maxLength={100}
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Password minimal 8 karakter
+          </p>
         </div>
 
         <div>

@@ -59,8 +59,8 @@ const Register = () => {
 
     if (!formData.password) {
       newErrors.password = 'Password wajib diisi';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password minimal 6 karakter';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password minimal 8 karakter';
     }
 
     if (!formData.confirmPassword) {

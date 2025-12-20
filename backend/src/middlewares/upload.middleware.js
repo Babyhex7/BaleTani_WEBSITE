@@ -2,27 +2,42 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// Create upload directory if not exists
-const uploadDir = path.join(__dirname, "../../public/uploads/products");
+// Create upload directories if not exists
+const productUploadDir = path.join(__dirname, "../../public/uploads/products");
+const categoryUploadDir = path.join(__dirname, "../../public/uploads/categories");
 
-// Ensure directory exists
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Ensure directories exist
+[productUploadDir, categoryUploadDir].forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
 
-// Configure storage
-const storage = multer.diskStorage({
+// Configure storage for products
+const productStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadDir);
+    cb(null, productUploadDir);
   },
   filename: (req, file, cb) => {
-    // Generate unique filename: timestamp-random-original.ext
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname).toLowerCase();
     const nameWithoutExt = path.basename(file.originalname, ext);
-    // Sanitize filename: Remove/replace non-alphanumeric (including spaces)
     const sanitizedName = nameWithoutExt.replace(/[^a-zA-Z0-9]/g, "-");
     cb(null, `${sanitizedName}-${uniqueSuffix}${ext}`);
+  },
+});
+
+// Configure storage for categories
+const categoryStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, categoryUploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname).toLowerCase();
+    const nameWithoutExt = path.basename(file.originalname, ext);
+    const sanitizedName = nameWithoutExt.replace(/[^a-zA-Z0-9]/g, "-");
+    cb(null, `category-${sanitizedName}-${uniqueSuffix}${ext}`);
   },
 });
 
@@ -55,13 +70,23 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer
-const upload = multer({
-  storage: storage,
+// Configure multer for products
+const uploadProduct = multer({
+  storage: productStorage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB max per file
-    files: 5, // Max 5 files per request
+    fileSize: 5 * 1024 * 1024,
+    files: 5,
+  },
+});
+
+// Configure multer for categories (single image)
+const uploadCategory = multer({
+  storage: categoryStorage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 2 * 1024 * 1024, // 2MB max for category images
+    files: 1, // Only 1 image per category
   },
 });
 
@@ -97,6 +122,8 @@ const handleMulterError = (err, req, res, next) => {
 };
 
 module.exports = {
-  upload,
+  upload: uploadProduct, // backward compatibility
+  uploadProduct,
+  uploadCategory,
   handleMulterError,
 };

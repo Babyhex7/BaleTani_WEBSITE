@@ -5,6 +5,8 @@ import {
   TrashIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import inventoryService from '../../services/services_admin/inventoryService';
+import { getImageUrl, handleImageError } from '../../utils/imageUtils';
 
 /**
  * Modal Form untuk Create & Edit Product
@@ -20,6 +22,8 @@ const ProductFormModal = ({
 }) => {
   // Ensure categories is always an array
   const categoriesList = Array.isArray(categories) ? categories : [];
+  const [allCategories, setAllCategories] = useState(categoriesList);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     product_name: '',
@@ -36,11 +40,22 @@ const ProductFormModal = ({
   const [images, setImages] = useState([]); // File objects untuk upload
   const [imagePreviews, setImagePreviews] = useState([]); // URLs untuk preview
   const [existingImages, setExistingImages] = useState([]); // Gambar dari server (edit mode)
+  const [deletedImageIds, setDeletedImageIds] = useState([]); // Track image IDs yang dihapus
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isInitialized, setIsInitialized] = useState(false); // Track if data loaded
 
-  // Load data saat edit mode
+  // Load data saat edit mode - ONLY ONCE when modal opens
   useEffect(() => {
+    if (!isOpen) {
+      // Reset initialization flag when modal closes
+      setIsInitialized(false);
+      return;
+    }
+
+    // Only initialize once when modal opens
+    if (isInitialized) return;
+
     if (product && mode === 'edit') {
       // Handle both 'name' and 'product_name' field names
       const productName = product.name || product.product_name;
@@ -62,11 +77,35 @@ const ProductFormModal = ({
       if (productImages.length > 0) {
         setExistingImages(productImages);
       }
+      
+      setIsInitialized(true);
     } else if (mode === 'create') {
       // Reset form untuk create mode
       resetForm();
+      setIsInitialized(true);
     }
-  }, [product, mode, isOpen]);
+  }, [isOpen, mode]); // Only depend on isOpen and mode
+
+  // Fetch all active categories (not paginated) when modal opens
+  useEffect(() => {
+    const fetchActiveCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        // Request a large limit on page 1 and filter active categories
+        const res = await inventoryService.getCategories({ page: 1, limit: 1000, is_active: true });
+        const cats = res?.data?.categories || res?.categories || res?.data || [];
+        setAllCategories(Array.isArray(cats) ? cats : []);
+      } catch (err) {
+        console.error('Failed to fetch all categories for ProductFormModal', err);
+        // fallback to categories passed via props
+        setAllCategories(categoriesList);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    if (isOpen) fetchActiveCategories();
+  }, [isOpen]);
 
   const resetForm = () => {
     setFormData({
@@ -83,6 +122,7 @@ const ProductFormModal = ({
     setImages([]);
     setImagePreviews([]);
     setExistingImages([]);
+    setDeletedImageIds([]);
     setErrors({});
   };
 
@@ -117,10 +157,10 @@ const ProductFormModal = ({
       return;
     }
 
-    // Validate file sizes (max 2MB per file)
-    const oversizedFiles = files.filter(file => file.size > 2 * 1024 * 1024);
+    // Validate file sizes (max 5MB per file - match backend limit)
+    const oversizedFiles = files.filter(file => file.size > 5 * 1024 * 1024);
     if (oversizedFiles.length > 0) {
-      toast.error('Ukuran file maksimal 2MB per gambar');
+      toast.error('Ukuran file maksimal 5MB per gambar');
       return;
     }
 
@@ -140,7 +180,16 @@ const ProductFormModal = ({
   };
 
   const removeExistingImage = (imageId) => {
-    setExistingImages(prev => prev.filter(img => img.image_id !== imageId));
+    // Remove dari UI
+    setExistingImages(prev => {
+      const updated = prev.filter(img => img.id !== imageId);
+      return updated;
+    });
+    // Track untuk dihapus di backend
+    setDeletedImageIds(prev => {
+      const updated = [...prev, imageId];
+      return updated;
+    });
   };
 
   const validate = () => {
@@ -205,26 +254,14 @@ const ProductFormModal = ({
         }
       });
       
-      // Debug: Log FormData contents
-      console.log('FormData to submit:');
-      for (let pair of submitData.entries()) {
-        console.log(pair[0] + ': ' + pair[1]);
-      }
-      
       // Append new images
       images.forEach((file) => {
         submitData.append('images', file);
       });
       
-      // Untuk edit mode, kirim info gambar yang dihapus
-      if (mode === 'edit' && product.ProductImages) {
-        const deletedImageIds = product.ProductImages
-          .filter(img => !existingImages.find(ei => ei.image_id === img.image_id))
-          .map(img => img.image_id);
-        
-        if (deletedImageIds.length > 0) {
-          submitData.append('deleted_image_ids', JSON.stringify(deletedImageIds));
-        }
+      // Untuk edit mode, kirim image IDs yang dihapus
+      if (mode === 'edit' && deletedImageIds.length > 0) {
+        submitData.append('deleted_image_ids', JSON.stringify(deletedImageIds));
       }
       
       await onSubmit(submitData);
@@ -284,24 +321,36 @@ const ProductFormModal = ({
                     ({totalImages}/5 gambar)
                   </span>
                 </label>
+                <p className="text-xs text-gray-600 mb-3">
+                  Format: JPG, PNG, WEBP, GIF. Maksimal 5MB per gambar. Gambar pertama akan menjadi foto utama.
+                </p>
                 
                 <div className="grid grid-cols-5 gap-3">
-                  {/* Existing Images dari Server */}
-                  {existingImages.map((img) => (
-                    <div key={img.image_id} className="relative group">
+                  {/* Existing Images dari Server - Sorted by display_order/is_primary */}
+                  {existingImages
+                    .sort((a, b) => {
+                      // Primary image first
+                      if (a.is_primary && !b.is_primary) return -1;
+                      if (!a.is_primary && b.is_primary) return 1;
+                      // Then by display_order
+                      return (a.display_order || 0) - (b.display_order || 0);
+                    })
+                    .map((img, index) => (
+                    <div key={img.id} className="relative group">
                       <img
-                        src={img.image_url}
+                        src={getImageUrl(img.image_url)}
                         alt="Product"
+                        onError={(e) => handleImageError(e, 'product')}
                         className="w-full h-24 object-cover rounded-lg border-2 border-gray-300"
                       />
                       <button
                         type="button"
-                        onClick={() => removeExistingImage(img.image_id)}
+                        onClick={() => removeExistingImage(img.id)}
                         className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <TrashIcon className="w-4 h-4" />
                       </button>
-                      {img.is_primary && (
+                      {index === 0 && (
                         <span className="absolute bottom-1 left-1 bg-green-600 text-white text-xs px-2 py-0.5 rounded">
                           Utama
                         </span>
@@ -351,7 +400,7 @@ const ProductFormModal = ({
                   <p className="mt-2 text-sm text-red-500">{errors.images}</p>
                 )}
                 <p className="mt-2 text-xs text-gray-500">
-                  Format: JPG, PNG, WEBP. Maksimal 2MB per gambar. Gambar pertama akan menjadi foto utama.
+                  Format: JPG, PNG, WEBP, GIF. Maksimal 5MB per gambar. Gambar pertama akan menjadi foto utama.
                 </p>
               </div>
 
@@ -392,7 +441,10 @@ const ProductFormModal = ({
                     }`}
                   >
                     <option value="">Pilih Kategori</option>
-                    {categoriesList.map(cat => {
+                    {categoriesLoading ? (
+                      <option disabled>Memuat kategori...</option>
+                    ) : (
+                      (allCategories || categoriesList).map(cat => {
                       // Handle both 'id' and 'category_id' field names
                       const catId = cat.id || cat.category_id;
                       const catName = cat.category_name;
@@ -401,7 +453,8 @@ const ProductFormModal = ({
                           {catName}
                         </option>
                       );
-                    })}
+                      })
+                    )}
                   </select>
                   {errors.category_id && (
                     <p className="mt-1 text-sm text-red-500">{errors.category_id}</p>
