@@ -3,7 +3,7 @@
  * API calls for customer order operations
  */
 
-import apiClient from "./apiClient";
+import apiClient from "../../utils/apiClient";
 
 const customerOrderService = {
   /**
@@ -58,6 +58,26 @@ const customerOrderService = {
         error.response?.data || {
           success: false,
           message: "Gagal mengambil detail order",
+        }
+      );
+    }
+  },
+
+  /**
+   * Get order status (for polling in Order Success Page)
+   */
+  getOrderStatus: async (orderId) => {
+    try {
+      const response = await apiClient.get(
+        `/customer/orders/${orderId}/status`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Get order status error:", error);
+      throw (
+        error.response?.data || {
+          success: false,
+          message: "Gagal mengambil status order",
         }
       );
     }

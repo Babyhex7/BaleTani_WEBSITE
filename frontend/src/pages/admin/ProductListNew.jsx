@@ -273,12 +273,18 @@ const ProductListNew = () => {
     // Get first image from ProductImages or images array
     const images = product.ProductImages || product.images || [];
     if (images.length > 0) {
-      return getImageUrlUtil(images[0].image_url);
+      const imageUrl = images[0].image_url || images[0];
+      return getImageUrlUtil(imageUrl);
     }
     
     // Fallback to primary_image_url if exists
     if (product.primary_image_url) {
       return getImageUrlUtil(product.primary_image_url);
+    }
+    
+    // Fallback to image_url if exists
+    if (product.image_url) {
+      return getImageUrlUtil(product.image_url);
     }
     
     return null;
@@ -489,14 +495,15 @@ const ProductListNew = () => {
                               <img 
                                 src={getImageUrl(product)} 
                                 alt={productName} 
-                                className="w-12 h-12 rounded-lg object-cover border" 
+                                className="w-12 h-12 rounded-lg object-cover border border-gray-200" 
                                 onError={(e) => {
+                                  console.error('Image load error:', getImageUrl(product));
                                   e.target.onerror = null;
-                                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"%3E%3Cpath stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z" /%3E%3C/svg%3E';
+                                  e.target.src = getImageUrlUtil(null, 'thumbnail');
                                 }}
                               />
                             ) : (
-                              <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                              <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
                                 <CubeIcon className="w-6 h-6 text-gray-400" />
                               </div>
                             )}

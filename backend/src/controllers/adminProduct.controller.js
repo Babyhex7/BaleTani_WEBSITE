@@ -485,6 +485,24 @@ const update = async (req, res) => {
       updated_at: new Date(),
     });
 
+    // Handle deleted images if provided
+    if (req.body.deleted_image_ids) {
+      try {
+        const deletedIds = JSON.parse(req.body.deleted_image_ids);
+        if (Array.isArray(deletedIds) && deletedIds.length > 0) {
+          console.log('[UPDATE PRODUCT] Deleting images:', deletedIds);
+          await ProductImage.destroy({
+            where: {
+              id: deletedIds,
+              product_id: product.id // Ensure images belong to this product
+            }
+          });
+        }
+      } catch (err) {
+        console.error('[UPDATE PRODUCT] Error parsing deleted_image_ids:', err);
+      }
+    }
+
     // Handle new image uploads if files are provided
     if (req.files && req.files.length > 0) {
       // Get current max display_order

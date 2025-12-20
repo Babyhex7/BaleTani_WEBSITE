@@ -40,15 +40,28 @@ const ProductFormModal = ({
   const [images, setImages] = useState([]); // File objects untuk upload
   const [imagePreviews, setImagePreviews] = useState([]); // URLs untuk preview
   const [existingImages, setExistingImages] = useState([]); // Gambar dari server (edit mode)
+  const [deletedImageIds, setDeletedImageIds] = useState([]); // Track image IDs yang dihapus
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isInitialized, setIsInitialized] = useState(false); // Track if data loaded
 
-  // Load data saat edit mode
+  // Load data saat edit mode - ONLY ONCE when modal opens
   useEffect(() => {
+    if (!isOpen) {
+      // Reset initialization flag when modal closes
+      setIsInitialized(false);
+      return;
+    }
+
+    // Only initialize once when modal opens
+    if (isInitialized) return;
+
     if (product && mode === 'edit') {
       // Handle both 'name' and 'product_name' field names
       const productName = product.name || product.product_name;
       const productImages = product.ProductImages || product.images || [];
+      
+      console.log('🔄 Initializing form with product:', productName, 'Images:', productImages.length);
       
       setFormData({
         product_name: productName || '',
@@ -66,11 +79,14 @@ const ProductFormModal = ({
       if (productImages.length > 0) {
         setExistingImages(productImages);
       }
+      
+      setIsInitialized(true);
     } else if (mode === 'create') {
       // Reset form untuk create mode
       resetForm();
+      setIsInitialized(true);
     }
-  }, [product, mode, isOpen]);
+  }, [isOpen, mode]); // Only depend on isOpen and mode
 
   // Fetch all active categories (not paginated) when modal opens
   useEffect(() => {
@@ -108,6 +124,7 @@ const ProductFormModal = ({
     setImages([]);
     setImagePreviews([]);
     setExistingImages([]);
+    setDeletedImageIds([]);
     setErrors({});
   };
 
@@ -165,7 +182,19 @@ const ProductFormModal = ({
   };
 
   const removeExistingImage = (imageId) => {
-    setExistingImages(prev => prev.filter(img => img.image_id !== imageId));
+    console.log('🗑️ Removing image:', imageId);
+    // Remove dari UI
+    setExistingImages(prev => {
+      const updated = prev.filter(img => img.id !== imageId);
+      console.log('📸 Remaining images:', updated.length);
+      return updated;
+    });
+    // Track untuk dihapus di backend
+    setDeletedImageIds(prev => {
+      const updated = [...prev, imageId];
+      console.log('🗑️ Deleted IDs:', updated);
+      return updated;
+    });
   };
 
   const validate = () => {
@@ -241,15 +270,10 @@ const ProductFormModal = ({
         submitData.append('images', file);
       });
       
-      // Untuk edit mode, kirim info gambar yang dihapus
-      if (mode === 'edit' && product.ProductImages) {
-        const deletedImageIds = product.ProductImages
-          .filter(img => !existingImages.find(ei => ei.image_id === img.image_id))
-          .map(img => img.image_id);
-        
-        if (deletedImageIds.length > 0) {
-          submitData.append('deleted_image_ids', JSON.stringify(deletedImageIds));
-        }
+      // Untuk edit mode, kirim image IDs yang dihapus
+      if (mode === 'edit' && deletedImageIds.length > 0) {
+        submitData.append('deleted_image_ids', JSON.stringify(deletedImageIds));
+        console.log('Deleted image IDs:', deletedImageIds);
       }
       
       await onSubmit(submitData);
@@ -309,11 +333,22 @@ const ProductFormModal = ({
                     ({totalImages}/5 gambar)
                   </span>
                 </label>
+                <p className="text-xs text-gray-600 mb-3">
+                  Format: JPG, PNG, WEBP, GIF. Maksimal 5MB per gambar. Gambar pertama akan menjadi foto utama.
+                </p>
                 
                 <div className="grid grid-cols-5 gap-3">
-                  {/* Existing Images dari Server */}
-                  {existingImages.map((img) => (
-                    <div key={img.image_id} className="relative group">
+                  {/* Existing Images dari Server - Sorted by display_order/is_primary */}
+                  {existingImages
+                    .sort((a, b) => {
+                      // Primary image first
+                      if (a.is_primary && !b.is_primary) return -1;
+                      if (!a.is_primary && b.is_primary) return 1;
+                      // Then by display_order
+                      return (a.display_order || 0) - (b.display_order || 0);
+                    })
+                    .map((img, index) => (
+                    <div key={img.id} className="relative group">
                       <img
                         src={getImageUrl(img.image_url)}
                         alt="Product"
@@ -322,12 +357,12 @@ const ProductFormModal = ({
                       />
                       <button
                         type="button"
-                        onClick={() => removeExistingImage(img.image_id)}
+                        onClick={() => removeExistingImage(img.id)}
                         className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <TrashIcon className="w-4 h-4" />
                       </button>
-                      {img.is_primary && (
+                      {index === 0 && (
                         <span className="absolute bottom-1 left-1 bg-green-600 text-white text-xs px-2 py-0.5 rounded">
                           Utama
                         </span>

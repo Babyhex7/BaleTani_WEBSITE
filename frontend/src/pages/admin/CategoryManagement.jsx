@@ -19,6 +19,7 @@ import DeleteConfirmModal from '../../components/ui_admin/DeleteConfirmModal';
 import Pagination from '../../components/ui_admin/Pagination';
 import inventoryService from '../../services/services_admin/inventoryService';
 import useDebounce from '../../hooks/useDebounce';
+import { getImageUrl } from '../../utils/imageUtils';
 
 const CategoryManagement = () => {
   // State management
@@ -167,8 +168,9 @@ const CategoryManagement = () => {
         showNotification('success', 'Kategori berhasil diupdate!');
       }
 
-      await fetchCategories();
       setShowFormModal(false);
+      // Force refresh to get updated data including new images
+      await fetchCategories();
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.message || 'Gagal menyimpan kategori';
       throw new Error(errorMsg);
@@ -357,6 +359,7 @@ const CategoryManagement = () => {
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gambar</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Kategori</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deskripsi</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Produk</th>
@@ -373,13 +376,27 @@ const CategoryManagement = () => {
                         <tr key={categoryId} className="hover:bg-gray-50">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <div className="p-2 bg-green-100 rounded-lg">
-                                <TagIcon className="w-5 h-5 text-green-600" />
-                              </div>
-                              <span className="text-sm font-medium text-gray-900">
-                                {category.category_name}
-                              </span>
+                              {category.category_image ? (
+                                <img
+                                  src={getImageUrl(category.category_image, 'thumbnail')}
+                                  alt={category.category_name}
+                                  className="w-12 h-12 object-cover rounded-lg border border-gray-200"
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = getImageUrl(null, 'thumbnail');
+                                  }}
+                                />
+                              ) : (
+                                <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
+                                  <TagIcon className="w-6 h-6 text-gray-400" />
+                                </div>
+                              )}
                             </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-sm font-medium text-gray-900">
+                              {category.category_name}
+                            </span>
                           </td>
                           <td className="px-6 py-4">
                             <p className="text-sm text-gray-600 max-w-md truncate">

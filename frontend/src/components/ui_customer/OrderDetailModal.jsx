@@ -329,9 +329,9 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
                   </button>
                 </div>
                 <p className="text-xs text-gray-500">a.n. {payment.account_name}</p>
-                {payment.expired_at && (
+                {(payment_expired_at || payment.expired_at) && (
                   <p className="text-xs text-red-600 mt-2">
-                    Berlaku hingga: {formatDate(payment.expired_at)}
+                    Berlaku hingga: {formatDate(payment_expired_at || payment.expired_at)}
                   </p>
                 )}
               </div>

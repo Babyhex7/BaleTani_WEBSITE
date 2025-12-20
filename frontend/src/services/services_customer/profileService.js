@@ -3,7 +3,7 @@
  * API calls untuk kelola profile customer
  */
 
-import apiClient from "./apiClient";
+import apiClient from "../../utils/apiClient";
 
 /**
  * Get customer profile dengan statistik

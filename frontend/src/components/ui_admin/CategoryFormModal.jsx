@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XMarkIcon, Squares2X2Icon, PhotoIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { getImageUrl } from '../../utils/imageUtils';
 
 /**
  * Modal untuk Create/Edit Kategori
@@ -220,9 +221,12 @@ const CategoryFormModal = ({
                 {(imagePreview || existingImage) && (
                   <div className="mb-3 relative inline-block">
                     <img
-                      src={imagePreview || `${import.meta.env.VITE_STATIC_BASE_URL}${existingImage}`}
+                      src={imagePreview || getImageUrl(existingImage, 'small')}
                       alt="Preview"
                       className="w-32 h-32 object-cover rounded-lg border-2 border-gray-300"
+                      onError={(e) => {
+                        e.target.src = getImageUrl(null, 'small');
+                      }}
                     />
                     <button
                       type="button"

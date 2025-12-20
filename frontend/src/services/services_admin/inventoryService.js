@@ -114,9 +114,19 @@ export const getCategoryById = async (id) => {
 // Membuat kategori baru
 export const createCategory = async (categoryData) => {
   try {
+    // Check if categoryData is FormData (for image uploads)
+    const isFormData = categoryData instanceof FormData;
+
     const response = await adminApiClient.post(
       "/admin/categories",
-      categoryData
+      categoryData,
+      isFormData
+        ? {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        : undefined
     );
     return response.data;
   } catch (error) {
@@ -127,9 +137,19 @@ export const createCategory = async (categoryData) => {
 // Memperbarui kategori
 export const updateCategory = async (id, categoryData) => {
   try {
+    // Check if categoryData is FormData (for image uploads)
+    const isFormData = categoryData instanceof FormData;
+
     const response = await adminApiClient.put(
       `/admin/categories/${id}`,
-      categoryData
+      categoryData,
+      isFormData
+        ? {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        : undefined
     );
     return response.data;
   } catch (error) {

@@ -41,6 +41,7 @@ import SearchBar from '../../components/ui/SearchBar';
 import Pagination from '../../components/ui/Pagination';
 import useDebounce from '../../hooks/useDebounce';
 import categoryService from '../../services/services_customer/categoryService';
+import { getImageUrl } from '../../utils/imageUtils';
 
 // Icon mapping untuk kategori berdasarkan nama
 const getCategoryIcon = (categoryName) => {
@@ -345,12 +346,15 @@ const CategoryPage = () => {
                     {hasImage ? (
                       <div className="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 overflow-hidden rounded-2xl group-hover:scale-110 transition-transform duration-300">
                         <img
-                          src={`${import.meta.env.VITE_STATIC_BASE_URL}${category.category_image}`}
+                          src={getImageUrl(category.category_image, 'small')}
                           alt={category.category_name}
                           className="w-full h-full object-cover"
                           onError={(e) => {
+                            console.error(`Failed to load category image: ${category.category_name}`);
+                            e.target.onerror = null;
                             e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
+                            const fallback = e.target.nextElementSibling;
+                            if (fallback) fallback.style.display = 'flex';
                           }}
                         />
                         <div className="hidden w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl items-center justify-center">

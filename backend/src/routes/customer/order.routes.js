@@ -13,6 +13,7 @@ const {
 const {
   getCustomerOrders,
   getOrderDetail: getOrderHistoryDetail,
+  getOrderStatus,
   reorderItems,
   cancelOrder,
   triggerManualCancel,
@@ -39,6 +40,13 @@ router.get("/history", authenticateCustomer, getCustomerOrders);
  * @access  Private (Customer only)
  */
 router.get("/history/:id", authenticateCustomer, getOrderHistoryDetail);
+
+/**
+ * @route   GET /api/customer/orders/:id/status
+ * @desc    Get order status (for polling in Order Success Page)
+ * @access  Private (Customer only)
+ */
+router.get("/:id/status", authenticateCustomer, getOrderStatus);
 
 /**
  * @route   POST /api/customer/orders/:id/reorder
