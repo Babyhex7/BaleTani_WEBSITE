@@ -120,8 +120,20 @@ const CategoryFormModal = ({
       submitData.append('description', formData.description);
       submitData.append('is_active', formData.is_active);
       
-      if (imageFile) {
-        submitData.append('category_image', imageFile);
+      // Handle image changes for edit mode
+      if (mode === 'edit') {
+        if (imageFile) {
+          // New image uploaded, send it
+          submitData.append('category_image', imageFile);
+        } else if (!existingImage && category?.category_image) {
+          // Image was removed (existingImage is null but category had image)
+          submitData.append('remove_image', 'true');
+        }
+      } else {
+        // Create mode - just upload if exists
+        if (imageFile) {
+          submitData.append('category_image', imageFile);
+        }
       }
       
       await onSubmit(submitData);

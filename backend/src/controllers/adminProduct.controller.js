@@ -490,16 +490,16 @@ const update = async (req, res) => {
       try {
         const deletedIds = JSON.parse(req.body.deleted_image_ids);
         if (Array.isArray(deletedIds) && deletedIds.length > 0) {
-          console.log('[UPDATE PRODUCT] Deleting images:', deletedIds);
+          console.log("[UPDATE PRODUCT] Deleting images:", deletedIds);
           await ProductImage.destroy({
             where: {
               id: deletedIds,
-              product_id: product.id // Ensure images belong to this product
-            }
+              product_id: product.id, // Ensure images belong to this product
+            },
           });
         }
       } catch (err) {
-        console.error('[UPDATE PRODUCT] Error parsing deleted_image_ids:', err);
+        console.error("[UPDATE PRODUCT] Error parsing deleted_image_ids:", err);
       }
     }
 

@@ -258,14 +258,35 @@ const updateCategory = async (req, res) => {
     if (category_name !== undefined) updateData.category_name = category_name;
     if (description !== undefined) updateData.description = description;
     if (is_active !== undefined) updateData.is_active = is_active;
-    
-    // Handle new image upload
-    if (req.file) {
+
+    // Handle image removal if remove_image flag is set
+    if (req.body.remove_image === "true") {
       // Delete old image if exists
       if (category.category_image) {
-        const oldImagePath = path.join(__dirname, "../../public", category.category_image);
+        const oldImagePath = path.join(
+          __dirname,
+          "../../public",
+          category.category_image
+        );
         if (fs.existsSync(oldImagePath)) {
           fs.unlinkSync(oldImagePath);
+          console.log("[CATEGORY UPDATE] Deleted old image:", oldImagePath);
+        }
+      }
+      updateData.category_image = null;
+    }
+    // Handle new image upload
+    else if (req.file) {
+      // Delete old image if exists
+      if (category.category_image) {
+        const oldImagePath = path.join(
+          __dirname,
+          "../../public",
+          category.category_image
+        );
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+          console.log("[CATEGORY UPDATE] Replaced old image:", oldImagePath);
         }
       }
       updateData.category_image = `/uploads/categories/${req.file.filename}`;
@@ -327,7 +348,11 @@ const deleteCategory = async (req, res) => {
 
     // Delete image file if exists
     if (category.category_image) {
-      const imagePath = path.join(__dirname, "../../public", category.category_image);
+      const imagePath = path.join(
+        __dirname,
+        "../../public",
+        category.category_image
+      );
       if (fs.existsSync(imagePath)) {
         fs.unlinkSync(imagePath);
       }
@@ -458,7 +483,11 @@ const deleteCategoryImage = async (req, res) => {
     }
 
     // Delete image file
-    const imagePath = path.join(__dirname, "../../public", category.category_image);
+    const imagePath = path.join(
+      __dirname,
+      "../../public",
+      category.category_image
+    );
     if (fs.existsSync(imagePath)) {
       fs.unlinkSync(imagePath);
     }
