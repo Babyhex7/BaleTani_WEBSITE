@@ -223,6 +223,7 @@ const Register = () => {
               </div>
             {/* Full Name field */}
             <Input
+              data-cy="fullname-input"
               label="Nama Lengkap"
               type="text"
               name="fullName"
@@ -236,6 +237,7 @@ const Register = () => {
 
             {/* Phone Number field */}
             <Input
+              data-cy="phone-input"
               label="Nomor Telepon"
               type="tel"
               name="phoneNumber"
@@ -254,6 +256,7 @@ const Register = () => {
               </label>
               <div className="relative">
                 <input
+                  data-cy="password-input"
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
@@ -281,7 +284,7 @@ const Register = () => {
               
               {/* Password strength indicator */}
               {formData.password && (
-                <div className="mt-2">
+                <div className="mt-2" data-cy="password-strength">
                   <div className="flex items-center space-x-2">
                     <div className="flex-1 bg-gray-200 rounded-full h-1.5 sm:h-2">
                       <div 
@@ -308,6 +311,7 @@ const Register = () => {
               </label>
               <div className="relative">
                 <input
+                  data-cy="confirm-password-input"
                   type={showConfirmPassword ? 'text' : 'password'}
                   name="confirmPassword"
                   value={formData.confirmPassword}
@@ -371,6 +375,7 @@ const Register = () => {
 
             {/* Submit button */}
             <Button
+              data-cy="register-submit-btn"
               type="submit"
               className="w-full btn-touch"
               loading={isLoading}

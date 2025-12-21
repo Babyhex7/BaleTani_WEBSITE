@@ -63,7 +63,8 @@ const SearchBar = ({
   onClear,
   onSubmit,
   placeholder = 'Cari produk...',
-  className = ''
+  className = '',
+  'data-cy': dataCy
 }) => {
   /**
    * Handle form submit
@@ -87,6 +88,7 @@ const SearchBar = ({
       
       {/* Search Input */}
       <input
+        data-cy={dataCy}
         type="text"
         placeholder={placeholder}
         value={value}

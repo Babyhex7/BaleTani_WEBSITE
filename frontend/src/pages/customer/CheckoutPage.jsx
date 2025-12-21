@@ -233,6 +233,7 @@ const CheckoutPage = () => {
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
+                      data-cy="pickup-method-self"
                       type="radio"
                       name="pickup"
                       value="self_pickup"
@@ -260,6 +261,7 @@ const CheckoutPage = () => {
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
+                      data-cy="pickup-method-delivery"
                       type="radio"
                       name="pickup"
                       value="delivery"
@@ -289,6 +291,7 @@ const CheckoutPage = () => {
                         Alamat Pengiriman <span className="text-red-500">*</span>
                       </label>
                       <textarea
+                        data-cy="delivery-address"
                         value={deliveryAddress}
                         onChange={(e) => setDeliveryAddress(e.target.value)}
                         rows={3}
@@ -327,6 +330,7 @@ const CheckoutPage = () => {
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
+                      data-cy="payment-qris"
                       type="radio"
                       name="payment"
                       value="qris"
@@ -354,6 +358,7 @@ const CheckoutPage = () => {
                   }`}>
                     <label className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 cursor-pointer">
                       <input
+                        data-cy="payment-transfer"
                         type="radio"
                         name="payment"
                         value="transfer"
@@ -388,6 +393,7 @@ const CheckoutPage = () => {
                               : 'border-gray-200 hover:border-gray-300'
                           }`}>
                             <input
+                              data-cy="bank-bri"
                               type="radio"
                               name="bank"
                               value="BRI"
@@ -408,6 +414,7 @@ const CheckoutPage = () => {
                               : 'border-gray-200 hover:border-gray-300'
                           }`}>
                             <input
+                              data-cy="bank-bca"
                               type="radio"
                               name="bank"
                               value="BCA"
@@ -428,6 +435,7 @@ const CheckoutPage = () => {
                               : 'border-gray-200 hover:border-gray-300'
                           }`}>
                             <input
+                              data-cy="bank-mandiri"
                               type="radio"
                               name="bank"
                               value="MANDIRI"
@@ -452,6 +460,7 @@ const CheckoutPage = () => {
                       : 'border-gray-200 hover:border-green-300'
                   }`}>
                     <input
+                      data-cy="payment-cash"
                       type="radio"
                       name="payment"
                       value="cash"
@@ -568,6 +577,7 @@ const CheckoutPage = () => {
 
                     {/* Create Order Button */}
                     <button
+                      data-cy="create-order-btn"
                       onClick={handleCreateOrder}
                       disabled={loading || items.length === 0}
                       className="w-full py-3 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"

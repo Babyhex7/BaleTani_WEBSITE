@@ -93,22 +93,22 @@ const OrderCard = ({ order, onViewDetail, onReorder }) => {
   const remainingItems = items.length - 3;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all duration-200">
+    <div data-cy="order-card" className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all duration-200">
       {/* Header */}
       <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-3">
             <ShoppingBag className="w-5 h-5 text-green-600" />
             <div>
-              <h3 className="font-semibold text-gray-900">{order_number}</h3>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <h3 data-cy="order-number" className="font-semibold text-gray-900">{order_number}</h3>
+              <div data-cy="order-date" className="flex items-center gap-2 text-sm text-gray-600">
                 <Calendar className="w-3.5 h-3.5" />
                 <span>{formatDate(order_date)}</span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(status)}`}>
+            <span data-cy="order-status" className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(status)}`}>
               {formatOrderStatus(status)}
             </span>
           </div>
@@ -199,20 +199,21 @@ const OrderCard = ({ order, onViewDetail, onReorder }) => {
       {/* Footer */}
       <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
         <div className="flex items-center justify-between mb-3">
-          <div className="text-sm text-gray-600">
+          <div data-cy="payment-status" className="text-sm text-gray-600">
             <span className="font-medium">Pembayaran:</span>{' '}
             {payment ? formatPaymentMethod(payment.method) : '-'}
             {payment?.bank && ` (${payment.bank})`}
           </div>
           <div className="text-right">
             <p className="text-sm text-gray-600">Total Belanja</p>
-            <p className="text-xl font-bold text-green-600">{formatCurrency(total_amount)}</p>
+            <p data-cy="order-total" className="text-xl font-bold text-green-600">{formatCurrency(total_amount)}</p>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="flex gap-2">
           <button
+            data-cy="view-detail-btn"
             onClick={() => onViewDetail(order)}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
@@ -220,6 +221,7 @@ const OrderCard = ({ order, onViewDetail, onReorder }) => {
             <span className="font-medium">Lihat Detail</span>
           </button>
           <button
+            data-cy="reorder-btn"
             onClick={() => onReorder(order)}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >

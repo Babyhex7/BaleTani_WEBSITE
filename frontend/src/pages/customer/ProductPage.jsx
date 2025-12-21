@@ -117,7 +117,8 @@ const ProductPage = () => {
             
             {/* Search Bar - Reusable Component */}
             <div className="lg:flex-1 lg:max-w-2xl">
-              <SearchBar 
+              <SearchBar
+                data-cy="search-input" 
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onClear={() => {
@@ -166,6 +167,7 @@ const ProductPage = () => {
                   <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-1.5 sm:space-y-2">
                     <label className="flex items-center gap-2.5 sm:gap-3 py-2 cursor-pointer hover:bg-gray-50 active:bg-gray-100 rounded px-2 -mx-2 btn-touch">
                       <input
+                        data-cy="category-filter"
                         type="radio"
                         name="category"
                         checked={selectedCategory === ''}
@@ -216,6 +218,7 @@ const ProductPage = () => {
                 <div className="flex items-center gap-2">
                   <span className="text-caption sm:text-sm text-gray-600 hidden sm:inline">Urutkan:</span>
                   <select
+                    data-cy="sort-dropdown"
                     value={selectedSort}
                     onChange={(e) => handleSortChange(e.target.value)}
                     className="input-touch px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-caption sm:text-sm bg-white flex-1 sm:flex-none"
