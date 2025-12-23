@@ -324,7 +324,7 @@ const AdminLogin = () => {
             </button>
           </form>
 
-          {/* Divider */}
+          {/* Divider
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200"></div>
@@ -332,9 +332,9 @@ const AdminLogin = () => {
             <div className="relative flex justify-center text-sm">
               <span className="px-4 bg-gray-50 lg:bg-white text-gray-500">Test Account</span>
             </div>
-          </div>
+          </div> */}
 
-          {/* Test Info */}
+          {/* Test Info
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
             <p className="text-sm text-gray-700 mb-2 font-medium">Demo Login:</p>
             <div className="space-y-1 text-sm">
@@ -348,7 +348,7 @@ const AdminLogin = () => {
             <p className="text-xs text-gray-500 mt-2">
               Super Admin dengan akses penuh ke semua modul
             </p>
-          </div>
+          </div> */}
 
           {/* Footer (Mobile only) */}
           <div className="lg:hidden text-center mt-8">
