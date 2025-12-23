@@ -45,7 +45,6 @@ const AdminSidebarNew = () => {
       key: 'products',
       submenu: [
         { name: 'Product List', path: '/admin/products' },
-        { name: 'Stock Overview', path: '/admin/stock-overview' },
         { name: 'Discount Management', path: '/admin/discounts' },
         { name: 'Category Management', path: '/admin/categories' },
       ]

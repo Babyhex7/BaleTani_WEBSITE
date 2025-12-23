@@ -210,8 +210,12 @@ const OrderSuccessPage = () => {
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-            second: '2-digit'
-          });
+            second: '2-digit',
+            hour12: false
+          }).replace(/\./g, ':');
+          
+          // Pisahkan tanggal dan waktu
+          const [datePart, timePart] = formattedExpiry.split(', ');
           
           return {
             title: `Transfer Bank - ${orderData.payment.bank}`,
@@ -220,7 +224,7 @@ const OrderSuccessPage = () => {
               `Rekening Transfer: ${orderData.payment.virtual_account}`,
               `a/n: ${orderData.payment.account_name}`,
               `Nominal: ${formatCurrency(orderData.total_amount)}`,
-              `Transfer sebelum: ${formattedExpiry}`,
+              `Transfer sebelum: Tanggal ${datePart} dan pukul ${timePart} WIB`,
               'Setelah transfer, konfirmasi ke admin via WhatsApp',
             ],
           };

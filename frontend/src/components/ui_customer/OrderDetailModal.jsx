@@ -198,8 +198,10 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
                           )}
                         </div>
                         <div className="flex-1 pb-3">
-                          <p className="font-semibold text-gray-900">{formatOrderStatus(item.status)}</p>
-                          <p className="text-sm text-gray-600">{formatDate(item.timestamp)}</p>
+                          <span className={`inline-block px-3 py-1 rounded-lg text-sm font-medium border ${getStatusColor(item.status)}`}>
+                            {formatOrderStatus(item.status)}
+                          </span>
+                          <p className="text-sm text-gray-600 mt-1">{formatDate(item.timestamp)}</p>
                           {item.notes && (
                             <p className="text-sm text-gray-700 mt-1 bg-white/50 px-3 py-2 rounded">{item.notes}</p>
                           )}
