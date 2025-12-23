@@ -208,67 +208,67 @@ const AdminManagement = () => {
           subtitle="Kelola data admin dan hak akses"
         />
 
-        <div className="admin-container">
+        <div className="admin-container px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-4 sm:mb-6">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Admin</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Admin</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.total}</p>
                 </div>
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <UserIcon className="w-6 h-6 text-blue-600" />
+                <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+                  <UserIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Admin Aktif</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Admin Aktif</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-600">{stats.active}</p>
                 </div>
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <CheckCircleIcon className="w-6 h-6 text-green-600" />
+                <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+                  <CheckCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Admin Nonaktif</p>
-                  <p className="text-2xl font-bold text-red-600">{stats.inactive}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Admin Nonaktif</p>
+                  <p className="text-xl sm:text-2xl font-bold text-red-600">{stats.inactive}</p>
                 </div>
-                <div className="p-3 bg-red-100 rounded-lg">
-                  <XCircleIcon className="w-6 h-6 text-red-600" />
+                <div className="p-2 sm:p-3 bg-red-100 rounded-lg">
+                  <XCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Roles</p>
-                  <p className="text-2xl font-bold text-purple-600">{stats.totalRoles}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Roles</p>
+                  <p className="text-xl sm:text-2xl font-bold text-purple-600">{stats.totalRoles}</p>
                 </div>
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <ShieldCheckIcon className="w-6 h-6 text-purple-600" />
+                <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
+                  <ShieldCheckIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Main Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-900">Daftar Admin</h2>
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Daftar Admin</h2>
                 <button
                   onClick={handleAddNew}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors w-full sm:w-auto"
                 >
                   <PlusIcon className="w-5 h-5" />
                   Tambah Admin
@@ -276,9 +276,9 @@ const AdminManagement = () => {
               </div>
 
               {/* Filters */}
-              <div className="flex flex-col md:flex-row gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 {/* Search */}
-                <div className="flex-1">
+                <div className="sm:col-span-1">
                   <div className="relative">
                     <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
                     <input
@@ -289,7 +289,7 @@ const AdminManagement = () => {
                         setSearchQuery(e.target.value);
                         setCurrentPage(1);
                       }}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -301,7 +301,7 @@ const AdminManagement = () => {
                     setFilterRole(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Semua Role</option>
                   {roles && roles.map((role) => (
@@ -318,7 +318,7 @@ const AdminManagement = () => {
                     setFilterStatus(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Semua Status</option>
                   <option value="true">Aktif</option>
@@ -363,7 +363,9 @@ const AdminManagement = () => {
                 </div>
               ) : (
                 <>
-                  <table className="w-full">
+                  {/* Desktop Table View */}
+                  <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -420,21 +422,21 @@ const AdminManagement = () => {
                             <div className="flex items-center justify-center gap-2">
                               <button
                                 onClick={() => handleView(admin)}
-                                className="text-blue-600 hover:text-blue-900"
+                                className="text-blue-600 hover:text-blue-900 transition-colors"
                                 title="Lihat Detail"
                               >
                                 <EyeIcon className="w-5 h-5" />
                               </button>
                               <button
                                 onClick={() => handleEdit(admin)}
-                                className="text-green-600 hover:text-green-900"
+                                className="text-green-600 hover:text-green-900 transition-colors"
                                 title="Edit"
                               >
                                 <PencilIcon className="w-5 h-5" />
                               </button>
                               <button
                                 onClick={() => handleDeleteClick(admin)}
-                                className="text-red-600 hover:text-red-900"
+                                className="text-red-600 hover:text-red-900 transition-colors"
                                 title="Hapus"
                               >
                                 <TrashIcon className="w-5 h-5" />
@@ -445,10 +447,72 @@ const AdminManagement = () => {
                       ))}
                     </tbody>
                   </table>
+                  </div>
+
+                  {/* Mobile/Tablet Card View */}
+                  <div className="lg:hidden divide-y divide-gray-200">
+                    {admins.map((admin) => (
+                      <div key={admin.id} className="p-4 sm:p-5 hover:bg-gray-50 transition-colors">
+                        {/* Header with Avatar */}
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="flex-shrink-0 h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <UserIcon className="w-7 h-7 text-blue-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-sm font-semibold text-gray-900 mb-1">{admin.full_name}</h3>
+                            <p className="text-xs text-gray-500">{admin.phone_number}</p>
+                          </div>
+                          <div className="flex-shrink-0">
+                            {getStatusBadge(admin.is_active)}
+                          </div>
+                        </div>
+
+                        {/* Info Grid */}
+                        <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b border-gray-200">
+                          <div>
+                            <div className="text-xs text-gray-500 mb-1">Role</div>
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              <ShieldCheckIcon className="w-3 h-3" />
+                              {admin.role?.role_name || '-'}
+                            </span>
+                          </div>
+                          <div>
+                            <div className="text-xs text-gray-500 mb-1">Bergabung</div>
+                            <div className="text-sm text-gray-700">{formatDate(admin.created_at)}</div>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleView(admin)}
+                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                          >
+                            <EyeIcon className="w-4 h-4" />
+                            Detail
+                          </button>
+                          <button
+                            onClick={() => handleEdit(admin)}
+                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+                          >
+                            <PencilIcon className="w-4 h-4" />
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(admin)}
+                            className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                            title="Hapus"
+                          >
+                            <TrashIcon className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
                   {/* Pagination */}
                   {totalPages > 1 && (
-                    <div className="px-6 py-4 border-t border-gray-200">
+                    <div className="px-4 sm:px-6 py-4 border-t border-gray-200">
                       <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}

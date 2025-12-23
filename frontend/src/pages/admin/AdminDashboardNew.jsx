@@ -137,11 +137,11 @@ const AdminDashboardNew = () => {
         />
 
         {/* Content */}
-        <div className="admin-container">
+        <div className="admin-container px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
 
           {/* Stats Cards - 8 KPIs */}
           {loading ? (
-            <div className="admin-stats-grid admin-section">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-4 sm:mb-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 animate-pulse">
                   <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
@@ -163,7 +163,7 @@ const AdminDashboardNew = () => {
           ) : (
             <>
               {/* Row 1: Primary Metrics */}
-              <div className="admin-stats-grid admin-section">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-4 sm:mb-6">
                 <StatCardNew
                   title="Pendapatan Hari Ini"
                   value={formatCurrency(stats.totalRevenue)}
@@ -210,7 +210,7 @@ const AdminDashboardNew = () => {
               </div>
 
               {/* Row 2: Action Required Metrics */}
-              <div className="admin-two-col admin-section">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                 <StatCardNew
                   title="Pengadaan Pending"
                   value={stats.pendingProcurements || 0}
@@ -235,10 +235,10 @@ const AdminDashboardNew = () => {
           )}
 
           {/* Recent Orders & Low Stock - Side by Side */}
-          <div className="admin-two-col admin-section">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
             {/* Recent Orders Table */}
-            <div className="admin-card-compact overflow-hidden p-0">
-              <div className="px-4 md:px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="admin-stat-icon-wrapper bg-purple-100">
@@ -324,7 +324,7 @@ const AdminDashboardNew = () => {
             </div>
 
             {/* Low Stock Products Table */}
-            <div className="admin-card-compact overflow-hidden p-0">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -411,16 +411,16 @@ const AdminDashboardNew = () => {
           </div>
 
           {/* Quick Actions Panel */}
-          <div className="admin-card">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="admin-stat-icon-wrapper bg-green-100">
-                <PlusIcon className="admin-stat-icon text-green-600" />
+              <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+                <PlusIcon className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
-              <h3 className="admin-card-title mb-0">
+              <h3 className="text-base sm:text-lg font-bold text-gray-900">
                 Aksi Cepat
               </h3>
             </div>
-            <div className="admin-stats-grid">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
               <Link to="/admin/products">
                 <button className="w-full p-3 md:p-4 bg-gray-50 hover:bg-green-50 border border-gray-200 hover:border-green-300 rounded-lg transition-all duration-200 hover:shadow-sm group">
                   <CubeIcon className="w-6 h-6 text-green-600 mx-auto mb-2 group-hover:scale-110 transition-transform" />

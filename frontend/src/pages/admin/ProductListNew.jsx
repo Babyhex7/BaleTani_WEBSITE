@@ -321,68 +321,68 @@ const ProductListNew = () => {
           subtitle="Kelola produk dan inventori"
         />
         
-        <div className="admin-container">
+        <div className="admin-container px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           {/* Stats Cards */}
-          <div className="admin-stats-grid admin-section">
-            <div className="admin-stat-card">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-4 sm:mb-6">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="admin-stat-label">Total Produk</p>
-                  <p className="admin-stat-value">{stats.total}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Produk</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.total}</p>
                 </div>
-                <div className="admin-stat-icon-wrapper bg-blue-100">
-                  <CubeIcon className="admin-stat-icon text-blue-600" />
+                <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+                  <CubeIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="admin-stat-card">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="admin-stat-label">Produk Aktif</p>
-                  <p className="admin-stat-value text-green-600">{stats.active}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Produk Aktif</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-600">{stats.active}</p>
                 </div>
-                <div className="admin-stat-icon-wrapper bg-green-100">
-                  <CheckCircleIcon className="admin-stat-icon text-green-600" />
+                <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+                  <CheckCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                 </div>
               </div>
             </div>
 
-            <div className="admin-stat-card">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="admin-stat-label">Stok Rendah</p>
-                  <p className="admin-stat-value text-yellow-600">{stats.lowStock}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Stok Rendah</p>
+                  <p className="text-xl sm:text-2xl font-bold text-yellow-600">{stats.lowStock}</p>
                 </div>
-                <div className="admin-stat-icon-wrapper bg-yellow-100">
-                  <ExclamationCircleIcon className="admin-stat-icon text-yellow-600" />
+                <div className="p-2 sm:p-3 bg-yellow-100 rounded-lg">
+                  <ExclamationCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
                 </div>
               </div>
             </div>
 
-            <div className="admin-stat-card">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="admin-stat-label">Stok Habis</p>
-                  <p className="admin-stat-value text-red-600">{stats.outOfStock}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Stok Habis</p>
+                  <p className="text-xl sm:text-2xl font-bold text-red-600">{stats.outOfStock}</p>
                 </div>
-                <div className="admin-stat-icon-wrapper bg-red-100">
-                  <ExclamationCircleIcon className="admin-stat-icon text-red-600" />
+                <div className="p-2 sm:p-3 bg-red-100 rounded-lg">
+                  <ExclamationCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Main Card */}
-          <div className="admin-card-compact overflow-hidden p-0">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             {/* Header */}
             <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Daftar Produk</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Daftar Produk</h2>
                 
                 <button
                   onClick={handleCreate}
-                  className="flex items-center justify-center gap-2 px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 text-sm sm:text-base font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-sm hover:shadow-md transition-all duration-200"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors w-full sm:w-auto"
                 >
                   <PlusIcon className="w-5 h-5" />
                   Tambah Produk
@@ -392,10 +392,10 @@ const ProductListNew = () => {
 
             {/* Filters */}
             <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <div className="flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                <div className="sm:col-span-1">
                   <div className="relative">
-                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
                       placeholder="Cari nama produk..."
@@ -404,19 +404,19 @@ const ProductListNew = () => {
                         setSearchQuery(e.target.value);
                         setCurrentPage(1);
                       }}
-                      className="w-full pl-10 pr-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
                 </div>
 
-                <div className="w-full sm:w-auto">
+                <div>
                   <select
                     value={filterType}
                     onChange={(e) => {
                       setFilterType(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="w-full sm:w-40 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Semua Tipe</option>
                     <option value="online">Online</option>
@@ -424,14 +424,14 @@ const ProductListNew = () => {
                   </select>
                 </div>
 
-                <div className="w-full sm:w-auto">
+                <div>
                   <select
                     value={filterStatus}
                     onChange={(e) => {
                       setFilterStatus(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="w-full sm:w-40 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Semua Status</option>
                     <option value="active">Aktif</option>
@@ -465,89 +465,179 @@ const ProductListNew = () => {
                   </button>
                 </div>
               ) : (
-                <div className="admin-table-wrapper">
-                  <table className="admin-table">
-                  <thead className="admin-table-header">
-                    <tr>
-                      <th className="admin-table-th">Produk</th>
-                      <th className="admin-table-th">Kategori</th>
-                      <th className="admin-table-th">Harga</th>
-                      <th className="admin-table-th">Stok</th>
-                      <th className="admin-table-th">Status</th>
-                      <th className="admin-table-th">Tipe</th>
-                      <th className="admin-table-th text-right">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody className="admin-table-body">
+                <>
+                  {/* Desktop Table View */}
+                  <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produk</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kategori</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Harga</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stok</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipe</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {products.map((product) => {
+                        const productId = product.id || product.product_id;
+                        const productName = product.name || product.product_name;
+                        const categoryName = product.category?.category_name || product.Category?.category_name;
+                        
+                        return (
+                        <tr key={productId} className="hover:bg-gray-50">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              {getImageUrl(product) ? (
+                                <img 
+                                  src={getImageUrl(product)} 
+                                  alt={productName} 
+                                  className="w-12 h-12 rounded-lg object-cover border border-gray-200" 
+                                  onError={(e) => {
+                                    console.error('Image load error:', getImageUrl(product));
+                                    e.target.onerror = null;
+                                    e.target.src = getImageUrlUtil(null, 'thumbnail');
+                                  }}
+                                />
+                              ) : (
+                                <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
+                                  <CubeIcon className="w-6 h-6 text-gray-400" />
+                                </div>
+                              )}
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">{productName}</p>
+                                <p className="text-xs text-gray-500">{product.unit}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">{categoryName || '-'}</td>
+                          <td className="px-6 py-4">
+                            <p className="text-sm font-medium text-gray-900">{formatCurrency(product.selling_price)}</p>
+                            {product.discount_price && product.discount_price < product.selling_price && (
+                              <p className="text-xs text-green-600">Diskon: {formatCurrency(product.discount_price)}</p>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            {getStockBadge(product.total_stock)}
+                          </td>
+                          <td className="px-6 py-4">{getStatusBadge(product.is_active)}</td>
+                          <td className="px-6 py-4">
+                            <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                              product.product_type === 'online' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                            }`}>
+                              {product.product_type}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <button onClick={() => handleView(product)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View">
+                                <EyeIcon className="w-5 h-5" />
+                              </button>
+                              <button onClick={() => handleEdit(product)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Edit">
+                                <PencilIcon className="w-5 h-5" />
+                              </button>
+                              <button onClick={() => handleDelete(product)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                                <TrashIcon className="w-5 h-5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  </div>
+
+                  {/* Mobile/Tablet Card View */}
+                  <div className="lg:hidden divide-y divide-gray-200">
                     {products.map((product) => {
-                      // Handle both 'id' and 'product_id' field names
                       const productId = product.id || product.product_id;
                       const productName = product.name || product.product_name;
                       const categoryName = product.category?.category_name || product.Category?.category_name;
                       
                       return (
-                      <tr key={productId} className="admin-table-tr">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
+                        <div key={productId} className="p-4 sm:p-5 hover:bg-gray-50 transition-colors">
+                          {/* Product Header */}
+                          <div className="flex items-start gap-3 mb-3">
                             {getImageUrl(product) ? (
                               <img 
                                 src={getImageUrl(product)} 
                                 alt={productName} 
-                                className="w-12 h-12 rounded-lg object-cover border border-gray-200" 
+                                className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border border-gray-200 flex-shrink-0" 
                                 onError={(e) => {
-                                  console.error('Image load error:', getImageUrl(product));
                                   e.target.onerror = null;
                                   e.target.src = getImageUrlUtil(null, 'thumbnail');
                                 }}
                               />
                             ) : (
-                              <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
-                                <CubeIcon className="w-6 h-6 text-gray-400" />
+                              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200 flex-shrink-0">
+                                <CubeIcon className="w-8 h-8 text-gray-400" />
                               </div>
                             )}
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">{productName}</p>
-                              <p className="text-xs text-gray-500">{product.unit}</p>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-sm font-semibold text-gray-900 mb-1">{productName}</h3>
+                              <p className="text-xs text-gray-500 mb-2">{product.unit}</p>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {getStatusBadge(product.is_active)}
+                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                  product.product_type === 'online' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                                }`}>
+                                  {product.product_type}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </td>
-                        <td className="admin-table-td">{categoryName || '-'}</td>
-                        <td className="admin-table-td">
-                          <p className="text-sm font-medium text-gray-900">{formatCurrency(product.selling_price)}</p>
-                          {product.discount_price && product.discount_price < product.selling_price && (
-                            <p className="text-xs text-green-600">Diskon: {formatCurrency(product.discount_price)}</p>
-                          )}
-                        </td>
-                        <td className="admin-table-td">
-                          {getStockBadge(product.total_stock)}
-                        </td>
-                        <td className="admin-table-td">{getStatusBadge(product.is_active)}</td>
-                        <td className="admin-table-td">
-                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                            product.product_type === 'online' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
-                          }`}>
-                            {product.product_type}
-                          </span>
-                        </td>
-                        <td className="admin-table-td text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <button onClick={() => handleView(product)} className="admin-btn-icon text-blue-600 hover:bg-blue-50" title="View">
-                              <EyeIcon className="w-5 h-5" />
+
+                          {/* Product Info Grid */}
+                          <div className="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">Kategori</div>
+                              <div className="text-sm font-medium text-gray-900 truncate">{categoryName || '-'}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">Harga</div>
+                              <div className="text-sm font-semibold text-gray-900">{formatCurrency(product.selling_price)}</div>
+                              {product.discount_price && product.discount_price < product.selling_price && (
+                                <div className="text-xs text-green-600">Diskon: {formatCurrency(product.discount_price)}</div>
+                              )}
+                            </div>
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">Stok</div>
+                              <div>{getStockBadge(product.total_stock)}</div>
+                            </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
+                            <button
+                              onClick={() => handleView(product)}
+                              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                            >
+                              <EyeIcon className="w-4 h-4" />
+                              Detail
                             </button>
-                            <button onClick={() => handleEdit(product)} className="admin-btn-icon text-green-600 hover:bg-green-50" title="Edit">
-                              <PencilIcon className="w-5 h-5" />
+                            <button
+                              onClick={() => handleEdit(product)}
+                              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+                            >
+                              <PencilIcon className="w-4 h-4" />
+                              Edit
                             </button>
-                            <button onClick={() => handleDelete(product)} className="admin-btn-icon text-red-600 hover:bg-red-50" title="Delete">
+                            <button
+                              onClick={() => handleDelete(product)}
+                              className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                              title="Hapus"
+                            >
                               <TrashIcon className="w-5 h-5" />
                             </button>
                           </div>
-                        </td>
-                      </tr>
+                        </div>
                       );
                     })}
-                  </tbody>
-                </table>
-                </div>
+                  </div>
+                </>
               )}
             </div>
 

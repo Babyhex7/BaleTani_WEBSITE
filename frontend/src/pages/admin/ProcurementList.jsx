@@ -267,55 +267,55 @@ const ProcurementList = () => {
           subtitle="Kelola pengadaan bahan baku"
         />
         
-        <div className="admin-container">
+        <div className="admin-container px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           {/* Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-4 sm:mb-6">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Pengadaan</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Pengadaan</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.total}</p>
                 </div>
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <ShoppingCartIcon className="w-6 h-6 text-blue-600" />
+                <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+                  <ShoppingCartIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Menunggu Persetujuan</p>
-                  <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Menunggu Persetujuan</p>
+                  <p className="text-xl sm:text-2xl font-bold text-yellow-600">{stats.pending}</p>
                 </div>
-                <div className="p-3 bg-yellow-100 rounded-lg">
-                  <ClockIcon className="w-6 h-6 text-yellow-600" />
+                <div className="p-2 sm:p-3 bg-yellow-100 rounded-lg">
+                  <ClockIcon className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Disetujui</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Disetujui</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-600">{stats.approved}</p>
                 </div>
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <CheckCircleIcon className="w-6 h-6 text-green-600" />
+                <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+                  <CheckCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Item</p>
-                  <p className="text-xl font-bold text-purple-600">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Item</p>
+                  <p className="text-lg sm:text-xl font-bold text-purple-600">
                     {stats.total}
                   </p>
                 </div>
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <ShoppingCartIcon className="w-6 h-6 text-purple-600" />
+                <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
+                  <ShoppingCartIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
                 </div>
               </div>
             </div>
@@ -324,13 +324,13 @@ const ProcurementList = () => {
           {/* Main Card */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <h2 className="text-xl font-bold text-gray-900">Daftar Pengadaan</h2>
+            <div className="p-4 sm:p-6 border-b border-gray-200">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Daftar Pengadaan</h2>
                 
                 <button
                   onClick={handleCreateNew}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors w-full sm:w-auto"
                 >
                   <PlusIcon className="w-5 h-5" />
                   Tambah Pengadaan
@@ -339,9 +339,9 @@ const ProcurementList = () => {
             </div>
 
             {/* Filters */}
-            <div className="p-6 border-b border-gray-200 bg-gray-50">
-              <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-                <div className="md:col-span-2">
+            <div className="p-4 sm:p-6 border-b border-gray-200 bg-gray-50">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
+                <div className="sm:col-span-2 lg:col-span-2">
                   <div className="relative">
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
@@ -350,7 +350,7 @@ const ProcurementList = () => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -359,7 +359,7 @@ const ProcurementList = () => {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Semua Status</option>
                     <option value="pending">Pending</option>
@@ -371,7 +371,7 @@ const ProcurementList = () => {
                   <select
                     value={typeFilter}
                     onChange={(e) => setTypeFilter(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Semua Tipe</option>
                     <option value="online">Online</option>
@@ -384,7 +384,7 @@ const ProcurementList = () => {
                     type="date"
                     value={dateFrom}
                     onChange={(e) => setDateFrom(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                 </div>
 
@@ -393,14 +393,14 @@ const ProcurementList = () => {
                     type="date"
                     value={dateTo}
                     onChange={(e) => setDateTo(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                 </div>
               </div>
             </div>
 
             {/* Table */}
-            <div>
+            <div className="overflow-hidden">
               {loading ? (
                 <div className="flex items-center justify-center py-12">
                   <ArrowPathIcon className="w-8 h-8 text-green-600 animate-spin" />
@@ -418,168 +418,262 @@ const ProcurementList = () => {
                   </button>
                 </div>
               ) : (
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        No. Pengadaan
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Tanggal
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Jenis
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Supplier
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Total Nilai
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Dibuat Oleh
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                        Aksi
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                <>
+                  {/* Desktop Table View */}
+                  <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            No. Pengadaan
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            Tanggal
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            Jenis
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            Supplier
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            Total Nilai
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            Status
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            Dibuat Oleh
+                          </th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                            Aksi
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {procurements.map((procurement) => (
+                          <tr key={procurement.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="font-mono font-semibold text-sm text-gray-900">
+                                {procurement.procurement_number}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                              {formatDate(procurement.procurement_date)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                              {getTypeBadge(procurement.procurement_type)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                              {procurement.supplier_name}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="font-semibold text-sm text-gray-900">
+                                {formatCurrency(procurement.total_amount)}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              {getStatusBadge(procurement.status)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                              {procurement.creator?.full_name || "-"}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                <button
+                                  onClick={() => handleViewDetail(procurement)}
+                                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                  title="Detail"
+                                >
+                                  <EyeIcon className="w-5 h-5" />
+                                </button>
+
+                                {procurement.status === "pending" && (
+                                  <>
+                                    <button
+                                      onClick={() => handleEdit(procurement)}
+                                      className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                      title="Edit"
+                                    >
+                                      <PencilIcon className="w-5 h-5" />
+                                    </button>
+
+                                    <button
+                                      onClick={() => handleDelete(procurement.id)}
+                                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                      title="Delete"
+                                    >
+                                      <TrashIcon className="w-5 h-5" />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile/Tablet Card View */}
+                  <div className="lg:hidden divide-y divide-gray-200">
                     {procurements.map((procurement) => (
-                      <tr key={procurement.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="font-mono font-semibold text-sm text-gray-900">
-                            {procurement.procurement_number}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {formatDate(procurement.procurement_date)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {getTypeBadge(procurement.procurement_type)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {procurement.supplier_name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="font-semibold text-sm text-gray-900">
-                            {formatCurrency(procurement.total_amount)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {getStatusBadge(procurement.status)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {procurement.creator?.full_name || "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <button
-                              onClick={() => handleViewDetail(procurement)}
-                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="Detail"
-                            >
-                              <EyeIcon className="w-5 h-5" />
-                            </button>
-
-                            {procurement.status === "pending" && (
-                              <>
-                                <button
-                                  onClick={() => handleEdit(procurement)}
-                                  className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                  title="Edit"
-                                >
-                                  <PencilIcon className="w-5 h-5" />
-                                </button>
-
-                                <button
-                                  onClick={() => handleDelete(procurement.id)}
-                                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                  title="Delete"
-                                >
-                                  <TrashIcon className="w-5 h-5" />
-                                </button>
-                              </>
-                            )}
+                      <div 
+                        key={procurement.id} 
+                        className="p-4 sm:p-5 hover:bg-gray-50 transition-colors"
+                      >
+                        {/* Header Row */}
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-mono font-semibold text-sm text-gray-900 mb-1">
+                              {procurement.procurement_number}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {formatDate(procurement.procurement_date)}
+                            </div>
                           </div>
-                        </td>
-                      </tr>
+                          <div className="ml-3 flex-shrink-0">
+                            {getStatusBadge(procurement.status)}
+                          </div>
+                        </div>
+
+                        {/* Info Grid */}
+                        <div className="grid grid-cols-2 gap-3 mb-3">
+                          <div>
+                            <div className="text-xs text-gray-500 mb-1">Jenis</div>
+                            {getTypeBadge(procurement.procurement_type)}
+                          </div>
+                          <div>
+                            <div className="text-xs text-gray-500 mb-1">Supplier</div>
+                            <div className="text-sm font-medium text-gray-900 truncate">
+                              {procurement.supplier_name}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-xs text-gray-500 mb-1">Total Nilai</div>
+                            <div className="text-sm font-semibold text-gray-900">
+                              {formatCurrency(procurement.total_amount)}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-xs text-gray-500 mb-1">Dibuat Oleh</div>
+                            <div className="text-sm text-gray-900 truncate">
+                              {procurement.creator?.full_name || "-"}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
+                          <button
+                            onClick={() => handleViewDetail(procurement)}
+                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                          >
+                            <EyeIcon className="w-4 h-4" />
+                            Detail
+                          </button>
+
+                          {procurement.status === "pending" && (
+                            <>
+                              <button
+                                onClick={() => handleEdit(procurement)}
+                                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+                              >
+                                <PencilIcon className="w-4 h-4" />
+                                Edit
+                              </button>
+
+                              <button
+                                onClick={() => handleDelete(procurement.id)}
+                                className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                                title="Hapus"
+                              >
+                                <TrashIcon className="w-5 h-5" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+                </>
               )}
             </div>
 
             {/* Pagination */}
             {!loading && procurements.length > 0 && (
-              <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
-                <div className="text-sm text-gray-600">
-                  Menampilkan{" "}
-                  <span className="font-semibold">
-                    {(pagination.currentPage - 1) * pagination.itemsPerPage + 1}
-                  </span>{" "}
-                  -{" "}
-                  <span className="font-semibold">
-                    {Math.min(
-                      pagination.currentPage * pagination.itemsPerPage,
-                      pagination.totalItems
-                    )}
-                  </span>{" "}
-                  dari{" "}
-                  <span className="font-semibold">{pagination.totalItems}</span>{" "}
-                  data
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() =>
-                      setPagination({
-                        ...pagination,
-                        currentPage: pagination.currentPage - 1,
-                      })
-                    }
-                    disabled={pagination.currentPage === 1}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-gray-700"
-                  >
-                    Sebelumnya
-                  </button>
-
-                  <div className="flex gap-1">
-                    {Array.from(
-                      { length: Math.min(pagination.totalPages, 5) },
-                      (_, i) => i + 1
-                    ).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() =>
-                          setPagination({ ...pagination, currentPage: page })
-                        }
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          pagination.currentPage === page
-                            ? "bg-green-600 text-white"
-                            : "border border-gray-300 text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ))}
+              <div className="px-4 sm:px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
+                    Menampilkan{" "}
+                    <span className="font-semibold">
+                      {(pagination.currentPage - 1) * pagination.itemsPerPage + 1}
+                    </span>{" "}
+                    -{" "}
+                    <span className="font-semibold">
+                      {Math.min(
+                        pagination.currentPage * pagination.itemsPerPage,
+                        pagination.totalItems
+                      )}
+                    </span>{" "}
+                    dari{" "}
+                    <span className="font-semibold">{pagination.totalItems}</span>{" "}
+                    data
                   </div>
 
-                  <button
-                    onClick={() =>
-                      setPagination({
-                        ...pagination,
-                        currentPage: pagination.currentPage + 1,
-                      })
-                    }
-                    disabled={pagination.currentPage === pagination.totalPages}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-gray-700"
-                  >
-                    Selanjutnya
-                  </button>
+                  <div className="flex justify-center gap-2">
+                    <button
+                      onClick={() =>
+                        setPagination({
+                          ...pagination,
+                          currentPage: pagination.currentPage - 1,
+                        })
+                      }
+                      disabled={pagination.currentPage === 1}
+                      className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm font-medium text-gray-700"
+                    >
+                      Prev
+                    </button>
+
+                    <div className="hidden sm:flex gap-1">
+                      {Array.from(
+                        { length: Math.min(pagination.totalPages, 5) },
+                        (_, i) => i + 1
+                      ).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() =>
+                            setPagination({ ...pagination, currentPage: page })
+                          }
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            pagination.currentPage === page
+                              ? "bg-green-600 text-white"
+                              : "border border-gray-300 text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Mobile page indicator */}
+                    <div className="sm:hidden flex items-center px-4 py-2 border border-gray-300 rounded-lg bg-white text-xs font-medium text-gray-700">
+                      {pagination.currentPage} / {pagination.totalPages}
+                    </div>
+
+                    <button
+                      onClick={() =>
+                        setPagination({
+                          ...pagination,
+                          currentPage: pagination.currentPage + 1,
+                        })
+                      }
+                      disabled={pagination.currentPage === pagination.totalPages}
+                      className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm font-medium text-gray-700"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

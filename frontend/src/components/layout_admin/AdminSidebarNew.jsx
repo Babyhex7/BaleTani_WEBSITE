@@ -13,7 +13,9 @@ import {
   ChevronRightIcon,
   ArrowRightOnRectangleIcon,
   QuestionMarkCircleIcon,
-  ChatBubbleLeftRightIcon
+  ChatBubbleLeftRightIcon,
+  Bars3Icon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 import useAdminStore from '../../store/store_admin/useAdminStore';
 
@@ -21,6 +23,7 @@ const AdminSidebarNew = () => {
   const location = useLocation();
   const { admin, logout } = useAdminStore();
   const [expandedMenus, setExpandedMenus] = useState([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMenu = (menuName) => {
     setExpandedMenus(prev => 
@@ -97,115 +100,169 @@ const AdminSidebarNew = () => {
   const isMenuExpanded = (key) => expandedMenus.includes(key);
 
   useEffect(() => {
-  menuItems.forEach(item => {
-    if (item.submenu) {
-      item.submenu.forEach(sub => {
-        if (location.pathname.startsWith(sub.path)) {
-          if (!expandedMenus.includes(item.key)) {
-            setExpandedMenus(prev => [...prev, item.key]);
+    menuItems.forEach(item => {
+      if (item.submenu) {
+        item.submenu.forEach(sub => {
+          if (location.pathname.startsWith(sub.path)) {
+            if (!expandedMenus.includes(item.key)) {
+              setExpandedMenus(prev => [...prev, item.key]);
+            }
           }
-        }
-      });
+        });
+      }
+    });
+  }, [location.pathname]);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
-  });
-}, [location.pathname]);
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
 
   return (
-    <div className="bg-white text-gray-800 w-64 min-h-screen flex flex-col shadow-xl border-r border-gray-200">
-      {/* Logo & Brand */}
-      <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700">
-        <h1 className="text-2xl font-bold text-white">BaleTani</h1>
-        <p className="text-sm text-green-100">Admin Panel</p>
-      </div>
+    <>
+      {/* Mobile Menu Button - Fixed at top */}
+      <button
+        onClick={() => setIsMobileMenuOpen(true)}
+        className="lg:hidden fixed top-4 left-4 z-40 p-2 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 transition-colors"
+        aria-label="Open menu"
+      >
+        <Bars3Icon className="w-6 h-6" />
+      </button>
 
-      {/* User Info */}
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-            {admin?.full_name?.charAt(0) || 'A'}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-800 truncate">
-              {admin?.full_name || 'Super Admin'}
-            </p>
-            <p className="text-xs text-gray-500 capitalize">
-              {admin?.role?.role_name?.replace(/_/g, ' ') || 'Demo Account'}
-            </p>
+      {/* Overlay for mobile */}
+      {isMobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        bg-white text-gray-800 w-64 min-h-screen flex flex-col shadow-xl border-r border-gray-200
+        fixed lg:sticky top-0 z-50 lg:z-auto
+        transition-transform duration-300 ease-in-out
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        {/* Logo & Brand */}
+        <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 relative">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white">BaleTani</h1>
+              <p className="text-sm text-green-100">Admin Panel</p>
+            </div>
+            {/* Close button for mobile */}
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="lg:hidden p-1 text-white hover:bg-green-700 rounded transition-colors"
+              aria-label="Close menu"
+            >
+              <XMarkIcon className="w-6 h-6" />
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 overflow-y-auto">
-        {menuItems.map((item) => (
-          <div key={item.key || item.path} className="mb-1">
-            {item.submenu ? (
-              // Menu dengan submenu
-              <div>
-                <button
-                  onClick={() => toggleMenu(item.key)}
-                  className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all duration-200"
-                >
-                  <div className="flex items-center gap-3">
-                    <item.icon className="w-5 h-5 flex-shrink-0" />
-                    <span className="text-sm font-medium">{item.name}</span>
-                  </div>
-                  {isMenuExpanded(item.key) ? (
-                    <ChevronDownIcon className="w-4 h-4 flex-shrink-0" />
-                  ) : (
-                    <ChevronRightIcon className="w-4 h-4 flex-shrink-0" />
-                  )}
-                </button>
-                
-                {/* Submenu Items */}
-                {isMenuExpanded(item.key) && (
-                  <div className="ml-4 mt-1 space-y-1">
-                    {item.submenu.map((subItem) => (
-                      <Link
-                        key={subItem.path}
-                        to={subItem.path}
-                        className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
-                          isActive(subItem.path)
-                            ? 'bg-green-600 text-white font-medium shadow-md'
-                            : 'text-gray-600 hover:bg-green-50 hover:text-green-700'
-                        }`}
-                      >
-                        <span className="text-xs">→</span>
-                        <span>{subItem.name}</span>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              // Menu tanpa submenu
-              <Link
-                to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                  isActive(item.path)
-                    ? 'bg-green-600 text-white font-medium shadow-md'
-                    : 'text-gray-700 hover:bg-green-50 hover:text-green-700'
-                }`}
-              >
-                <item.icon className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm font-medium">{item.name}</span>
-              </Link>
-            )}
+        {/* User Info */}
+        <div className="p-4 border-b border-gray-200 bg-gray-50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+              {admin?.full_name?.charAt(0) || 'A'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-800 truncate">
+                {admin?.full_name || 'Super Admin'}
+              </p>
+              <p className="text-xs text-gray-500 capitalize">
+                {admin?.role?.role_name?.replace(/_/g, ' ') || 'Demo Account'}
+              </p>
+            </div>
           </div>
-        ))}
-      </nav>
+        </div>
 
-      {/* Logout Button */}
-      <div className="p-4 border-t border-gray-200">
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200 font-medium"
-        >
-          <ArrowRightOnRectangleIcon className="w-5 h-5" />
-          <span className="text-sm">Logout</span>
-        </button>
+        {/* Navigation */}
+        <nav className="flex-1 p-4 overflow-y-auto">
+          {menuItems.map((item) => (
+            <div key={item.key || item.path} className="mb-1">
+              {item.submenu ? (
+                // Menu dengan submenu
+                <div>
+                  <button
+                    onClick={() => toggleMenu(item.key)}
+                    className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all duration-200"
+                  >
+                    <div className="flex items-center gap-3">
+                      <item.icon className="w-5 h-5 flex-shrink-0" />
+                      <span className="text-sm font-medium">{item.name}</span>
+                    </div>
+                    {isMenuExpanded(item.key) ? (
+                      <ChevronDownIcon className="w-4 h-4 flex-shrink-0" />
+                    ) : (
+                      <ChevronRightIcon className="w-4 h-4 flex-shrink-0" />
+                    )}
+                  </button>
+                  
+                  {/* Submenu Items */}
+                  {isMenuExpanded(item.key) && (
+                    <div className="ml-4 mt-1 space-y-1">
+                      {item.submenu.map((subItem) => (
+                        <Link
+                          key={subItem.path}
+                          to={subItem.path}
+                          className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
+                            isActive(subItem.path)
+                              ? 'bg-green-600 text-white font-medium shadow-md'
+                              : 'text-gray-600 hover:bg-green-50 hover:text-green-700'
+                          }`}
+                        >
+                          <span className="text-xs">→</span>
+                          <span>{subItem.name}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                // Menu tanpa submenu
+                <Link
+                  to={item.path}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                    isActive(item.path)
+                      ? 'bg-green-600 text-white font-medium shadow-md'
+                      : 'text-gray-700 hover:bg-green-50 hover:text-green-700'
+                  }`}
+                >
+                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-sm font-medium">{item.name}</span>
+                </Link>
+              )}
+            </div>
+          ))}
+        </nav>
+
+        {/* Logout Button */}
+        <div className="p-4 border-t border-gray-200">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200 font-medium"
+          >
+            <ArrowRightOnRectangleIcon className="w-5 h-5" />
+            <span className="text-sm">Logout</span>
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

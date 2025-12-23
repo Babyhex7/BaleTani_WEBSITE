@@ -7,12 +7,12 @@
   * {
     @apply border-gray-200;
   }
-  
+
   body {
     @apply bg-gray-50 text-gray-900 font-body;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
@@ -24,43 +24,43 @@
   .btn-primary {
     @apply bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   }
-  
+
   .btn-secondary {
     @apply bg-secondary-400 hover:bg-secondary-500 text-gray-900 px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary-400 focus:ring-offset-2;
   }
-  
+
   .btn-accent {
     @apply bg-accent-500 hover:bg-accent-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-accent-400 focus:ring-offset-2;
   }
-  
+
   .btn-outline {
     @apply border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   }
-  
+
   /* Card Styles */
   .card {
     @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-100;
   }
-  
+
   .card-hover {
     @apply transform hover:scale-105 transition-all duration-200;
   }
-  
+
   /* Input Styles */
   .input-field {
     @apply w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
   }
-  
+
   /* Text Styles */
   .text-gradient {
     @apply bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent;
   }
-  
+
   /* Hero gradient background */
   .hero-gradient {
     @apply bg-gradient-to-br from-primary-50 via-white to-secondary-50;
   }
-  
+
   /* Promo badge */
   .promo-badge {
     @apply absolute top-2 right-2 bg-accent-500 text-white text-xs font-bold px-2 py-1 rounded-full;
@@ -72,12 +72,12 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -85,18 +85,34 @@
 
 /* Animation keyframes for custom animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes pulse-slow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
 }
 
 @keyframes scale-in {
-  0% { transform: scale(0.95); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .animate-float {
@@ -118,294 +134,282 @@
    ======================================== */
 
 @layer components {
-  
   /* ===== SPACING SYSTEM (Padding & Margin) ===== */
-  
+
   /* Padding untuk Section - Responsive di semua device */
   .section-py {
     @apply py-8 sm:py-12 lg:py-16;
   }
-  
+
   .section-px {
     @apply px-4 sm:px-6 lg:px-8;
   }
-  
+
   /* Kombinasi padding section (vertical + horizontal) */
   .section-padding-responsive {
     @apply py-8 px-4 sm:py-12 sm:px-6 lg:py-16 lg:px-8;
   }
-  
+
   /* Container dengan max-width & padding responsive */
   .container-app {
     @apply container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
   }
-  
+
   /* Gap untuk Grid - Responsive spacing antar elemen */
   .gap-responsive {
     @apply gap-4 md:gap-6 lg:gap-8;
   }
-  
+
   /* Gap untuk Product Grid dengan Sidebar (lebih tight) */
   .gap-products {
     @apply gap-3 sm:gap-4;
   }
-  
-  
+
   /* ===== TYPOGRAPHY SCALE - Mobile First ===== */
-  
+
   /* Hero Heading - Extra Large untuk landing page */
   .heading-hero {
     @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight;
   }
-  
+
   /* Section Heading - Large untuk section title */
   .heading-section {
     @apply text-2xl sm:text-3xl md:text-4xl font-bold leading-tight;
   }
-  
+
   /* Card/Component Heading - Medium */
   .heading-card {
     @apply text-xl sm:text-2xl font-bold leading-tight;
   }
-  
+
   /* Subheading */
   .heading-sub {
     @apply text-lg sm:text-xl font-semibold leading-tight;
   }
-  
+
   /* Body text - Readable di semua device */
   .text-body {
     @apply text-sm sm:text-base lg:text-lg leading-relaxed;
   }
-  
+
   /* Small text - Caption, metadata */
   .text-caption {
     @apply text-xs sm:text-sm leading-relaxed;
   }
-  
-  
+
   /* ===== GRID LAYOUTS - Responsive Columns ===== */
-  
+
   /* Grid untuk Product Cards - Full Width (tanpa sidebar) */
   .grid-products {
     @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6;
   }
-  
+
   /* Grid untuk Product Cards - Dengan Sidebar (ProductPage, PromoPage, CategoryPage) */
   .grid-products-sidebar {
     @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-4;
   }
-  
+
   /* Grid untuk Categories (lebih sedikit kolom) */
   .grid-categories {
     @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6;
   }
-  
+
   /* Layout Container - Sidebar + Main Content (2 columns) */
   .layout-with-sidebar {
     @apply grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6;
   }
-  
+
   /* Grid 2 kolom mobile, 4 kolom desktop */
   .grid-features {
     @apply grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6;
   }
-  
+
   /* Grid untuk Testimonials */
   .grid-testimonials {
     @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
   }
-  
-  
+
   /* ===== MOBILE TOUCH-FRIENDLY ELEMENTS ===== */
-  
+
   /* Button dengan min height untuk mudah di-tap */
   .btn-touch {
     @apply min-h-12 px-4 flex items-center justify-center rounded-lg font-medium transition-all;
   }
-  
+
   /* Card yang clickable di mobile */
   .card-touch {
     @apply min-h-20 cursor-pointer active:scale-95 transition-transform;
   }
-  
+
   /* Input field dengan touch target yang besar */
   .input-touch {
     @apply min-h-12 px-4 py-3 rounded-lg border focus:ring-2 transition-all;
   }
-  
-  
+
   /* ===== CARD COMPONENTS - Responsive ===== */
-  
+
   /* Card dengan padding responsive */
   .card-responsive {
     @apply bg-white rounded-lg p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow;
   }
-  
+
   /* Card untuk Product */
   .card-product {
     @apply bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100;
   }
-  
+
   /* Card untuk Category */
   .card-category {
     @apply bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all h-full border border-gray-100 hover:border-green-200;
   }
-  
+
   /* Card untuk Promo dengan flexbox column */
   .card-promo {
     @apply bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col h-full;
   }
-  
+
   /* Card untuk Cart Item - Mobile First */
   .card-cart-item {
     @apply bg-white rounded-lg border border-gray-200 hover:border-green-300 transition-colors;
   }
-  
-  
+
   /* ===== BUTTONS - Responsive Sizes ===== */
-  
+
   /* Button Small - Untuk mobile */
   .btn-sm {
     @apply px-4 py-2 text-sm rounded-lg font-medium;
   }
-  
+
   /* Button Medium - Default */
   .btn-md {
     @apply px-6 py-3 text-base rounded-lg font-medium;
   }
-  
+
   /* Button Large - Untuk CTA */
   .btn-lg {
     @apply px-8 py-4 text-base md:text-lg rounded-lg font-semibold;
   }
-  
-  
+
   /* ===== IMAGES - Responsive Aspect Ratios ===== */
-  
+
   /* Image container dengan aspect ratio 1:1 (square) */
   .image-square {
     @apply aspect-square w-full object-cover;
   }
-  
+
   /* Image container 4:3 untuk product */
   .image-product {
     @apply aspect-[4/3] w-full object-cover;
   }
-  
+
   /* Image container 16:9 untuk banner */
   .image-banner {
     @apply aspect-video w-full object-cover;
   }
-  
-  
+
   /* ===== MOBILE SPECIFIC UTILITIES ===== */
-  
+
   /* Hide di mobile, show di desktop */
   .hide-mobile {
     @apply hidden lg:block;
   }
-  
+
   /* Show di mobile, hide di desktop */
   .show-mobile {
     @apply block lg:hidden;
   }
-  
+
   /* Full width di mobile, auto di desktop */
   .full-mobile {
     @apply w-full lg:w-auto;
   }
-  
+
   /* Stack vertical di mobile, horizontal di desktop */
   .stack-mobile {
     @apply flex flex-col lg:flex-row;
   }
-  
-  
+
   /* ===== NAVIGATION & MENU ===== */
-  
+
   /* Mobile menu drawer (full screen) */
   .mobile-menu {
     @apply fixed inset-0 bg-white transform transition-transform duration-300;
   }
-  
+
   /* Mobile bottom navigation */
   .mobile-nav-bottom {
     @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4;
   }
-  
+
   /* Floating action button (filter, cart, etc) */
   .floating-button {
     @apply lg:hidden fixed bottom-6 right-6 p-4 rounded-full shadow-lg flex items-center gap-2 transition-colors z-floating;
   }
-  
-  
+
   /* ===== MODAL & OVERLAY ===== */
-  
+
   /* Modal responsive - Full screen mobile, centered desktop */
   .modal-responsive {
     @apply fixed inset-0 lg:inset-auto lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 
            bg-white w-full lg:w-auto lg:max-w-2xl lg:rounded-xl shadow-2xl;
   }
-  
+
   /* Modal Slide from Bottom - Untuk Mobile Filter (ProductPage style) */
   .modal-bottom {
     @apply lg:hidden fixed inset-0 bg-black bg-opacity-50 flex items-end z-overlay;
     /* Note: Add 'animate-fade-in-fast' directly in component HTML */
   }
-  
+
   .modal-bottom-content {
     @apply bg-white w-full max-h-[80vh] rounded-t-2xl overflow-y-auto z-modal;
     /* Note: Add 'animate-slide-up-modal' directly in component HTML */
   }
-  
+
   /* Modal content padding */
   .modal-content {
     @apply p-4 sm:p-6 lg:p-8;
   }
-  
-  
+
   /* ===== SAFE AREA (untuk iPhone notch, dll) ===== */
-  
+
   /* Padding bottom untuk safe area */
   .safe-bottom {
     padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   }
-  
+
   /* Padding top untuk safe area */
   .safe-top {
     padding-top: calc(1rem + env(safe-area-inset-top));
   }
-  
-  
+
   /* ===== Z-INDEX HIERARCHY ===== */
   /* Consistent z-index values across all components */
   /* Order: Sticky(10) < Navbar(20) < Dropdown(30) < Floating Button(40) < Modal Overlay(50) < Modal Content(60) < Toast(70) */
-  
+
   .z-sticky {
     @apply z-10; /* Sticky elements like sidebar/header in modal */
   }
-  
+
   .z-navbar {
     @apply z-20; /* Navigation bar - below modal */
   }
-  
+
   .z-dropdown {
     @apply z-30; /* Dropdowns from navbar - above navbar */
   }
-  
+
   .z-floating {
     @apply z-40; /* Floating action buttons - below modal */
   }
-  
+
   .z-overlay {
     @apply z-50; /* Modal backdrops - covers everything below */
   }
-  
+
   .z-modal {
     @apply z-60; /* Modal content - above overlay */
   }
-  
+
   .z-toast {
     @apply z-70; /* Toast notifications - always on top */
   }
@@ -420,26 +424,26 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
+
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
+
   .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
+
   /* Safe area padding untuk notch devices */
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 1rem);
   }
-  
+
   .pt-safe {
     padding-top: env(safe-area-inset-top, 1rem);
   }
@@ -452,36 +456,34 @@
    ======================================== */
 
 @layer components {
-  
   /* ===== ADMIN CONTAINER & LAYOUT ===== */
-  
+
   /* Admin content container */
   .admin-container {
     @apply p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen;
   }
-  
+
   /* Admin section spacing */
   .admin-section {
     @apply mb-4 sm:mb-6 lg:mb-8;
   }
-  
-  
+
   /* ===== ADMIN CARD SYSTEM ===== */
-  
+
   /* Standard admin card */
   .admin-card {
     @apply bg-white rounded-lg border border-gray-100 shadow-sm 
            p-4 sm:p-5 lg:p-6 
            hover:shadow-md transition-all duration-200;
   }
-  
+
   /* Compact card (untuk lists) */
   .admin-card-compact {
     @apply bg-white rounded-lg border border-gray-100 shadow-sm 
            p-3 sm:p-4 
            hover:shadow-md transition-all duration-200;
   }
-  
+
   /* Stat card untuk dashboard */
   .admin-stat-card {
     @apply bg-white rounded-lg border border-gray-100 shadow-sm 
@@ -489,172 +491,167 @@
            relative overflow-hidden
            hover:shadow-md hover:border-gray-200 transition-all duration-200;
   }
-  
-  
+
   /* ===== ADMIN STAT CARD COMPONENTS ===== */
-  
+
   /* Icon wrapper untuk stat card */
   .admin-stat-icon-wrapper {
     @apply w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16
            rounded-lg flex items-center justify-center
            flex-shrink-0;
   }
-  
+
   /* Icon size responsive */
   .admin-stat-icon {
     @apply w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8;
   }
-  
+
   /* Stat label (judul) */
   .admin-stat-label {
     @apply text-xs sm:text-sm text-gray-600 font-medium
            mb-1 sm:mb-2
            line-clamp-2;
   }
-  
+
   /* Stat value (angka besar) */
   .admin-stat-value {
     @apply text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900
            mb-1 sm:mb-2
            break-words;
   }
-  
+
   /* Stat trend/caption */
   .admin-stat-trend {
     @apply text-xs sm:text-sm font-medium
            flex items-center flex-wrap gap-1;
   }
-  
-  
+
   /* ===== ADMIN GRID SYSTEM ===== */
-  
+
   /* Dashboard stats grid (2 cols mobile, 4 cols desktop) */
   .admin-stats-grid {
     @apply grid gap-3 sm:gap-4 lg:gap-6
            grid-cols-2 lg:grid-cols-4;
   }
-  
+
   /* Product/Item grid (1-4 columns responsive) */
   .admin-items-grid {
     @apply grid gap-3 sm:gap-4 lg:gap-6
            grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
   }
-  
+
   /* Two column layout (form + preview) */
   .admin-two-col {
     @apply grid gap-4 sm:gap-6 lg:gap-8
            grid-cols-1 lg:grid-cols-2;
   }
-  
+
   /* Three column layout */
   .admin-three-col {
     @apply grid gap-3 sm:gap-4 lg:gap-6
            grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
   }
-  
-  
+
   /* ===== ADMIN TYPOGRAPHY ===== */
-  
+
   /* Page title (main heading) */
   .admin-page-title {
     @apply text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900
            mb-2 sm:mb-3 lg:mb-4;
   }
-  
+
   /* Section title (subheading) */
   .admin-section-title {
     @apply text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900
            mb-2 sm:mb-3;
   }
-  
+
   /* Card title */
   .admin-card-title {
     @apply text-sm sm:text-base lg:text-lg font-semibold text-gray-900
            mb-2 sm:mb-3;
   }
-  
+
   /* Label text */
   .admin-label {
     @apply text-xs sm:text-sm font-medium text-gray-700
            mb-1 sm:mb-2;
   }
-  
+
   /* Body text */
   .admin-text {
     @apply text-sm sm:text-base text-gray-600;
   }
-  
+
   /* Small text / caption */
   .admin-text-sm {
     @apply text-xs sm:text-sm text-gray-500;
   }
-  
-  
+
   /* ===== ADMIN TABLE SYSTEM ===== */
-  
+
   /* Table container - NO horizontal overflow on outer container */
   .admin-table-container {
     @apply border-t border-b border-gray-200;
   }
-  
+
   /* Table wrapper dengan scroll horizontal HANYA untuk table */
   .admin-table-wrapper {
     @apply overflow-x-auto;
   }
-  
+
   /* Custom scrollbar styling for webkit browsers */
   .admin-table-wrapper::-webkit-scrollbar {
     height: 8px;
   }
-  
+
   .admin-table-wrapper::-webkit-scrollbar-track {
     @apply bg-gray-100;
   }
-  
+
   .admin-table-wrapper::-webkit-scrollbar-thumb {
     @apply bg-gray-300 rounded;
   }
-  
+
   .admin-table-wrapper::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-400;
   }
-  
+
   /* Table */
   .admin-table {
     @apply min-w-full divide-y divide-gray-200;
   }
-  
+
   /* Table header */
   .admin-table-header {
     @apply bg-gray-50 border-b border-gray-200;
   }
-  
+
   /* Table header cell */
   .admin-table-th {
     @apply px-3 sm:px-4 lg:px-6 py-2 sm:py-3
            text-left text-xs sm:text-sm font-semibold text-gray-700
            uppercase tracking-wider;
   }
-  
+
   /* Table body */
   .admin-table-body {
     @apply bg-white divide-y divide-gray-100;
   }
-  
+
   /* Table row */
   .admin-table-tr {
     @apply hover:bg-gray-50 transition-colors;
   }
-  
+
   /* Table cell */
   .admin-table-td {
     @apply px-3 sm:px-4 lg:px-6 py-3 sm:py-4
            text-xs sm:text-sm text-gray-900;
   }
-  
-  
+
   /* ===== ADMIN BUTTONS ===== */
-  
+
   /* Primary button */
   .admin-btn-primary {
     @apply px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3
@@ -665,7 +662,7 @@
            focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
-  
+
   /* Secondary button */
   .admin-btn-secondary {
     @apply px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3
@@ -675,7 +672,7 @@
            focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
-  
+
   /* Outline button */
   .admin-btn-outline {
     @apply px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3
@@ -686,7 +683,7 @@
            focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
-  
+
   /* Danger button */
   .admin-btn-danger {
     @apply px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3
@@ -697,14 +694,14 @@
            focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
-  
+
   /* Small button (icon buttons) */
   .admin-btn-sm {
     @apply px-2 sm:px-3 py-1.5 sm:py-2
            text-xs sm:text-sm font-medium
            rounded-lg transition-all duration-200;
   }
-  
+
   /* Icon button (square) */
   .admin-btn-icon {
     @apply p-2 sm:p-2.5
@@ -712,10 +709,9 @@
            hover:bg-gray-100
            focus:outline-none focus:ring-2 focus:ring-gray-400;
   }
-  
-  
+
   /* ===== ADMIN FORM ELEMENTS ===== */
-  
+
   /* Input field */
   .admin-input {
     @apply w-full px-3 sm:px-4 py-2 sm:py-2.5
@@ -725,7 +721,7 @@
            disabled:bg-gray-100 disabled:cursor-not-allowed
            transition-all duration-200;
   }
-  
+
   /* Textarea */
   .admin-textarea {
     @apply w-full px-3 sm:px-4 py-2 sm:py-2.5
@@ -737,7 +733,7 @@
            resize-vertical
            transition-all duration-200;
   }
-  
+
   /* Select dropdown */
   .admin-select {
     @apply w-full px-3 sm:px-4 py-2 sm:py-2.5
@@ -748,70 +744,214 @@
            bg-white
            transition-all duration-200;
   }
-  
+
   /* Form group wrapper */
   .admin-form-group {
     @apply mb-4 sm:mb-5 lg:mb-6;
   }
-  
-  
+
   /* ===== ADMIN BADGES & STATUS ===== */
-  
+
   /* Badge base */
   .admin-badge {
     @apply inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1
            rounded-full text-xs sm:text-sm font-medium;
   }
-  
+
   /* Status badges */
   .admin-badge-success {
     @apply bg-green-100 text-green-700;
   }
-  
+
   .admin-badge-warning {
     @apply bg-yellow-100 text-yellow-700;
   }
-  
+
   .admin-badge-danger {
     @apply bg-red-100 text-red-700;
   }
-  
+
   .admin-badge-info {
     @apply bg-blue-100 text-blue-700;
   }
-  
+
   .admin-badge-neutral {
     @apply bg-gray-100 text-gray-700;
   }
-  
-  
+
   /* ===== ADMIN HEADER (Page Header) ===== */
-  
+
   .admin-page-header {
     @apply mb-4 sm:mb-6 lg:mb-8
            pb-4 sm:pb-5 lg:pb-6
            border-b border-gray-200;
   }
-  
+
   .admin-header-content {
     @apply flex flex-col sm:flex-row sm:items-center sm:justify-between
            gap-3 sm:gap-4;
   }
-  
-  
-  /* ===== ADMIN FILTERS & SEARCH ===== */
-  
-  /* Filter container */
+
+  /* ===== ADMIN LOADING & EMPTY STATES ===== */
+
+  .admin-loading {
+    @apply flex items-center justify-center py-8 sm:py-12;
+  }
+
+  .admin-spinner {
+    @apply animate-spin rounded-full h-8 w-8 sm:h-10 border-4 border-green-600 border-t-transparent;
+  }
+
+  .admin-empty-state {
+    @apply flex flex-col items-center justify-center py-8 sm:py-12 text-center px-4;
+  }
+
+  .admin-empty-icon {
+    @apply w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mb-3 sm:mb-4;
+  }
+
+  .admin-empty-text {
+    @apply text-sm sm:text-base text-gray-500 font-medium;
+  }
+
+  /* ===== ADMIN MOBILE CARD VIEW (Alternative to Table) ===== */
+
+  /* Card untuk mobile view replacement table */
+  .admin-mobile-card {
+    @apply lg:hidden bg-white border border-gray-200 rounded-lg p-4 
+           hover:border-green-300 hover:shadow-sm transition-all mb-3;
+  }
+
+  /* Card header */
+  .admin-mobile-card-header {
+    @apply flex items-start justify-between mb-3 pb-3 border-b border-gray-100;
+  }
+
+  /* Card body with info grid */
+  .admin-mobile-card-body {
+    @apply grid grid-cols-2 gap-3 mb-3;
+  }
+
+  /* Card info item */
+  .admin-mobile-card-info {
+    @apply space-y-1;
+  }
+
+  .admin-mobile-card-label {
+    @apply text-xs text-gray-500;
+  }
+
+  .admin-mobile-card-value {
+    @apply text-sm font-medium text-gray-900;
+  }
+
+  /* Card footer/actions */
+  .admin-mobile-card-footer {
+    @apply flex items-center gap-2 pt-3 border-t border-gray-100;
+  }
+
+  /* ===== ADMIN PAGINATION (Mobile Optimized) ===== */
+
+  .admin-pagination {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between 
+           gap-4 px-4 sm:px-6 py-4 bg-gray-50 border-t border-gray-200;
+  }
+
+  .admin-pagination-info {
+    @apply text-xs sm:text-sm text-gray-600 text-center sm:text-left;
+  }
+
+  .admin-pagination-controls {
+    @apply flex justify-center gap-2;
+  }
+
+  .admin-pagination-btn {
+    @apply px-3 sm:px-4 py-2 border border-gray-300 rounded-lg 
+           hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed 
+           text-xs sm:text-sm font-medium text-gray-700 transition-colors;
+  }
+
+  .admin-pagination-page {
+    @apply px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors;
+  }
+
+  .admin-pagination-page-active {
+    @apply bg-green-600 text-white;
+  }
+
+  .admin-pagination-page-inactive {
+    @apply border border-gray-300 text-gray-700 hover:bg-gray-100;
+  }
+
+  /* Mobile page indicator (shows current/total) */
+  .admin-pagination-mobile-indicator {
+    @apply sm:hidden flex items-center px-4 py-2 border border-gray-300 rounded-lg 
+           bg-white text-xs font-medium text-gray-700;
+  }
+
+  /* ===== ADMIN FILTERS PANEL ===== */
+
   .admin-filters {
+    @apply px-4 sm:px-6 py-4 bg-gray-50 border-b border-gray-200;
+  }
+
+  .admin-filters-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4;
+  }
+
+  /* Search input wrapper */
+  .admin-search-wrapper {
+    @apply sm:col-span-2 lg:col-span-2;
+  }
+
+  /* ===== ADMIN RESPONSIVE UTILITIES ===== */
+
+  /* Hide table on mobile, show cards */
+  .admin-hide-mobile {
+    @apply hidden lg:block;
+  }
+
+  /* Show only on mobile */
+  .admin-show-mobile {
+    @apply block lg:hidden;
+  }
+
+  /* Responsive text truncate with tooltip */
+  .admin-truncate-mobile {
+    @apply truncate max-w-[120px] sm:max-w-[150px] md:max-w-[200px] lg:max-w-none;
+  }
+
+  /* Stack buttons vertically on mobile */
+  .admin-action-group {
+    @apply flex flex-col sm:flex-row gap-2 sm:gap-3;
+  }
+
+  /* Modal full screen on mobile */
+  .admin-modal-responsive {
+    @apply fixed inset-0 lg:inset-auto lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2
+           bg-white w-full h-full lg:h-auto lg:w-auto lg:max-w-2xl lg:max-h-[90vh]
+           overflow-y-auto lg:rounded-xl shadow-2xl z-modal;
+  }
+
+  /* Sidebar toggle button (mobile only) */
+  .admin-sidebar-toggle {
+    @apply lg:hidden fixed bottom-6 left-6 p-4 bg-green-600 text-white 
+           rounded-full shadow-lg hover:bg-green-700 transition-colors z-floating;
+  }
+
+  /* ===== ADMIN FILTERS & SEARCH ===== */
+
+  /* Filter container */
+  .admin-filters-container {
     @apply flex flex-col sm:flex-row gap-3 sm:gap-4
            mb-4 sm:mb-6;
   }
-  
+
   /* Search bar */
   .admin-search {
     @apply flex-1 relative;
   }
-  
+
   .admin-search-input {
     @apply w-full pl-10 pr-4 py-2 sm:py-2.5
            text-sm sm:text-base
@@ -819,71 +959,68 @@
            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
            transition-all duration-200;
   }
-  
+
   .admin-search-icon {
     @apply absolute left-3 top-1/2 -translate-y-1/2
            w-4 h-4 sm:w-5 sm:h-5 text-gray-400;
   }
-  
-  
-  /* ===== ADMIN EMPTY STATE ===== */
-  
-  .admin-empty-state {
+
+  /* ===== ADMIN EMPTY STATE (Enhanced) ===== */
+
+  .admin-empty-state-container {
     @apply flex flex-col items-center justify-center
            py-8 sm:py-12 lg:py-16
            text-center;
   }
-  
-  .admin-empty-icon {
+
+  .admin-empty-state-icon {
     @apply w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20
            text-gray-300 mb-4;
   }
-  
-  .admin-empty-text {
+
+  .admin-empty-state-text {
     @apply text-sm sm:text-base text-gray-600
            mb-4 sm:mb-6;
   }
-  
-  
-  /* ===== ADMIN LOADING STATE ===== */
-  
-  .admin-loading {
+
+  /* ===== ADMIN LOADING STATE (Enhanced) ===== */
+
+  .admin-loading-container {
     @apply flex items-center justify-center
            py-8 sm:py-12 lg:py-16;
   }
-  
-  .admin-spinner {
+
+  .admin-loading-spinner {
     @apply animate-spin rounded-full
            h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12
            border-4 border-green-600 border-t-transparent;
   }
-  
-  
-  /* ===== ADMIN MODAL ===== */
-  
+
+  /* ===== ADMIN MODAL (Enhanced) ===== */
+
   .admin-modal-overlay {
     @apply fixed inset-0 bg-black bg-opacity-50
            flex items-center justify-center
            p-4 sm:p-6
            z-overlay;
   }
-  
+
   .admin-modal-content {
     @apply bg-white rounded-lg shadow-xl
            w-full max-w-md sm:max-w-lg lg:max-w-2xl
            max-h-[90vh] overflow-y-auto
            z-modal;
   }
-  
+
   .admin-modal-header {
     @apply px-4 sm:px-6 py-4 sm:py-5
            border-b border-gray-200;
   }
-  
+
   .admin-modal-body {
     @apply px-4 sm:px-6 py-4 sm:py-5;
   }
-  
+
   .admin-modal-footer {
     @apply px-4 sm:px-6 py-4 sm:py-5
            border-t border-gray-200

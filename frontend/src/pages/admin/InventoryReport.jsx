@@ -129,19 +129,19 @@ const InventoryReport = () => {
           subtitle="Laporan stok dan pergerakan inventory"
         />
 
-        <div className="admin-container">
+        <div className="admin-container px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           {/* Filters */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-gray-900">Filter Laporan</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Filter Laporan</h2>
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="px-4 sm:px-6 py-4 bg-gray-50">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                     Tanggal Awal
                   </label>
                   <input
@@ -150,7 +150,7 @@ const InventoryReport = () => {
                     onChange={(e) =>
                       setFilters({ ...filters, date_from: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Untuk stock movements
@@ -158,7 +158,7 @@ const InventoryReport = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                     Tanggal Akhir
                   </label>
                   <input
@@ -167,12 +167,12 @@ const InventoryReport = () => {
                     onChange={(e) =>
                       setFilters({ ...filters, date_to: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                     Kategori
                   </label>
                   <select
@@ -180,7 +180,7 @@ const InventoryReport = () => {
                     onChange={(e) =>
                       setFilters({ ...filters, category_id: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Semua Kategori</option>
                     {categories.map((cat) => (
@@ -192,7 +192,7 @@ const InventoryReport = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                     Tipe Produk
                   </label>
                   <select
@@ -200,7 +200,7 @@ const InventoryReport = () => {
                     onChange={(e) =>
                       setFilters({ ...filters, product_type: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Semua Tipe</option>
                     <option value="online">Online</option>
@@ -209,7 +209,7 @@ const InventoryReport = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                     Status Stok
                   </label>
                   <select
@@ -217,7 +217,7 @@ const InventoryReport = () => {
                     onChange={(e) =>
                       setFilters({ ...filters, stock_status: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Semua Status</option>
                     <option value="normal">Normal</option>
@@ -231,7 +231,7 @@ const InventoryReport = () => {
                 <button
                   onClick={fetchReport}
                   disabled={loading}
-                  className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto"
                 >
                   {loading ? (
                     <>
@@ -253,103 +253,103 @@ const InventoryReport = () => {
           {reportData && (
             <div className="space-y-6">
               {/* Summary Statistics */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+                <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">Total Produk</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Produk</p>
+                      <p className="text-xl sm:text-2xl font-bold text-gray-900">
                         {reportData.summary.totalProducts}
                       </p>
                     </div>
-                    <div className="p-3 bg-blue-100 rounded-lg">
-                      <CubeIcon className="w-6 h-6 text-blue-600" />
+                    <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+                      <CubeIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Nilai Stok</p>
-                      <p className="text-xl font-bold text-green-600">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">Nilai Stok</p>
+                      <p className="text-lg sm:text-xl font-bold text-green-600 truncate">
                         {formatCurrency(reportData.summary.totalStockValue)}
                       </p>
                     </div>
-                    <div className="p-3 bg-green-100 rounded-lg">
-                      <BanknotesIcon className="w-6 h-6 text-green-600" />
+                    <div className="p-2 sm:p-3 bg-green-100 rounded-lg flex-shrink-0 ml-2">
+                      <BanknotesIcon className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">Stok Normal</p>
-                      <p className="text-2xl font-bold text-green-600">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">Stok Normal</p>
+                      <p className="text-xl sm:text-2xl font-bold text-green-600">
                         {reportData.summary.normalStock}
                       </p>
                     </div>
-                    <div className="p-3 bg-green-100 rounded-lg">
-                      <CheckCircleIcon className="w-6 h-6 text-green-600" />
+                    <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+                      <CheckCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">Stok Rendah</p>
-                      <p className="text-2xl font-bold text-yellow-600">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">Stok Rendah</p>
+                      <p className="text-xl sm:text-2xl font-bold text-yellow-600">
                         {reportData.summary.lowStock}
                       </p>
                     </div>
-                    <div className="p-3 bg-yellow-100 rounded-lg">
-                      <ExclamationTriangleIcon className="w-6 h-6 text-yellow-600" />
+                    <div className="p-2 sm:p-3 bg-yellow-100 rounded-lg">
+                      <ExclamationTriangleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">Stok Habis</p>
-                      <p className="text-2xl font-bold text-red-600">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">Stok Habis</p>
+                      <p className="text-xl sm:text-2xl font-bold text-red-600">
                         {reportData.summary.outOfStock}
                       </p>
                     </div>
-                    <div className="p-3 bg-red-100 rounded-lg">
-                      <ArchiveBoxXMarkIcon className="w-6 h-6 text-red-600" />
+                    <div className="p-2 sm:p-3 bg-red-100 rounded-lg">
+                      <ArchiveBoxXMarkIcon className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Breakdown Section */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Category Breakdown */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                  <div className="p-6 border-b border-gray-200">
-                    <h3 className="text-lg font-bold text-gray-900">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900">
                       Breakdown per Kategori
                     </h3>
                   </div>
-                  <div className="p-6">
+                  <div className="p-4 sm:p-6">
                     <div className="space-y-3 max-h-80 overflow-y-auto">
                       {reportData.categoryBreakdown.map((cat) => (
                         <div
                           key={cat.category_id}
-                          className="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
+                          className="flex justify-between items-center p-3 sm:p-4 bg-gray-50 rounded-lg"
                         >
-                          <div>
-                            <p className="font-semibold text-gray-900">
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold text-sm sm:text-base text-gray-900 truncate">
                               {cat.category_name}
                             </p>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-xs sm:text-sm text-gray-600">
                               {cat.total_products} produk • {cat.total_stock} stok
                             </p>
                           </div>
-                          <p className="font-bold text-green-600">
+                          <p className="font-bold text-sm sm:text-base text-green-600 ml-2 truncate">
                             {formatCurrency(cat.total_value)}
                           </p>
                         </div>
@@ -359,36 +359,36 @@ const InventoryReport = () => {
                 </div>
 
                 {/* Type Breakdown */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                  <div className="p-6 border-b border-gray-200">
-                    <h3 className="text-lg font-bold text-gray-900">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900">
                       Breakdown per Tipe Produk
                     </h3>
                   </div>
-                  <div className="p-6">
+                  <div className="p-4 sm:p-6">
                     <div className="space-y-3">
-                      <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-semibold text-gray-900">Online</p>
-                          <p className="text-sm text-gray-600">
+                      <div className="flex justify-between items-center p-3 sm:p-4 bg-gray-50 rounded-lg">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-sm sm:text-base text-gray-900">Online</p>
+                          <p className="text-xs sm:text-sm text-gray-600">
                             {reportData.typeBreakdown.online.count} produk •{" "}
                             {reportData.typeBreakdown.online.stock} stok
                           </p>
                         </div>
-                        <p className="font-bold text-blue-600">
+                        <p className="font-bold text-sm sm:text-base text-blue-600 ml-2 truncate">
                           {formatCurrency(reportData.typeBreakdown.online.value)}
                         </p>
                       </div>
 
-                      <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-semibold text-gray-900">Offline</p>
-                          <p className="text-sm text-gray-600">
+                      <div className="flex justify-between items-center p-3 sm:p-4 bg-gray-50 rounded-lg">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-sm sm:text-base text-gray-900">Offline</p>
+                          <p className="text-xs sm:text-sm text-gray-600">
                             {reportData.typeBreakdown.offline.count} produk •{" "}
                             {reportData.typeBreakdown.offline.stock} stok
                           </p>
                         </div>
-                        <p className="font-bold text-purple-600">
+                        <p className="font-bold text-sm sm:text-base text-purple-600 ml-2 truncate">
                           {formatCurrency(reportData.typeBreakdown.offline.value)}
                         </p>
                       </div>
@@ -399,19 +399,19 @@ const InventoryReport = () => {
 
               {/* Stock Movements Summary */}
               {reportData.movementSummary && (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                  <div className="p-6 border-b border-gray-200">
-                    <h3 className="text-lg font-bold text-gray-900">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900">
                       Ringkasan Pergerakan Stok
                     </h3>
                   </div>
-                  <div className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <p className="text-sm text-blue-600 font-medium mb-1">
+                  <div className="p-4 sm:p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                      <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <p className="text-xs sm:text-sm text-blue-600 font-medium mb-1">
                           Masuk (Pengadaan)
                         </p>
-                        <p className="text-2xl font-bold text-blue-700">
+                        <p className="text-xl sm:text-2xl font-bold text-blue-700">
                           {reportData.movementSummary.procurement_in.quantity}
                         </p>
                         <p className="text-xs text-blue-600">
@@ -419,11 +419,11 @@ const InventoryReport = () => {
                         </p>
                       </div>
 
-                      <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                        <p className="text-sm text-green-600 font-medium mb-1">
+                      <div className="p-3 sm:p-4 bg-green-50 rounded-lg border border-green-200">
+                        <p className="text-xs sm:text-sm text-green-600 font-medium mb-1">
                           Keluar (Penjualan)
                         </p>
-                        <p className="text-2xl font-bold text-green-700">
+                        <p className="text-xl sm:text-2xl font-bold text-green-700">
                           {reportData.movementSummary.sale_out.quantity}
                         </p>
                         <p className="text-xs text-green-600">
@@ -431,11 +431,11 @@ const InventoryReport = () => {
                         </p>
                       </div>
 
-                      <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                        <p className="text-sm text-purple-600 font-medium mb-1">
+                      <div className="p-3 sm:p-4 bg-purple-50 rounded-lg border border-purple-200">
+                        <p className="text-xs sm:text-sm text-purple-600 font-medium mb-1">
                           Penyesuaian
                         </p>
-                        <p className="text-2xl font-bold text-purple-700">
+                        <p className="text-xl sm:text-2xl font-bold text-purple-700">
                           {reportData.movementSummary.adjustment.quantity}
                         </p>
                         <p className="text-xs text-purple-600">
@@ -443,11 +443,11 @@ const InventoryReport = () => {
                         </p>
                       </div>
 
-                      <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-                        <p className="text-sm text-red-600 font-medium mb-1">
+                      <div className="p-3 sm:p-4 bg-red-50 rounded-lg border border-red-200">
+                        <p className="text-xs sm:text-sm text-red-600 font-medium mb-1">
                           Kadaluarsa
                         </p>
-                        <p className="text-2xl font-bold text-red-700">
+                        <p className="text-xl sm:text-2xl font-bold text-red-700">
                           {reportData.movementSummary.expired.quantity}
                         </p>
                         <p className="text-xs text-red-600">
@@ -460,13 +460,15 @@ const InventoryReport = () => {
               )}
 
               {/* Products List */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-6 border-b border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-900">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900">
                     Daftar Produk ({reportData.products.length})
                   </h3>
                 </div>
-                <div>
+                
+                {/* Desktop Table View */}
+                <div className="hidden lg:block overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
@@ -557,17 +559,77 @@ const InventoryReport = () => {
                     </tbody>
                   </table>
                 </div>
+
+                {/* Mobile/Tablet Card View */}
+                <div className="lg:hidden divide-y divide-gray-200">
+                  {reportData.products.map((product) => (
+                    <div key={product.id} className="p-4 hover:bg-gray-50 transition-colors">
+                      {/* Product Header with Image */}
+                      <div className="flex items-start gap-3 mb-3">
+                        {product.image_url ? (
+                          <img
+                            src={getImageUrl(product.image_url)}
+                            alt={product.name}
+                            className="w-16 h-16 rounded-lg object-cover border flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                            <CubeIcon className="w-8 h-8 text-gray-400" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-sm text-gray-900 mb-1">{product.name}</h4>
+                          <p className="text-xs text-gray-500 mb-1">{product.sku}</p>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                product.product_type === "online"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {product.product_type === "online" ? "Online" : "Offline"}
+                            </span>
+                            {getStockBadge(product.status)}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Info Grid */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <div className="text-xs text-gray-500 mb-1">Kategori</div>
+                          <div className="text-sm text-gray-900">{product.category_name}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-500 mb-1">Harga</div>
+                          <div className="text-sm font-semibold text-gray-900 truncate">{formatCurrency(product.price)}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-500 mb-1">Stok</div>
+                          <div className="text-sm font-semibold text-gray-900">
+                            {product.total_stock} {product.unit}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-500 mb-1">Nilai Stok</div>
+                          <div className="text-sm font-bold text-green-600 truncate">{formatCurrency(product.stock_value)}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Recent Stock Movements */}
               {reportData.recentMovements && reportData.recentMovements.length > 0 && (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                  <div className="p-6 border-b border-gray-200">
-                    <h3 className="text-lg font-bold text-gray-900">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900">
                       Pergerakan Stok Terkini (50 Terakhir)
                     </h3>
                   </div>
-                  <div>
+                  <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead className="bg-gray-50 border-b border-gray-200">
                         <tr>

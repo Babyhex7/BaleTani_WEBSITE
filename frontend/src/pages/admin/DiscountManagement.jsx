@@ -311,94 +311,94 @@ const DiscountManagement = () => {
           subtitle="Kelola campaign diskon produk"
         />
 
-        <div className="admin-container">
+        <div className="admin-container px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           {/* Toast Notification dipindah global di main.jsx */}
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-4 sm:mb-6">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Diskon</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Diskon</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">
                     {stats.total}
                   </p>
                 </div>
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <TagIcon className="w-6 h-6 text-blue-600" />
+                <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+                  <TagIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Diskon Aktif</p>
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Diskon Aktif</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-600">
                     {stats.active}
                   </p>
                 </div>
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <CheckCircleIcon className="w-6 h-6 text-green-600" />
+                <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+                  <CheckCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Diskon Nonaktif</p>
-                  <p className="text-2xl font-bold text-gray-600">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Diskon Nonaktif</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-600">
                     {stats.inactive}
                   </p>
                 </div>
-                <div className="p-3 bg-gray-100 rounded-lg">
-                  <XCircleIcon className="w-6 h-6 text-gray-600" />
+                <div className="p-2 sm:p-3 bg-gray-100 rounded-lg">
+                  <XCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Percentage</p>
-                  <p className="text-2xl font-bold text-purple-600">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Percentage</p>
+                  <p className="text-xl sm:text-2xl font-bold text-purple-600">
                     {stats.percentage}
                   </p>
                 </div>
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <TagIcon className="w-6 h-6 text-purple-600" />
+                <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
+                  <TagIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Fixed Amount</p>
-                  <p className="text-2xl font-bold text-orange-600">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Fixed Amount</p>
+                  <p className="text-xl sm:text-2xl font-bold text-orange-600">
                     {stats.fixedAmount}
                   </p>
                 </div>
-                <div className="p-3 bg-orange-100 rounded-lg">
-                  <TagIcon className="w-6 h-6 text-orange-600" />
+                <div className="p-2 sm:p-3 bg-orange-100 rounded-lg">
+                  <TagIcon className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Main Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <h2 className="text-xl font-bold text-gray-900">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">
                   Daftar Diskon
                 </h2>
 
                 <button
                   onClick={handleCreate}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors w-full sm:w-auto"
                 >
                   <PlusIcon className="w-5 h-5" />
                   Tambah Diskon
@@ -407,8 +407,8 @@ const DiscountManagement = () => {
             </div>
 
             {/* Filters */}
-            <div className="p-6 border-b border-gray-200 bg-gray-50">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 <div>
                   <div className="relative">
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -420,7 +420,7 @@ const DiscountManagement = () => {
                         setSearchQuery(e.target.value);
                         setCurrentPage(1);
                       }}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -432,7 +432,7 @@ const DiscountManagement = () => {
                       setFilterStatus(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Semua Status</option>
                     <option value="active">Aktif</option>
@@ -448,7 +448,7 @@ const DiscountManagement = () => {
                       setFilterType(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Semua Tipe</option>
                     <option value="percentage">Percentage</option>
@@ -488,152 +488,273 @@ const DiscountManagement = () => {
                   </button>
                 </div>
               ) : (
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Nama Diskon
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Tipe
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Nilai
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Max Potongan
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Periode
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Produk
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                        Aksi
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                <>
+                  {/* Desktop Table View */}
+                  <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Nama Diskon
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Tipe
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Nilai
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Max Potongan
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Periode
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Produk
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                          Aksi
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {discounts.map((discount) => {
+                        const discountId = discount.id || discount.discount_id;
+                        const productCount = discount.product_count || 0;
+
+                        return (
+                          <tr key={discountId} className="hover:bg-gray-50">
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-green-100 rounded-lg">
+                                  <TagIcon className="w-5 h-5 text-green-600" />
+                                </div>
+                                <span className="text-sm font-medium text-gray-900">
+                                  {discount.discount_name}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span
+                                className={`px-2 py-1 text-xs font-medium rounded ${
+                                  discount.discount_type === "percentage"
+                                    ? "bg-purple-100 text-purple-700"
+                                    : "bg-orange-100 text-orange-700"
+                                }`}
+                              >
+                                {discount.discount_type === "percentage"
+                                  ? "Percentage"
+                                  : "Fixed Amount"}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="text-sm font-semibold text-gray-900">
+                                {formatValue(
+                                  discount.discount_type,
+                                  discount.value
+                                )}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              {discount.discount_type === "percentage" && discount.max_discount ? (
+                                <span className="text-sm font-medium text-orange-600">
+                                  {formatValue("fixed_amount", discount.max_discount)}
+                                </span>
+                              ) : (
+                                <span className="text-xs text-gray-400">-</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="text-sm text-gray-600">
+                                <div>{formatDate(discount.start_date)}</div>
+                                <div className="text-xs text-gray-500">
+                                  s/d {formatDate(discount.end_date)}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-1 text-sm text-gray-700">
+                                <CubeIcon className="w-4 h-4 text-gray-500" />
+                                <span className="font-medium">{productCount} produk</span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2">
+                                {getStatusBadge(discount)}
+                                <button
+                                  onClick={() => handleToggleStatus(discount)}
+                                  className={`text-xs px-2 py-1 rounded ${
+                                    discount.is_active
+                                      ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                      : "bg-green-100 text-green-600 hover:bg-green-200"
+                                  }`}
+                                  title={
+                                    discount.is_active ? "Nonaktifkan" : "Aktifkan"
+                                  }
+                                >
+                                  {discount.is_active ? "Off" : "On"}
+                                </button>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => handleAssignProducts(discount)}
+                                  className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                  title="Tambah produk ke diskon"
+                                >
+                                  <PlusIcon className="w-5 h-5" />
+                                </button>
+
+                                <button
+                                  onClick={() => handleView(discount)}
+                                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                  title="View"
+                                >
+                                  <EyeIcon className="w-5 h-5" />
+                                </button>
+                                <button
+                                  onClick={() => handleEdit(discount)}
+                                  className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                  title="Edit"
+                                >
+                                  <PencilIcon className="w-5 h-5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(discount)}
+                                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                  title="Delete"
+                                >
+                                  <TrashIcon className="w-5 h-5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  </div>
+
+                  {/* Mobile/Tablet Card View */}
+                  <div className="lg:hidden divide-y divide-gray-200">
                     {discounts.map((discount) => {
                       const discountId = discount.id || discount.discount_id;
                       const productCount = discount.product_count || 0;
 
                       return (
-                        <tr key={discountId} className="hover:bg-gray-50">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 bg-green-100 rounded-lg">
+                        <div key={discountId} className="p-4 sm:p-5 hover:bg-gray-50 transition-colors">
+                          {/* Header */}
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
                                 <TagIcon className="w-5 h-5 text-green-600" />
                               </div>
-                              <span className="text-sm font-medium text-gray-900">
-                                {discount.discount_name}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span
-                              className={`px-2 py-1 text-xs font-medium rounded ${
-                                discount.discount_type === "percentage"
-                                  ? "bg-purple-100 text-purple-700"
-                                  : "bg-orange-100 text-orange-700"
-                              }`}
-                            >
-                              {discount.discount_type === "percentage"
-                                ? "Percentage"
-                                : "Fixed Amount"}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-sm font-semibold text-gray-900">
-                              {formatValue(
-                                discount.discount_type,
-                                discount.value
-                              )}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            {discount.discount_type === "percentage" && discount.max_discount ? (
-                              <span className="text-sm font-medium text-orange-600">
-                                {formatValue("fixed_amount", discount.max_discount)}
-                              </span>
-                            ) : (
-                              <span className="text-xs text-gray-400">-</span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="text-sm text-gray-600">
-                              <div>{formatDate(discount.start_date)}</div>
-                              <div className="text-xs text-gray-500">
-                                s/d {formatDate(discount.end_date)}
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-sm font-semibold text-gray-900 mb-1 truncate">
+                                  {discount.discount_name}
+                                </h3>
+                                <span
+                                  className={`inline-block px-2 py-1 text-xs font-medium rounded ${
+                                    discount.discount_type === "percentage"
+                                      ? "bg-purple-100 text-purple-700"
+                                      : "bg-orange-100 text-orange-700"
+                                  }`}
+                                >
+                                  {discount.discount_type === "percentage"
+                                    ? "Percentage"
+                                    : "Fixed Amount"}
+                                </span>
                               </div>
                             </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-1 text-sm text-gray-700">
-                              <CubeIcon className="w-4 h-4 text-gray-500" />
-                              <span className="font-medium">{productCount} produk</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
+                            <div className="ml-2">
                               {getStatusBadge(discount)}
-                              <button
-                                onClick={() => handleToggleStatus(discount)}
-                                className={`text-xs px-2 py-1 rounded ${
-                                  discount.is_active
-                                    ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                    : "bg-green-100 text-green-600 hover:bg-green-200"
-                                }`}
-                                title={
-                                  discount.is_active ? "Nonaktifkan" : "Aktifkan"
-                                }
-                              >
-                                {discount.is_active ? "Off" : "On"}
-                              </button>
                             </div>
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <button
-                                onClick={() => handleAssignProducts(discount)}
-                                className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg"
-                                title="Tambah produk ke diskon"
-                              >
-                                <PlusIcon className="w-5 h-5" />
-                              </button>
+                          </div>
 
-                              <button
-                                onClick={() => handleView(discount)}
-                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                                title="View"
-                              >
-                                <EyeIcon className="w-5 h-5" />
-                              </button>
-                              <button
-                                onClick={() => handleEdit(discount)}
-                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
-                                title="Edit"
-                              >
-                                <PencilIcon className="w-5 h-5" />
-                              </button>
-                              <button
-                                onClick={() => handleDelete(discount)}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                                title="Delete"
-                              >
-                                <TrashIcon className="w-5 h-5" />
-                              </button>
+                          {/* Info Grid */}
+                          <div className="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">Nilai Diskon</div>
+                              <div className="text-sm font-semibold text-gray-900">
+                                {formatValue(discount.discount_type, discount.value)}
+                              </div>
                             </div>
-                          </td>
-                        </tr>
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">Max Potongan</div>
+                              <div className="text-sm font-medium text-orange-600">
+                                {discount.discount_type === "percentage" && discount.max_discount
+                                  ? formatValue("fixed_amount", discount.max_discount)
+                                  : "-"}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">Periode</div>
+                              <div className="text-sm text-gray-900">
+                                {formatDate(discount.start_date)}
+                                <div className="text-xs text-gray-500">s/d {formatDate(discount.end_date)}</div>
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">Produk</div>
+                              <div className="flex items-center gap-1 text-sm text-gray-900">
+                                <CubeIcon className="w-4 h-4 text-gray-500" />
+                                <span className="font-medium">{productCount}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
+                            <button
+                              onClick={() => handleAssignProducts(discount)}
+                              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
+                            >
+                              <PlusIcon className="w-4 h-4" />
+                              Assign
+                            </button>
+                            <button
+                              onClick={() => handleView(discount)}
+                              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                            >
+                              <EyeIcon className="w-4 h-4" />
+                              Detail
+                            </button>
+                            <button
+                              onClick={() => handleEdit(discount)}
+                              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+                            >
+                              <PencilIcon className="w-4 h-4" />
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(discount)}
+                              className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                              title="Hapus"
+                            >
+                              <TrashIcon className="w-5 h-5" />
+                            </button>
+                          </div>
+
+                          {/* Toggle Status Button */}
+                          <button
+                            onClick={() => handleToggleStatus(discount)}
+                            className={`w-full mt-2 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
+                              discount.is_active
+                                ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                : "bg-green-100 text-green-700 hover:bg-green-200"
+                            }`}
+                          >
+                            {discount.is_active ? "Nonaktifkan Diskon" : "Aktifkan Diskon"}
+                          </button>
+                        </div>
                       );
                     })}
-                  </tbody>
-                </table>
+                  </div>
+                </>
               )}
             </div>
 

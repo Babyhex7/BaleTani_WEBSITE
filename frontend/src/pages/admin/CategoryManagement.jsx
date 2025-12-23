@@ -238,56 +238,56 @@ const CategoryManagement = () => {
           subtitle="Kelola kategori produk"
         />
 
-        <div className="admin-container">
+        <div className="admin-container px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           {/* Stats Cards */}
-          <div className="admin-three-col admin-section">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Kategori</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Kategori</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.total}</p>
                 </div>
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <TagIcon className="w-6 h-6 text-blue-600" />
+                <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+                  <TagIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Kategori Aktif</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Kategori Aktif</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-600">{stats.active}</p>
                 </div>
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <CheckCircleIcon className="w-6 h-6 text-green-600" />
+                <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+                  <CheckCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Kategori Nonaktif</p>
-                  <p className="text-2xl font-bold text-gray-600">{stats.inactive}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Kategori Nonaktif</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-600">{stats.inactive}</p>
                 </div>
-                <div className="p-3 bg-gray-100 rounded-lg">
-                  <XCircleIcon className="w-6 h-6 text-gray-600" />
+                <div className="p-2 sm:p-3 bg-gray-100 rounded-lg">
+                  <XCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Main Card */}
-          <div className="admin-card-compact overflow-hidden p-0">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             {/* Header */}
             <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <h2 className="text-xl font-bold text-gray-900">Daftar Kategori</h2>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Daftar Kategori</h2>
 
                 <button
                   onClick={handleCreate}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors w-full sm:w-auto"
                 >
                   <PlusIcon className="w-5 h-5" />
                   Tambah Kategori
@@ -297,7 +297,7 @@ const CategoryManagement = () => {
 
             {/* Filters */}
             <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <div className="relative">
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -309,7 +309,7 @@ const CategoryManagement = () => {
                         setSearchQuery(e.target.value);
                         setCurrentPage(1);
                       }}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -321,7 +321,7 @@ const CategoryManagement = () => {
                       setFilterStatus(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Semua Status</option>
                     <option value="true">Aktif</option>
@@ -355,77 +355,151 @@ const CategoryManagement = () => {
                   </button>
                 </div>
               ) : (
-                <div className="admin-table-wrapper">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gambar</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Kategori</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deskripsi</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Produk</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                <>
+                  {/* Desktop Table View */}
+                  <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gambar</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Kategori</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deskripsi</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Produk</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {categories.map((category) => {
+                        const categoryId = category.id || category.category_id;
+                        const productCount = category.product_count || 0;
+
+                        return (
+                          <tr key={categoryId} className="hover:bg-gray-50">
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                {category.category_image ? (
+                                  <img
+                                    src={getImageUrl(category.category_image, 'thumbnail')}
+                                    alt={category.category_name}
+                                    className="w-12 h-12 object-cover rounded-lg border border-gray-200"
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src = getImageUrl(null, 'thumbnail');
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
+                                    <TagIcon className="w-6 h-6 text-gray-400" />
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="text-sm font-medium text-gray-900">
+                                {category.category_name}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-sm text-gray-600 max-w-md truncate">
+                                {category.description || '-'}
+                              </p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="text-sm text-gray-900">{productCount} produk</span>
+                            </td>
+                            <td className="px-6 py-4">{getStatusBadge(category.is_active)}</td>
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <button onClick={() => handleView(category)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View">
+                                  <EyeIcon className="w-5 h-5" />
+                                </button>
+                                <button onClick={() => handleEdit(category)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Edit">
+                                  <PencilIcon className="w-5 h-5" />
+                                </button>
+                                <button onClick={() => handleDelete(category)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                                  <TrashIcon className="w-5 h-5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  </div>
+
+                  {/* Mobile/Tablet Card View */}
+                  <div className="lg:hidden divide-y divide-gray-200">
                     {categories.map((category) => {
                       const categoryId = category.id || category.category_id;
                       const productCount = category.product_count || 0;
 
                       return (
-                        <tr key={categoryId} className="hover:bg-gray-50">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              {category.category_image ? (
-                                <img
-                                  src={getImageUrl(category.category_image, 'thumbnail')}
-                                  alt={category.category_name}
-                                  className="w-12 h-12 object-cover rounded-lg border border-gray-200"
-                                  onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = getImageUrl(null, 'thumbnail');
-                                  }}
-                                />
-                              ) : (
-                                <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
-                                  <TagIcon className="w-6 h-6 text-gray-400" />
-                                </div>
-                              )}
+                        <div key={categoryId} className="p-4 sm:p-5 hover:bg-gray-50 transition-colors">
+                          {/* Header with Image */}
+                          <div className="flex items-start gap-3 mb-3">
+                            {category.category_image ? (
+                              <img
+                                src={getImageUrl(category.category_image, 'thumbnail')}
+                                alt={category.category_name}
+                                className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-gray-200 flex-shrink-0"
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.src = getImageUrl(null, 'thumbnail');
+                                }}
+                              />
+                            ) : (
+                              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200 flex-shrink-0">
+                                <TagIcon className="w-8 h-8 text-gray-400" />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-sm font-semibold text-gray-900 mb-1">{category.category_name}</h3>
+                              <div className="mb-2">
+                                {getStatusBadge(category.is_active)}
+                              </div>
+                              <p className="text-xs text-gray-500 line-clamp-2">
+                                {category.description || 'Tidak ada deskripsi'}
+                              </p>
                             </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-sm font-medium text-gray-900">
-                              {category.category_name}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-sm text-gray-600 max-w-md truncate">
-                              {category.description || '-'}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-sm text-gray-900">{productCount} produk</span>
-                          </td>
-                          <td className="px-6 py-4">{getStatusBadge(category.is_active)}</td>
-                          <td className="px-6 py-4 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <button onClick={() => handleView(category)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="View">
-                                <EyeIcon className="w-5 h-5" />
-                              </button>
-                              <button onClick={() => handleEdit(category)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Edit">
-                                <PencilIcon className="w-5 h-5" />
-                              </button>
-                              <button onClick={() => handleDelete(category)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
-                                <TrashIcon className="w-5 h-5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
+                          </div>
+
+                          {/* Info */}
+                          <div className="mb-3 pb-3 border-b border-gray-200">
+                            <div className="text-xs text-gray-500 mb-1">Jumlah Produk</div>
+                            <div className="text-sm font-medium text-gray-900">{productCount} produk</div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleView(category)}
+                              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                            >
+                              <EyeIcon className="w-4 h-4" />
+                              Detail
+                            </button>
+                            <button
+                              onClick={() => handleEdit(category)}
+                              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+                            >
+                              <PencilIcon className="w-4 h-4" />
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(category)}
+                              className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                              title="Hapus"
+                            >
+                              <TrashIcon className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
                       );
                     })}
-                  </tbody>
-                </table>
-                </div>
+                  </div>
+                </>
               )}
             </div>
 
