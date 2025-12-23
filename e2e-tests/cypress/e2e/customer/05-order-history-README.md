@@ -5,7 +5,9 @@
 **File:** `05-order-history.cy.js`  
 **Total Tests:** 15  
 **Status:** ✅ 15/15 Passing (100%)  
-**Duration:** ~2 min 15 sec
+**Duration:** ~2 min 15 sec  
+**Backend Verification:** ✅ 100% API Endpoints Verified  
+**Critical Features:** ✅ Order Cancellation with Stock Restore
 
 ## 🎯 Test Coverage
 
@@ -16,6 +18,371 @@
 3. Order Filtering (4 tests)
 4. Order Detail View (2 tests)
 5. Order Actions (1 test)
+
+---
+
+## 🔗 Backend API Verification
+
+**Controller:** `backend/src/controllers/customerOrderHistory.controller.js`  
+**Routes:** `backend/src/routes/customer/order.routes.js`
+
+### ✅ Verified API Endpoints
+
+| Endpoint                           | Method | Purpose                        | Auth        | Status    |
+| ---------------------------------- | ------ | ------------------------------ | ----------- | --------- |
+| `/api/customer/orders`             | GET    | Get order list with filters    | ✅ Required | ✅ Exists |
+| `/api/customer/orders/:id`         | GET    | Get order detail               | ✅ Required | ✅ Exists |
+| `/api/customer/orders/:id/status`  | GET    | Get order status (for polling) | ✅ Required | ✅ Exists |
+| `/api/customer/orders/:id/cancel`  | POST   | Cancel pending order           | ✅ Required | ✅ Exists |
+| `/api/customer/orders/:id/reorder` | POST   | Reorder items to cart          | ✅ Required | ✅ Exists |
+
+**Penjelasan Backend:**
+
+- Semua endpoint memerlukan JWT authentication token
+- Customer hanya bisa akses order miliknya sendiri (filtered by customer_id)
+- Order cancellation hanya untuk status `pending_payment`
+- Reorder akan validasi stock availability sebelum add to cart
+- Stock otomatis restore saat order cancelled
+
+---
+
+## 📊 GET /api/customer/orders (List Orders)
+
+**Query Parameters:**
+
+```javascript
+{
+  page: 1,                    // ✅ Pagination page
+  limit: 10,                  // ✅ Items per page
+  search: "ORD-20251223",     // ✅ Search by order_number
+  status: "pending_payment",  // ✅ Filter by order_status
+  date_range: "7",            // ✅ Filter by date ('7', '30', '90' days)
+  sort: "newest"              // ✅ Sort by created_at ('newest' | 'oldest')
+}
+```
+
+**Response:**
+
+```javascript
+{
+  success: true,
+  data: {
+    orders: [
+      {
+        id: "uuid",
+        order_number: "ORD-20251223-1234",
+        order_status: "pending_payment",
+        payment_status: "pending",
+        payment_method: "transfer",
+        delivery_method: "self_pickup",
+        total_amount: 100000,
+        payment_expired_at: "2025-12-23T10:10:00Z",
+        created_at: "2025-12-23T10:00:00Z",
+        items: [
+          {
+            product_name: "Beras Premium",
+            quantity: 2,
+            price: 50000,
+            product_image: "/uploads/products/beras.jpg"
+          }
+        ]
+      }
+    ],
+    stats: {
+      total: 10,
+      pending_payment: 2,
+      processing: 3,
+      completed: 5,
+      cancelled: 0
+    },
+    pagination: {
+      current_page: 1,
+      total_pages: 1,
+      total_items: 10,
+      per_page: 10
+    }
+  }
+}
+```
+
+### 🔍 Filter Implementation (Verified)
+
+**1. Status Filter:**
+
+```javascript
+// Backend: customerOrderHistory.controller.js:77-80
+if (status && status !== "all") {
+  whereClause.order_status = status;
+}
+```
+
+**Valid Status Values:**
+
+- `all` - Show all orders (default)
+- `pending_payment` - Menunggu Pembayaran
+- `confirmed` - Dikonfirmasi
+- `processing` - Diproses
+- `ready_pickup` - Siap Diambil
+- `on_delivery` - Dalam Pengiriman
+- `completed` - Selesai
+- `cancelled` - Dibatalkan
+
+**2. Date Range Filter:**
+
+```javascript
+// Backend: customerOrderHistory.controller.js:82-96
+if (date_range) {
+  const now = new Date();
+  let startDate;
+
+  switch (date_range) {
+    case "7":
+      startDate = new Date(now.setDate(now.getDate() - 7));
+      break;
+    case "30":
+      startDate = new Date(now.setDate(now.getDate() - 30));
+      break;
+    case "90":
+      startDate = new Date(now.setDate(now.getDate() - 90));
+      break;
+  }
+
+  whereClause.created_at = { [Op.gte]: startDate };
+}
+```
+
+**3. Search by Order Number:**
+
+```javascript
+// Backend: customerOrderHistory.controller.js:98-100
+if (search) {
+  whereClause.order_number = { [Op.like]: `%${search}%` };
+}
+```
+
+✅ **Supports partial matching:** "ORD-2025" will match "ORD-20251223-1234"
+
+---
+
+## ❌ POST /api/customer/orders/:id/cancel (Cancel Order)
+
+**Critical Business Rule:** Only orders with `order_status = 'pending_payment'` can be cancelled.
+
+**Implementation:**
+
+```javascript
+// Backend: customerOrderHistory.controller.js
+exports.cancelOrder = async (req, res) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const { id } = req.params;
+    const customerId = req.customer.id;
+
+    // STEP 1: Fetch order with items
+    const order = await Order.findOne({
+      where: {
+        id: id,
+        customer_id: customerId,
+      },
+      include: [{ model: OrderItem, as: "items" }],
+      transaction,
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order tidak ditemukan",
+      });
+    }
+
+    // STEP 2: Validate order status
+    if (order.order_status !== "pending_payment") {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Hanya pesanan dengan status 'Menunggu Pembayaran' yang bisa dibatalkan",
+      });
+    }
+
+    // STEP 3: Update order status
+    await order.update(
+      {
+        order_status: "cancelled",
+        payment_status: "cancelled",
+        cancelled_at: new Date(),
+      },
+      { transaction }
+    );
+
+    // STEP 4: Restore product stock (IMPORTANT!)
+    for (const item of order.items) {
+      await Product.increment("total_stock", {
+        by: item.quantity,
+        where: { id: item.product_id },
+        transaction,
+      });
+
+      // Record stock movement
+      await StockMovement.create(
+        {
+          product_id: item.product_id,
+          movement_type: "in",
+          quantity: item.quantity,
+          reference_type: "order_cancelled",
+          reference_id: order.id,
+          notes: `Order cancelled: ${order.order_number}`,
+        },
+        { transaction }
+      );
+    }
+
+    // STEP 5: Create status history
+    await OrderStatusHistory.create(
+      {
+        order_id: order.id,
+        status: "cancelled",
+        notes: "Dibatalkan oleh customer",
+        created_by: customerId,
+      },
+      { transaction }
+    );
+
+    await transaction.commit();
+
+    return res.json({
+      success: true,
+      message: "Order berhasil dibatalkan",
+      data: { order },
+    });
+  } catch (error) {
+    await transaction.rollback();
+    return res.status(500).json({
+      success: false,
+      message: "Gagal membatalkan order",
+    });
+  }
+};
+```
+
+**Why Stock Restore is Critical:**
+
+- When order cancelled, products become available again
+- Prevents stock discrepancy
+- Maintains inventory accuracy
+- Allows other customers to purchase
+
+**Example Flow:**
+
+```
+1. Customer A orders 5 units of Product X
+   → Stock: 10 → 5 (reduced during order creation)
+
+2. Customer A cancels order
+   → Stock: 5 → 10 (restored during cancellation)
+
+3. Product X available for other customers ✅
+```
+
+---
+
+## 🔄 POST /api/customer/orders/:id/reorder (Reorder)
+
+**Purpose:** Add items from previous order back to cart
+
+**Implementation:**
+
+```javascript
+exports.reorder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const customerId = req.customer.id;
+
+    // STEP 1: Fetch order with items
+    const order = await Order.findOne({
+      where: { id, customer_id: customerId },
+      include: [
+        {
+          model: OrderItem,
+          as: "items",
+          include: [{ model: Product, as: "product" }],
+        },
+      ],
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        message: "Order tidak ditemukan",
+      });
+    }
+
+    // STEP 2: Validate and prepare cart items
+    const cart = [];
+    const unavailableProducts = [];
+
+    for (const item of order.items) {
+      const product = item.product;
+
+      // Check if product still available
+      if (!product || !product.is_active) {
+        unavailableProducts.push(item.product_name);
+        continue;
+      }
+
+      // Check stock availability
+      if (product.total_stock === 0) {
+        unavailableProducts.push(product.name + " (habis)");
+        continue;
+      }
+
+      // Adjust quantity if exceeds current stock
+      const quantity = Math.min(item.quantity, product.total_stock);
+
+      cart.push({
+        product_id: product.id,
+        quantity: quantity,
+      });
+    }
+
+    // STEP 3: Return cart data (frontend will add to localStorage)
+    return res.json({
+      success: true,
+      message:
+        cart.length > 0
+          ? "Produk berhasil ditambahkan ke keranjang"
+          : "Semua produk tidak tersedia",
+      data: {
+        cart,
+        unavailable_products: unavailableProducts,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Gagal melakukan reorder",
+    });
+  }
+};
+```
+
+**Smart Features:**
+
+- ✅ Filters out discontinued products
+- ✅ Filters out out-of-stock products
+- ✅ Adjusts quantity if stock insufficient
+- ✅ Shows which products are unavailable
+
+**Example:**
+
+```
+Original Order:
+- Beras Premium (3 units) → Available ✅
+- Telur Ayam (2 units) → Out of stock ❌
+- Sayur Bayam (1 unit) → Discontinued ❌
+
+Reorder Result:
+- Added to cart: Beras Premium (3 units)
+- Unavailable: Telur Ayam (habis), Sayur Bayam
+```
 
 ---
 

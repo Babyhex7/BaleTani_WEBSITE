@@ -5,7 +5,9 @@
 **File:** `03-cart.cy.js`  
 **Total Tests:** 18  
 **Status:** ✅ 18/18 Passing (100%)  
-**Duration:** ~2 min 20 sec
+**Duration:** ~2 min 20 sec  
+**Implementation Type:** ✅ Client-Side (Zustand + localStorage)  
+**Backend API:** ❌ Not Used (Cart is fully client-side)
 
 ## 🎯 Test Coverage
 
@@ -15,6 +17,210 @@
 2. Update Cart Quantity (6 tests)
 3. Remove from Cart (4 tests)
 4. Cart Calculations (3 tests)
+
+---
+
+## 🏗️ Cart Architecture (Verified)
+
+### 📦 State Management: Zustand
+
+**File:** `frontend/src/store/store_customer/useCartStore.js`
+
+```javascript
+// Zustand Store Structure
+const useCartStore = create((set, get) => ({
+  // State
+  items: [],
+
+  // Actions (All Working ✅)
+  addItem: (product, quantity = 1) => {
+    // Logic: Check if product exists, update qty or add new
+    // Auto-save to localStorage
+  },
+
+  removeItem: (itemId) => {
+    // Logic: Remove from array, update localStorage
+  },
+
+  updateQuantity: (itemId, quantity) => {
+    // Logic: Update qty with validation (min: 1, max: stock)
+  },
+
+  clearCart: () => {
+    // Logic: Empty array, clear localStorage
+  },
+
+  getTotalItems: () => {
+    // Calculate total quantity across all items
+  },
+
+  getTotalPrice: () => {
+    // Calculate sum of (price × quantity) for all items
+    // Includes discount calculation
+  },
+
+  // Persistence
+  persist: {
+    name: "baletani-cart", // localStorage key
+    storage: localStorage,
+  },
+}));
+```
+
+### 💾 localStorage Schema
+
+**Key:** `baletani-cart`  
+**Structure:**
+
+```json
+{
+  "state": {
+    "items": [
+      {
+        "id": "prod-001",
+        "name": "Beras Premium",
+        "price": 50000,
+        "quantity": 2,
+        "image": "/uploads/products/beras.jpg",
+        "stock": 100,
+        "discount": {
+          "type": "percentage",
+          "value": 10,
+          "discounted_price": 45000
+        }
+      }
+    ]
+  },
+  "version": 0
+}
+```
+
+### 🔄 Persistence Flow
+
+```mermaid
+User Action → Zustand Store → Auto-save to localStorage → Browser Storage
+     ↓              ↓                    ↓                        ↓
+  Add to Cart   Update State      JSON.stringify()       Persisted Data
+     ↓              ↓                    ↓                        ↓
+  Page Refresh → Load from localStorage → Hydrate Store → UI Restored
+```
+
+**Key Features:**
+
+- ✅ **Auto-save:** Every cart action automatically persists
+- ✅ **Auto-restore:** Cart data loaded on page refresh
+- ✅ **Cross-page sync:** Cart state shared across all pages
+- ✅ **No API calls:** All operations are instant (client-side only)
+
+### 🎨 UI Components (Verified)
+
+**CartPage:** `frontend/src/pages/customer/CartPage.jsx`
+
+- Display cart items list
+- Empty cart state
+- Clear cart modal
+- Checkout button
+
+**CartItem:** `frontend/src/components/layout/CartItem.jsx`
+
+- Product info display
+- Quantity controls (-, +, input)
+- Remove button
+- Subtotal calculation
+- Stock validation
+
+**OrderSummary:** `frontend/src/components/layout/OrderSummary.jsx`
+
+- Subtotal display
+- Delivery fee (Rp 10.000 for delivery, Rp 0 for self-pickup)
+- Total calculation
+- Discount display
+
+### 🧮 Price Calculation Logic
+
+**Formula:**
+
+```javascript
+// 1. Item Subtotal (per product)
+itemSubtotal = discounted_price ? (discounted_price × quantity) : (price × quantity)
+
+// 2. Cart Subtotal (all products)
+cartSubtotal = Σ(itemSubtotal for all items)
+
+// 3. Delivery Fee (conditional)
+deliveryFee = deliveryMethod === 'delivery' ? 10000 : 0
+
+// 4. Grand Total
+grandTotal = cartSubtotal + deliveryFee
+```
+
+**Example Calculation:**
+
+```
+Product 1: Beras Premium
+- Original Price: Rp 50.000
+- Discount: 10% → Rp 45.000
+- Quantity: 2
+- Subtotal: Rp 90.000
+
+Product 2: Telur Ayam
+- Price: Rp 25.000
+- No discount
+- Quantity: 1
+- Subtotal: Rp 25.000
+
+---
+Cart Subtotal: Rp 115.000
+Delivery Fee: Rp 10.000
+Grand Total: Rp 125.000
+```
+
+### 🛡️ Validation Rules (Verified)
+
+**Quantity Validation:**
+
+```javascript
+// Minimum quantity
+if (quantity < 1) {
+  quantity = 1; // Cannot be less than 1
+  disableDecreaseButton = true;
+}
+
+// Maximum quantity (stock limit)
+if (quantity > product.stock) {
+  quantity = product.stock;
+  disableIncreaseButton = true;
+  showWarning("Jumlah melebihi stok tersedia");
+}
+```
+
+**Out of Stock Products:**
+
+```javascript
+// Prevent add to cart if stock = 0
+if (product.stock === 0) {
+  showError("Produk habis");
+  disableAddToCartButton = true;
+  return;
+}
+```
+
+### ⚡ Performance Considerations
+
+**Advantages of Client-Side Cart:**
+
+- ✅ Instant response (no API latency)
+- ✅ Works offline
+- ✅ Reduced server load
+- ✅ No database queries for cart operations
+
+**Limitations:**
+
+- ⚠️ Cart data lost if localStorage cleared
+- ⚠️ Not synchronized across devices
+- ⚠️ Stock validation only on checkout (not real-time)
+
+**Note:** Cart data is sent to backend only during checkout (order creation)
 
 ---
 

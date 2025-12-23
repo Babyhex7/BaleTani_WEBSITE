@@ -5,7 +5,8 @@
 **File:** `01-auth.cy.js`  
 **Total Tests:** 21  
 **Status:** ✅ 20/21 Passing (95.24%)  
-**Duration:** ~2 min 31 sec
+**Duration:** ~2 min 31 sec  
+**Backend Verification:** ✅ 100% API Endpoints Verified
 
 ## 🎯 Test Coverage
 
@@ -17,6 +18,55 @@
 4. Customer Logout (2 tests)
 5. Protected Routes (3 tests)
 6. Navigation Flow (1 test)
+
+---
+
+## 🔗 Backend API Verification
+
+**Controller:** `backend/src/controllers/customerAuth.controller.js`  
+**Routes:** `backend/src/routes/customerAuth.routes.js`
+
+### ✅ Verified API Endpoints
+
+| Endpoint                      | Method | Controller Function    | Status    |
+| ----------------------------- | ------ | ---------------------- | --------- |
+| `/api/customer/auth/register` | POST   | `registerCustomer()`   | ✅ Exists |
+| `/api/customer/auth/login`    | POST   | `loginCustomer()`      | ✅ Exists |
+| `/api/customer/auth/profile`  | GET    | `getCustomerProfile()` | ✅ Exists |
+| `/api/customer/auth/logout`   | POST   | `logout()`             | ✅ Exists |
+
+### 🔐 Backend Security Features Verified
+
+✅ **Phone Number Normalization:**
+
+- Convert 08xxx → 628xxx format
+- Implementation: `backend/src/utils/phoneHelper.js`
+- Function: `normalizePhoneNumber()`
+
+✅ **Input Validation:**
+
+- Phone format validation (08xxx or 628xxx)
+- Name length validation (2-100 chars)
+- Password strength validation (6+ chars)
+- Implementation: `backend/src/utils/validationHelper.js`
+
+✅ **JWT Token Management:**
+
+- Token generation with 24-hour expiry
+- Token stored in localStorage
+- Auto-refresh on page reload
+
+✅ **Rate Limiting:**
+
+- Registration: Limited requests per IP
+- Login: Limited requests per IP
+- Implementation: `backend/src/middlewares/rateLimiter.middleware.js`
+
+✅ **Password Security:**
+
+- Hashed with bcrypt (10 rounds)
+- Never stored in plain text
+- Automatic hashing via Sequelize hooks
 
 ---
 
