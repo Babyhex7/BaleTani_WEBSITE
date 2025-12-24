@@ -1,8 +1,8 @@
 // ================================================================
-// SCENARIO 4: STRESS TEST (Breaking Point)
+// SCENARIO 4: STRESS TEST - SHORT VERSION (6 menit)
 // ================================================================
 // Test untuk mencari breaking point sistem
-// Duration: 10-15 menit, Gradually increase sampai sistem fail
+// Duration: 6 menit (SHORT), Gradually increase sampai 300 VUs
 //
 // Purpose:
 // - Find maximum capacity sistem
@@ -24,7 +24,8 @@ import { check, sleep, group } from "k6";
 import { SharedArray } from "k6/data";
 import { Rate, Trend, Counter, Gauge } from "k6/metrics";
 
-import { stages } from "../config/stages.js";
+// Import config - GUNAKAN STAGES SHORT!
+import { stagesShort } from "../config/stages-short.js";
 import { thresholds } from "../config/thresholds.js";
 import { endpoints, buildUrl } from "../config/endpoints.js";
 
@@ -50,8 +51,8 @@ const products = new SharedArray("products", function () {
 
 // Test configuration
 export let options = {
-  // Stress test: gradually increase sampai break
-  stages: stages.stress,
+  // Stress test SHORT: gradually increase to 300 VUs, 6 min total
+  stages: stagesShort.stress,
 
   // Thresholds akan fail, tapi capture data
   thresholds: thresholds.stress,
@@ -60,8 +61,9 @@ export let options = {
   httpDebug: "full",
 
   tags: {
-    test_type: "stress",
+    test_type: "stress_short",
     goal: "find_breaking_point",
+    duration: "6min",
   },
 };
 
@@ -69,11 +71,14 @@ export let options = {
  * Setup function
  */
 export function setup() {
-  console.log("💥 Starting Stress Test - Finding Breaking Point...");
-  console.log(`   Duration: ~10 minutes`);
-  console.log(`   Ramping: 100 → 200 → 300 → 400 → 500 VUs`);
+  console.log("💥 Starting Stress Test - SHORT VERSION...");
+  console.log(`   Duration: 6 minutes (SHORT)`);
+  console.log(`   Ramping: 100 → 200 → 300 VUs`);
   console.log(`   Expected: System will start failing at some point`);
-  console.log(`   Goal: Document max capacity\n`);
+  console.log(`   Goal: Document max capacity`);
+  console.log(
+    `   ℹ️  SHORT VERSION: 6min, up to 300 VUs (enough to find breaking point)\n`
+  );
 
   console.log("⚠️  MONITOR CLOSELY:");
   console.log("   - Database connection pool (max 100)");

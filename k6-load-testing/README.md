@@ -12,6 +12,23 @@ Load testing suite menggunakan K6 untuk menguji **Customer Journey** BaleTani E-
 
 ---
 
+## ⚡ QUICK START - Versi Pendek (1 Jam)
+
+**🎯 SOLUSI untuk test yang kelamaan & suka berhenti sendiri!**
+
+```powershell
+# Run ALL tests dalam 1 jam (vs 6+ jam original)
+.\run-all-short.ps1
+
+# Atau manual satu-per-satu
+k6 run scenarios/02-baseline-load-SHORT.js   # 10 min
+k6 run scenarios/05-endurance-SHORT.js       # 30 min
+```
+
+**📚 Dokumentasi lengkap:** [QUICK_RUN_SHORT.md](QUICK_RUN_SHORT.md) | [LOAD_TEST_STRATEGY.md](LOAD_TEST_STRATEGY.md)
+
+---
+
 ## 🎯 Tujuan Testing
 
 - ✅ Validasi performa sistem pada beban normal (50 concurrent users)
@@ -39,7 +56,8 @@ k6-load-testing/
 ├── .gitignore                   # Ignore results & .env
 │
 ├── config/
-│   ├── stages.js                # Load profiles (baseline, peak, stress, etc)
+│   ├── stages.js                # Load profiles FULL (30min-4hour per test)
+│   ├── stages-short.js          # 🔥 Load profiles SHORT (5-30min) - REKOMENDASI!
 │   ├── thresholds.js            # Success criteria per scenario
 │   └── endpoints.js             # API endpoint definitions
 │

@@ -1,8 +1,8 @@
 // ================================================================
-// SCENARIO 6: SPIKE TEST (Traffic Surge & Recovery)
+// SCENARIO 6: SPIKE TEST - SHORT VERSION (10 menit)
 // ================================================================
 // Test kemampuan sistem recover dari sudden traffic spike
-// Duration: 20 menit
+// Duration: 10 menit (SHORT)
 // Pattern: 20 → 200 → 20 VUs (sudden 10x spike)
 //
 // Purpose:
@@ -27,7 +27,8 @@ import { check, sleep, group } from "k6";
 import { SharedArray } from "k6/data";
 import { Rate, Trend, Counter, Gauge } from "k6/metrics";
 
-import { stages } from "../config/stages.js";
+// Import config - GUNAKAN STAGES SHORT!
+import { stagesShort } from "../config/stages-short.js";
 import { thresholds } from "../config/thresholds.js";
 import { endpoints, buildUrl } from "../config/endpoints.js";
 
@@ -57,15 +58,16 @@ const products = new SharedArray("products", function () {
 
 // Test configuration
 export let options = {
-  // Spike pattern: 20 → 200 → 20 VUs
-  stages: stages.spike,
+  // Spike pattern SHORT: 20 → 200 → 20 VUs, 10 min total
+  stages: stagesShort.spike,
 
   // Thresholds untuk spike (toleran selama spike, strict untuk recovery)
   thresholds: thresholds.spike,
 
   tags: {
-    test_type: "spike",
+    test_type: "spike_short",
     pattern: "20_200_20",
+    duration: "10min",
   },
 };
 

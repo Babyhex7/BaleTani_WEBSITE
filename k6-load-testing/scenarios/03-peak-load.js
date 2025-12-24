@@ -1,8 +1,8 @@
 // ================================================================
-// SCENARIO 3: PEAK LOAD TEST (Flash Sale / High Traffic)
+// SCENARIO 3: PEAK LOAD TEST - SHORT VERSION (8 menit)
 // ================================================================
 // Test performa sistem saat traffic tinggi (flash sale scenario)
-// Duration: 15 menit, 150 Virtual Users (VUs)
+// Duration: 8 menit (SHORT), 150 Virtual Users (VUs)
 //
 // Purpose:
 // - Simulate flash sale / promo besar-besaran
@@ -23,8 +23,8 @@ import { check, sleep, group } from "k6";
 import { SharedArray } from "k6/data";
 import { Rate, Trend, Counter } from "k6/metrics";
 
-// Import config
-import { stages } from "../config/stages.js";
+// Import config - GUNAKAN STAGES SHORT!
+import { stagesShort } from "../config/stages-short.js";
 import { thresholds } from "../config/thresholds.js";
 import { endpoints, buildUrl } from "../config/endpoints.js";
 
@@ -54,15 +54,16 @@ const products = new SharedArray("products", function () {
 
 // Test configuration
 export let options = {
-  // Peak load: 150 VUs, ramp-up cepat (3 menit)
-  stages: stages.peak,
+  // Peak load SHORT: 150 VUs, 8 menit total
+  stages: stagesShort.peak,
 
   // Thresholds lebih toleran untuk peak
   thresholds: thresholds.peak,
 
   tags: {
-    test_type: "peak",
+    test_type: "peak_short",
     scenario: "flash_sale",
+    duration: "8min",
   },
 };
 
@@ -70,10 +71,11 @@ export let options = {
  * Setup function
  */
 export function setup() {
-  console.log("🔥 Starting Peak Load Test (Flash Sale Simulation)...");
-  console.log(`   Duration: 15 minutes`);
+  console.log("🔥 Starting Peak Load Test - SHORT VERSION...");
+  console.log(`   Duration: 8 minutes (SHORT)`);
   console.log(`   Target VUs: 150`);
-  console.log(`   Expected: Higher response time, some 429 errors\n`);
+  console.log(`   Expected: Higher response time, some 429 errors`);
+  console.log(`   ℹ️  SHORT VERSION: 8min (vs 15min original)\n`);
 
   return {
     startTime: new Date().toISOString(),
