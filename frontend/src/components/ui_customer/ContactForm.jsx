@@ -58,12 +58,27 @@ const ContactForm = ({ onSuccess, onError }) => {
 
     if (!formData.whatsapp_number.trim()) {
       newErrors.whatsapp_number = 'Nomor WhatsApp wajib diisi';
-    } else if (!/^(\+62|62|0)[0-9]{9,13}$/.test(formData.whatsapp_number)) {
-      newErrors.whatsapp_number = 'Format nomor WhatsApp tidak valid';
+    } else {
+      // Bersihkan spasi dan dash
+      const cleanNumber = formData.whatsapp_number.replace(/[\s-]/g, '');
+      
+      // Validasi format nomor Indonesia:
+      // - 08xxxxxxxxx (10-13 digit, dimulai dengan 08)
+      // - 628xxxxxxxxx (11-14 digit, dimulai dengan 628)
+      // - +628xxxxxxxxx (12-15 karakter, dimulai dengan +628)
+      const isValid = /^(\+628|628|08)[0-9]{8,11}$/.test(cleanNumber);
+      
+      if (!isValid) {
+        newErrors.whatsapp_number = 'Format nomor WhatsApp tidak valid. Gunakan format: 08xxx, 628xxx, atau +628xxx';
+      }
     }
 
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Format email tidak valid';
+    if (formData.email && formData.email.trim()) {
+      // Validasi email yang lebih ketat
+      const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(formData.email.trim())) {
+        newErrors.email = 'Format email tidak valid';
+      }
     }
 
     if (!formData.subject.trim()) {
