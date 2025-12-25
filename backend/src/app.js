@@ -21,29 +21,36 @@ app.use(
   })
 );
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 500, // limit each IP to 500 requests per windowMs (naik dari 100)
-  message: {
-    success: false,
-    message: "Too many requests from this IP, please try again later.",
-  },
-  // Skip static files (uploads, images)
-  skip: (req) => {
-    return req.url.startsWith("/uploads/");
-  },
-  // Handler untuk rate limit
-  handler: (req, res) => {
-    console.warn(`⚠️ Rate limit exceeded from IP: ${req.ip}`);
-    res.status(429).json({
+// Rate limiting - DISABLE for load testing if DISABLE_RATE_LIMIT=true
+const isRateLimitDisabled = process.env.DISABLE_RATE_LIMIT === "true";
+
+if (!isRateLimitDisabled) {
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 500, // limit each IP to 500 requests per windowMs (naik dari 100)
+    message: {
       success: false,
-      message: "Terlalu banyak request. Silakan tunggu beberapa saat.",
-      retryAfter: Math.ceil(req.rateLimit.resetTime / 1000),
-    });
-  },
-});
-app.use(limiter);
+      message: "Too many requests from this IP, please try again later.",
+    },
+    // Skip static files (uploads, images)
+    skip: (req) => {
+      return req.url.startsWith("/uploads/");
+    },
+    // Handler untuk rate limit
+    handler: (req, res) => {
+      console.warn(`⚠️ Rate limit exceeded from IP: ${req.ip}`);
+      res.status(429).json({
+        success: false,
+        message: "Terlalu banyak request. Silakan tunggu beberapa saat.",
+        retryAfter: Math.ceil(req.rateLimit.resetTime / 1000),
+      });
+    },
+  });
+  app.use(limiter);
+  console.log("🔒 Global rate limiter enabled");
+} else {
+  console.log("⚠️ Global rate limiter DISABLED (for load testing)");
+}
 
 // CORS configuration - Allow multiple development origins (localhost and local IPs)
 const corsOptions = {
@@ -168,6 +175,11 @@ if (process.env.NODE_ENV !== "production") {
   const cacheStatsRoutes = require("./routes/cacheStats");
   app.use("/api/cache", cacheStatsRoutes);
   console.log("🔍 Cache monitoring endpoints enabled at /api/cache");
+
+  // Database pool monitoring
+  const poolStatsRoutes = require("./routes/poolStats");
+  app.use("/api/pool-stats", poolStatsRoutes);
+  console.log("🔍 DB Pool monitoring endpoints enabled at /api/pool-stats");
 }
 
 // Catch browser extension logs (to prevent CORS errors)

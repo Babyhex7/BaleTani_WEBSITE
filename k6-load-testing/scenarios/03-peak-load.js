@@ -161,16 +161,18 @@ function fastPurchase(baseUrl) {
   group("Fast Purchase", function () {
     // Quick login
     const customer = randomItem(customers);
-    const token = loginCustomer(
+    const authResult = loginCustomer(
       baseUrl,
       customer.phone_number,
       customer.password
     );
 
-    if (!token) {
+    if (!authResult.success) {
       errorRate.add(1);
       return;
     }
+
+    const token = authResult.token;
 
     sleep(1); // Minimal delay
 
@@ -240,16 +242,18 @@ function fastPurchase(baseUrl) {
 function bulkBuying(baseUrl) {
   group("Bulk Buying", function () {
     const customer = randomItem(customers);
-    const token = loginCustomer(
+    const authResult = loginCustomer(
       baseUrl,
       customer.phone_number,
       customer.password
     );
 
-    if (!token) {
+    if (!authResult.success) {
       errorRate.add(1);
       return;
     }
+
+    const token = authResult.token;
 
     sleep(1);
 

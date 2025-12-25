@@ -86,10 +86,10 @@ export let options = {
 
   // Thresholds untuk endurance
   thresholds: {
-    http_req_duration: ["p95<1500", "p99<3000"], // Slightly relaxed
-    http_req_failed: ["rate<0.03"], // <3% error rate
-    errors: ["rate<0.03"],
-    slow_requests_above_1s: ["count<50"], // Max 50 slow requests
+    "http_req_duration": ["p(95)<1500", "p(99)<3000"], // Slightly relaxed
+    "http_req_failed": ["rate<0.03"], // <3% error rate
+    "errors": ["rate<0.03"],
+    "slow_requests_above_1s": ["count<50"], // Max 50 slow requests
   },
 
   tags: {
@@ -166,7 +166,7 @@ function productBrowsing(baseUrl) {
     let start = Date.now();
 
     // Get products
-    let res = http.get(buildUrl(baseUrl, "/api/public/products"), {
+    let res = http.get(`${baseUrl}/api/public/products`, {
       tags: { name: "GetProducts" },
     });
 
@@ -188,7 +188,7 @@ function productBrowsing(baseUrl) {
     start = Date.now();
 
     let detailRes = http.get(
-      buildUrl(baseUrl, `/api/public/products/${product.id}`),
+      `${baseUrl}/api/public/products/${product.product_id}`,
       {
         tags: { name: "ProductDetail" },
       }
@@ -214,7 +214,7 @@ function purchaseFlow(baseUrl) {
   group("Purchase Flow", function () {
     // Login
     let customer = randomItem(customers);
-    let authResult = loginCustomer(baseUrl, customer.phone, customer.password);
+    let authResult = loginCustomer(baseUrl, customer.phone_number, customer.password);
 
     if (!authResult.success) {
       errorRate.add(1);
@@ -228,19 +228,19 @@ function purchaseFlow(baseUrl) {
 
     let orderPayload = {
       customer_name: customer.name,
-      customer_phone: customer.phone,
+      customer_phone: customer.phone_number,
       delivery_method: "self_pickup",
       payment_method: "cash",
       items: [
         {
-          product_id: randomItem(products).id,
+          product_id: randomItem(products).product_id,
           quantity: randomInt(1, 2),
         },
       ],
     };
 
     let checkoutRes = http.post(
-      buildUrl(baseUrl, "/api/customer/orders/create"),
+      `${baseUrl}/api/customer/orders/create`,
       JSON.stringify(orderPayload),
       {
         headers: {
@@ -270,7 +270,7 @@ function purchaseFlow(baseUrl) {
 function orderHistory(baseUrl) {
   group("Order History", function () {
     let customer = randomItem(customers);
-    let authResult = loginCustomer(baseUrl, customer.phone, customer.password);
+    let authResult = loginCustomer(baseUrl, customer.phone_number, customer.password);
 
     if (!authResult.success) {
       errorRate.add(1);
@@ -281,7 +281,7 @@ function orderHistory(baseUrl) {
 
     let start = Date.now();
 
-    let historyRes = http.get(buildUrl(baseUrl, "/api/customer/orders"), {
+    let historyRes = http.get(`${baseUrl}/api/customer/orders/history`, {
       headers: getAuthHeaders(authResult.token),
       tags: { name: "OrderHistory" },
     });

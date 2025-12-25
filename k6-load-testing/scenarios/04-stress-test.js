@@ -123,7 +123,7 @@ function stressLogin(baseUrl) {
     const customer = randomItem(customers);
     const startTime = Date.now();
 
-    const token = loginCustomer(
+    const authResult = loginCustomer(
       baseUrl,
       customer.phone_number,
       customer.password
@@ -131,7 +131,7 @@ function stressLogin(baseUrl) {
 
     const duration = Date.now() - startTime;
 
-    if (!token) {
+    if (!authResult.success) {
       errorRate.add(1);
     }
 
@@ -150,16 +150,18 @@ function stressLogin(baseUrl) {
 function stressCart(baseUrl) {
   group("Stress Cart", function () {
     const customer = randomItem(customers);
-    const token = loginCustomer(
+    const authResult = loginCustomer(
       baseUrl,
       customer.phone_number,
       customer.password
     );
 
-    if (!token) {
+    if (!authResult.success) {
       errorRate.add(1);
       return;
     }
+
+    const token = authResult.token;
 
     // Rapid cart additions
     for (let i = 0; i < 3; i++) {

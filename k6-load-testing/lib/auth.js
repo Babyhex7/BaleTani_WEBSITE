@@ -38,23 +38,56 @@ export function loginCustomer(baseUrl, phoneNumber, password) {
 
   const response = http.post(loginUrl, payload, params);
 
+  // Parse response body safely
+  let responseBody = null;
+  try {
+    responseBody = response.json();
+  } catch (e) {
+    console.error(
+      `❌ Failed to parse response for ${phoneNumber}: ${response.body}`
+    );
+    return { success: false, token: null, error: response.body };
+  }
+
   // Validasi response
   const loginSuccess = check(response, {
     "login status 200": (r) => r.status === 200,
-    "login has token": (r) => r.json("data.token") !== undefined,
-    "login has customer data": (r) => r.json("data.customer") !== undefined,
+    "login has token": (r) => {
+      try {
+        return r.json("data.token") !== undefined;
+      } catch (e) {
+        return false;
+      }
+    },
+    "login has customer data": (r) => {
+      try {
+        return r.json("data.customer") !== undefined;
+      } catch (e) {
+        return false;
+      }
+    },
   });
 
-  if (loginSuccess && response.status === 200) {
-    const token = response.json("data.token");
-    return token;
+  if (loginSuccess && response.status === 200 && responseBody.success) {
+    return {
+      success: true,
+      token: responseBody.data.token,
+      customer: responseBody.data.customer,
+    };
   }
 
   // Log error jika login gagal
   console.error(
-    `❌ Login failed for ${phoneNumber}: ${response.status} - ${response.body}`
+    `❌ Login failed for ${phoneNumber}: ${response.status} - ${JSON.stringify(
+      responseBody
+    )}`
   );
-  return null;
+  return {
+    success: false,
+    token: null,
+    error: responseBody ? responseBody.message : response.body,
+    statusCode: response.status,
+  };
 }
 
 /**

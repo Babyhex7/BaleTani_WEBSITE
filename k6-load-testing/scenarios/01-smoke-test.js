@@ -83,17 +83,19 @@ export default function () {
   // TEST 2: Customer Login
   // ============================================
   const testCustomer = randomItem(customers);
-  const token = loginCustomer(
+  const authResult = loginCustomer(
     endpoints.health.replace("/api/health", ""),
     testCustomer.phone_number,
     testCustomer.password
   );
 
-  if (!token) {
+  if (!authResult.success || !authResult.token) {
     errorRate.add(1);
     console.error("❌ Smoke test failed at login!");
     return; // Stop jika login gagal
   }
+
+  const token = authResult.token;
 
   sleep(1);
 

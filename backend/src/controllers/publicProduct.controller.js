@@ -33,6 +33,11 @@ const { CUSTOMER, PATTERNS } = require("../cache/cacheKeys");
  * - Invalidation: Saat admin create/update/delete product
  */
 exports.getAllProducts = async (req, res) => {
+  const requestId = `REQ-${Date.now()}-${Math.random()
+    .toString(36)
+    .substr(2, 9)}`;
+  const startTime = Date.now();
+
   try {
     const {
       page = 1,
@@ -43,6 +48,10 @@ exports.getAllProducts = async (req, res) => {
       maxPrice = 999999999,
       sortBy = "newest", // newest, name_asc, name_desc, price_asc, price_desc
     } = req.query;
+
+    console.log(
+      `🔍 [${requestId}] getAllProducts START - page=${page}, category=${category}`
+    );
 
     // ========================================
     // STEP 1: Check Cache
@@ -58,6 +67,8 @@ exports.getAllProducts = async (req, res) => {
 
       // Jika cache ada, langsung return (skip query database)
       if (cachedData) {
+        const duration = Date.now() - startTime;
+        console.log(`✅ [${requestId}] CACHE HIT - duration=${duration}ms`);
         return res.json({
           success: true,
           message: "Products retrieved from cache",
@@ -65,6 +76,7 @@ exports.getAllProducts = async (req, res) => {
           cached: true, // Flag untuk debugging
         });
       }
+      console.log(`⚠️ [${requestId}] CACHE MISS - querying database...`);
     }
 
     // ========================================
@@ -310,12 +322,25 @@ exports.getAllProducts = async (req, res) => {
       cached: false, // Flag untuk debugging
     });
   } catch (error) {
-    console.error("❌ Error fetching products:", error);
+    const duration = Date.now() - startTime;
+    console.error(
+      `❌ [${requestId}] getAllProducts ERROR - duration=${duration}ms`
+    );
+    console.error(`   Error type: ${error.name}`);
+    console.error(`   Error message: ${error.message}`);
+    console.error(`   Stack: ${error.stack?.split("\n")[0]}`);
+
     res.status(500).json({
       success: false,
       message: "Failed to fetch products",
       error: error.message,
+      requestId: requestId, // Untuk debugging
     });
+  } finally {
+    const duration = Date.now() - startTime;
+    if (duration > 1000) {
+      console.warn(`⚠️ [${requestId}] SLOW QUERY - took ${duration}ms`);
+    }
   }
 };
 

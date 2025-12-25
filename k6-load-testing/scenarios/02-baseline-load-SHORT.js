@@ -145,7 +145,7 @@ export default function () {
 function productBrowsingJourney(baseUrl) {
   group("Product Browsing Journey", function () {
     // 1. View product list
-    let listRes = http.get(buildUrl(baseUrl, "/api/public/products"), {
+    let listRes = http.get(`${baseUrl}/api/public/products`, {
       tags: { name: "GetProducts" },
     });
 
@@ -165,7 +165,7 @@ function productBrowsingJourney(baseUrl) {
     // 2. View random category
     let category = randomItem(categories);
     let categoryRes = http.get(
-      buildUrl(baseUrl, `/api/public/products?category=${category.id}`),
+      `${baseUrl}/api/public/products?category=${category.category_id}`,
       { tags: { name: "FilterByCategory" } }
     );
 
@@ -178,7 +178,7 @@ function productBrowsingJourney(baseUrl) {
     // 3. View product details
     let product = randomItem(products);
     let detailRes = http.get(
-      buildUrl(baseUrl, `/api/public/products/${product.id}`),
+      `${baseUrl}/api/public/products/${product.product_id}`,
       { tags: { name: "GetProductDetail" } }
     );
 
@@ -206,7 +206,11 @@ function purchaseFlowJourney(baseUrl) {
     let customer = randomItem(customers);
     let loginStart = Date.now();
 
-    let authResult = loginCustomer(baseUrl, customer.phone, customer.password);
+    let authResult = loginCustomer(
+      baseUrl,
+      customer.phone_number,
+      customer.password
+    );
 
     if (!authResult.success) {
       errorRate.add(1);
@@ -219,7 +223,7 @@ function purchaseFlowJourney(baseUrl) {
     thinkTime();
 
     // 2. Browse products
-    let productsRes = http.get(buildUrl(baseUrl, "/api/public/products"), {
+    let productsRes = http.get(`${baseUrl}/api/public/products`, {
       tags: { name: "BrowseProducts" },
     });
 
@@ -249,7 +253,7 @@ function purchaseFlowJourney(baseUrl) {
 
     let orderPayload = {
       customer_name: customer.name,
-      customer_phone: customer.phone,
+      customer_phone: customer.phone_number,
       delivery_method: "delivery",
       delivery_address: "Jl. Test No. 123, Jakarta",
       payment_method: "transfer",
@@ -257,14 +261,14 @@ function purchaseFlowJourney(baseUrl) {
       items: Array.from({ length: itemsToAdd }, () => {
         let product = randomItem(products);
         return {
-          product_id: product.id,
+          product_id: product.product_id,
           quantity: randomInt(1, 2),
         };
       }),
     };
 
     let checkoutRes = http.post(
-      buildUrl(baseUrl, "/api/customer/orders/create"),
+      `${baseUrl}/api/customer/orders/create`,
       JSON.stringify(orderPayload),
       {
         headers: {
@@ -279,7 +283,8 @@ function purchaseFlowJourney(baseUrl) {
       "checkout: status 201": (r) => r.status === 201,
       "checkout: has order_id": (r) => {
         try {
-          return JSON.parse(r.body).data.order_id !== undefined;
+          const body = JSON.parse(r.body);
+          return body.success && body.data.id !== undefined;
         } catch (e) {
           return false;
         }
@@ -304,7 +309,11 @@ function orderHistoryJourney(baseUrl) {
   group("Order History Journey", function () {
     // 1. Login
     let customer = randomItem(customers);
-    let authResult = loginCustomer(baseUrl, customer.phone, customer.password);
+    let authResult = loginCustomer(
+      baseUrl,
+      customer.phone_number,
+      customer.password
+    );
 
     if (!authResult.success) {
       errorRate.add(1);
@@ -315,7 +324,7 @@ function orderHistoryJourney(baseUrl) {
     thinkTime();
 
     // 2. Get order history
-    let historyRes = http.get(buildUrl(baseUrl, "/api/customer/orders"), {
+    let historyRes = http.get(`${baseUrl}/api/customer/orders/history`, {
       headers: getAuthHeaders(token),
       tags: { name: "GetOrderHistory" },
     });
@@ -334,7 +343,7 @@ function orderHistoryJourney(baseUrl) {
     thinkTime();
 
     // 3. Get profile
-    let profileRes = http.get(buildUrl(baseUrl, "/api/customer/auth/profile"), {
+    let profileRes = http.get(`${baseUrl}/api/customer/profile`, {
       headers: getAuthHeaders(token),
       tags: { name: "GetProfile" },
     });
