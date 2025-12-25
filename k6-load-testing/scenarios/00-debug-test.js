@@ -255,7 +255,7 @@ function purchaseFlowJourney(baseUrl) {
     for (let i = 0; i < itemsToAdd; i++) {
       let product = randomItem(products);
       let quantity = randomInt(1, 2);
-      
+
       let cartData = {
         product_id: product.product_id,
         quantity: quantity,
@@ -299,7 +299,7 @@ function purchaseFlowJourney(baseUrl) {
       delivery_address: customer.address || "Jakarta",
       payment_method: "bank_transfer",
       bank_name: "BCA",
-      items: cartItems
+      items: cartItems,
     };
 
     let checkoutRes = http.post(

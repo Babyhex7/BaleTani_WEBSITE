@@ -86,10 +86,10 @@ export let options = {
 
   // Thresholds untuk endurance
   thresholds: {
-    "http_req_duration": ["p(95)<1500", "p(99)<3000"], // Slightly relaxed
-    "http_req_failed": ["rate<0.03"], // <3% error rate
-    "errors": ["rate<0.03"],
-    "slow_requests_above_1s": ["count<50"], // Max 50 slow requests
+    http_req_duration: ["p(95)<1500", "p(99)<3000"], // Slightly relaxed
+    http_req_failed: ["rate<0.03"], // <3% error rate
+    errors: ["rate<0.03"],
+    slow_requests_above_1s: ["count<50"], // Max 50 slow requests
   },
 
   tags: {
@@ -214,7 +214,11 @@ function purchaseFlow(baseUrl) {
   group("Purchase Flow", function () {
     // Login
     let customer = randomItem(customers);
-    let authResult = loginCustomer(baseUrl, customer.phone_number, customer.password);
+    let authResult = loginCustomer(
+      baseUrl,
+      customer.phone_number,
+      customer.password
+    );
 
     if (!authResult.success) {
       errorRate.add(1);
@@ -270,7 +274,11 @@ function purchaseFlow(baseUrl) {
 function orderHistory(baseUrl) {
   group("Order History", function () {
     let customer = randomItem(customers);
-    let authResult = loginCustomer(baseUrl, customer.phone_number, customer.password);
+    let authResult = loginCustomer(
+      baseUrl,
+      customer.phone_number,
+      customer.password
+    );
 
     if (!authResult.success) {
       errorRate.add(1);
