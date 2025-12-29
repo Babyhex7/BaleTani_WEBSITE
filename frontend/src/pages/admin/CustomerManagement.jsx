@@ -240,7 +240,7 @@ const CustomerManagement = () => {
           subtitle="Kelola data pelanggan"
         />
         
-        <div className="admin-container px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="admin-container px-4 sm:px-6 lg:px-6 py-4 sm:py-6">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-4 sm:mb-6">
             <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">

@@ -116,79 +116,79 @@ const ProcurementDetailModal = ({ procurementId, onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-full sm:max-w-2xl lg:max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
 
         {/* Header */}
-        <div className="bg-white px-6 py-4 flex justify-between items-start border-b">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-green-50 rounded-lg">
-              <FiPackage size={24} className="text-green-600" />
+        <div className="bg-white px-3 sm:px-4 lg:px-6 py-3 sm:py-4 flex justify-between items-start border-b">
+          <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+            <div className="p-1.5 sm:p-2 bg-green-50 rounded-lg flex-shrink-0">
+              <FiPackage size={20} className="text-green-600 sm:w-6 sm:h-6" />
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">Detail Pengadaan</h2>
-              <p className="text-sm text-gray-500 mt-0.5">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 truncate">Detail Pengadaan</h2>
+              <p className="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">
                 {procurement.procurement_number}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-200 flex-shrink-0 ml-2"
           >
-            <FiX size={24} className="text-gray-500" />
+            <FiX size={20} className="text-gray-500 sm:w-6 sm:h-6" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
           {/* Info Grid */}
-          <div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-8 lg:gap-x-12 gap-y-3 sm:gap-y-4 mb-4 sm:mb-6">
 
             {/* Left Column */}
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <FiClock size={18} className="text-gray-400 mt-0.5" />
-                <div className="flex-1">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <FiClock size={16} className="text-gray-400 mt-0.5 sm:w-[18px] sm:h-[18px] flex-shrink-0" />
+                <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-500">Tanggal Pengadaan</p>
-                  <p className="text-sm font-semibold text-gray-900">{formatDate(procurement.procurement_date)}</p>
+                  <p className="text-xs sm:text-sm font-semibold text-gray-900">{formatDate(procurement.procurement_date)}</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <FiPackage size={18} className="text-gray-400 mt-0.5" />
-                <div className="flex-1">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <FiPackage size={16} className="text-gray-400 mt-0.5 sm:w-[18px] sm:h-[18px] flex-shrink-0" />
+                <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-500">Jenis</p>
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-xs sm:text-sm font-medium text-gray-900 mt-1">
                     {getTypeBadge(procurement.procurement_type)}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <FiUser size={18} className="text-gray-400 mt-0.5" />
-                <div className="flex-1">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <FiUser size={16} className="text-gray-400 mt-0.5 sm:w-[18px] sm:h-[18px] flex-shrink-0" />
+                <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-500">Supplier</p>
-                  <p className="text-sm font-semibold text-gray-900">{procurement.supplier_name}</p>
+                  <p className="text-xs sm:text-sm font-semibold text-gray-900 break-words">{procurement.supplier_name}</p>
                 </div>
               </div>
             </div>
 
             {/* Right Column */}
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <FiFileText size={18} className="text-gray-400 mt-0.5" />
-                <div className="flex-1">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <FiFileText size={16} className="text-gray-400 mt-0.5 sm:w-[18px] sm:h-[18px] flex-shrink-0" />
+                <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-500">Status</p>
                   <div className="mt-1">{getStatusBadge(procurement.status)}</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <FiUser size={18} className="text-gray-400 mt-0.5" />
-                <div className="flex-1">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <FiUser size={16} className="text-gray-400 mt-0.5 sm:w-[18px] sm:h-[18px] flex-shrink-0" />
+                <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-500">Dibuat oleh</p>
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-xs sm:text-sm font-semibold text-gray-900 break-words">
                     {procurement.creator?.full_name || "-"}
                   </p>
                   <p className="text-xs text-gray-500">{formatDateTime(procurement.created_at)}</p>
@@ -199,19 +199,20 @@ const ProcurementDetailModal = ({ procurementId, onClose }) => {
 
           {/* Notes */}
           {procurement.notes && (
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
               <p className="text-xs text-gray-600 mb-1">Catatan</p>
-              <p className="text-sm text-gray-900">{procurement.notes}</p>
+              <p className="text-xs sm:text-sm text-gray-900 break-words">{procurement.notes}</p>
             </div>
           )}
 
           {/* Items Table */}
           <div>
-            <h3 className="text-base font-bold text-gray-900 mb-3">
+            <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-2 sm:mb-3">
               Daftar Item
             </h3>
 
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
+            {/* Desktop Table View */}
+            <div className="hidden lg:block border border-gray-200 rounded-lg overflow-hidden">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
@@ -258,14 +259,56 @@ const ProcurementDetailModal = ({ procurementId, onClose }) => {
                 </tfoot>
               </table>
             </div>
+
+            {/* Mobile/Tablet Card View */}
+            <div className="lg:hidden space-y-3">
+              {procurement.items?.map((item) => (
+                <div key={item.id} className="border border-gray-200 rounded-lg p-3 sm:p-4 bg-white">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="text-xs sm:text-sm font-semibold text-gray-900 flex-1">
+                      {item.product?.name}
+                    </p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
+                    <div>
+                      <p className="text-gray-500">Jumlah</p>
+                      <p className="font-semibold text-gray-900">{item.quantity} unit</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Harga/Unit</p>
+                      <p className="font-medium text-gray-900">{formatCurrency(item.purchase_price_per_unit)}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Subtotal</p>
+                      <p className="font-semibold text-gray-900">{formatCurrency(item.subtotal)}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Expiry</p>
+                      <p className="text-gray-900">{item.expiry_date ? formatDate(item.expiry_date) : "-"}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {/* Mobile Total */}
+              <div className="border-t-2 border-gray-300 pt-3 mt-3">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm sm:text-base font-bold text-gray-900">Total</p>
+                  <p className="text-base sm:text-lg font-bold text-gray-900">
+                    {formatCurrency(procurement.total_amount)}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="bg-white px-6 py-4 flex justify-end items-center border-t">
+        <div className="bg-white px-3 sm:px-4 lg:px-6 py-3 sm:py-4 flex justify-end items-center border-t">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+            className="px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 w-full sm:w-auto"
           >
             Tutup
           </button>

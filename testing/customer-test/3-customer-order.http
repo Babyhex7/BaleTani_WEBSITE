@@ -749,7 +749,7 @@ Authorization: Bearer {{customerToken}}
 
 ### TEST 6.1: WhatsApp Link - Format Benar
 # Expected: WhatsApp link ada di response checkout
-# Format: https://wa.me/6285885725027?text=...
+# Format: https://wa.me/6287735517999?text=...
 # Text berisi: order_number, total, bank_name, customer_name
 
 ###
@@ -858,7 +858,7 @@ Authorization: Bearer {{customerToken}}
 # ⚠️ Max 50 items per order
 # ⚠️ Stock validation PENTING (prevent overselling)
 # ⚠️ Cron job auto-cancel expired orders
-# ⚠️ WhatsApp link ke admin (085885725027)
+# ⚠️ WhatsApp link ke admin (6287735517999)
 
 ###
 

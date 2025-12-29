@@ -190,38 +190,38 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-full sm:max-w-3xl lg:max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="bg-white px-6 py-4 border-b flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b flex justify-between items-center">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 truncate">
                 {isEdit ? "Edit Pengadaan" : "Buat Pengadaan Baru"}
               </h2>
-              <p className="text-sm text-gray-500">Tambah pengadaan barang baru</p>
+              <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">Tambah pengadaan barang baru</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0 ml-2"
           >
-            <FiX size={20} className="text-gray-500" />
+            <FiX size={18} className="text-gray-500 sm:w-5 sm:h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
-          <div className="space-y-5">
-            {/* Basic Info - Horizontal Layout */}
-            <div className="grid grid-cols-3 gap-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
+          <div className="space-y-4 sm:space-y-5">
+            {/* Basic Info - Responsive Layout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">
                   Tanggal Pengadaan <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -229,28 +229,28 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
                   name="procurement_date"
                   value={formData.procurement_date}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">
                   Tipe Pengadaan <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="procurement_type"
                   value={formData.procurement_type}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="online">Online</option>
                   <option value="offline">Offline</option>
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <div className="sm:col-span-2 lg:col-span-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">
                   Supplier (Opsional)
                 </label>
                 <input
@@ -259,50 +259,157 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
                   value={formData.supplier_name}
                   onChange={handleInputChange}
                   placeholder="Nama supplier..."
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
 
             {/* Items Section */}
             <div>
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-base font-semibold text-gray-900">
+              <div className="flex justify-between items-center mb-2 sm:mb-3">
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900">
                   Daftar Item
                 </h3>
                 <button
                   type="button"
                   onClick={addItem}
-                  className="text-green-600 hover:text-green-700 text-sm font-medium flex items-center gap-1.5"
+                  className="text-green-600 hover:text-green-700 text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-1.5"
                 >
-                  <FiPlus size={16} />
-                  Tambah Baris
+                  <FiPlus size={14} className="sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Tambah Baris</span>
+                  <span className="sm:hidden">Tambah</span>
                 </button>
               </div>
 
-              {/* Table Header */}
-              <div className="grid grid-cols-12 gap-3 mb-2 px-3 text-xs font-medium text-gray-600">
-                <div className="col-span-4">Produk <span className="text-red-500">*</span></div>
-                <div className="col-span-2">Jumlah <span className="text-red-500">*</span></div>
-                <div className="col-span-2">Harga/Unit <span className="text-red-500">*</span></div>
-                <div className="col-span-2">Subtotal</div>
-                <div className="col-span-2">Expiry (Opsional)</div>
+              {/* Desktop Table View */}
+              <div className="hidden lg:block">
+                {/* Table Header */}
+                <div className="grid grid-cols-12 gap-3 mb-2 px-3 text-xs font-medium text-gray-600">
+                  <div className="col-span-4">Produk <span className="text-red-500">*</span></div>
+                  <div className="col-span-2">Jumlah <span className="text-red-500">*</span></div>
+                  <div className="col-span-2">Harga/Unit <span className="text-red-500">*</span></div>
+                  <div className="col-span-2">Subtotal</div>
+                  <div className="col-span-2">Expiry (Opsional)</div>
+                </div>
+
+                {/* Items List */}
+                <div className="space-y-2">
+                  {formData.items.map((item, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-12 gap-3 items-center bg-gray-50 p-3 rounded-lg border border-gray-200"
+                    >
+                      <div className="col-span-4">
+                        <select
+                          value={item.product_id}
+                          onChange={(e) =>
+                            handleItemChange(index, "product_id", e.target.value)
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        >
+                          <option value="">-- Pilih produk --</option>
+                          {products.map((product) => (
+                            <option key={product.id} value={product.id}>
+                              {product.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="col-span-2">
+                        <input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            handleItemChange(index, "quantity", e.target.value)
+                          }
+                          min="1"
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
+                      </div>
+
+                      <div className="col-span-2">
+                        <input
+                          type="number"
+                          value={item.unit_price}
+                          onChange={(e) =>
+                            handleItemChange(index, "unit_price", e.target.value)
+                          }
+                          min="0"
+                          placeholder="0"
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
+                      </div>
+
+                      <div className="col-span-2">
+                        <div className="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md font-medium text-gray-900">
+                          {formatCurrency(
+                            parseFloat(item.quantity) *
+                              parseFloat(item.unit_price || 0)
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="col-span-2">
+                        <input
+                          type="date"
+                          value={item.expiry_date}
+                          onChange={(e) =>
+                            handleItemChange(index, "expiry_date", e.target.value)
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div className="col-span-1 flex justify-end">
+                        {formData.items.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeItem(index)}
+                            className="text-red-600 hover:bg-red-50 p-2 rounded-md transition-colors"
+                          >
+                            <FiTrash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* Items List */}
-              <div className="space-y-2">
+              {/* Mobile/Tablet Card View */}
+              <div className="lg:hidden space-y-3">
                 {formData.items.map((item, index) => (
                   <div
                     key={index}
-                    className="grid grid-cols-12 gap-3 items-center bg-gray-50 p-3 rounded-lg border border-gray-200"
+                    className="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-200 space-y-3"
                   >
-                    <div className="col-span-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-semibold text-gray-700">Item {index + 1}</span>
+                      {formData.items.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeItem(index)}
+                          className="text-red-600 hover:bg-red-50 p-1.5 rounded-md transition-colors"
+                        >
+                          <FiTrash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Produk <span className="text-red-500">*</span>
+                      </label>
                       <select
                         value={item.product_id}
                         onChange={(e) =>
                           handleItemChange(index, "product_id", e.target.value)
                         }
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                         required
                       >
                         <option value="">-- Pilih produk --</option>
@@ -314,71 +421,73 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
                       </select>
                     </div>
 
-                    <div className="col-span-2">
-                      <input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) =>
-                          handleItemChange(index, "quantity", e.target.value)
-                        }
-                        min="1"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                    </div>
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Jumlah <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            handleItemChange(index, "quantity", e.target.value)
+                          }
+                          min="1"
+                          className="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
+                      </div>
 
-                    <div className="col-span-2">
-                      <input
-                        type="number"
-                        value={item.unit_price}
-                        onChange={(e) =>
-                          handleItemChange(index, "unit_price", e.target.value)
-                        }
-                        min="0"
-                        placeholder="0"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                    </div>
-
-                    <div className="col-span-2">
-                      <div className="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md font-medium text-gray-900">
-                        {formatCurrency(
-                          parseFloat(item.quantity) *
-                            parseFloat(item.unit_price || 0)
-                        )}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Harga/Unit <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          value={item.unit_price}
+                          onChange={(e) =>
+                            handleItemChange(index, "unit_price", e.target.value)
+                          }
+                          min="0"
+                          placeholder="0"
+                          className="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
                       </div>
                     </div>
 
-                    <div className="col-span-2">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Expiry Date (Opsional)
+                      </label>
                       <input
                         type="date"
                         value={item.expiry_date}
                         onChange={(e) =>
                           handleItemChange(index, "expiry_date", e.target.value)
                         }
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
 
-                    <div className="col-span-1 flex justify-end">
-                      {formData.items.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeItem(index)}
-                          className="text-red-600 hover:bg-red-50 p-2 rounded-md transition-colors"
-                        >
-                          <FiTrash2 size={16} />
-                        </button>
-                      )}
+                    <div className="pt-2 border-t border-gray-200">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-medium text-gray-700">Subtotal</span>
+                        <span className="text-sm sm:text-base font-bold text-gray-900">
+                          {formatCurrency(
+                            parseFloat(item.quantity) *
+                              parseFloat(item.unit_price || 0)
+                          )}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="mt-5">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <div className="mt-4 sm:mt-5">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">
                 Catatan (Opsional)
               </label>
               <textarea
@@ -386,16 +495,16 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
                 value={formData.notes}
                 onChange={handleInputChange}
                 placeholder="Tulis catatan tambahan terkait pengadaan..."
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none"/>
+                className="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 h-20 sm:h-24 resize-none"/>
             </div>
 
             {/* Total */}
-            <div className="bg-green-50 px-4 py-3 rounded-lg border border-green-200">
+            <div className="bg-green-50 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border border-green-200">
               <div className="flex justify-between items-center">
-                <span className="text-base font-semibold text-gray-900">
+                <span className="text-sm sm:text-base font-semibold text-gray-900">
                   Total Pengadaan
                 </span>
-                <span className="text-2xl font-bold text-green-600">
+                <span className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600">
                   {formatCurrency(calculateTotal())}
                 </span>
               </div>
@@ -404,11 +513,11 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
         </form>
 
         {/* Footer */}
-        <div className="bg-white px-6 py-4 flex justify-between border-t">
+        <div className="bg-white px-3 sm:px-4 lg:px-6 py-3 sm:py-4 flex flex-col-reverse sm:flex-row justify-between gap-2 sm:gap-0 border-t">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 text-sm border border-gray-300 hover:bg-gray-50 rounded-md font-medium transition-colors"
+            className="w-full sm:w-auto px-4 sm:px-5 py-2 text-xs sm:text-sm border border-gray-300 hover:bg-gray-50 rounded-md font-medium transition-colors"
             disabled={submitting}
           >
             Batal
@@ -416,13 +525,13 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
           <button
             onClick={handleSubmit}
             disabled={submitting || loading}
-            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-4 sm:px-5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? (
-              <>
+              <span className="flex items-center justify-center">
                 <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                 Menyimpan...
-              </>
+              </span>
             ) : (
               isEdit ? "Perbarui Pengadaan" : "Buat Pengadaan"
             )}

@@ -284,7 +284,7 @@ const OrderSuccessPage = () => {
       window.open(orderData.whatsapp.url, '_blank');
     } else {
       // Fallback ke message lama jika backend tidak generate WhatsApp message
-      const adminPhone = '6285885725027'; // Nomor dari .env
+      const adminPhone = import.meta.env.VITE_WHATSAPP_NUMBER || '6287735517999'; // Nomor dari .env
       
       let message = `🛒 *KONFIRMASI PESANAN BALETANI*\n\n`;
       message += `📋 *Detail Pesanan*\n`;

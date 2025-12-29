@@ -554,7 +554,7 @@ const createOrder = async (req, res) => {
     // Add WhatsApp message to response (with error handling)
     try {
       const adminWhatsAppPhone =
-        process.env.WHATSAPP_ADMIN_PHONE || "6285885725027";
+        process.env.WHATSAPP_ADMIN_PHONE || "6287735517999";
 
       responseData.whatsapp = {
         phone: adminWhatsAppPhone,

@@ -339,18 +339,18 @@ const ProcurementList = () => {
             </div>
 
             {/* Filters */}
-            <div className="p-4 sm:p-6 border-b border-gray-200 bg-gray-50">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
+            <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200 bg-gray-50">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
                 <div className="sm:col-span-2 lg:col-span-2">
                   <div className="relative">
-                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <MagnifyingGlassIcon className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                     <input
                       type="text"
                       placeholder="Cari no. pengadaan atau supplier..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                      className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -359,11 +359,13 @@ const ProcurementList = () => {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none bg-white cursor-pointer"
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
                   >
-                    <option value="">Semua Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
+                    <option value="" className="text-xs sm:text-sm">Semua Status</option>
+                    <option value="pending" className="text-xs sm:text-sm">Menunggu</option>
+                    <option value="approved" className="text-xs sm:text-sm">Disetujui</option>
+                    <option value="rejected" className="text-xs sm:text-sm">Ditolak</option>
                   </select>
                 </div>
 
@@ -371,11 +373,12 @@ const ProcurementList = () => {
                   <select
                     value={typeFilter}
                     onChange={(e) => setTypeFilter(e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none bg-white cursor-pointer"
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
                   >
-                    <option value="">Semua Tipe</option>
-                    <option value="online">Online</option>
-                    <option value="offline">Offline</option>
+                    <option value="" className="text-xs sm:text-sm">Semua Tipe</option>
+                    <option value="online" className="text-xs sm:text-sm">Online</option>
+                    <option value="offline" className="text-xs sm:text-sm">Offline</option>
                   </select>
                 </div>
 
@@ -384,7 +387,7 @@ const ProcurementList = () => {
                     type="date"
                     value={dateFrom}
                     onChange={(e) => setDateFrom(e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer"
                   />
                 </div>
 
@@ -393,7 +396,7 @@ const ProcurementList = () => {
                     type="date"
                     value={dateTo}
                     onChange={(e) => setDateTo(e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer"
                   />
                 </div>
               </div>
@@ -524,15 +527,15 @@ const ProcurementList = () => {
                       >
                         {/* Header Row */}
                         <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="font-mono font-semibold text-sm text-gray-900 mb-1">
+                          <div className="flex-1 min-w-0 pr-2">
+                            <div className="font-mono font-semibold text-sm text-gray-900 mb-1 break-all">
                               {procurement.procurement_number}
                             </div>
                             <div className="text-xs text-gray-500">
                               {formatDate(procurement.procurement_date)}
                             </div>
                           </div>
-                          <div className="ml-3 flex-shrink-0">
+                          <div className="ml-2 flex-shrink-0">
                             {getStatusBadge(procurement.status)}
                           </div>
                         </div>
@@ -543,21 +546,21 @@ const ProcurementList = () => {
                             <div className="text-xs text-gray-500 mb-1">Jenis</div>
                             {getTypeBadge(procurement.procurement_type)}
                           </div>
-                          <div>
+                          <div className="min-w-0">
                             <div className="text-xs text-gray-500 mb-1">Supplier</div>
-                            <div className="text-sm font-medium text-gray-900 truncate">
+                            <div className="text-sm font-medium text-gray-900 truncate" title={procurement.supplier_name}>
                               {procurement.supplier_name}
                             </div>
                           </div>
                           <div>
                             <div className="text-xs text-gray-500 mb-1">Total Nilai</div>
-                            <div className="text-sm font-semibold text-gray-900">
+                            <div className="text-sm font-semibold text-gray-900 break-words">
                               {formatCurrency(procurement.total_amount)}
                             </div>
                           </div>
-                          <div>
+                          <div className="min-w-0">
                             <div className="text-xs text-gray-500 mb-1">Dibuat Oleh</div>
-                            <div className="text-sm text-gray-900 truncate">
+                            <div className="text-sm text-gray-900 truncate" title={procurement.creator?.full_name || "-"}>
                               {procurement.creator?.full_name || "-"}
                             </div>
                           </div>

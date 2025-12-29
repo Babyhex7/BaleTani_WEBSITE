@@ -15,7 +15,7 @@ module.exports = defineConfig({
       TEST_CUSTOMER_PASSWORD: "password123",
 
       // WhatsApp
-      WHATSAPP_NUMBER: "085885725027",
+      WHATSAPP_NUMBER: "6287735517999",
     },
 
     setupNodeEvents(on, config) {
