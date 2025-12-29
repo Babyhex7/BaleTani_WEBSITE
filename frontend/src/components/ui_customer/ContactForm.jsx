@@ -94,6 +94,7 @@ const ContactForm = ({ onSuccess, onError }) => {
 
     try {
       const response = await contactService.submitContactForm(formData);
+      console.log(response);
       
       if (response.success) {
         // Reset form
@@ -107,7 +108,7 @@ const ContactForm = ({ onSuccess, onError }) => {
         
         // Show success toast
         toast.success(response.message || 'Pesan berhasil dikirim! Kami akan membalas segera via WhatsApp.', {
-          duration: 4000,
+          duration: 2000,
           position: 'top-right'
         });
         
@@ -121,7 +122,7 @@ const ContactForm = ({ onSuccess, onError }) => {
       
       // Show error toast
       toast.error(errorMessage, {
-        duration: 4000,
+        duration: 3000,
         position: 'top-right'
       });
       
