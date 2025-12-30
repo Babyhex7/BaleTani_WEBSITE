@@ -1,0 +1,174 @@
+# ============================================
+# BaleTani - Docker Compose Development
+# Untuk pengembangan lokal dengan hot-reload
+# ============================================
+
+services:
+  # ============================================
+  # DATABASE SERVICE - MySQL
+  # ============================================
+  mysql:
+    image: mysql:8.0
+    container_name: baletani-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-baletani}
+      MYSQL_USER: ${DB_USER:-baletani_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-baletani_password}
+      TZ: Asia/Jakarta
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data_dev:/var/lib/mysql
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - baletani-network-dev
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  # ============================================
+  # REDIS SERVICE - Caching
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: baletani-redis-dev
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data_dev:/data
+    networks:
+      - baletani-network-dev
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ============================================
+  # BACKEND SERVICE - Node.js dengan Hot Reload
+  # ============================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: baletani-backend-dev
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      # Database
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-baletani}
+      DB_USER: ${DB_USER:-baletani_user}
+      DB_PASSWORD: ${DB_PASSWORD:-baletani_password}
+      # JWT
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-key}
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # ML Service
+      ML_SERVICE_URL: http://ml-service:8000
+    ports:
+      - "${BACKEND_PORT:-5000}:5000"
+    volumes:
+      # Mount source code untuk hot-reload
+      - ./backend/src:/app/src
+      - ./backend/seeders:/app/seeders
+      - ./backend/scripts:/app/scripts
+      - ./backend/migrations:/app/migrations
+      - ./backend/public/uploads:/app/public/uploads
+      # Exclude node_modules
+      - /app/node_modules
+    networks:
+      - baletani-network-dev
+
+  # ============================================
+  # ML SERVICE - Python/FastAPI dengan Hot Reload
+  # ============================================
+  ml-service:
+    build:
+      context: ./ml-recommendation-service
+      dockerfile: Dockerfile.dev
+    container_name: baletani-ml-service-dev
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      PYTHONDONTWRITEBYTECODE: 1
+      PYTHONUNBUFFERED: 1
+      PORT: 8000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-baletani}
+      DB_USER: ${DB_USER:-baletani_user}
+      DB_PASSWORD: ${DB_PASSWORD:-baletani_password}
+    ports:
+      - "${ML_PORT:-8000}:8000"
+    volumes:
+      # Mount source code untuk hot-reload
+      - ./ml-recommendation-service:/app
+      - /app/__pycache__
+    networks:
+      - baletani-network-dev
+
+  # ============================================
+  # FRONTEND SERVICE - Vite Dev Server
+  # ============================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: baletani-frontend-dev
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:5000/api
+      VITE_ML_API_URL: http://localhost:8000
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    volumes:
+      # Mount source code untuk hot-reload
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/vite.config.js:/app/vite.config.js
+      - ./frontend/tailwind.config.js:/app/tailwind.config.js
+      - ./frontend/postcss.config.js:/app/postcss.config.js
+      # Exclude node_modules
+      - /app/node_modules
+    networks:
+      - baletani-network-dev
+
+# ============================================
+# NETWORKS
+# ============================================
+networks:
+  baletani-network-dev:
+    driver: bridge
+    name: baletani-network-dev
+
+# ============================================
+# VOLUMES
+# ============================================
+volumes:
+  mysql_data_dev:
+    name: baletani-mysql-data-dev
+  redis_data_dev:
+    name: baletani-redis-data-dev
