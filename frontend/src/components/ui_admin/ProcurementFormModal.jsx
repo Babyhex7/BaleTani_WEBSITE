@@ -1,11 +1,23 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { FiX, FiPlus, FiTrash2 } from "react-icons/fi";
+import { FiX, FiPlus, FiTrash2, FiChevronDown } from "react-icons/fi";
 import procurementService from "../../services/services_admin/procurementService";
 import { getProducts } from "../../services/services_admin/inventoryService";
+import useAdminStore from "../../store/store_admin/useAdminStore";
 
 const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
   const isEdit = !!procurement;
+  const isPending = procurement?.status === "pending";
+  const { admin } = useAdminStore();
+  
+  // Check if user has permission to approve/reject
+  const adminRole = typeof admin?.role === "string" ? admin.role : admin?.role?.role_name;
+  const canApproveReject = adminRole === "super_admin" || adminRole === "super_inventory_admin";
+  
+  const [showActionDropdown, setShowActionDropdown] = useState(false);
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [showRejectionModal, setShowRejectionModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const [formData, setFormData] = useState({
     procurement_date: procurement?.procurement_date?.slice(0, 10) || "",
@@ -36,6 +48,18 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showActionDropdown && !event.target.closest('.relative')) {
+        setShowActionDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showActionDropdown]);
 
   const fetchProducts = async () => {
     try {
@@ -184,6 +208,46 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
         error.response?.data?.message ||
           `Gagal ${isEdit ? "memperbarui" : "membuat"} pengadaan`
       );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleApprove = async () => {
+    try {
+      setSubmitting(true);
+      const response = await procurementService.approveProcurement(procurement.id);
+      if (response.success) {
+        toast.success("Pengadaan berhasil disetujui");
+        setShowApprovalModal(false);
+        onSuccess();
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Gagal menyetujui pengadaan");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!rejectionReason.trim()) {
+      toast.error("Alasan penolakan harus diisi");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const response = await procurementService.rejectProcurement(procurement.id, {
+        rejection_reason: rejectionReason,
+      });
+      if (response.success) {
+        toast.success("Pengadaan berhasil ditolak");
+        setShowRejectionModal(false);
+        setRejectionReason("");
+        onSuccess();
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Gagal menolak pengadaan");
     } finally {
       setSubmitting(false);
     }
@@ -513,7 +577,7 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
         </form>
 
         {/* Footer */}
-        <div className="bg-white px-3 sm:px-4 lg:px-6 py-3 sm:py-4 flex flex-col-reverse sm:flex-row justify-between gap-2 sm:gap-0 border-t">
+        <div className="bg-white px-3 sm:px-4 lg:px-6 py-3 sm:py-4 flex flex-col-reverse sm:flex-row justify-between gap-2 sm:gap-3 border-t">
           <button
             type="button"
             onClick={onClose}
@@ -522,22 +586,183 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
           >
             Batal
           </button>
-          <button
-            onClick={handleSubmit}
-            disabled={submitting || loading}
-            className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-4 sm:px-5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {submitting ? (
-              <span className="flex items-center justify-center">
-                <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Menyimpan...
-              </span>
-            ) : (
-              isEdit ? "Perbarui Pengadaan" : "Buat Pengadaan"
+          
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            {/* Action Dropdown - only show for pending status when editing and user has permission */}
+            {isEdit && isPending && canApproveReject && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowActionDropdown(!showActionDropdown)}
+                  disabled={submitting}
+                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  Aksi
+                  <FiChevronDown className={`w-4 h-4 transition-transform ${showActionDropdown ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {/* Dropdown Menu */}
+                {showActionDropdown && (
+                  <div className="absolute right-0 bottom-full mb-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowActionDropdown(false);
+                        setShowApprovalModal(true);
+                      }}
+                      disabled={submitting}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-green-50 text-green-700 font-medium flex items-center gap-2 border-b disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Setujui Pengadaan
+                    </button>
+                    
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowActionDropdown(false);
+                        setShowRejectionModal(true);
+                      }}
+                      disabled={submitting}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-700 font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      Tolak Pengadaan
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
-          </button>
+            
+            {/* Save/Update button - only show for pending or when creating new */}
+            {(!isEdit || isPending) && (
+              <button
+                onClick={handleSubmit}
+                disabled={submitting || loading}
+                className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-4 sm:px-5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {submitting ? (
+                  <span className="flex items-center justify-center">
+                    <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Menyimpan...
+                  </span>
+                ) : (
+                  isEdit ? "Perbarui Pengadaan" : "Buat Pengadaan"
+                )}
+              </button>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Approval Confirmation Modal */}
+      {showApprovalModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 animate-fadeIn">
+            <div className="p-6">
+              <div className="flex items-center justify-center w-12 h-12 mx-auto bg-green-100 rounded-full mb-4">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-center text-gray-900 mb-2">
+                Setujui Pengadaan
+              </h3>
+              <p className="text-sm text-gray-600 text-center mb-6">
+                Apakah Anda yakin ingin menyetujui pengadaan ini? Tindakan ini tidak dapat dibatalkan.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowApprovalModal(false)}
+                  disabled={submitting}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleApprove}
+                  disabled={submitting}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {submitting ? (
+                    <>
+                      <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Memproses...
+                    </>
+                  ) : (
+                    'Ya, Setujui'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rejection Modal */}
+      {showRejectionModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 animate-fadeIn">
+            <div className="p-6">
+              <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-center text-gray-900 mb-2">
+                Tolak Pengadaan
+              </h3>
+              <p className="text-sm text-gray-600 text-center mb-4">
+                Silakan masukkan alasan penolakan pengadaan ini:
+              </p>
+              
+              <textarea
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="Contoh: Harga terlalu tinggi, stok tidak sesuai..."
+                rows="4"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none mb-4"
+                disabled={submitting}
+              />
+              
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowRejectionModal(false);
+                    setRejectionReason("");
+                  }}
+                  disabled={submitting}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleReject}
+                  disabled={submitting || !rejectionReason.trim()}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {submitting ? (
+                    <>
+                      <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Memproses...
+                    </>
+                  ) : (
+                    'Tolak Pengadaan'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

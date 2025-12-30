@@ -914,6 +914,401 @@ const createOfflineOrder = async (req, res) => {
   }
 };
 
+/**
+ * GET /api/admin/orders/:id/invoice
+ * Generate Invoice/Receipt for Offline Order
+ */
+const generateOrderInvoice = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Fetch order with complete details
+    const order = await Order.findByPk(id, {
+      include: [
+        {
+          model: OrderItem,
+          as: "orderItems",
+          include: [
+            {
+              model: Product,
+              as: "product",
+              attributes: ["id", "name", "quantity_info"],
+            },
+          ],
+        },
+        {
+          model: Customer,
+          as: "customer",
+          attributes: ["id", "full_name", "phone_number", "email"],
+        },
+        {
+          model: Admin,
+          as: "creator",
+          attributes: ["id", "full_name", "phone_number"],
+        },
+        {
+          model: PaymentDetail,
+          as: "paymentDetails",
+        },
+      ],
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order tidak ditemukan",
+      });
+    }
+
+    // Generate invoice HTML
+    const invoiceHTML = generateInvoiceHTML(order);
+
+    // Return HTML response
+    res.setHeader("Content-Type", "text/html");
+    res.send(invoiceHTML);
+  } catch (error) {
+    console.error("Error generating invoice:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal generate invoice",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Helper function to generate Invoice HTML
+ */
+const generateInvoiceHTML = (order) => {
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(value);
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const itemsHTML = order.orderItems
+    .map(
+      (item, index) => `
+    <tr>
+      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${index + 1}</td>
+      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+        ${item.product_name}
+        ${item.product?.quantity_info ? `<br><small style="color: #6b7280;">(${item.product.quantity_info})</small>` : ""}
+      </td>
+      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${item.quantity}</td>
+      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right;">${formatCurrency(item.final_price)}</td>
+      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600;">${formatCurrency(item.subtotal)}</td>
+    </tr>
+  `
+    )
+    .join("");
+
+  return `
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice - ${order.order_number}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f4f6;
+      padding: 20px;
+    }
+    .invoice-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .invoice-header {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    .invoice-header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    .invoice-header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .invoice-body {
+      padding: 30px;
+    }
+    .invoice-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      gap: 20px;
+    }
+    .info-section {
+      flex: 1;
+    }
+    .info-section h3 {
+      font-size: 14px;
+      color: #6b7280;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .info-section p {
+      font-size: 14px;
+      color: #374151;
+      margin-bottom: 5px;
+      line-height: 1.6;
+    }
+    .info-section strong {
+      color: #111827;
+      font-weight: 600;
+    }
+    .order-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 5px;
+    }
+    .badge-offline {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+    .badge-paid {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    thead {
+      background-color: #f9fafb;
+    }
+    th {
+      padding: 12px;
+      text-align: left;
+      font-size: 13px;
+      color: #6b7280;
+      text-transform: uppercase;
+      font-weight: 600;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    th:nth-child(1) { text-align: center; width: 50px; }
+    th:nth-child(3) { text-align: center; width: 80px; }
+    th:nth-child(4), th:nth-child(5) { text-align: right; width: 120px; }
+    td {
+      font-size: 14px;
+      color: #374151;
+    }
+    .totals {
+      margin-top: 20px;
+      text-align: right;
+    }
+    .totals-row {
+      display: flex;
+      justify-content: flex-end;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+    .totals-label {
+      width: 200px;
+      text-align: right;
+      color: #6b7280;
+      padding-right: 20px;
+    }
+    .totals-value {
+      width: 150px;
+      text-align: right;
+      font-weight: 600;
+      color: #374151;
+    }
+    .total-grand {
+      border-top: 2px solid #e5e7eb;
+      margin-top: 10px;
+      padding-top: 10px;
+      font-size: 16px;
+    }
+    .total-grand .totals-label {
+      color: #111827;
+      font-weight: 700;
+    }
+    .total-grand .totals-value {
+      color: #10b981;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .invoice-footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+    }
+    .invoice-footer p {
+      margin: 5px 0;
+    }
+    .print-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      padding: 12px 24px;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+      transition: all 0.3s ease;
+    }
+    .print-button:hover {
+      background-color: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(16, 185, 129, 0.4);
+    }
+    @media print {
+      body {
+        padding: 0;
+        background-color: white;
+      }
+      .invoice-container {
+        box-shadow: none;
+        border-radius: 0;
+      }
+      .print-button {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice-container">
+    <!-- Header -->
+    <div class="invoice-header">
+      <h1>🌾 INVOICE BALETANI</h1>
+      <p>Sistem Penjualan Hasil Pertanian</p>
+    </div>
+
+    <!-- Body -->
+    <div class="invoice-body">
+      <!-- Invoice Info -->
+      <div class="invoice-info">
+        <div class="info-section">
+          <h3>Informasi Order</h3>
+          <p><strong>No. Order:</strong> ${order.order_number}</p>
+          <p><strong>Tanggal:</strong> ${formatDate(order.created_at)}</p>
+          <p><strong>Tipe:</strong> <span class="order-badge badge-offline">OFFLINE</span></p>
+          <p><strong>Status:</strong> <span class="order-badge badge-paid">${order.payment_status === "paid" ? "LUNAS" : "BELUM LUNAS"}</span></p>
+        </div>
+        <div class="info-section">
+          <h3>Informasi Customer</h3>
+          <p><strong>Nama:</strong> ${order.customer_name || order.customer?.full_name || "-"}</p>
+          <p><strong>Telepon:</strong> ${order.customer_phone || order.customer?.phone_number || "-"}</p>
+          ${order.delivery_address ? `<p><strong>Alamat:</strong> ${order.delivery_address}</p>` : ""}
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Produk</th>
+            <th>Qty</th>
+            <th>Harga</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHTML}
+        </tbody>
+      </table>
+
+      <!-- Totals -->
+      <div class="totals">
+        <div class="totals-row">
+          <div class="totals-label">Subtotal Produk:</div>
+          <div class="totals-value">${formatCurrency(order.item_subtotal)}</div>
+        </div>
+        ${
+          order.delivery_fee > 0
+            ? `
+        <div class="totals-row">
+          <div class="totals-label">Biaya Pengiriman:</div>
+          <div class="totals-value">${formatCurrency(order.delivery_fee)}</div>
+        </div>
+        `
+            : ""
+        }
+        ${
+          order.discount_amount > 0
+            ? `
+        <div class="totals-row">
+          <div class="totals-label">Diskon:</div>
+          <div class="totals-value">- ${formatCurrency(order.discount_amount)}</div>
+        </div>
+        `
+            : ""
+        }
+        <div class="totals-row total-grand">
+          <div class="totals-label">TOTAL:</div>
+          <div class="totals-value">${formatCurrency(order.total_amount)}</div>
+        </div>
+      </div>
+
+      <!-- Payment Info -->
+      <div style="margin-top: 30px; padding: 15px; background-color: #f9fafb; border-radius: 8px;">
+        <p style="font-size: 14px; color: #374151; margin-bottom: 5px;">
+          <strong>Metode Pembayaran:</strong> ${order.payment_method === "cash" ? "TUNAI" : order.payment_method === "transfer" ? "TRANSFER BANK" : "QRIS"}
+        </p>
+        <p style="font-size: 14px; color: #374151;">
+          <strong>Metode Pengiriman:</strong> ${order.delivery_method === "self_pickup" ? "AMBIL SENDIRI" : "DELIVERY"}
+        </p>
+        ${order.admin_notes ? `<p style="font-size: 13px; color: #6b7280; margin-top: 10px;"><strong>Catatan:</strong> ${order.admin_notes}</p>` : ""}
+      </div>
+
+      <!-- Footer -->
+      <div class="invoice-footer">
+        <p><strong>Terima kasih atas pembelian Anda!</strong></p>
+        <p>BaleTani - Sistem Penjualan Hasil Pertanian</p>
+        <p>Untuk pertanyaan, hubungi: admin@baletani.com | +62 812-3456-7890</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print Button -->
+  <button class="print-button" onclick="window.print()">🖨️ Print Invoice</button>
+</body>
+</html>
+  `;
+};
+
 module.exports = {
   getAllOrders,
   getOrderById,
@@ -922,4 +1317,5 @@ module.exports = {
   cancelOrder,
   getOrderStatistics,
   createOfflineOrder,
+  generateOrderInvoice,
 };

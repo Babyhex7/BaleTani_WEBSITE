@@ -4,9 +4,10 @@
  */
 
 import { useState, useEffect } from "react";
-import { X, Package, User, MapPin, CreditCard, Clock, FileText } from "lucide-react";
+import { X, Package, User, MapPin, CreditCard, Clock, FileText, Printer } from "lucide-react";
 import orderService from "../../services/services_admin/orderService";
 import { dummyOrderDetail } from "../../data/dummyOrders";
+import toast from "react-hot-toast";
 
 const OrderDetailModal = ({ orderId, useDummyData, onClose, onUpdateStatus }) => {
   const [order, setOrder] = useState(null);
@@ -73,6 +74,20 @@ const OrderDetailModal = ({ orderId, useDummyData, onClose, onUpdateStatus }) =>
         {config.label}
       </span>
     );
+  };
+
+  const handlePrintInvoice = () => {
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+    const invoiceURL = `${baseURL}/api/admin/orders/${orderId}/invoice`;
+    
+    // Open invoice in new window for printing
+    const printWindow = window.open(invoiceURL, '_blank', 'width=800,height=600');
+    
+    if (!printWindow) {
+      toast.error('Popup diblokir! Mohon izinkan popup untuk print invoice.');
+    } else {
+      toast.success('Invoice dibuka di tab baru. Silakan print.');
+    }
   };
 
   if (loading) {
@@ -344,6 +359,18 @@ const OrderDetailModal = ({ orderId, useDummyData, onClose, onUpdateStatus }) =>
           >
             Close
           </button>
+          
+          {/* Print Invoice Button - Only for Offline Orders */}
+          {order.order_type === "offline" && (
+            <button
+              onClick={handlePrintInvoice}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+            >
+              <Printer className="w-4 h-4" />
+              Print Invoice
+            </button>
+          )}
+          
           <button
             onClick={onUpdateStatus}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"

@@ -197,6 +197,69 @@ const ProcurementDetailModal = ({ procurementId, onClose }) => {
             </div>
           </div>
 
+          {/* Approval/Rejection Info */}
+          {procurement.status === "approved" && procurement.approver && (
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <FiCheckCircle size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm font-semibold text-green-900 mb-2">
+                    ✅ Pengadaan Disetujui
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+                    <div>
+                      <p className="text-green-700 font-medium">Disetujui oleh:</p>
+                      <p className="text-green-900 font-semibold">
+                        {procurement.approver?.full_name || "-"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-green-700 font-medium">Tanggal Approval:</p>
+                      <p className="text-green-900 font-semibold">
+                        {formatDateTime(procurement.approved_at)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {procurement.status === "rejected" && procurement.rejector && (
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <FiAlertCircle size={20} className="text-red-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm font-semibold text-red-900 mb-2">
+                    ❌ Pengadaan Ditolak
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm mb-3">
+                    <div>
+                      <p className="text-red-700 font-medium">Ditolak oleh:</p>
+                      <p className="text-red-900 font-semibold">
+                        {procurement.rejector?.full_name || "-"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-red-700 font-medium">Tanggal Penolakan:</p>
+                      <p className="text-red-900 font-semibold">
+                        {formatDateTime(procurement.rejected_at)}
+                      </p>
+                    </div>
+                  </div>
+                  {procurement.rejection_reason && (
+                    <div>
+                      <p className="text-red-700 font-medium mb-1">Alasan Penolakan:</p>
+                      <p className="text-red-900 bg-white p-2 rounded border border-red-200 break-words">
+                        {procurement.rejection_reason}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Notes */}
           {procurement.notes && (
             <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-50 rounded-lg">

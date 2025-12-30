@@ -1,0 +1,142 @@
+### QUICK TEST - PROCUREMENT & INVOICE FIXES
+### Tanggal: 30 Desember 2025
+
+# ============================================
+# TEST 1: PROCUREMENT APPROVAL INFO
+# ============================================
+
+### 1.1 Get Procurement Detail (Approved)
+GET {{baseUrl}}/api/admin/procurements/:procurement_id
+Authorization: Bearer {{admin_token}}
+
+# Expected:
+# - status: "approved"
+# - approver: { full_name, phone_number }
+# - approved_at: timestamp
+# Frontend harus menampilkan section hijau dengan info approver
+
+### 1.2 Get Procurement Detail (Rejected)
+GET {{baseUrl}}/api/admin/procurements/:procurement_id
+Authorization: Bearer {{admin_token}}
+
+# Expected:
+# - status: "rejected"
+# - rejector: { full_name, phone_number }
+# - rejected_at: timestamp
+# - rejection_reason: "alasan penolakan"
+# Frontend harus menampilkan section merah dengan info rejector dan alasan
+
+
+# ============================================
+# TEST 2: INVOICE ORDER OFFLINE
+# ============================================
+
+### 2.1 Get Order Detail (Offline)
+GET {{baseUrl}}/api/admin/orders/:order_id
+Authorization: Bearer {{admin_token}}
+
+# Expected:
+# - order_type: "offline"
+# - order_number: "ORD-20251230-XXXX"
+# - customer_name, customer_phone
+# - payment_method: "cash" / "transfer" / "qris"
+# - items array with products
+
+### 2.2 Generate Invoice (Offline Order)
+GET {{baseUrl}}/api/admin/orders/:order_id/invoice
+Authorization: Bearer {{admin_token}}
+
+# Expected Response:
+# - Status: 200 OK
+# - Content-Type: text/html
+# - Body: HTML invoice dengan:
+#   * Header hijau dengan logo BaleTani
+#   * Info order (nomor, tanggal, status)
+#   * Info customer (nama, telepon, alamat)
+#   * Tabel items (produk, qty, harga, subtotal)
+#   * Summary (subtotal, ongkir, diskon, total)
+#   * Tombol print floating
+
+### 2.3 Generate Invoice (Online Order - Should Work Too)
+GET {{baseUrl}}/api/admin/orders/:order_id/invoice
+Authorization: Bearer {{admin_token}}
+
+# Expected:
+# - Tetap bisa generate invoice
+# - Tapi tombol "Print Invoice" hanya muncul untuk offline orders
+
+
+# ============================================
+# TEST 3: FRONTEND UI
+# ============================================
+
+### 3.1 Procurement Detail Modal
+# Steps:
+# 1. Login sebagai admin
+# 2. Buka Procurement List
+# 3. Klik detail procurement dengan status "approved"
+# 4. Verifikasi muncul:
+#    - Section hijau dengan icon check
+#    - "Disetujui oleh: [Nama Admin]"
+#    - "Tanggal Approval: [DD Mmm YYYY, HH:MM]"
+# 
+# 5. Kembali ke list
+# 6. Klik detail procurement dengan status "rejected"
+# 7. Verifikasi muncul:
+#    - Section merah dengan icon alert
+#    - "Ditolak oleh: [Nama Admin]"
+#    - "Tanggal Penolakan: [DD Mmm YYYY, HH:MM]"
+#    - "Alasan Penolakan: [Text alasan]"
+
+### 3.2 Order Detail Modal - Print Invoice Button
+# Steps:
+# 1. Login sebagai admin/cashier
+# 2. Buka Order Management
+# 3. Klik detail order dengan order_type = "offline"
+# 4. Verifikasi tombol "Print Invoice" muncul di footer
+#    - Warna hijau
+#    - Icon printer
+#    - Posisi antara "Close" dan "Update Status"
+# 
+# 5. Klik tombol "Print Invoice"
+# 6. Verifikasi:
+#    - Invoice terbuka di tab baru
+#    - Toast success muncul: "Invoice dibuka di tab baru. Silakan print."
+#    - Invoice tampil dengan design profesional
+#    - Ada tombol "Print Invoice" di invoice
+# 
+# 7. Klik tombol print di invoice
+# 8. Verifikasi print dialog muncul
+
+### 3.3 Order Detail Modal - Online Order (No Print Button)
+# Steps:
+# 1. Buka Order Management
+# 2. Klik detail order dengan order_type = "online"
+# 3. Verifikasi tombol "Print Invoice" TIDAK muncul
+# 4. Hanya ada tombol "Close" dan "Update Status"
+
+
+# ============================================
+# EXPECTED RESULTS SUMMARY
+# ============================================
+
+✅ Procurement Detail Modal:
+   - Menampilkan info approver dengan background hijau
+   - Menampilkan info rejector dengan background merah
+   - Menampilkan alasan penolakan (jika ada)
+
+✅ Invoice Order Offline:
+   - Endpoint /invoice berfungsi dan return HTML
+   - HTML invoice professional dengan CSS embedded
+   - Tombol print floating di invoice
+   - Informasi lengkap (order, customer, items, payment)
+
+✅ Order Detail Modal:
+   - Tombol "Print Invoice" muncul untuk offline orders
+   - Tombol berwarna hijau dengan icon printer
+   - Klik tombol membuka invoice di tab baru
+   - Toast notification muncul
+
+✅ Security:
+   - Endpoint dilindungi authenticateAdmin middleware
+   - Hanya admin yang bisa akses

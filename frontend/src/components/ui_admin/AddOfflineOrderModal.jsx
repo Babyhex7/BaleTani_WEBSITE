@@ -17,7 +17,11 @@ import {
   TruckIcon,
   ShoppingCartIcon,
   DocumentTextIcon,
-  BanknotesIcon
+  BanknotesIcon,
+  PrinterIcon,
+  CheckCircleIcon,
+  MagnifyingGlassIcon,
+  CubeIcon
 } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 import orderService from "../../services/services_admin/orderService";
@@ -35,14 +39,20 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [adminNotes, setAdminNotes] = useState("");
 
-  // Items state
-  const [items, setItems] = useState([
-    { product_id: "", quantity: 1, price: 0, subtotal: 0, product_name: "" },
-  ]);
+  // Items state - start with empty array
+  const [items, setItems] = useState([]);
 
   // Products list
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  
+  // Print invoice modal state
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [createdOrderId, setCreatedOrderId] = useState(null);
+  
+  // Product search modal state
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch products when modal opens
   useEffect(() => {
@@ -127,20 +137,34 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
     }
   };
 
-  // Add item row
+  // Add item - Open modal to select product
   const addItem = () => {
-    setItems([
-      ...items,
-      { product_id: "", quantity: 1, price: 0, subtotal: 0, product_name: "" },
-    ]);
+    setShowProductModal(true);
+    setSearchQuery("");
   };
 
   // Remove item row
   const removeItem = (index) => {
-    if (items.length > 1) {
-      const newItems = items.filter((_, i) => i !== index);
-      setItems(newItems);
-    }
+    const newItems = items.filter((_, i) => i !== index);
+    setItems(newItems);
+  };
+  
+  // Select product from modal
+  const selectProduct = (product) => {
+    const price = typeof product.selling_price === "number" ? product.selling_price : Number(product.selling_price) || 0;
+    
+    // Add new item with selected product
+    const newItem = {
+      product_id: product.id,
+      product_name: product.name,
+      quantity: 1,
+      price: price,
+      subtotal: price * 1
+    };
+    
+    setItems([...items, newItem]);
+    setShowProductModal(false);
+    setSearchQuery("");
   };
 
   // Update item
@@ -166,6 +190,16 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
 
     setItems(newItems);
   };
+  
+  // Filter products based on search query
+  const filteredProducts = products.filter((product) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      product.name?.toLowerCase().includes(query) ||
+      product.id?.toString().includes(query)
+    );
+  });
 
   // Calculate totals
   const calculateTotals = () => {
@@ -199,8 +233,7 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
         return;
       }
 
-      const validItems = items.filter((item) => item.product_id);
-      if (validItems.length === 0) {
+      if (items.length === 0) {
         toast.error("Minimal harus ada 1 produk");
         setLoading(false);
         return;
@@ -216,19 +249,30 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
         delivery_fee: parseFloat(deliveryFee || 0),
         discount_amount: parseFloat(discountAmount || 0),
         admin_notes: adminNotes,
-        items: validItems.map((item) => ({
-          product_id: item.product_id, // UUID string, don't parse to int
+        items: items.map((item) => ({
+          product_id: item.product_id,
           quantity: parseInt(item.quantity),
         })),
       };
 
-      await orderService.createOfflineOrder(orderData);
+      const response = await orderService.createOfflineOrder(orderData);
 
       toast.success("Order offline berhasil dibuat!");
-      setTimeout(() => {
-        onSuccess();
-        handleClose();
-      }, 1000);
+      
+      // Get order ID from response
+      const orderId = response.data?.id;
+      
+      // Show print invoice modal for cash payments
+      if (orderId && paymentMethod === 'cash') {
+        setCreatedOrderId(orderId);
+        setShowPrintModal(true);
+      } else {
+        // For non-cash payments, just close and refresh
+        setTimeout(() => {
+          onSuccess();
+          handleClose();
+        }, 1000);
+      }
     } catch (error) {
       console.error("Error creating order:", error);
       toast.error(
@@ -251,10 +295,37 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
     setDeliveryFee(0);
     setDiscountAmount(0);
     setAdminNotes("");
-    setItems([
-      { product_id: "", quantity: 1, price: 0, subtotal: 0, product_name: "" },
-    ]);
+    setItems([]);
+    setShowPrintModal(false);
+    setCreatedOrderId(null);
     onClose();
+  };
+
+  // Handle print invoice
+  const handlePrintInvoice = () => {
+    if (!createdOrderId) return;
+    
+    try {
+      const invoiceUrl = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'}/admin/orders/${createdOrderId}/invoice`;
+      const printWindow = window.open(invoiceUrl, '_blank');
+      
+      if (!printWindow) {
+        toast.error('Popup diblokir! Silakan izinkan popup untuk mencetak invoice.');
+      } else {
+        toast.success('Invoice dibuka di tab baru');
+      }
+    } catch (error) {
+      console.error('Error opening invoice:', error);
+      toast.error('Gagal membuka invoice');
+    }
+  };
+
+  // Handle skip print and close
+  const handleSkipPrint = () => {
+    setShowPrintModal(false);
+    setCreatedOrderId(null);
+    onSuccess();
+    handleClose();
   };
 
   if (!isOpen) return null;
@@ -479,32 +550,26 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                   <div className="col-span-1 text-center">Aksi</div>
                 </div>
 
-                {items.map((item, index) => (
+                {items.length === 0 ? (
+                  <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-lg">
+                    <ShoppingCartIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-sm text-gray-500 mb-2">Belum ada produk ditambahkan</p>
+                    <p className="text-xs text-gray-400">Klik "Tambah Item" untuk memilih produk</p>
+                  </div>
+                ) : (
+                  items.map((item, index) => (
                   <div
                     key={index}
                     className="grid grid-cols-12 gap-3 items-center"
                   >
-                    {/* Product Select */}
+                    {/* Product Name (Read-only) */}
                     <div className="col-span-5">
-                      <select
-                        value={item.product_id}
-                        onChange={(e) =>
-                          updateItem(index, "product_id", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
-                        required
-                      >
-                        <option value="">Pilih Produk... ({products.length} produk tersedia)</option>
-                        {products.length === 0 ? (
-                          <option disabled>Loading produk...</option>
-                        ) : (
-                          products.map((product) => (
-                            <option key={product.id} value={product.id}>
-                              {product.name} - {formatCurrency(product.selling_price)} (Stock: {product.total_stock})
-                            </option>
-                          ))
-                        )}
-                      </select>
+                      <input
+                        type="text"
+                        value={item.product_name}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-sm font-medium text-gray-900"
+                        readOnly
+                      />
                     </div>
 
                     {/* Quantity */}
@@ -512,13 +577,21 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                       <input
                         type="number"
                         value={item.quantity}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Allow empty string untuk bisa hapus angka
                           updateItem(
                             index,
                             "quantity",
-                            parseInt(e.target.value) || 1
-                          )
-                        }
+                            value === '' ? '' : parseInt(value) || 0
+                          );
+                        }}
+                        onBlur={(e) => {
+                          // Saat blur, jika kosong atau 0, set ke 1
+                          if (e.target.value === '' || parseInt(e.target.value) === 0) {
+                            updateItem(index, "quantity", 1);
+                          }
+                        }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
                         min="1"
                         required
@@ -550,15 +623,15 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                       <button
                         type="button"
                         onClick={() => removeItem(index)}
-                        disabled={items.length === 1}
-                        className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
                         title="Hapus item"
                       >
                         <TrashIcon className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
 
@@ -630,6 +703,181 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
           </div>
         </form>
       </div>
+
+      {/* Print Invoice Confirmation Modal */}
+      {showPrintModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-[60] flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+            <div className="p-6">
+              {/* Success Icon */}
+              <div className="flex items-center justify-center w-16 h-16 mx-auto bg-green-100 rounded-full mb-4">
+                <CheckCircleIcon className="w-10 h-10 text-green-600" />
+              </div>
+              
+              {/* Title */}
+              <h3 className="text-xl font-bold text-center text-gray-900 mb-2">
+                Order Berhasil Dibuat!
+              </h3>
+              
+              {/* Description */}
+              <p className="text-sm text-gray-600 text-center mb-6">
+                Order telah berhasil diproses dan pembayaran telah diterima.
+                <br />
+                <span className="font-semibold text-gray-800">
+                  Apakah Anda ingin mencetak invoice/kwitansi?
+                </span>
+              </p>
+
+              {/* Order Info */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span className="text-gray-600">Customer:</span>
+                  <span className="font-semibold text-gray-900">{customerName}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span className="text-gray-600">Metode Pembayaran:</span>
+                  <span className="font-semibold text-gray-900">
+                    {paymentMethod === 'cash' ? 'Tunai' : 
+                     paymentMethod === 'qris' ? 'QRIS' : 
+                     paymentMethod === 'transfer' ? 'Transfer' : paymentMethod}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Total Pembayaran:</span>
+                  <span className="font-bold text-green-600 text-lg">
+                    Rp {total.toLocaleString('id-ID')}
+                  </span>
+                </div>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={handleSkipPrint}
+                  className="flex-1 px-4 py-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  Lewati
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handlePrintInvoice();
+                    handleSkipPrint();
+                  }}
+                  className="flex-1 px-4 py-3 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                >
+                  <PrinterIcon className="w-5 h-5" />
+                  Cetak Invoice
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Product Search Modal */}
+      {showProductModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-[70] flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <CubeIcon className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Pilih Produk
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {products.length} produk tersedia
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setShowProductModal(false);
+                  setSearchQuery("");
+                }}
+                className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <XMarkIcon className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Search Bar */}
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="relative">
+                <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cari nama produk..."
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            {/* Product List */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {filteredProducts.length === 0 ? (
+                <div className="text-center py-12">
+                  <CubeIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 text-sm">
+                    {searchQuery ? 'Produk tidak ditemukan' : 'Belum ada produk offline'}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {filteredProducts.map((product) => (
+                    <button
+                      key={product.id}
+                      type="button"
+                      onClick={() => selectProduct(product)}
+                      className="text-left p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all group"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-gray-900 mb-1 truncate group-hover:text-green-700">
+                            {product.name}
+                          </h4>
+                          <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <span className="flex items-center gap-1">
+                              <BanknotesIcon className="w-4 h-4" />
+                              {formatCurrency(product.selling_price)}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <CubeIcon className="w-4 h-4" />
+                              Stok: {product.total_stock || 0}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-gray-100 group-hover:bg-green-600 flex items-center justify-center transition-colors">
+                            <svg className="w-4 h-4 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+              <p className="text-xs text-gray-500 text-center">
+                Klik produk untuk menambahkannya ke order
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -13,6 +13,7 @@ const {
   cancelOrder,
   getOrderStatistics,
   createOfflineOrder,
+  generateOrderInvoice,
 } = require("../../controllers/adminOrder.controller");
 const { authenticateAdmin } = require("../../middlewares/auth.middleware");
 
@@ -26,6 +27,7 @@ router.get("/statistics", getOrderStatistics);
 router.get("/", getAllOrders);
 router.post("/create-offline", createOfflineOrder);
 router.get("/:id", getOrderById);
+router.get("/:id/invoice", generateOrderInvoice); // Generate invoice for order
 router.put("/:id/status", updateOrderStatus);
 router.put("/:id/notes", updateAdminNotes);
 router.put("/:id/cancel", cancelOrder);

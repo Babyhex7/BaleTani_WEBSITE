@@ -448,6 +448,9 @@ const ProcurementList = () => {
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                             Dibuat Oleh
                           </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            Approved/Rejected By
+                          </th>
                           <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                             Aksi
                           </th>
@@ -480,6 +483,31 @@ const ProcurementList = () => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                               {procurement.creator?.full_name || "-"}
+                            </td>
+                            <td className="px-6 py-4 text-sm">
+                              {procurement.status === "approved" && procurement.approver ? (
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-1.5 text-green-700">
+                                    <CheckIcon className="w-4 h-4 flex-shrink-0" />
+                                    <span className="font-medium">{procurement.approver.full_name}</span>
+                                  </div>
+                                  <div className="text-xs text-gray-500 pl-5">
+                                    {formatDate(procurement.approved_at)}
+                                  </div>
+                                </div>
+                              ) : procurement.status === "rejected" && procurement.rejector ? (
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-1.5 text-red-700">
+                                    <XMarkIcon className="w-4 h-4 flex-shrink-0" />
+                                    <span className="font-medium">{procurement.rejector.full_name}</span>
+                                  </div>
+                                  <div className="text-xs text-gray-500 pl-5">
+                                    {formatDate(procurement.rejected_at)}
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right">
                               <div className="flex items-center justify-end gap-1">
@@ -565,6 +593,28 @@ const ProcurementList = () => {
                             </div>
                           </div>
                         </div>
+
+                        {/* Approved/Rejected By - Only show if approved or rejected */}
+                        {(procurement.status === "approved" || procurement.status === "rejected") && (
+                          <div className="mt-3 p-3 rounded-lg" style={{
+                            backgroundColor: procurement.status === "approved" ? '#f0fdf4' : '#fef2f2',
+                            borderLeft: `3px solid ${procurement.status === "approved" ? '#22c55e' : '#ef4444'}`
+                          }}>
+                            <div className="text-xs text-gray-600 mb-1">
+                              {procurement.status === "approved" ? "✅ Disetujui Oleh" : "❌ Ditolak Oleh"}
+                            </div>
+                            <div className="text-sm font-medium" style={{
+                              color: procurement.status === "approved" ? '#15803d' : '#991b1b'
+                            }}>
+                              {procurement.status === "approved" 
+                                ? procurement.approver?.full_name || "-"
+                                : procurement.rejector?.full_name || "-"}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {formatDate(procurement.status === "approved" ? procurement.approved_at : procurement.rejected_at)}
+                            </div>
+                          </div>
+                        )}
 
                         {/* Action Buttons */}
                         <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
