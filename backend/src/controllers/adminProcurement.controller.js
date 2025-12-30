@@ -293,7 +293,7 @@ const createProcurement = async (req, res) => {
           quantity: item.quantity,
           purchase_price_per_unit: item.unit_price,
           subtotal: parseFloat(item.quantity) * parseFloat(item.unit_price),
-          expiry_date: item.expiry_date,
+          expiry_date: item.expiry_date || null,
         },
         { transaction }
       );
@@ -471,7 +471,7 @@ const updateProcurement = async (req, res) => {
           quantity: item.quantity,
           purchase_price_per_unit: item.unit_price,
           subtotal: parseFloat(item.quantity) * parseFloat(item.unit_price),
-          expiry_date: item.expiry_date,
+          expiry_date: item.expiry_date || null,
         },
         { transaction }
       );

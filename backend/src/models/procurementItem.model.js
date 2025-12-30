@@ -31,7 +31,7 @@ const ProcurementItem = sequelize.define(
     },
     expiry_date: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
     },
     created_at: {
       type: DataTypes.DATE,

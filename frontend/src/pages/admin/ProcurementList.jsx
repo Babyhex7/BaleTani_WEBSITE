@@ -235,7 +235,7 @@ const ProcurementList = () => {
 
   return (
     <span
-      className={`px-3 py-1 rounded-full text-xs font-semibold ${badges[normalized]}`}
+      className={`px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${badges[normalized]}`}
     >
       {labels[normalized] || status}
     </span>
@@ -423,127 +423,156 @@ const ProcurementList = () => {
               ) : (
                 <>
                   {/* Desktop Table View */}
-                  <div className="hidden lg:block overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-gray-50 border-b border-gray-200">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            No. Pengadaan
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Tanggal
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Jenis
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Supplier
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Total Nilai
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Status
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Dibuat Oleh
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Approved/Rejected By
-                          </th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                            Aksi
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {procurements.map((procurement) => (
-                          <tr key={procurement.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="font-mono font-semibold text-sm text-gray-900">
-                                {procurement.procurement_number}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                              {formatDate(procurement.procurement_date)}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                              {getTypeBadge(procurement.procurement_type)}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                              {procurement.supplier_name}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="font-semibold text-sm text-gray-900">
-                                {formatCurrency(procurement.total_amount)}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {getStatusBadge(procurement.status)}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                              {procurement.creator?.full_name || "-"}
-                            </td>
-                            <td className="px-6 py-4 text-sm">
-                              {procurement.status === "approved" && procurement.approver ? (
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-1.5 text-green-700">
-                                    <CheckIcon className="w-4 h-4 flex-shrink-0" />
-                                    <span className="font-medium">{procurement.approver.full_name}</span>
-                                  </div>
-                                  <div className="text-xs text-gray-500 pl-5">
-                                    {formatDate(procurement.approved_at)}
-                                  </div>
-                                </div>
-                              ) : procurement.status === "rejected" && procurement.rejector ? (
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-1.5 text-red-700">
-                                    <XMarkIcon className="w-4 h-4 flex-shrink-0" />
-                                    <span className="font-medium">{procurement.rejector.full_name}</span>
-                                  </div>
-                                  <div className="text-xs text-gray-500 pl-5">
-                                    {formatDate(procurement.rejected_at)}
-                                  </div>
-                                </div>
-                              ) : (
-                                <span className="text-gray-400">-</span>
-                              )}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right">
-                              <div className="flex items-center justify-end gap-1">
-                                <button
-                                  onClick={() => handleViewDetail(procurement)}
-                                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                  title="Detail"
-                                >
-                                  <EyeIcon className="w-5 h-5" />
-                                </button>
-
-                                {procurement.status === "pending" && (
-                                  <>
-                                    <button
-                                      onClick={() => handleEdit(procurement)}
-                                      className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                      title="Edit"
-                                    >
-                                      <PencilIcon className="w-5 h-5" />
-                                    </button>
-
-                                    <button
-                                      onClick={() => handleDelete(procurement.id)}
-                                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                      title="Delete"
-                                    >
-                                      <TrashIcon className="w-5 h-5" />
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            </td>
+                  <div className="hidden lg:block">
+                    <div className="overflow-x-auto">
+                      <table className="w-full table-fixed">
+                        <colgroup>
+                          <col className="w-32" />
+                          <col className="w-28" />
+                          <col className="w-20" />
+                          <col className="w-32" />
+                          <col className="w-28" />
+                          <col className="w-24" />
+                          <col className="w-28" />
+                          <col className="w-36" />
+                          <col className="w-24" />
+                        </colgroup>
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                          <tr>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              No. Pengadaan
+                            </th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Tanggal
+                            </th>
+                            <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Jenis
+                            </th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Supplier
+                            </th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Total Nilai
+                            </th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Status
+                            </th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Dibuat Oleh
+                            </th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Approved/Rejected By
+                            </th>
+                            <th className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                              Aksi
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {procurements.map((procurement) => (
+                            <tr key={procurement.id} className="hover:bg-gray-50">
+                              <td className="px-3 py-3">
+                                <span className="font-mono font-semibold text-xs text-gray-900 block truncate" title={procurement.procurement_number}>
+                                  {procurement.procurement_number}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-xs text-gray-600">
+                                <div className="truncate" title={formatDate(procurement.procurement_date)}>
+                                  {new Date(procurement.procurement_date).toLocaleDateString("id-ID", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  })}
+                                </div>
+                              </td>
+                              <td className="px-2 py-3 text-xs text-gray-600">
+                                {getTypeBadge(procurement.procurement_type)}
+                              </td>
+                              <td className="px-3 py-3 text-xs text-gray-600">
+                                <div className="truncate" title={procurement.supplier_name}>
+                                  {procurement.supplier_name}
+                                </div>
+                              </td>
+                              <td className="px-3 py-3">
+                                <span className="font-semibold text-xs text-gray-900 block truncate" title={formatCurrency(procurement.total_amount)}>
+                                  {formatCurrency(procurement.total_amount)}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3">
+                                {getStatusBadge(procurement.status)}
+                              </td>
+                              <td className="px-3 py-3 text-xs text-gray-600">
+                                <div className="truncate" title={procurement.creator?.full_name || "-"}>
+                                  {procurement.creator?.full_name || "-"}
+                                </div>
+                              </td>
+                              <td className="px-3 py-3 text-xs">
+                                {procurement.status === "approved" && procurement.approver ? (
+                                  <div className="truncate" title={`${procurement.approver.full_name} - ${formatDate(procurement.approved_at)}`}>
+                                    <div className="flex items-center gap-1 text-green-700">
+                                      <CheckIcon className="w-3 h-3 flex-shrink-0" />
+                                      <span className="font-medium truncate">{procurement.approver.full_name}</span>
+                                    </div>
+                                    <div className="text-xs text-gray-500 truncate">
+                                      {new Date(procurement.approved_at).toLocaleDateString("id-ID", {
+                                        day: "2-digit",
+                                        month: "short",
+                                      })}
+                                    </div>
+                                  </div>
+                                ) : procurement.status === "rejected" && procurement.rejector ? (
+                                  <div className="truncate" title={`${procurement.rejector.full_name} - ${formatDate(procurement.rejected_at)}`}>
+                                    <div className="flex items-center gap-1 text-red-700">
+                                      <XMarkIcon className="w-3 h-3 flex-shrink-0" />
+                                      <span className="font-medium truncate">{procurement.rejector.full_name}</span>
+                                    </div>
+                                    <div className="text-xs text-gray-500 truncate">
+                                      {new Date(procurement.rejected_at).toLocaleDateString("id-ID", {
+                                        day: "2-digit",
+                                        month: "short",
+                                      })}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="px-2 py-3 text-right">
+                                <div className="flex items-center justify-end gap-1">
+                                  <button
+                                    onClick={() => handleViewDetail(procurement)}
+                                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    title="Detail"
+                                  >
+                                    <EyeIcon className="w-4 h-4" />
+                                  </button>
+
+                                  {procurement.status === "pending" && (
+                                    <>
+                                      <button
+                                        onClick={() => handleEdit(procurement)}
+                                        className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                        title="Edit"
+                                      >
+                                        <PencilIcon className="w-4 h-4" />
+                                      </button>
+
+                                      <button
+                                        onClick={() => handleDelete(procurement.id)}
+                                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                        title="Delete"
+                                      >
+                                        <TrashIcon className="w-4 h-4" />
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
 
                   {/* Mobile/Tablet Card View */}
