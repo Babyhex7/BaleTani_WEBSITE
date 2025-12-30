@@ -18,6 +18,7 @@
 const { FAQ, Admin } = require("../models");
 const { Op } = require("sequelize");
 const { sequelize } = require("../config/database");
+const cacheService = require("../cache/cacheService");
 
 /**
  * Get all FAQs with filters
@@ -146,6 +147,10 @@ exports.createFAQ = async (req, res, next) => {
       updated_by: adminId,
     });
 
+    // Clear FAQ cache untuk customer side
+    cacheService.delPattern('public_faqs_');
+    cacheService.del('faq_categories');
+
     res.status(201).json({
       success: true,
       message: "FAQ berhasil dibuat",
@@ -185,6 +190,10 @@ exports.updateFAQ = async (req, res, next) => {
 
     await faq.save();
 
+    // Clear FAQ cache untuk customer side
+    cacheService.delPattern('public_faqs_');
+    cacheService.del('faq_categories');
+
     res.status(200).json({
       success: true,
       message: "FAQ berhasil diupdate",
@@ -213,6 +222,10 @@ exports.deleteFAQ = async (req, res, next) => {
     }
 
     await faq.destroy();
+
+    // Clear FAQ cache untuk customer side
+    cacheService.delPattern('public_faqs_');
+    cacheService.del('faq_categories');
 
     res.status(200).json({
       success: true,
@@ -247,6 +260,10 @@ exports.bulkUpdateOrder = async (req, res, next) => {
     );
 
     await Promise.all(updatePromises);
+
+    // Clear FAQ cache untuk customer side
+    cacheService.delPattern('public_faqs_');
+    cacheService.del('faq_categories');
 
     res.status(200).json({
       success: true,
