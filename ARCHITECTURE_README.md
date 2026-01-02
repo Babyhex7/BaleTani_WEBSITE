@@ -43,6 +43,293 @@
 
 ## 🏗️ Arsitektur Sistem
 
+### 🎯 Tipe Arsitektur: Three-Tier Architecture (N-Tier)
+
+BaleTani menggunakan **Three-Tier Architecture** (juga dikenal sebagai **N-Tier** atau **Multi-Tier Architecture**). Berikut penjelasan lengkapnya:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                        PERBANDINGAN TIER ARCHITECTURE                               │
+├─────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                     │
+│   ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│   │  ONE-TIER (Monolithic)                                                       │   │
+│   │  ┌─────────────────────────────────────────────────────┐                    │   │
+│   │  │  UI + Business Logic + Database (All in One)        │  ❌ Bukan ini      │   │
+│   │  └─────────────────────────────────────────────────────┘                    │   │
+│   │  Contoh: Desktop application dengan local database                          │   │
+│   └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                     │
+│   ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│   │  TWO-TIER (Client-Server)                                                    │   │
+│   │  ┌──────────────────────┐    ┌──────────────────────┐                       │   │
+│   │  │  Client (UI + Logic) │◀──▶│      Database        │   ❌ Bukan ini        │   │
+│   │  └──────────────────────┘    └──────────────────────┘                       │   │
+│   │  Contoh: Fat client langsung akses database                                 │   │
+│   └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                     │
+│   ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│   │  THREE-TIER / N-TIER (Multi-Tier)    ✅ BALETANI MENGGUNAKAN INI            │   │
+│   │                                                                              │   │
+│   │  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐           │   │
+│   │  │ PRESENTATION     │  │ APPLICATION      │  │ DATA             │           │   │
+│   │  │ TIER             │  │ TIER             │  │ TIER             │           │   │
+│   │  │                  │  │                  │  │                  │           │   │
+│   │  │ • React Frontend │──│ • Express Backend│──│ • MySQL Database │           │   │
+│   │  │ • User Interface │  │ • Business Logic │  │ • Data Storage   │           │   │
+│   │  │ • Client-side    │  │ • API Server     │  │ • Persistence    │           │   │
+│   │  └──────────────────┘  │ • ML Service     │  └──────────────────┘           │   │
+│   │                        └──────────────────┘                                 │   │
+│   └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                     │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 📊 Detail Three-Tier Architecture BaleTani
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                     │
+│                    BALETANI THREE-TIER ARCHITECTURE                                 │
+│                                                                                     │
+│  ═══════════════════════════════════════════════════════════════════════════════   │
+│                                                                                     │
+│                           ┌─────────────────────────┐                               │
+│                           │       INTERNET          │                               │
+│                           │    (Users/Browsers)     │                               │
+│                           └───────────┬─────────────┘                               │
+│                                       │                                             │
+│                                       │ HTTP/HTTPS                                  │
+│                                       ▼                                             │
+│  ═══════════════════════════════════════════════════════════════════════════════   │
+│  ║                                                                               ║  │
+│  ║    TIER 1: PRESENTATION LAYER (Frontend / Client Side)                       ║  │
+│  ║                                                                               ║  │
+│  ║    ┌─────────────────────────────────────────────────────────────────────┐   ║  │
+│  ║    │                         REACT APPLICATION                            │   ║  │
+│  ║    │                                                                      │   ║  │
+│  ║    │   Tanggung Jawab:                                                    │   ║  │
+│  ║    │   • Menampilkan User Interface (UI)                                  │   ║  │
+│  ║    │   • Handling user interactions (click, input, scroll)                │   ║  │
+│  ║    │   • Client-side routing (React Router)                               │   ║  │
+│  ║    │   • State management (Zustand)                                       │   ║  │
+│  ║    │   • Form validation (client-side)                                    │   ║  │
+│  ║    │   • API calls ke backend (Axios)                                     │   ║  │
+│  ║    │                                                                      │   ║  │
+│  ║    │   TIDAK Boleh:                                                       │   ║  │
+│  ║    │   ✗ Akses langsung ke database                                       │   ║  │
+│  ║    │   ✗ Business logic yang kompleks                                     │   ║  │
+│  ║    │   ✗ Menyimpan data sensitif (password, secrets)                      │   ║  │
+│  ║    │                                                                      │   ║  │
+│  ║    │   Tech: React 18, Vite, Tailwind CSS, Zustand, Axios                 │   ║  │
+│  ║    └─────────────────────────────────────────────────────────────────────┘   ║  │
+│  ║                                                                               ║  │
+│  ═══════════════════════════════════════════════════════════════════════════════   │
+│                                       │                                             │
+│                                       │ REST API (JSON)                             │
+│                                       │ + JWT Token                                 │
+│                                       ▼                                             │
+│  ═══════════════════════════════════════════════════════════════════════════════   │
+│  ║                                                                               ║  │
+│  ║    TIER 2: APPLICATION LAYER (Backend / Business Logic)                      ║  │
+│  ║                                                                               ║  │
+│  ║    ┌─────────────────────────────────────────────────────────────────────┐   ║  │
+│  ║    │                    EXPRESS.JS + ML SERVICE                           │   ║  │
+│  ║    │                                                                      │   ║  │
+│  ║    │   Tanggung Jawab:                                                    │   ║  │
+│  ║    │   • Business logic & rules                                           │   ║  │
+│  ║    │   • Authentication & Authorization (JWT, RBAC)                       │   ║  │
+│  ║    │   • Request validation & sanitization                                │   ║  │
+│  ║    │   • Data processing & transformation                                 │   ║  │
+│  ║    │   • Caching strategy (NodeCache)                                     │   ║  │
+│  ║    │   • File upload handling                                             │   ║  │
+│  ║    │   • AI/ML recommendations (FastAPI + TensorFlow)                     │   ║  │
+│  ║    │   • Error handling & logging                                         │   ║  │
+│  ║    │                                                                      │   ║  │
+│  ║    │   TIDAK Boleh:                                                       │   ║  │
+│  ║    │   ✗ Rendering UI (backend hanya return JSON)                         │   ║  │
+│  ║    │   ✗ Direct SQL queries (gunakan ORM)                                 │   ║  │
+│  ║    │                                                                      │   ║  │
+│  ║    │   Tech: Node.js, Express, Sequelize ORM, Python, FastAPI             │   ║  │
+│  ║    └─────────────────────────────────────────────────────────────────────┘   ║  │
+│  ║                                                                               ║  │
+│  ═══════════════════════════════════════════════════════════════════════════════   │
+│                                       │                                             │
+│                                       │ SQL Queries (via ORM)                       │
+│                                       │ Sequelize Models                            │
+│                                       ▼                                             │
+│  ═══════════════════════════════════════════════════════════════════════════════   │
+│  ║                                                                               ║  │
+│  ║    TIER 3: DATA LAYER (Database / Persistence)                               ║  │
+│  ║                                                                               ║  │
+│  ║    ┌─────────────────────────────────────────────────────────────────────┐   ║  │
+│  ║    │                       MySQL DATABASE                                 │   ║  │
+│  ║    │                                                                      │   ║  │
+│  ║    │   Tanggung Jawab:                                                    │   ║  │
+│  ║    │   • Data storage & persistence                                       │   ║  │
+│  ║    │   • Data integrity (constraints, foreign keys)                       │   ║  │
+│  ║    │   • Indexing untuk performa query                                    │   ║  │
+│  ║    │   • Transaction management                                           │   ║  │
+│  ║    │   • Backup & recovery                                                │   ║  │
+│  ║    │                                                                      │   ║  │
+│  ║    │   Tables:                                                            │   ║  │
+│  ║    │   • users, admins, customers, roles, permissions                     │   ║  │
+│  ║    │   • products, categories, product_images, discounts                  │   ║  │
+│  ║    │   • orders, order_items, carts, payment_details                      │   ║  │
+│  ║    │   • procurements, contact_messages, faqs                             │   ║  │
+│  ║    │                                                                      │   ║  │
+│  ║    │   Tech: MySQL 8.0, Connection Pooling, Auto-backup                   │   ║  │
+│  ║    └─────────────────────────────────────────────────────────────────────┘   ║  │
+│  ║                                                                               ║  │
+│  ═══════════════════════════════════════════════════════════════════════════════   │
+│                                                                                     │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 🔄 Alur Request dalam Three-Tier Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                         REQUEST FLOW IN THREE-TIER                                  │
+│                                                                                     │
+│   CONTOH: Customer melihat detail produk                                            │
+│                                                                                     │
+│   ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│   │                                                                              │   │
+│   │   STEP 1: User Request (Presentation Tier)                                   │   │
+│   │   ════════════════════════════════════════                                   │   │
+│   │                                                                              │   │
+│   │   User clicks on product card in browser                                     │   │
+│   │                    │                                                         │   │
+│   │                    ▼                                                         │   │
+│   │   ┌─────────────────────────────────────────────────────────┐               │   │
+│   │   │  React Component: ProductDetail.jsx                      │               │   │
+│   │   │                                                          │               │   │
+│   │   │  useEffect(() => {                                       │               │   │
+│   │   │    productService.getById(productId)  // Axios call      │               │   │
+│   │   │      .then(res => setProduct(res.data))                  │               │   │
+│   │   │  }, [productId]);                                        │               │   │
+│   │   └─────────────────────────────────────────────────────────┘               │   │
+│   │                    │                                                         │   │
+│   │                    │ GET /api/public/products/42                             │   │
+│   │                    │ Headers: { Authorization: Bearer <token> }              │   │
+│   │                    ▼                                                         │   │
+│   │                                                                              │   │
+│   │   STEP 2: Business Processing (Application Tier)                             │   │
+│   │   ══════════════════════════════════════════════                             │   │
+│   │                                                                              │   │
+│   │   ┌─────────────────────────────────────────────────────────┐               │   │
+│   │   │  Express Backend                                         │               │   │
+│   │   │                                                          │               │   │
+│   │   │  1. [Middleware] Rate limiter check                      │               │   │
+│   │   │  2. [Middleware] Auth validation (if required)           │               │   │
+│   │   │  3. [Routes] product.routes.js → match /products/:id     │               │   │
+│   │   │  4. [Controller] productController.getById()             │               │   │
+│   │   │  5. [Cache] Check NodeCache for cached data              │               │   │
+│   │   │     - Cache HIT → Return cached data                     │               │   │
+│   │   │     - Cache MISS → Continue to database                  │               │   │
+│   │   │  6. [Service] productService.findOne(id)                 │               │   │
+│   │   └─────────────────────────────────────────────────────────┘               │   │
+│   │                    │                                                         │   │
+│   │                    │ Sequelize Query: Product.findByPk(42, { include: ... }) │   │
+│   │                    ▼                                                         │   │
+│   │                                                                              │   │
+│   │   STEP 3: Data Retrieval (Data Tier)                                         │   │
+│   │   ══════════════════════════════════                                         │   │
+│   │                                                                              │   │
+│   │   ┌─────────────────────────────────────────────────────────┐               │   │
+│   │   │  MySQL Database                                          │               │   │
+│   │   │                                                          │               │   │
+│   │   │  SELECT p.*, c.name as category_name, pi.image_url       │               │   │
+│   │   │  FROM products p                                         │               │   │
+│   │   │  LEFT JOIN categories c ON p.category_id = c.id          │               │   │
+│   │   │  LEFT JOIN product_images pi ON p.id = pi.product_id     │               │   │
+│   │   │  WHERE p.id = 42 AND p.is_active = 1;                    │               │   │
+│   │   │                                                          │               │   │
+│   │   │  Returns: { id: 42, name: "Beras Organik", price: 50000 }│               │   │
+│   │   └─────────────────────────────────────────────────────────┘               │   │
+│   │                    │                                                         │   │
+│   │                    │ Query Result (Raw Data)                                 │   │
+│   │                    ▼                                                         │   │
+│   │                                                                              │   │
+│   │   STEP 4: Response Processing (Application Tier)                             │   │
+│   │   ══════════════════════════════════════════════                             │   │
+│   │                                                                              │   │
+│   │   ┌─────────────────────────────────────────────────────────┐               │   │
+│   │   │  Express Backend                                         │               │   │
+│   │   │                                                          │               │   │
+│   │   │  1. Transform data (add image URLs, format price)        │               │   │
+│   │   │  2. Store in NodeCache for future requests               │               │   │
+│   │   │  3. Format JSON response                                 │               │   │
+│   │   │  4. Send response with proper status code                │               │   │
+│   │   └─────────────────────────────────────────────────────────┘               │   │
+│   │                    │                                                         │   │
+│   │                    │ JSON Response: { success: true, data: {...} }           │   │
+│   │                    ▼                                                         │   │
+│   │                                                                              │   │
+│   │   STEP 5: UI Update (Presentation Tier)                                      │   │
+│   │   ═════════════════════════════════════                                      │   │
+│   │                                                                              │   │
+│   │   ┌─────────────────────────────────────────────────────────┐               │   │
+│   │   │  React Component                                         │               │   │
+│   │   │                                                          │               │   │
+│   │   │  1. Receive JSON response                                │               │   │
+│   │   │  2. Update state: setProduct(response.data)              │               │   │
+│   │   │  3. Re-render component with product details             │               │   │
+│   │   │  4. Display: name, price, images, description            │               │   │
+│   │   └─────────────────────────────────────────────────────────┘               │   │
+│   │                                                                              │   │
+│   └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                     │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### ✅ Keuntungan Three-Tier Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                    KEUNTUNGAN THREE-TIER ARCHITECTURE                               │
+│                                                                                     │
+│   ┌──────────────────────────────────────────────────────────────────────────────┐  │
+│   │  1. SEPARATION OF CONCERNS (Pemisahan Tanggung Jawab)                        │  │
+│   │     • Setiap tier punya tanggung jawab spesifik                              │  │
+│   │     • Mudah di-maintain dan debug                                            │  │
+│   │     • Tim dapat bekerja paralel (FE, BE, DBA)                                │  │
+│   └──────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                     │
+│   ┌──────────────────────────────────────────────────────────────────────────────┐  │
+│   │  2. SCALABILITY (Skalabilitas)                                               │  │
+│   │     • Setiap tier dapat di-scale secara independen                           │  │
+│   │     • Backend sibuk? Tambah instance backend saja                            │  │
+│   │     • Database lambat? Upgrade database saja                                 │  │
+│   └──────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                     │
+│   ┌──────────────────────────────────────────────────────────────────────────────┐  │
+│   │  3. SECURITY (Keamanan)                                                      │  │
+│   │     • Database tidak terekspos langsung ke internet                          │  │
+│   │     • Validasi di multiple layers (client + server)                          │  │
+│   │     • Business logic terlindungi di backend                                  │  │
+│   └──────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                     │
+│   ┌──────────────────────────────────────────────────────────────────────────────┐  │
+│   │  4. MAINTAINABILITY (Kemudahan Maintenance)                                  │  │
+│   │     • Update frontend tanpa sentuh backend                                   │  │
+│   │     • Ganti database tanpa ubah frontend                                     │  │
+│   │     • Technology stack bisa berbeda per tier                                 │  │
+│   └──────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                     │
+│   ┌──────────────────────────────────────────────────────────────────────────────┐  │
+│   │  5. REUSABILITY (Dapat Digunakan Ulang)                                      │  │
+│   │     • API backend bisa dipakai mobile app di masa depan                      │  │
+│   │     • Business logic tersentralisasi                                         │  │
+│   │     • Tidak perlu duplikasi kode                                             │  │
+│   └──────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                     │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 BaleTani menggunakan arsitektur **Multi-Service** dengan 3 service utama yang dapat di-deploy secara independen:
 
 ### 🌐 High-Level Architecture
@@ -1783,8 +2070,8 @@ volumes:
 │   │   HOSTING     │   │   SERVERS     │   │         SERVERS            │        │
 │   │               │   │               │   │                            │        │
 │   │  Options:     │   │  Options:     │   │  Options:                  │        │
-│   │  • Vercel     │   │  • AWS EC2    │   │  • AWS EC2 (GPU optional)  │        │
-│   │  • Netlify    │   │  • GCP GCE    │   │  • GCP Compute Engine      │        │
+│   │  •      │   │  • AWS EC2    │   │  • AWS EC2 (GPU optional)  │        │
+│   │  •    │   │  • GCP GCE    │   │  • GCP Compute Engine      │        │
 │   │  • AWS S3+CF  │   │  • DigitalOcean│  │  • AWS Lambda + API GW     │        │
 │   │  • Firebase   │   │  • Heroku     │   │  • GCP Cloud Run           │        │
 │   │    Hosting    │   │  • Railway    │   │                            │        │
@@ -1916,6 +2203,267 @@ uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 4  # Production
 
 - Recommendations: 15 menit
 - Product embeddings: 1 jam
+
+---
+
+## 🏠 Rumahweb Hosting Deployment
+
+### Arsitektur di Rumahweb Medium Plan
+
+BaleTani di-deploy menggunakan **Rumahweb Medium Hosting** dengan Node.js dan MySQL support:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                      RUMAHWEB MEDIUM HOSTING ARCHITECTURE                           │
+│                                                                                     │
+│                          ┌─────────────────────────┐                                │
+│                          │     DOMAIN/DNS          │                                │
+│                          │     baletani.com        │                                │
+│                          │  (Rumahweb/Cloudflare)  │                                │
+│                          └───────────┬─────────────┘                                │
+│                                      │                                              │
+│                                      │ DNS A Record → Server IP                     │
+│                                      ▼                                              │
+│  ┌──────────────────────────────────────────────────────────────────────────────┐   │
+│  │                    RUMAHWEB SERVER (Medium Plan)                              │   │
+│  │                                                                               │   │
+│  │    Specs: 2GB RAM | 30GB SSD | Unlimited Bandwidth                            │   │
+│  │    Features: Node.js ✓ | MySQL ✓ | SSL ✓ | cPanel ✓                           │   │
+│  │                                                                               │   │
+│  │  ┌─────────────────────────────────────────────────────────────────────────┐ │   │
+│  │  │            APACHE / LITESPEED (Web Server + Reverse Proxy)               │ │   │
+│  │  │  • SSL Termination (Let's Encrypt)                                       │ │   │
+│  │  │  • Static file serving                                                   │ │   │
+│  │  │  • Proxy requests /api/* ke Node.js :5000                                │ │   │
+│  │  └─────────────────────────────────────────────────────────────────────────┘ │   │
+│  │                          │                                                    │   │
+│  │         ┌────────────────┴────────────────┐                                   │   │
+│  │         │                                 │                                   │   │
+│  │         ▼                                 ▼                                   │   │
+│  │  ┌─────────────────────────┐    ┌─────────────────────────┐                   │   │
+│  │  │   📁 FRONTEND           │    │   ⚙️ BACKEND            │                   │   │
+│  │  │   (React Build)         │    │   (Node.js + Express)   │                   │   │
+│  │  │                         │    │                         │                   │   │
+│  │  │   /public_html/         │    │   /home/user/app/       │                   │   │
+│  │  │   • index.html          │    │   • PM2 managed         │                   │   │
+│  │  │   • assets/ (JS,CSS)    │    │   • Port: 5000          │                   │   │
+│  │  │   • .htaccess           │    │   • JWT Auth            │                   │   │
+│  │  │                         │    │   • REST API            │                   │   │
+│  │  │   https://baletani.com  │    │   • File uploads        │                   │   │
+│  │  └─────────────────────────┘    └────────────┬────────────┘                   │   │
+│  │                                              │                                │   │
+│  │                                              │ Sequelize ORM                  │   │
+│  │                                              ▼                                │   │
+│  │                               ┌────────────────────────────┐                  │   │
+│  │                               │    🗄️ MySQL DATABASE       │                  │   │
+│  │                               │                            │                  │   │
+│  │                               │    Host: localhost         │                  │   │
+│  │                               │    Port: 3306              │                  │   │
+│  │                               │    Database: baletani_db   │                  │   │
+│  │                               │    Managed: phpMyAdmin     │                  │   │
+│  │                               │    Backup: Daily auto      │                  │   │
+│  │                               └────────────────────────────┘                  │   │
+│  │                                                                               │   │
+│  └───────────────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Struktur File di Server Rumahweb
+
+```
+/home/username/
+│
+├── public_html/                    # 📁 Frontend (React build output)
+│   ├── index.html                  # Entry point SPA
+│   ├── assets/
+│   │   ├── index-[hash].js         # Bundled React app
+│   │   ├── index-[hash].css        # Compiled Tailwind CSS
+│   │   └── images/                 # Static images
+│   ├── favicon.ico
+│   └── .htaccess                   # Apache rewrite rules
+│
+├── app/                            # ⚙️ Backend (Node.js)
+│   ├── package.json
+│   ├── ecosystem.config.js         # PM2 configuration
+│   ├── .env                        # Environment variables
+│   ├── src/
+│   │   ├── app.js
+│   │   ├── server.js
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── middlewares/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   └── utils/
+│   ├── public/
+│   │   └── uploads/                # User uploaded files
+│   │       ├── products/
+│   │       └── categories/
+│   ├── logs/                       # PM2 logs
+│   └── node_modules/
+│
+└── tmp/                            # Temporary files
+```
+
+### Konfigurasi Files
+
+#### .htaccess (Frontend SPA + API Proxy)
+
+```apache
+# /public_html/.htaccess
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Proxy API requests ke Node.js backend
+    RewriteRule ^api/(.*)$ http://127.0.0.1:5000/api/$1 [P,L]
+
+    # Proxy uploads folder
+    RewriteRule ^uploads/(.*)$ http://127.0.0.1:5000/uploads/$1 [P,L]
+
+    # SPA fallback - semua route ke index.html
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ /index.html [L]
+</IfModule>
+
+# Gzip compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css
+    AddOutputFilterByType DEFLATE application/javascript application/json
+</IfModule>
+
+# Cache static assets
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+</IfModule>
+```
+
+#### Environment Variables (.env)
+
+```env
+# /home/username/app/.env
+
+# Server
+NODE_ENV=production
+PORT=5000
+
+# Database (Rumahweb MySQL - dari cPanel)
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=username_baletani
+DB_PASSWORD=<password_dari_cpanel>
+DB_NAME=username_baletani_db
+DB_DIALECT=mysql
+DB_POOL_MAX=15
+DB_POOL_MIN=5
+
+# JWT
+JWT_SECRET=<random_secret_64_characters>
+JWT_EXPIRES_IN=7d
+
+# URLs
+FRONTEND_URL=https://baletani.com
+BACKEND_URL=https://baletani.com/api
+
+# ML Service (disabled untuk Medium plan)
+ML_SERVICE_ENABLED=false
+
+# File Upload
+UPLOAD_PATH=./public/uploads
+MAX_FILE_SIZE=5242880
+```
+
+#### PM2 Ecosystem Config
+
+```javascript
+// /home/username/app/ecosystem.config.js
+
+module.exports = {
+  apps: [
+    {
+      name: "baletani-backend",
+      script: "./src/server.js",
+      instances: 1,
+      exec_mode: "fork",
+      env_production: {
+        NODE_ENV: "production",
+        PORT: 5000,
+      },
+      max_memory_restart: "400M",
+      error_file: "./logs/error.log",
+      out_file: "./logs/output.log",
+      log_date_format: "YYYY-MM-DD HH:mm:ss Z",
+      autorestart: true,
+      watch: false,
+    },
+  ],
+};
+```
+
+### Deployment Steps
+
+```bash
+# 1. SSH ke server Rumahweb
+ssh username@server.rumahweb.com
+
+# 2. Setup Backend
+cd ~/app
+git clone <repository> . # atau upload via FileZilla/cPanel
+npm install --production
+cp .env.example .env
+nano .env  # Edit sesuai konfigurasi
+
+# 3. Setup Database (via cPanel)
+# - Buka cPanel → MySQL Databases
+# - Create database: username_baletani_db
+# - Create user & assign ke database
+# - Import schema via phpMyAdmin
+
+# 4. Run Migrations & Seed
+npm run migrate
+npm run seed
+
+# 5. Start Backend dengan PM2
+pm2 start ecosystem.config.js --env production
+pm2 save
+pm2 startup  # Enable auto-start on reboot
+
+# 6. Build & Deploy Frontend (dari local)
+# Di komputer lokal:
+cd frontend
+npm run build
+# Upload isi folder dist/ ke public_html/ via FTP
+
+# 7. Verify
+pm2 status
+curl https://baletani.com/api/health
+```
+
+### Limitasi & Optimasi Rumahweb Medium
+
+| Limitasi             | Impact                      | Solusi                                                            |
+| -------------------- | --------------------------- | ----------------------------------------------------------------- |
+| **RAM 2GB**          | ML Service tidak bisa jalan | Set `ML_SERVICE_ENABLED=false`, gunakan SQL-based recommendations |
+| **Storage 30GB**     | Terbatas untuk uploads      | Compress images (80% quality), max 1200px, cleanup rutin          |
+| **Shared CPU**       | Response time bervariasi    | Gunakan NodeCache agresif, optimize queries                       |
+| **Connection limit** | Max DB connections terbatas | Pool max 15-20, bukan 100                                         |
+
+### Upgrade Path
+
+Jika traffic meningkat, pertimbangkan upgrade ke:
+
+| Plan                  | RAM | Storage | Cocok Untuk                     |
+| --------------------- | --- | ------- | ------------------------------- |
+| **Medium** (saat ini) | 2GB | 30GB    | ≤1000 users/day                 |
+| **VPS SSD 2**         | 4GB | 60GB    | 1000-5000 users/day, ML enabled |
+| **VPS SSD 3**         | 8GB | 100GB   | 5000+ users/day, full features  |
 
 ---
 
