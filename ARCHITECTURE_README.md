@@ -1556,21 +1556,22 @@ npm run dev
 
 ### 5️⃣ Akses Aplikasi
 
-| Service                 | Port | Path           | Development URL              |
-| ----------------------- | ---- | -------------- | ---------------------------- |
-| 🌐 Frontend Customer    | 5173 | `/`            | `http://localhost:5173`      |
-| 🔐 Frontend Admin       | 5173 | `/admin`       | `http://localhost:5173/admin` |
-| 🔌 Backend API          | 5000 | `/api`         | `http://localhost:5000`      |
-| 💚 Backend Health Check | 5000 | `/api/health`  | `http://localhost:5000/api/health` |
-| 🤖 ML Service API       | 8000 | `/v1`          | `http://localhost:8000`      |
-| 📖 ML Service Docs      | 8000 | `/docs`        | `http://localhost:8000/docs` |
-| 📊 ML Service Health    | 8000 | `/health`      | `http://localhost:8000/health` |
+| Service                 | Port | Path          | Development URL                    |
+| ----------------------- | ---- | ------------- | ---------------------------------- |
+| 🌐 Frontend Customer    | 5173 | `/`           | `http://localhost:5173`            |
+| 🔐 Frontend Admin       | 5173 | `/admin`      | `http://localhost:5173/admin`      |
+| 🔌 Backend API          | 5000 | `/api`        | `http://localhost:5000`            |
+| 💚 Backend Health Check | 5000 | `/api/health` | `http://localhost:5000/api/health` |
+| 🤖 ML Service API       | 8000 | `/v1`         | `http://localhost:8000`            |
+| 📖 ML Service Docs      | 8000 | `/docs`       | `http://localhost:8000/docs`       |
+| 📊 ML Service Health    | 8000 | `/health`     | `http://localhost:8000/health`     |
 
-> **Catatan:**  
-> - Frontend adalah single application dengan routing terpisah untuk Customer dan Admin  
-> - Development: URL di atas menggunakan `localhost`  
-> - Production: Ganti `localhost` dengan domain/IP server Anda  
-> - Network Access: Ganti dengan IP komputer (misal: `192.168.x.x:port`)  
+> **Catatan:**
+>
+> - Frontend adalah single application dengan routing terpisah untuk Customer dan Admin
+> - Development: URL di atas menggunakan `localhost`
+> - Production: Ganti `localhost` dengan domain/IP server Anda
+> - Network Access: Ganti dengan IP komputer (misal: `192.168.x.x:port`)
 > - Gunakan reverse proxy (Nginx) untuk production deployment
 
 ---
