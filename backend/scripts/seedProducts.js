@@ -256,7 +256,7 @@ async function seedProducts() {
       });
 
       console.log(
-        `   ✅ Created: ${prod.name} - Rp${prod.price.toLocaleString("id-ID")}/${prod.unit}`
+        `   ✅ Created: ${prod.name} - Rp${prod.price.toLocaleString("id-ID")}/${prod.unit}`,
       );
       createdCount++;
     }
