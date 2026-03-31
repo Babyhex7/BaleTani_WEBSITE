@@ -10,6 +10,7 @@ const {
 } = require("../../middlewares/upload.middleware");
 const productController = require("../../controllers/adminProduct.controller");
 const productImageController = require("../../controllers/adminProductImage.controller");
+const stockMovementController = require("../../controllers/stockMovement.controller");
 
 /**
  * Product Management Routes
@@ -140,6 +141,34 @@ router.delete(
   authenticateAdmin,
   roleMiddleware(["super_admin", "super_inventory_admin"]),
   productImageController.deleteImage
+);
+
+// ============================================
+// STOCK MOVEMENT & HISTORY ROUTES
+// ============================================
+
+/**
+ * GET /api/admin/products/:product_id/stock-history
+ * Get stock history/movement log for a product
+ * Access: super_admin, super_inventory_admin, inventory_admin
+ */
+router.get(
+  "/:product_id/stock-history",
+  authenticateAdmin,
+  roleMiddleware(["super_admin", "super_inventory_admin", "inventory_admin"]),
+  stockMovementController.getStockHistory
+);
+
+/**
+ * GET /api/admin/products/:product_id/stock-summary
+ * Get stock summary (total by movement type) for a product
+ * Access: super_admin, super_inventory_admin, inventory_admin
+ */
+router.get(
+  "/:product_id/stock-summary",
+  authenticateAdmin,
+  roleMiddleware(["super_admin", "super_inventory_admin", "inventory_admin"]),
+  stockMovementController.getStockSummary
 );
 
 module.exports = router;

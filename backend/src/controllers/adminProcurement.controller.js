@@ -6,6 +6,7 @@ const {
   Product,
   Admin,
   StockMovement,
+  StockHistory,
   SoftDeleteLog,
 } = require("../models");
 
@@ -539,13 +540,30 @@ const updateProcurement = async (req, res) => {
  * Approve procurement
  */
 const approveProcurement = async (req, res) => {
+  const transaction = await sequelize.transaction();
+
   try {
     const { id } = req.params;
     const { notes } = req.body;
 
-    const procurement = await Procurement.findByPk(id);
+    const procurement = await Procurement.findByPk(id, {
+      include: [
+        {
+          model: ProcurementItem,
+          as: "items",
+          include: [
+            {
+              model: Product,
+              as: "product",
+            },
+          ],
+        },
+      ],
+      transaction,
+    });
 
     if (!procurement) {
+      await transaction.rollback();
       return res.status(404).json({
         success: false,
         message: "Pengadaan tidak ditemukan",
@@ -553,18 +571,55 @@ const approveProcurement = async (req, res) => {
     }
 
     if (procurement.status !== "pending") {
+      await transaction.rollback();
       return res.status(400).json({
         success: false,
         message: "Hanya pengadaan dengan status pending yang dapat disetujui",
       });
     }
 
+    // Update procurement status
     await procurement.update({
       status: "approved",
       approved_by: req.user.id,
       approved_at: new Date(),
       notes: notes || procurement.notes,
-    });
+    }, { transaction });
+
+    // Update stock for each item and log history
+    for (const item of procurement.items) {
+      const product = item.product;
+      const quantity_change = parseFloat(item.quantity);
+
+      // Update product stock
+      const newStock = parseFloat(product.total_stock || 0) + quantity_change;
+      await product.update({
+        total_stock: newStock,
+      }, { transaction });
+
+      // Log stock history
+      await StockHistory.create({
+        product_id: product.id,
+        change_type: "procurement",
+        quantity_change: quantity_change,
+        reason: `Procurement ${procurement.procurement_number} approved`,
+        reference_id: procurement.id,
+      }, { transaction });
+
+      // Also log in StockMovement for backward compatibility
+      await StockMovement.create({
+        product_id: product.id,
+        movement_type: "procurement_in",
+        quantity_change: quantity_change,
+        stock_before: parseFloat(product.total_stock || 0),
+        stock_after: newStock,
+        reference_type: "procurement",
+        reference_id: procurement.id,
+        created_by: req.user.id,
+      }, { transaction });
+    }
+
+    await transaction.commit();
 
     res.status(200).json({
       success: true,
@@ -572,6 +627,7 @@ const approveProcurement = async (req, res) => {
       data: procurement,
     });
   } catch (error) {
+    await transaction.rollback();
     console.error("❌ Error in approveProcurement:", error);
     res.status(500).json({
       success: false,

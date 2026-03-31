@@ -13,9 +13,6 @@ const sequelize = new Sequelize(
     dialectOptions: {
       timezone: "+07:00",
       connectTimeout: 60000, // 60 seconds
-      // Keep connection alive untuk prevent MySQL timeout
-      keepAlive: true,
-      keepAliveInitialDelay: 10000, // 10 detik
     },
     logging:
       process.env.NODE_ENV === "development"

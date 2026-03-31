@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const publicProductController = require("../../controllers/publicProduct.controller");
+const stockMovementController = require("../../controllers/stockMovement.controller");
 
 /**
  * ============================================
@@ -37,5 +38,13 @@ router.get("/", publicProductController.getAllProducts);
  * @access  Public
  */
 router.get("/:id", publicProductController.getProductById);
+
+/**
+ * @route   GET /api/public/products/:id/stock-status
+ * @desc    Get public stock status and recent sales for a product
+ * @access  Public
+ * @note    Shows only non-sensitive data (recent sales count, current stock)
+ */
+router.get("/:id/stock-status", stockMovementController.getPublicStockStatus);
 
 module.exports = router;

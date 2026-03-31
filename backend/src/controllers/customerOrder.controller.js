@@ -5,6 +5,7 @@
 
 const { sequelize } = require("../config/database");
 const { getWIBDate } = require("../utils/dateHelper");
+const stockMovementService = require("../services/stockMovementService");
 const {
   Order,
   OrderItem,
@@ -12,6 +13,7 @@ const {
   OrderStatusHistory,
   Cart,
   PaymentDetail,
+  StockHistory,
 } = require("../models");
 
 /**
@@ -150,20 +152,21 @@ const createOrder = async (req, res) => {
 
     for (const item of items) {
       // Validate item structure
-      if (!item.product_id || !item.quantity || item.quantity < 1) {
+      const quantity = parseFloat(item.quantity);
+      if (!item.product_id || !quantity || quantity <= 0) {
         await transaction.rollback();
         return res.status(400).json({
           success: false,
-          message: "Item tidak valid: product_id dan quantity wajib diisi",
+          message: "Item tidak valid: product_id dan quantity wajib diisi (bisa decimal misal 0.5)",
         });
       }
 
-      // Limit quantity per item
-      if (item.quantity > 100) {
+      // Limit quantity per item (changed from 100 to allow flexibility with decimals)
+      if (quantity > 1000) {
         await transaction.rollback();
         return res.status(400).json({
           success: false,
-          message: "Maksimal 100 quantity per item",
+          message: "Maksimal 1000 quantity per item",
         });
       }
 
@@ -220,12 +223,13 @@ const createOrder = async (req, res) => {
         });
       }
 
-      // Check stock
-      if (product.total_stock < item.quantity) {
+      // Check stock (support decimal quantities)
+      const currentStock = parseFloat(product.total_stock || 0);
+      if (currentStock < quantity) {
         await transaction.rollback();
         return res.status(400).json({
           success: false,
-          message: `Stok ${product.name} tidak mencukupi. Tersedia: ${product.total_stock}`,
+          message: `Stok ${product.name} tidak mencukupi. Tersedia: ${currentStock}`,
         });
       }
 
@@ -245,23 +249,24 @@ const createOrder = async (req, res) => {
         }
       }
 
-      const itemTotal = Math.round(finalPrice * item.quantity * 100) / 100;
+      const itemTotal = Math.round(finalPrice * quantity * 100) / 100;
       itemSubtotal += itemTotal;
 
       orderItemsData.push({
         product_id: item.product_id,
         product_name: product.name,
-        quantity: item.quantity,
+        quantity: quantity,
         original_price: Math.round(originalPrice * 100) / 100,
         discount_price: Math.round(discountValue * 100) / 100,
         final_price: Math.round(finalPrice * 100) / 100,
         subtotal: itemTotal,
       });
 
-      // Update stock
+      // Update stock (support decimal quantities like 0.5 kg)
+      const newStock = currentStock - quantity;
       await product.update(
         {
-          total_stock: product.total_stock - item.quantity,
+          total_stock: newStock,
           updated_at: getWIBDate(),
         },
         { transaction }
@@ -350,12 +355,22 @@ const createOrder = async (req, res) => {
     }
 
     // Create order status history
+    // Cari system admin untuk automatic status history (bukan dari customer action)
+    const Admin = require("../models").Admin;
+    const systemAdmin = await Admin.findOne({
+      attributes: ["id"],
+      where: { full_name: "Super Admin" },
+      transaction,
+    });
+
+    const changedBy = systemAdmin?.id || null; // Use Super Admin or null if not found
+
     await OrderStatusHistory.create(
       {
         order_id: order.id,
         old_status: null,
         new_status: orderStatus, // pending_payment untuk semua metode
-        changed_by: customerId,
+        changed_by: changedBy,
         notes:
           payment_method === "cash"
             ? "Order created - Cash payment (pay on delivery/pickup)"
@@ -404,6 +419,42 @@ const createOrder = async (req, res) => {
     }
 
     await transaction.commit();
+
+    // ========================================
+    // LOG STOCK MOVEMENTS (after transaction commit)
+    // ========================================
+    // Log each item as a "sale_out" stock movement
+    try {
+      for (const item of items) {
+        const quantity = parseFloat(item.quantity);
+        await stockMovementService.logStockMovement({
+          product_id: item.product_id,
+          movement_type: "sale_out",
+          quantity_change: -quantity, // Negative because it's a reduction
+          created_by: "67ff125f-d9e6-42a7-93a6-f212f9db890d", // Use admin ID for stock movements
+          reference_id: order.id,
+          reference_type: "order",
+        });
+
+        // Also log in StockHistory
+        try {
+          await StockHistory.create({
+            product_id: item.product_id,
+            change_type: "order",
+            quantity_change: -quantity,
+            reason: `Order ${order.order_number}`,
+            reference_id: order.id,
+          });
+          console.log(`[ORDER ${order.order_number}] StockHistory logged for product ${item.product_id}: -${quantity}`);
+        } catch (historyError) {
+          console.error(`[ORDER ${order.order_number}] Failed to log StockHistory for product ${item.product_id}:`, historyError.message);
+        }
+      }
+      console.log(`[ORDER ${order.order_number}] Stock movements logged successfully`);
+    } catch (stockError) {
+      // Log the error but don't fail the order - stock was already updated in DB
+      console.error(`[ORDER ${order.order_number}] Failed to log stock movements:`, stockError.message);
+    }
 
     // Fetch created order with items and payment detail
     const createdOrder = await Order.findByPk(order.id, {

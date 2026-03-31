@@ -64,6 +64,10 @@ router.use("/contacts", contactRoutes); // /api/admin/contacts/*
 // Procurement Management
 router.use("/procurements", procurementRoutes); // /api/admin/procurements/*
 
+// Stock History
+const stockHistoryRoutes = require("./stockHistory.routes");
+router.use("/stock-history", stockHistoryRoutes); // /api/admin/stock-history/*
+
 // Reports & Analytics
 router.use("/reports", reportRoutes); // /api/admin/reports/*
 

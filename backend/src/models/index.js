@@ -16,6 +16,7 @@ const OrderItem = require("./orderItem.model");
 const OrderStatusHistory = require("./orderStatusHistory.model");
 const PaymentDetail = require("./paymentDetail.model");
 const StockMovement = require("./stockMovement.model");
+const StockHistory = require("./stockHistory.model");
 const SoftDeleteLog = require("./softDeleteLog.model");
 const FAQ = require("./faq.model");
 const ContactMessage = require("./contactMessage.model");
@@ -380,6 +381,16 @@ Admin.hasMany(ContactMessage, {
   as: "repliedMessages",
 });
 
+// Product → StockHistory
+Product.hasMany(StockHistory, {
+  foreignKey: "product_id",
+  as: "stockHistory",
+});
+StockHistory.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
 module.exports = {
   Admin,
   Role,
@@ -399,6 +410,7 @@ module.exports = {
   OrderStatusHistory,
   PaymentDetail,
   StockMovement,
+  StockHistory,
   SoftDeleteLog,
   FAQ,
   ContactMessage,

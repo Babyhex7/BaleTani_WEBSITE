@@ -42,7 +42,7 @@ const OrderStatusHistory = sequelize.define(
       allowNull: false,
       comment: "Admin ID who made the change",
       references: {
-        model: "admins",
+        model: "users",
         key: "id"
       }
     },

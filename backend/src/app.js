@@ -4,7 +4,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 // FIX: Tambah CSRF protection untuk keamanan
 const { doubleCsrf } = require("csrf-csrf");
-require("dotenv").config();
+require("dotenv").config({ path: "../.env" });
 
 const errorHandler = require("./middlewares/error.middleware");
 

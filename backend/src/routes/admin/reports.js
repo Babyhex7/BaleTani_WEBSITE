@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { authenticateAdmin } = require("../../middlewares/auth.middleware");
 const reportController = require("../../controllers/adminReport.controller");
+const stockMovementController = require("../../controllers/stockMovement.controller");
 
 /**
  * ============================================
@@ -30,5 +31,12 @@ router.get("/procurement", reportController.getProcurementReport);
  * Get inventory report with stock info
  */
 router.get("/inventory", reportController.getInventoryReport);
+
+/**
+ * GET /api/admin/reports/stock-movements
+ * Get stock movements report with advanced filtering
+ * Supports: product_id, movement_type, reference_type, date range filters
+ */
+router.get("/stock-movements", stockMovementController.getAllMovements);
 
 module.exports = router;

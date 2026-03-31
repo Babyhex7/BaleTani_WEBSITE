@@ -340,7 +340,7 @@ const create = async (req, res) => {
       quantity_info: quantity_info || null,
       shelf_life_days: parseInt(shelf_life_days),
       total_stock: initialStockValue, // Set initial stock from input or default to 0
-      is_active: is_active === true || is_active === "true",
+      is_active: product_type === 'offline' ? true : (is_active === true || is_active === "true"),
       created_at: new Date(),
       updated_at: new Date(),
     });
@@ -481,7 +481,7 @@ const update = async (req, res) => {
       shelf_life_days: shelf_life_days
         ? parseInt(shelf_life_days)
         : product.shelf_life_days,
-      is_active: is_active !== undefined ? is_active : product.is_active,
+      is_active: (product_type === 'offline' || product.product_type === 'offline') ? true : (is_active !== undefined ? is_active : product.is_active),
       updated_at: new Date(),
     });
 
