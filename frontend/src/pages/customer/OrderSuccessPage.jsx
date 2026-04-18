@@ -305,7 +305,7 @@ const OrderSuccessPage = () => {
       message += `*TOTAL: ${formatCurrency(orderData.total_amount)}*\n\n`;
       
       message += `🚚 *Metode Pengiriman:*\n`;
-      message += `${orderData.delivery_method === 'delivery' ? '🏠 Delivery/Antar' : '🏪 Ambil Sendiri (Self Pickup)'}\n`;
+      message += `${orderData.delivery_method === 'delivery' ? '🏠 Delivery/Antar' : orderData.delivery_method === 'self_pickup' ? '🏪 Ambil Sendiri (Self Pickup)' : '🛍️ Transaksi di Toko'}\n`;
       if (orderData.delivery_address) {
         message += `Alamat: ${orderData.delivery_address}\n`;
       }
