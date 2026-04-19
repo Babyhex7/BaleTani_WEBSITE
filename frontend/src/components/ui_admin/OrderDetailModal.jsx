@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { X, Package, User, MapPin, CreditCard, Clock, FileText, Printer } from "lucide-react";
+import { X, Package, User, MapPin, CreditCard, Clock, Printer } from "lucide-react";
 import orderService from "../../services/services_admin/orderService";
 import { dummyOrderDetail } from "../../data/dummyOrders";
 import toast from "react-hot-toast";

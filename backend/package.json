@@ -14,7 +14,7 @@
     "seed:comprehensive": "node seeders/comprehensiveDataSeeder.js",
     "seed:dev": "nodemon seeders/index.js",
     "seed:admin": "node seeders/adminSeeder.js",
-    "seed:roles": "node seeders/runRoleSeeder.js",
+    "seed:roles": "node seeders/roleSeeder.js",
     "setup:rbac": "node scripts/setupRBAC.js",
     "seed:rbac-permissions": "node seeders/rolePermissionSeeder.js",
     "seed:rbac-admins": "node seeders/adminDummySeeder.js",

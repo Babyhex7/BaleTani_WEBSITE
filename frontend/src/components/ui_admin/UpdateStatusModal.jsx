@@ -6,6 +6,7 @@
 import { useState, useEffect } from "react";
 import { X, AlertCircle } from "lucide-react";
 import orderService from "../../services/services_admin/orderService";
+import OrderReceiptModal from "./OrderReceiptModal";
 
 const UpdateStatusModal = ({ order, useDummyData, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,8 @@ const UpdateStatusModal = ({ order, useDummyData, onClose, onSuccess }) => {
   const [error, setError] = useState(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [receiptOrder, setReceiptOrder] = useState(null);
 
   // Auto-sync payment_status dengan order_status
   useEffect(() => {
@@ -51,21 +54,39 @@ const UpdateStatusModal = ({ order, useDummyData, onClose, onSuccess }) => {
     setError(null);
 
     try {
+      let updatedOrder = order;
+
       if (useDummyData) {
         // Simulasi API call
         await new Promise((resolve) => setTimeout(resolve, 1000));
         console.log("Update status (dummy):", formData);
+        updatedOrder = { ...order, ...formData };
       } else {
         await orderService.updateOrderStatus(order.id, formData);
+        // Fetch updated order to get complete data for receipt
+        const response = await orderService.getOrderById(order.id);
+        updatedOrder = response.data;
       }
 
-      onSuccess();
+      // Jika status berubah menjadi "completed", tampilkan receipt modal
+      if (formData.order_status === "completed") {
+        setReceiptOrder(updatedOrder);
+        setShowReceiptModal(true);
+        // Jangan langsung menutup modal, tunggu user selesai dengan receipt
+      } else {
+        onSuccess();
+      }
     } catch (err) {
       console.error("Error updating status:", err);
       setError(err.response?.data?.message || "Gagal update status");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleReceiptModalClose = () => {
+    setShowReceiptModal(false);
+    onSuccess();
   };
 
   const handleCancel = async () => {
@@ -273,6 +294,13 @@ const UpdateStatusModal = ({ order, useDummyData, onClose, onSuccess }) => {
             </div>
           )}
         </form>
+
+        {/* Receipt Modal - Auto show saat status completed */}
+        <OrderReceiptModal
+          order={receiptOrder}
+          isOpen={showReceiptModal}
+          onClose={handleReceiptModalClose}
+        />
       </div>
     </div>
   );
