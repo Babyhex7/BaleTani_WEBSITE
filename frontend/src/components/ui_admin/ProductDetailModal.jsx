@@ -15,6 +15,7 @@ import {
   ArrowDownIcon
 } from '@heroicons/react/24/outline';
 import { getImageUrl, handleImageError } from '../../utils/imageUtils';
+import adminApiClient from '../../services/services_admin/adminApiClient';
 
 /**
  * Modal untuk melihat detail produk (Read-only)
@@ -37,22 +38,91 @@ const ProductDetailModal = ({
   }, [isOpen, product, activeTab]);
 
   const fetchStockHistory = async () => {
-    if (!product?.id) return;
+    const productId = product?.id || product?.product_id;
+    if (!productId) return;
     
     setLoadingHistory(true);
     try {
-      const response = await fetch(`/api/admin/stock-history?product_id=${product.id}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setStockHistory(data.data.history || []);
+      const toRelevantMovements = (movements = []) =>
+        movements.filter((movement) => {
+          const quantityChange = Number(movement.quantity_change || 0);
+          if (movement.reference_type === 'procurement') {
+            return true;
+          }
+          if (movement.reference_type === 'order') {
+            return quantityChange < 0;
+          }
+          return false;
+        });
+
+      const normalizeLegacyHistory = (history = []) =>
+        history
+          .filter((item) => item.change_type === 'procurement' || item.change_type === 'order')
+          .map((item) => {
+            const quantityChange = Number(item.quantity_change || 0);
+            const isProcurement = item.change_type === 'procurement';
+            const isOrder = item.change_type === 'order';
+
+            return {
+              id: item.id,
+              movement_type: isOrder
+                ? 'sale_out'
+                : quantityChange >= 0
+                ? 'procurement_in'
+                : 'adjustment',
+              quantity_change: quantityChange,
+              stock_before: null,
+              stock_after: null,
+              reference_id: item.reference_id || null,
+              reference_type: isProcurement ? 'procurement' : 'order',
+              reason: item.reason || null,
+              created_at: item.created_at,
+            };
+          });
+
+      let movementEntries = [];
+      try {
+        const response = await adminApiClient.get(`/admin/products/${productId}/stock-history?limit=100`);
+        if (response?.status === 200) {
+          const data = response.data;
+          movementEntries = toRelevantMovements(data?.data?.movements || []);
+        }
+      } catch (movementError) {
+        console.error('Failed to fetch stock movements endpoint:', movementError);
       }
+
+      let legacyEntries = [];
+      // Fallback compatibility: endpoint lama dipanggil hanya jika movement kosong.
+      if (movementEntries.length === 0) {
+        try {
+          const legacyResponse = await adminApiClient.get(`/admin/stock-history?product_id=${productId}&limit=100`);
+          if (legacyResponse?.status === 200) {
+            const legacyData = legacyResponse.data;
+            legacyEntries = normalizeLegacyHistory(legacyData?.data?.history || []);
+          }
+        } catch (legacyError) {
+          console.error('Failed to fetch legacy stock history endpoint:', legacyError);
+        }
+      }
+
+      const mergedHistory = [...movementEntries, ...legacyEntries]
+        .filter((item) => item.reference_type === 'procurement' || item.reference_type === 'order')
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      const dedupedHistory = mergedHistory.filter((item, index, array) => {
+        const key = `${item.reference_type}-${item.reference_id || ''}-${item.created_at}-${item.quantity_change}`;
+        return (
+          array.findIndex((entry) => {
+            const entryKey = `${entry.reference_type}-${entry.reference_id || ''}-${entry.created_at}-${entry.quantity_change}`;
+            return entryKey === key;
+          }) === index
+        );
+      });
+
+      setStockHistory(dedupedHistory);
     } catch (error) {
       console.error('Failed to fetch stock history:', error);
+      setStockHistory([]);
     } finally {
       setLoadingHistory(false);
     }
@@ -66,6 +136,7 @@ const ProductDetailModal = ({
   const productName = product.name || product.product_name;
   const categoryName = category.category_name;
   const hasImages = images.length > 0;
+  const shouldHideActiveStatusBadge = product.product_type === 'offline' && product.is_active;
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -81,6 +152,60 @@ const ProductDetailModal = ({
       currency: 'IDR',
       minimumFractionDigits: 0
     }).format(value || 0);
+  };
+
+  const formatQuantity = (value) => {
+    const parsed = Number(value || 0);
+    if (Number.isNaN(parsed)) return '0';
+    if (Number.isInteger(parsed)) return String(parsed);
+    return parsed.toFixed(2).replace(/\.?0+$/, '');
+  };
+
+  const getHistoryConfig = (item) => {
+    const quantity = Number(item.quantity_change || 0);
+    const isIncrease = quantity > 0;
+    const isProcurement =
+      item.reference_type === 'procurement' || item.movement_type === 'procurement_in';
+    const isOrder =
+      item.reference_type === 'order' || item.movement_type === 'sale_out';
+
+    if (isOrder) {
+      return {
+        title: 'Pengurangan dari Order',
+        source: 'Order',
+        icon: ArrowDownIcon,
+        iconClass: 'bg-red-100 text-red-600',
+        valueClass: 'text-red-600',
+      };
+    }
+
+    if (isProcurement) {
+      if (isIncrease) {
+        return {
+          title: 'Penambahan dari Procurement',
+          source: 'Procurement',
+          icon: ArrowUpIcon,
+          iconClass: 'bg-green-100 text-green-600',
+          valueClass: 'text-green-600',
+        };
+      }
+
+      return {
+        title: 'Pengurangan dari Procurement',
+        source: 'Procurement',
+        icon: ArrowDownIcon,
+        iconClass: 'bg-orange-100 text-orange-600',
+        valueClass: 'text-orange-600',
+      };
+    }
+
+    return {
+      title: item.movement_type || 'Perubahan Stok',
+      source: item.reference_type || 'Sistem',
+      icon: ClockIcon,
+      iconClass: 'bg-gray-100 text-gray-600',
+      valueClass: quantity >= 0 ? 'text-green-600' : 'text-red-600',
+    };
   };
 
   const getStockBadge = () => {
@@ -252,13 +377,15 @@ const ProductDetailModal = ({
                     </h2>
                     <div className="flex items-center gap-3">
                       {getStockBadge()}
-                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                        product.is_active
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-700'
-                      }`}>
-                        {product.is_active ? 'Aktif' : 'Nonaktif'}
-                      </span>
+                      {!shouldHideActiveStatusBadge && (
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                          product.is_active
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}>
+                          {product.is_active ? 'Aktif' : 'Nonaktif'}
+                        </span>
+                      )}
                       <span className={`px-3 py-1 text-xs font-medium rounded-full ${
                         product.product_type === 'online'
                           ? 'bg-blue-100 text-blue-700'
@@ -398,41 +525,47 @@ const ProductDetailModal = ({
                   <div className="space-y-3">
                     {stockHistory.map((item, index) => (
                       <div key={item.id || index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-full ${
-                            item.change_type === 'procurement' 
-                              ? 'bg-green-100 text-green-600'
-                              : item.change_type === 'order'
-                              ? 'bg-red-100 text-red-600'
-                              : 'bg-blue-100 text-blue-600'
-                          }`}>
-                            {item.change_type === 'procurement' ? (
-                              <ArrowUpIcon className="w-4 h-4" />
-                            ) : item.change_type === 'order' ? (
-                              <ArrowDownIcon className="w-4 h-4" />
-                            ) : (
-                              <ClockIcon className="w-4 h-4" />
-                            )}
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">
-                              {item.reason || `${item.change_type} - ${item.quantity_change > 0 ? 'Penambahan' : 'Pengurangan'} ${Math.abs(item.quantity_change)}`}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {new Date(item.created_at).toLocaleString('id-ID')}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className={`text-sm font-medium ${
-                            item.quantity_change > 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {item.quantity_change > 0 ? '+' : ''}{item.quantity_change}
-                          </p>
-                          <p className="text-xs text-gray-500 capitalize">
-                            {item.change_type}
-                          </p>
-                        </div>
+                        {(() => {
+                          const historyConfig = getHistoryConfig(item);
+                          const QuantityIcon = historyConfig.icon;
+                          const quantityValue = Number(item.quantity_change || 0);
+                          const referenceLabel = item.reference_id
+                            ? `${historyConfig.source} #${String(item.reference_id).slice(0, 8)}`
+                            : historyConfig.source;
+
+                          return (
+                            <>
+                              <div className="flex items-center gap-3">
+                                <div className={`p-2 rounded-full ${historyConfig.iconClass}`}>
+                                  <QuantityIcon className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {historyConfig.title}
+                                  </p>
+                                  {item.reason && (
+                                    <p className="text-xs text-gray-600">
+                                      {item.reason}
+                                    </p>
+                                  )}
+                                  <p className="text-xs text-gray-500">
+                                    {new Date(item.created_at).toLocaleString('id-ID')} - {referenceLabel}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className={`text-sm font-medium ${historyConfig.valueClass}`}>
+                                  {quantityValue > 0 ? '+' : ''}{formatQuantity(quantityValue)}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {item.stock_before !== null && item.stock_after !== null
+                                    ? `Stok: ${formatQuantity(item.stock_before)} -> ${formatQuantity(item.stock_after)}`
+                                    : 'Stok: -'}
+                                </p>
+                              </div>
+                            </>
+                          );
+                        })()}
                       </div>
                     ))}
                   </div>

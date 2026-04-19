@@ -5,7 +5,6 @@
 
 const { sequelize } = require("../config/database");
 const { getWIBDate } = require("../utils/dateHelper");
-const stockMovementService = require("../services/stockMovementService");
 const {
   Order,
   OrderItem,
@@ -13,7 +12,9 @@ const {
   OrderStatusHistory,
   Cart,
   PaymentDetail,
+  StockMovement,
   StockHistory,
+  Admin,
 } = require("../models");
 
 /**
@@ -149,6 +150,7 @@ const createOrder = async (req, res) => {
     // Calculate totals and prepare order items
     let itemSubtotal = 0;
     const orderItemsData = [];
+    const orderStockMovements = [];
 
     for (const item of items) {
       // Validate item structure
@@ -264,6 +266,13 @@ const createOrder = async (req, res) => {
 
       // Update stock (support decimal quantities like 0.5 kg)
       const newStock = currentStock - quantity;
+      orderStockMovements.push({
+        product_id: item.product_id,
+        quantity,
+        stock_before: currentStock,
+        stock_after: newStock,
+      });
+
       await product.update(
         {
           total_stock: newStock,
@@ -356,7 +365,6 @@ const createOrder = async (req, res) => {
 
     // Create order status history
     // Cari system admin untuk automatic status history (bukan dari customer action)
-    const Admin = require("../models").Admin;
     const systemAdmin = await Admin.findOne({
       attributes: ["id"],
       where: { full_name: "Super Admin" },
@@ -425,30 +433,60 @@ const createOrder = async (req, res) => {
     // ========================================
     // Log each item as a "sale_out" stock movement
     try {
-      for (const item of items) {
-        const quantity = parseFloat(item.quantity);
-        await stockMovementService.logStockMovement({
-          product_id: item.product_id,
-          movement_type: "sale_out",
-          quantity_change: -quantity, // Negative because it's a reduction
-          created_by: "67ff125f-d9e6-42a7-93a6-f212f9db890d", // Use admin ID for stock movements
-          reference_id: order.id,
-          reference_type: "order",
-        });
+      const stockActorId =
+        changedBy ||
+        (
+          await Admin.findOne({
+            attributes: ["id"],
+            order: [["created_at", "ASC"]],
+          })
+        )?.id;
+
+      for (const movement of orderStockMovements) {
+        if (stockActorId) {
+          try {
+            await StockMovement.create({
+              product_id: movement.product_id,
+              movement_type: "sale_out",
+              quantity_change: -movement.quantity,
+              stock_before: movement.stock_before,
+              stock_after: movement.stock_after,
+              reference_type: "order",
+              reference_id: order.id,
+              created_by: stockActorId,
+              created_at: getWIBDate(),
+            });
+          } catch (movementError) {
+            console.error(
+              `[ORDER ${order.order_number}] Failed to log StockMovement for product ${movement.product_id}:`,
+              movementError.message
+            );
+          }
+        }
 
         // Also log in StockHistory
         try {
           await StockHistory.create({
-            product_id: item.product_id,
+            product_id: movement.product_id,
             change_type: "order",
-            quantity_change: -quantity,
+            quantity_change: -movement.quantity,
             reason: `Order ${order.order_number}`,
             reference_id: order.id,
           });
-          console.log(`[ORDER ${order.order_number}] StockHistory logged for product ${item.product_id}: -${quantity}`);
+          console.log(
+            `[ORDER ${order.order_number}] StockHistory logged for product ${movement.product_id}: -${movement.quantity}`
+          );
         } catch (historyError) {
-          console.error(`[ORDER ${order.order_number}] Failed to log StockHistory for product ${item.product_id}:`, historyError.message);
+          console.error(
+            `[ORDER ${order.order_number}] Failed to log StockHistory for product ${movement.product_id}:`,
+            historyError.message
+          );
         }
+      }
+      if (!stockActorId) {
+        console.warn(
+          `[ORDER ${order.order_number}] StockMovement skipped: no admin actor found`
+        );
       }
       console.log(`[ORDER ${order.order_number}] Stock movements logged successfully`);
     } catch (stockError) {

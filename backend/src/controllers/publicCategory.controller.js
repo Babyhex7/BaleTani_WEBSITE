@@ -270,7 +270,7 @@ const getCategoryById = async (req, res) => {
           ? discountInfo.finalPrice
           : parseFloat(productData.selling_price),
         stock: productData.total_stock,
-        unit: productData.quantity_info || "unit", // ✅ Added for consistency with publicProduct
+        unit: productData.quantity_info || "kg", // Default kg jika quantity_info belum diisi
         image:
           productData.images && productData.images.length > 0
             ? productData.images[0].image_url

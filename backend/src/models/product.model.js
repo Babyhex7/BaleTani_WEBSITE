@@ -40,9 +40,9 @@ const Product = sequelize.define(
       allowNull: false,
     },
     total_stock: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DECIMAL(10, 2),
       defaultValue: 0,
-      comment: "Jumlah stok yang ditampilkan ke customer",
+      comment: "Jumlah stok yang ditampilkan ke customer (support decimal, contoh 0.5 kg)",
     },
     is_active: {
       type: DataTypes.BOOLEAN,

@@ -88,6 +88,14 @@ const OrderCard = ({ order, onViewDetail, onReorder }) => {
     }).format(value);
   };
 
+  const formatQuantity = (value) => {
+    const numeric = Number(value || 0);
+    if (Number.isInteger(numeric)) {
+      return String(numeric);
+    }
+    return numeric.toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
+  };
+
   // Limit items to show
   const displayItems = items.slice(0, 3);
   const remainingItems = items.length - 3;
@@ -175,7 +183,7 @@ const OrderCard = ({ order, onViewDetail, onReorder }) => {
             <div className="flex-1 min-w-0">
               <h4 className="font-medium text-gray-900 truncate">{item.product_name}</h4>
               <p className="text-sm text-gray-600">
-                {item.quantity} {item.unit} × {formatCurrency(item.price)}
+                {formatQuantity(item.quantity)} {item.unit || 'kg'} × {formatCurrency(item.price)}
               </p>
             </div>
 

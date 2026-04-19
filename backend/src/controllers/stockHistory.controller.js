@@ -97,7 +97,8 @@ const createManual = async (req, res) => {
     });
 
     // Update product stock
-    const newStock = product.total_stock + parseFloat(quantity_change);
+    const currentStock = parseFloat(product.total_stock || 0);
+    const newStock = currentStock + parseFloat(quantity_change);
     await product.update({
       total_stock: Math.max(0, newStock), // Prevent negative stock
       updated_at: new Date(),

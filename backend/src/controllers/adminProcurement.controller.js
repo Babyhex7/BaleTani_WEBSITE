@@ -323,6 +323,18 @@ const createProcurement = async (req, res) => {
         },
         { transaction }
       );
+
+      // Record stock history (procurement add)
+      await StockHistory.create(
+        {
+          product_id: item.product_id,
+          change_type: "procurement",
+          quantity_change,
+          reason: `Procurement ${procurement.procurement_number} created`,
+          reference_id: procurement.id,
+        },
+        { transaction }
+      );
     }
 
     await transaction.commit();
@@ -428,6 +440,18 @@ const updateProcurement = async (req, res) => {
         },
         { transaction }
       );
+
+      // Record stock history (procurement reduce due update rollback)
+      await StockHistory.create(
+        {
+          product_id: oldItem.product_id,
+          change_type: "procurement",
+          quantity_change,
+          reason: `Procurement ${procurement.procurement_number} updated (rollback old item)`,
+          reference_id: procurement.id,
+        },
+        { transaction }
+      );
     }
 
     // Delete old items
@@ -496,6 +520,18 @@ const updateProcurement = async (req, res) => {
           reference_type: "procurement",
           reference_id: procurement.id,
           created_by: req.user.id,
+        },
+        { transaction }
+      );
+
+      // Record stock history (procurement add after update)
+      await StockHistory.create(
+        {
+          product_id: item.product_id,
+          change_type: "procurement",
+          quantity_change,
+          reason: `Procurement ${procurement.procurement_number} updated`,
+          reference_id: procurement.id,
         },
         { transaction }
       );
@@ -703,6 +739,18 @@ const rejectProcurement = async (req, res) => {
           reference_type: "procurement",
           reference_id: procurement.id,
           created_by: req.user.id,
+        },
+        { transaction }
+      );
+
+      // Record stock history (procurement reduce due rejection)
+      await StockHistory.create(
+        {
+          product_id: item.product_id,
+          change_type: "procurement",
+          quantity_change,
+          reason: `Procurement ${procurement.procurement_number} rejected`,
+          reference_id: procurement.id,
         },
         { transaction }
       );

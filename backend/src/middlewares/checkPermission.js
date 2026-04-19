@@ -19,8 +19,8 @@ const { Admin, Role, Permission, RolePermission } = require("../models");
 const checkPermission = (module, action) => {
   return async (req, res, next) => {
     try {
-      // Ambil admin dari request (sudah di-set oleh authenticateAdmin middleware)
-      const adminId = req.admin?.id;
+      // Ambil admin dari request (modern: req.user, legacy: req.admin)
+      const adminId = req.user?.id || req.admin?.id;
 
       if (!adminId) {
         return res.status(401).json({
@@ -49,6 +49,7 @@ const checkPermission = (module, action) => {
       // Super Admin punya akses ke semua
       if (admin.role.role_name === "super_admin") {
         req.userRole = admin.role.role_name;
+        req.admin = req.admin || req.user;
         return next();
       }
 
@@ -83,6 +84,9 @@ const checkPermission = (module, action) => {
 
       // Simpan info role di request untuk dipakai controller
       req.userRole = admin.role.role_name;
+      if (!req.admin && req.user) {
+        req.admin = req.user;
+      }
 
       next();
     } catch (error) {

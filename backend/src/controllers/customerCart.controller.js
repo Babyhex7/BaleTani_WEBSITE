@@ -117,7 +117,7 @@ exports.getCart = async (req, res) => {
         price: parseFloat(product.selling_price),
         finalPrice: finalPrice,
         stock: product.total_stock,
-        unit: product.quantity_info || "unit", // ✅ Added for consistency
+        unit: product.quantity_info || "kg", // Default ke kg jika belum diisi
         quantityInfo: product.quantity_info, // ✅ Added for consistency
         quantity: parseFloat(item.quantity),
         subtotal: subtotal,
@@ -172,22 +172,23 @@ exports.addToCart = async (req, res) => {
   try {
     const customerId = req.customer.id;
     const { product_id, quantity } = req.body;
+    const parsedQty = parseFloat(quantity);
 
     // Validate input
-    if (!product_id || !quantity || quantity < 1) {
+    if (!product_id || Number.isNaN(parsedQty) || parsedQty <= 0) {
       await transaction.rollback();
       return res.status(400).json({
         success: false,
-        message: "Product ID and valid quantity are required",
+        message: "Product ID dan quantity valid wajib diisi (boleh desimal, contoh 0.5)",
       });
     }
 
-    // Validate quantity limit (max 100 per product)
-    if (quantity > 100) {
+    // Validate quantity limit
+    if (parsedQty > 1000) {
       await transaction.rollback();
       return res.status(400).json({
         success: false,
-        message: "Maksimal pembelian 100 item per produk",
+        message: "Maksimal pembelian 1000 per produk",
       });
     }
 
@@ -206,11 +207,12 @@ exports.addToCart = async (req, res) => {
       });
     }
 
-    if (product.total_stock < quantity) {
+    const currentStock = parseFloat(product.total_stock || 0);
+    if (currentStock < parsedQty) {
       await transaction.rollback();
       return res.status(400).json({
         success: false,
-        message: `Not enough stock. Available: ${product.total_stock}`,
+        message: `Not enough stock. Available: ${currentStock}`,
       });
     }
 
@@ -225,13 +227,13 @@ exports.addToCart = async (req, res) => {
 
     if (cartItem) {
       // Update quantity
-      const newQuantity = parseFloat(cartItem.quantity) + quantity;
+      const newQuantity = parseFloat(cartItem.quantity || 0) + parsedQty;
 
-      if (product.total_stock < newQuantity) {
+      if (currentStock < newQuantity) {
         await transaction.rollback();
         return res.status(400).json({
           success: false,
-          message: `Cannot add more. Maximum stock: ${product.total_stock}`,
+          message: `Cannot add more. Maximum stock: ${currentStock}`,
         });
       }
 
@@ -254,7 +256,7 @@ exports.addToCart = async (req, res) => {
         {
           customer_id: customerId,
           product_id: product_id,
-          quantity: quantity,
+          quantity: parsedQty,
         },
         { transaction }
       );
@@ -293,13 +295,14 @@ exports.updateCartItem = async (req, res) => {
     const customerId = req.customer.id;
     const { id } = req.params;
     const { quantity } = req.body;
+    const parsedQty = parseFloat(quantity);
 
     // Validate input
-    if (!quantity || quantity < 1) {
+    if (Number.isNaN(parsedQty) || parsedQty <= 0) {
       await transaction.rollback();
       return res.status(400).json({
         success: false,
-        message: "Valid quantity is required",
+        message: "Quantity valid wajib diisi (boleh desimal, contoh 0.5)",
       });
     }
 
@@ -329,18 +332,19 @@ exports.updateCartItem = async (req, res) => {
     }
 
     // Check stock
-    if (cartItem.product.total_stock < quantity) {
+    const currentStock = parseFloat(cartItem.product.total_stock || 0);
+    if (currentStock < parsedQty) {
       await transaction.rollback();
       return res.status(400).json({
         success: false,
         message: `Not enough stock. Available: ${
-          cartItem.product.total_stock
-        } ${cartItem.product.quantity_info || "unit"}`,
+          currentStock
+        } ${cartItem.product.quantity_info || "kg"}`,
       });
     }
 
     // Update quantity
-    cartItem.quantity = quantity;
+    cartItem.quantity = parsedQty;
     await cartItem.save({ transaction });
 
     await transaction.commit();

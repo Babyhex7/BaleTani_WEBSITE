@@ -99,6 +99,14 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
     }).format(value);
   };
 
+  const formatQuantity = (value) => {
+    const numeric = Number(value || 0);
+    if (Number.isInteger(numeric)) {
+      return String(numeric);
+    }
+    return numeric.toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
+  };
+
   // Status timeline mapping dengan Lucide icons
   const getStatusIcon = (status) => {
     const iconMap = {
@@ -293,7 +301,7 @@ const OrderDetailModal = ({ order, onClose, onReorder, onCancel }) => {
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900">{item.product_name}</h4>
                     <p className="text-sm text-gray-600">
-                      {item.quantity} {item.unit} × {formatCurrency(item.price)}
+                      {formatQuantity(item.quantity)} {item.unit || 'kg'} × {formatCurrency(item.price)}
                     </p>
                   </div>
                   <div className="text-right">

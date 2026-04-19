@@ -320,13 +320,16 @@ const create = async (req, res) => {
     }
 
     // Parse initial stock (default 0 if not provided)
-    const initialStockValue = initial_stock ? parseInt(initial_stock, 10) : 0;
+    const initialStockValue =
+      initial_stock !== undefined && initial_stock !== null && initial_stock !== ""
+        ? parseFloat(initial_stock)
+        : 0;
 
-    // Validate initial stock (must be >= 0 and integer)
-    if (initialStockValue < 0 || !Number.isInteger(initialStockValue)) {
+    // Validate initial stock (must be >= 0 and numeric)
+    if (Number.isNaN(initialStockValue) || initialStockValue < 0) {
       return res.status(400).json({
         success: false,
-        message: "Stok awal harus berupa angka bulat positif",
+        message: "Stok awal harus berupa angka positif (boleh desimal, contoh 0.5)",
       });
     }
 

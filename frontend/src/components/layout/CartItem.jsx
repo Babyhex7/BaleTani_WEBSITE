@@ -8,6 +8,21 @@ import { getImageUrl } from '../../utils/imageUtils';
 
 const CartItem = ({ item, onUpdateQuantity, onRemove, disabled = false }) => {
 
+  const isWeightBasedItem = (unit) => {
+    const text = String(unit || '').toLowerCase();
+    return text.includes('kg') || text.includes('kilogram');
+  };
+
+  const quantityStep = isWeightBasedItem(item.unit) ? 0.5 : 1;
+
+  const formatQuantity = (value) => {
+    const numeric = Number(value || 0);
+    if (Number.isInteger(numeric)) {
+      return String(numeric);
+    }
+    return numeric.toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
+  };
+
   // Format price
   const formatPrice = (price) => {
     return new Intl.NumberFormat('id-ID', {
@@ -18,8 +33,8 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, disabled = false }) => {
   };
 
   const handleQuantityChange = (delta) => {
-    const newQuantity = item.quantity + delta;
-    if (newQuantity >= 1 && newQuantity <= item.stock) {
+    const newQuantity = Number((Number(item.quantity || 0) + delta * quantityStep).toFixed(2));
+    if (newQuantity >= quantityStep && newQuantity <= Number(item.stock || 0) + 1e-9) {
       onUpdateQuantity(item.id, newQuantity);
     }
   };
@@ -81,18 +96,21 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, disabled = false }) => {
               <button
                 data-cy="quantity-decrease"
                 onClick={() => handleQuantityChange(-1)}
-                disabled={disabled || item.quantity <= 1}
+                disabled={disabled || Number(item.quantity || 0) <= quantityStep}
                 className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <Minus size={14} className="sm:w-4 sm:h-4" />
               </button>
               <span data-cy="quantity-input" className="w-8 sm:w-10 text-center font-semibold text-sm sm:text-base">
-                {item.quantity}
+                {formatQuantity(item.quantity)}
               </span>
               <button
                 data-cy="quantity-increase"
                 onClick={() => handleQuantityChange(1)}
-                disabled={disabled || item.quantity >= item.stock}
+                disabled={
+                  disabled ||
+                  Number(item.quantity || 0) + quantityStep > Number(item.stock || 0) + 1e-9
+                }
                 className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <Plus size={14} className="sm:w-4 sm:h-4" />
@@ -101,7 +119,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, disabled = false }) => {
 
             {/* Stock Info - Compact on mobile */}
             <span className="text-xs sm:text-sm text-gray-500">
-              Maks. {item.stock}
+              Maks. {formatQuantity(item.stock)} {item.unit || 'kg'}
             </span>
 
             {/* Remove Button - Icon only on mobile */}

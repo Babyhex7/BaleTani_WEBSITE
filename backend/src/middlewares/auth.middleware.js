@@ -69,6 +69,9 @@ const authenticateAdmin = async (req, res, next) => {
       type: "admin", // Distinguish from customer
     };
 
+    // Backward compatibility: some legacy middlewares still read req.admin
+    req.admin = req.user;
+
     next();
   } catch (error) {
     console.error("Admin auth middleware error:", error);

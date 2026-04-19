@@ -16,6 +16,8 @@ const {
   Discount,
   Admin,
   PaymentDetail,
+  StockMovement,
+  StockHistory,
 } = require("../models");
 
 /**
@@ -733,8 +735,19 @@ const createOfflineOrder = async (req, res) => {
     // Calculate totals from items
     let subtotal = 0;
     const orderItems = [];
+    const orderStockMovements = [];
 
     for (const item of items) {
+      const qty = parseFloat(item.quantity);
+
+      if (!item.product_id || Number.isNaN(qty) || qty <= 0) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: "Setiap item wajib punya product_id dan quantity valid (boleh desimal, contoh 0.5)",
+        });
+      }
+
       const product = await Product.findByPk(item.product_id, { transaction });
 
       if (!product) {
@@ -746,11 +759,12 @@ const createOfflineOrder = async (req, res) => {
       }
 
       // Check stock
-      if (product.total_stock < item.quantity) {
+      const currentStock = parseFloat(product.total_stock || 0);
+      if (currentStock < qty) {
         await transaction.rollback();
         return res.status(400).json({
           success: false,
-          message: `Stok ${product.name} tidak mencukupi. Tersedia: ${product.total_stock}`,
+          message: `Stok ${product.name} tidak mencukupi. Tersedia: ${currentStock}`,
         });
       }
 
@@ -784,7 +798,6 @@ const createOfflineOrder = async (req, res) => {
         discountValue = Math.round((originalPrice - finalPrice) * 100) / 100;
       }
 
-      const qty = parseFloat(item.quantity);
       const itemSubtotal = Math.round(finalPrice * qty * 100) / 100;
 
       subtotal += itemSubtotal;
@@ -849,12 +862,23 @@ const createOfflineOrder = async (req, res) => {
 
       // Update product stock
       const product = await Product.findByPk(item.product_id, { transaction });
+      const stockBefore = parseFloat(product.total_stock || 0);
+      const quantityChange = parseFloat(item.quantity);
+      const stockAfter = stockBefore - quantityChange;
+
       await product.update(
         {
-          total_stock: product.total_stock - item.quantity,
+          total_stock: stockAfter,
         },
         { transaction }
       );
+
+      orderStockMovements.push({
+        product_id: item.product_id,
+        quantity_change: quantityChange,
+        stock_before: stockBefore,
+        stock_after: stockAfter,
+      });
     }
 
     // Create status history
@@ -881,6 +905,37 @@ const createOfflineOrder = async (req, res) => {
       },
       { transaction }
     );
+
+    // Log stock reduction history for offline order (order hanya mencatat pengurangan)
+    for (const movement of orderStockMovements) {
+      await StockMovement.create(
+        {
+          product_id: movement.product_id,
+          movement_type: "sale_out",
+          quantity_change: -movement.quantity_change,
+          stock_before: movement.stock_before,
+          stock_after: movement.stock_after,
+          reference_type: "order",
+          reference_id: order.id,
+          created_by: adminId,
+          created_at: getWIBDate(),
+        },
+        { transaction }
+      );
+
+      await StockHistory.create(
+        {
+          product_id: movement.product_id,
+          change_type: "order",
+          quantity_change: -movement.quantity_change,
+          reason: `Order ${order.order_number}`,
+          reference_id: order.id,
+          created_at: getWIBDate(),
+          updated_at: getWIBDate(),
+        },
+        { transaction }
+      );
+    }
 
     // Commit transaction
     await transaction.commit();

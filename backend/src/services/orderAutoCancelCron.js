@@ -73,9 +73,11 @@ const autoCancelExpiredOrders = async () => {
             });
 
             if (product) {
+              const currentStock = parseFloat(product.total_stock || 0);
+              const restoreQty = parseFloat(item.quantity || 0);
               await product.update(
                 {
-                  total_stock: product.total_stock + item.quantity,
+                  total_stock: currentStock + restoreQty,
                   updated_at: now,
                 },
                 { transaction }

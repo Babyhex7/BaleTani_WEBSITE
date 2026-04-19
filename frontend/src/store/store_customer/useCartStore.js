@@ -6,6 +6,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+const normalizeQuantity = (value) => {
+  const numeric = parseFloat(value);
+  if (Number.isNaN(numeric) || numeric <= 0) {
+    return 0;
+  }
+  return Math.round(numeric * 100) / 100;
+};
+
 const useCartStore = create(
   persist(
     (set, get) => ({
@@ -14,7 +22,10 @@ const useCartStore = create(
 
       // Computed values (as functions)
       getTotalItems: () => {
-        return get().items.reduce((total, item) => total + item.quantity, 0);
+        return get().items.reduce(
+          (total, item) => total + normalizeQuantity(item.quantity),
+          0
+        );
       },
 
       getTotalPrice: () => {
@@ -28,11 +39,17 @@ const useCartStore = create(
       addItem: (product, quantity = 1) => {
         const items = get().items;
         const existingItem = items.find((item) => item.id === product.id);
+        const qtyToAdd = normalizeQuantity(quantity);
+
+        if (qtyToAdd <= 0) {
+          return;
+        }
 
         if (existingItem) {
           // ✅ CRITICAL FIX: Enforce stock limit when adding to existing item
-          const newQuantity = existingItem.quantity + quantity;
-          const maxAllowed = product.stock || existingItem.stock;
+          const existingQty = normalizeQuantity(existingItem.quantity);
+          const newQuantity = normalizeQuantity(existingQty + qtyToAdd);
+          const maxAllowed = normalizeQuantity(product.stock || existingItem.stock);
 
           // Prevent exceeding stock
           if (newQuantity > maxAllowed) {
@@ -43,7 +60,7 @@ const useCartStore = create(
             set({
               items: items.map((item) =>
                 item.id === product.id
-                  ? { ...item, quantity: maxAllowed }
+                  ? { ...item, quantity: normalizeQuantity(maxAllowed) }
                   : item
               ),
             });
@@ -82,9 +99,9 @@ const useCartStore = create(
                   product.discount?.finalPrice ||
                   product.price,
                 discount: product.discount,
-                quantity,
+                quantity: qtyToAdd,
                 stock: product.stock,
-                unit: product.unit || product.quantityInfo || "unit",
+                unit: product.unit || product.quantityInfo || "kg",
               },
             ],
           });
@@ -98,7 +115,9 @@ const useCartStore = create(
       },
 
       updateQuantity: (productId, quantity) => {
-        if (quantity <= 0) {
+        const normalized = normalizeQuantity(quantity);
+
+        if (normalized <= 0) {
           get().removeItem(productId);
           return;
         }
@@ -106,7 +125,12 @@ const useCartStore = create(
         set({
           items: get().items.map((item) =>
             item.id === productId
-              ? { ...item, quantity: Math.min(quantity, item.stock) }
+              ? {
+                  ...item,
+                  quantity: normalizeQuantity(
+                    Math.min(normalized, normalizeQuantity(item.stock))
+                  ),
+                }
               : item
           ),
         });

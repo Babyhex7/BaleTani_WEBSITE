@@ -77,6 +77,26 @@ const useAddToCart = () => {
   // Get addItem function dari Cart Store
   const addItem = useCartStore((state) => state.addItem);
 
+  const normalizeQty = (value) => {
+    const numeric = parseFloat(value);
+    if (Number.isNaN(numeric)) {
+      return 0;
+    }
+    return Math.round(numeric * 100) / 100;
+  };
+
+  const formatQty = (value) => {
+    const numeric = normalizeQty(value);
+    if (Number.isInteger(numeric)) {
+      return String(numeric);
+    }
+    return numeric.toFixed(2).replace(/\.00$/, "").replace(/0$/, "");
+  };
+
+  const getUnitLabel = (product) => {
+    return product?.unit || product?.quantityInfo || "kg";
+  };
+
   /**
    * Handler untuk add to cart dengan berbagai validasi
    * Returns event handler function untuk button onClick
@@ -110,6 +130,8 @@ const useAddToCart = () => {
   ) => {
     // Return event handler function
     return async (e) => {
+      const requestedQty = normalizeQty(quantity);
+
       // ========================================
       // STEP 0: EVENT HANDLING
       // ========================================
@@ -185,7 +207,7 @@ const useAddToCart = () => {
       if (
         product.stock === undefined ||
         product.stock === null ||
-        product.stock === 0
+        parseFloat(product.stock) === 0
       ) {
         console.log("⚠️ Product out of stock:", product.name);
 
@@ -197,24 +219,29 @@ const useAddToCart = () => {
       // ========================================
       // STEP 4: VALIDASI QUANTITY VS STOCK
       // ========================================
-      if (quantity > product.stock) {
+      const availableStock = normalizeQty(product.stock);
+      const unitLabel = getUnitLabel(product);
+
+      if (requestedQty > availableStock) {
         console.log(
           "⚠️ Insufficient stock. Requested:",
-          quantity,
+          requestedQty,
           "Available:",
-          product.stock
+          availableStock
         );
 
-        toast.error(`Stok tidak mencukupi. Tersedia: ${product.stock} unit`);
+        toast.error(
+          `Stok tidak mencukupi. Tersedia: ${formatQty(availableStock)} ${unitLabel}`
+        );
 
         return; // Stop execution
       }
 
       // Validasi quantity minimal
-      if (quantity < 1) {
-        console.log("⚠️ Invalid quantity:", quantity);
+      if (requestedQty <= 0) {
+        console.log("⚠️ Invalid quantity:", requestedQty);
 
-        toast.error("Jumlah minimal pembelian adalah 1");
+        toast.error(`Jumlah minimal pembelian adalah lebih dari 0 ${unitLabel}`);
 
         return; // Stop execution
       }
@@ -229,25 +256,29 @@ const useAddToCart = () => {
       );
 
       if (existingCartItem) {
-        const newTotalQuantity = existingCartItem.quantity + quantity;
+        const newTotalQuantity = normalizeQty(
+          normalizeQty(existingCartItem.quantity) + requestedQty
+        );
 
-        if (newTotalQuantity > product.stock) {
+        if (newTotalQuantity > availableStock) {
           console.log("⚠️ Adding would exceed stock:", {
             currentInCart: existingCartItem.quantity,
-            tryingToAdd: quantity,
+            tryingToAdd: requestedQty,
             newTotal: newTotalQuantity,
-            maxStock: product.stock,
+            maxStock: availableStock,
           });
 
-          const remaining = product.stock - existingCartItem.quantity;
+          const remaining = normalizeQty(
+            availableStock - normalizeQty(existingCartItem.quantity)
+          );
 
           if (remaining <= 0) {
             toast.error(
-              `${product.name} sudah maksimal di keranjang (${product.stock} unit)`
+              `${product.name} sudah maksimal di keranjang (${formatQty(availableStock)} ${unitLabel})`
             );
           } else {
             toast.error(
-              `Hanya bisa menambah ${remaining} unit lagi. Stok maksimal: ${product.stock}`
+              `Hanya bisa menambah ${formatQty(remaining)} ${unitLabel} lagi. Stok maksimal: ${formatQty(availableStock)} ${unitLabel}`
             );
           }
 
@@ -264,8 +295,8 @@ const useAddToCart = () => {
 
         console.log("🛒 Adding to cart:", {
           product: product.name,
-          quantity,
-          stock: product.stock,
+          quantity: requestedQty,
+          stock: availableStock,
           currentInCart: existingCartItem?.quantity || 0,
         });
 
@@ -274,17 +305,14 @@ const useAddToCart = () => {
         // - Merge jika produk sudah ada
         // - Simpan ke localStorage
         // - Update total items & price
-        addItem(product, quantity);
+        addItem(product, requestedQty);
 
         // ========================================
         // SUCCESS NOTIFICATION (Skip if silent mode)
         // ========================================
         if (!silent) {
           // Format pesan sesuai quantity
-          const message =
-            quantity === 1
-              ? `${product.name} ditambahkan ke keranjang!`
-              : `${product.name} (${quantity}x) ditambahkan ke keranjang!`;
+          const message = `${product.name} (${formatQty(requestedQty)} ${unitLabel}) ditambahkan ke keranjang!`;
 
           toast.success(message);
         }

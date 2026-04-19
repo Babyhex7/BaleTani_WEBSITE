@@ -531,7 +531,7 @@ const getInventoryReport = async (req, res) => {
     const totalProducts = products.length;
     const totalStockValue = products.reduce((sum, p) => {
       const price = parseFloat(p.selling_price) || 0;
-      const stock = parseInt(p.total_stock) || 0;
+      const stock = parseFloat(p.total_stock) || 0;
       return sum + stock * price;
     }, 0);
     const outOfStock = products.filter((p) => p.total_stock === 0).length;
@@ -599,7 +599,7 @@ const getInventoryReport = async (req, res) => {
         const type = movement.movement_type;
         if (movementSummary[type]) {
           movementSummary[type].count++;
-          movementSummary[type].quantity += Math.abs(parseInt(movement.quantity) || 0);
+          movementSummary[type].quantity += Math.abs(parseFloat(movement.quantity) || 0);
         }
       });
     }
@@ -621,7 +621,7 @@ const getInventoryReport = async (req, res) => {
       }
 
       const price = parseFloat(p.selling_price) || 0;
-      const stock = parseInt(p.total_stock) || 0;
+      const stock = parseFloat(p.total_stock) || 0;
 
       categoryStats[catId].total_products++;
       categoryStats[catId].total_stock += stock;
@@ -641,17 +641,17 @@ const getInventoryReport = async (req, res) => {
     const typeBreakdown = {
       online: {
         count: onlineProducts.length,
-        stock: onlineProducts.reduce((sum, p) => sum + (parseInt(p.total_stock) || 0), 0),
+        stock: onlineProducts.reduce((sum, p) => sum + (parseFloat(p.total_stock) || 0), 0),
         value: onlineProducts.reduce(
-          (sum, p) => sum + (parseInt(p.total_stock) || 0) * (parseFloat(p.selling_price) || 0),
+          (sum, p) => sum + (parseFloat(p.total_stock) || 0) * (parseFloat(p.selling_price) || 0),
           0
         ),
       },
       offline: {
         count: offlineProducts.length,
-        stock: offlineProducts.reduce((sum, p) => sum + (parseInt(p.total_stock) || 0), 0),
+        stock: offlineProducts.reduce((sum, p) => sum + (parseFloat(p.total_stock) || 0), 0),
         value: offlineProducts.reduce(
-          (sum, p) => sum + (parseInt(p.total_stock) || 0) * (parseFloat(p.selling_price) || 0),
+          (sum, p) => sum + (parseFloat(p.total_stock) || 0) * (parseFloat(p.selling_price) || 0),
           0
         ),
       },
@@ -661,7 +661,7 @@ const getInventoryReport = async (req, res) => {
 
     // Format products list
     const productsList = products.map((p) => {
-      const stock = parseInt(p.total_stock) || 0;
+      const stock = parseFloat(p.total_stock) || 0;
       const price = parseFloat(p.selling_price) || 0;
       
       return {
@@ -685,7 +685,7 @@ const getInventoryReport = async (req, res) => {
       product_name: m.product?.name || "N/A",
       product_unit: m.product?.quantity_info || "-",
       movement_type: m.movement_type,
-      quantity: parseInt(m.quantity) || 0,
+      quantity: parseFloat(m.quantity) || 0,
       movement_date: m.movement_date,
       notes: m.notes || "-",
       creator_name: m.creator?.username || "System",

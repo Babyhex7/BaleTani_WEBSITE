@@ -17,13 +17,13 @@ import useCartStore from '../../store/store_customer/useCartStore';
 const CartPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
-  const { items, updateQuantity, removeItem, clearCart, getTotalItems, getTotalPrice } = useCartStore();
+  const { items, updateQuantity, removeItem, clearCart, getTotalPrice } = useCartStore();
   
   const [loading, setLoading] = useState(false);
   const [showClearModal, setShowClearModal] = useState(false);
 
   // Calculate totals
-  const totalItems = getTotalItems();
+  const totalItems = items.length;
   const totalPrice = getTotalPrice();
 
   // Redirect if not authenticated

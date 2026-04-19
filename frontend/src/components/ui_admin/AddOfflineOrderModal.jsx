@@ -54,6 +54,23 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
   const [showProductModal, setShowProductModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const isWeightBasedUnit = (unitText) => {
+    const text = String(unitText || '').toLowerCase();
+    return text.includes('kg') || text.includes('kilogram');
+  };
+
+  const getQuantityStep = (unitText) => (isWeightBasedUnit(unitText) ? 0.5 : 1);
+
+  const getDefaultQuantity = (unitText) => getQuantityStep(unitText);
+
+  const formatQuantity = (value) => {
+    const numeric = Number(value || 0);
+    if (Number.isInteger(numeric)) {
+      return String(numeric);
+    }
+    return numeric.toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
+  };
+
   // Fetch products when modal opens
   useEffect(() => {
     if (isOpen) {
@@ -152,14 +169,17 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
   // Select product from modal
   const selectProduct = (product) => {
     const price = typeof product.selling_price === "number" ? product.selling_price : Number(product.selling_price) || 0;
+    const unit = product.quantity_info || 'kg';
+    const defaultQty = getDefaultQuantity(unit);
     
     // Add new item with selected product
     const newItem = {
       product_id: product.id,
       product_name: product.name,
-      quantity: 1,
+      unit,
+      quantity: defaultQty,
       price: price,
-      subtotal: price * 1
+      subtotal: price * defaultQty
     };
     
     setItems([...items, newItem]);
@@ -177,15 +197,18 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
       const product = products.find((p) => p.id === value);
       if (product) {
         const price = typeof product.selling_price === "number" ? product.selling_price : Number(product.selling_price) || 0;
+        const unit = product.quantity_info || 'kg';
         newItems[index].price = price;
         newItems[index].product_name = product.name;
+        newItems[index].unit = unit;
         newItems[index].subtotal = price * newItems[index].quantity;
       }
     }
 
     // Update subtotal when quantity changes
     if (field === "quantity") {
-      newItems[index].subtotal = newItems[index].price * value;
+      const parsedQty = Number(value || 0);
+      newItems[index].subtotal = newItems[index].price * parsedQty;
     }
 
     setItems(newItems);
@@ -239,6 +262,17 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
         return;
       }
 
+      const hasInvalidQty = items.some((item) => {
+        const qty = parseFloat(item.quantity);
+        return !item.product_id || Number.isNaN(qty) || qty <= 0;
+      });
+
+      if (hasInvalidQty) {
+        toast.error("Setiap item harus memiliki produk dan quantity valid (boleh desimal, contoh 0.5)");
+        setLoading(false);
+        return;
+      }
+
       const orderData = {
         customer_name: customerName,
         customer_phone: customerPhone,
@@ -251,7 +285,7 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
         admin_notes: adminNotes,
         items: items.map((item) => ({
           product_id: item.product_id,
-          quantity: parseInt(item.quantity),
+          quantity: parseFloat(item.quantity),
         })),
       };
 
@@ -580,20 +614,24 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                         onChange={(e) => {
                           const value = e.target.value;
                           // Allow empty string untuk bisa hapus angka
+                          const parsed = parseFloat(value);
                           updateItem(
                             index,
                             "quantity",
-                            value === '' ? '' : parseInt(value) || 0
+                            value === '' ? '' : Number.isNaN(parsed) ? 0 : parsed
                           );
                         }}
                         onBlur={(e) => {
-                          // Saat blur, jika kosong atau 0, set ke 1
-                          if (e.target.value === '' || parseInt(e.target.value) === 0) {
-                            updateItem(index, "quantity", 1);
+                          const minQty = getDefaultQuantity(item.unit);
+                          const parsed = parseFloat(e.target.value);
+                          // Saat blur, jika kosong/invalid, reset ke minimal sesuai unit
+                          if (e.target.value === '' || Number.isNaN(parsed) || parsed <= 0) {
+                            updateItem(index, "quantity", minQty);
                           }
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
-                        min="1"
+                        min={getDefaultQuantity(item.unit)}
+                        step={getQuantityStep(item.unit)}
                         required
                       />
                     </div>
@@ -851,7 +889,7 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                             </span>
                             <span className="flex items-center gap-1">
                               <CubeIcon className="w-4 h-4" />
-                              Stok: {product.total_stock || 0}
+                              Stok: {formatQuantity(product.total_stock || 0)} {product.quantity_info || 'kg'}
                             </span>
                           </div>
                         </div>

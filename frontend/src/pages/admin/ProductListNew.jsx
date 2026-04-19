@@ -311,6 +311,18 @@ const ProductListNew = () => {
     );
   };
 
+  const shouldHideActiveStatusBadge = (product) => {
+    return product?.product_type === 'offline' && product?.is_active;
+  };
+
+  const renderProductStatusBadge = (product) => {
+    if (shouldHideActiveStatusBadge(product)) {
+      return null;
+    }
+
+    return getStatusBadge(product?.is_active);
+  };
+
   return (
     <div className="flex min-h-screen bg-white">
       <AdminSidebarNew />
@@ -522,7 +534,7 @@ const ProductListNew = () => {
                           <td className="px-6 py-4">
                             {getStockBadge(product.total_stock)}
                           </td>
-                          <td className="px-6 py-4">{getStatusBadge(product.is_active)}</td>
+                          <td className="px-6 py-4">{renderProductStatusBadge(product)}</td>
                           <td className="px-6 py-4">
                             <span className={`px-3 py-1 text-xs font-medium rounded-full ${
                               product.product_type === 'online' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
@@ -580,7 +592,7 @@ const ProductListNew = () => {
                               <h3 className="text-sm font-semibold text-gray-900 mb-1">{productName}</h3>
                               <p className="text-xs text-gray-500 mb-2">{product.unit}</p>
                               <div className="flex items-center gap-2 flex-wrap">
-                                {getStatusBadge(product.is_active)}
+                                {renderProductStatusBadge(product)}
                                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                                   product.product_type === 'online' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
                                 }`}>

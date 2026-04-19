@@ -17,7 +17,7 @@ import { getImageUrl } from '../../utils/imageUtils';
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
-  const { items, clearCart, getTotalItems, getTotalPrice } = useCartStore();
+  const { items, clearCart, getTotalPrice } = useCartStore();
 
   const [pickupMethod, setPickupMethod] = useState('self_pickup');
   const [paymentMethod, setPaymentMethod] = useState('qris'); // Default QRIS - gunakan: 'cash', 'transfer', 'qris'
@@ -28,7 +28,7 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
 
   // Calculate totals
-  const totalItems = getTotalItems();
+  const totalItems = items.length;
   const totalPrice = getTotalPrice();
 
   // Redirect if not authenticated or cart empty
@@ -52,6 +52,14 @@ const CheckoutPage = () => {
       currency: 'IDR',
       minimumFractionDigits: 0
     }).format(price);
+  };
+
+  const formatQuantity = (value) => {
+    const numeric = Number(value || 0);
+    if (Number.isInteger(numeric)) {
+      return String(numeric);
+    }
+    return numeric.toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
   };
 
   // Handle create order
@@ -204,7 +212,9 @@ const CheckoutPage = () => {
 
                       {/* Quantity & Subtotal */}
                       <div className="text-right flex-shrink-0">
-                        <p className="text-xs sm:text-sm text-gray-600 mb-1">x {item.quantity}</p>
+                        <p className="text-xs sm:text-sm text-gray-600 mb-1">
+                          {formatQuantity(item.quantity)} {item.unit || 'kg'}
+                        </p>
                         <p className="font-semibold text-gray-900 text-sm sm:text-base lg:text-lg">
                           {formatPrice(item.finalPrice * item.quantity)}
                         </p>

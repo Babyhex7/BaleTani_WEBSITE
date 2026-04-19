@@ -12,7 +12,6 @@ import Footer from '../../components/layout/Footer';
 import LoginModal from '../../components/ui/LoginModal';
 import Button from '../../components/ui/Button';
 import useAuthStore from '../../store/store_customer/useAuthStore';
-import useCartStore from '../../store/store_customer/useCartStore';
 import useAddToCart from '../../hooks/hook_customer/useAddToCart'; // ✅ Import hook
 import productService from '../../services/services_customer/productService';
 import { getImageUrl as getImageUrlUtil } from '../../utils/imageUtils';
@@ -22,7 +21,6 @@ const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
-  const addItem = useCartStore((state) => state.addItem);
   
   // ✅ Use hook untuk consistent validation
   const { 
@@ -37,6 +35,33 @@ const ProductDetailPage = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
+  const isWeightBasedProduct = (targetProduct) => {
+    const unitText = String(
+      targetProduct?.unit || targetProduct?.quantityInfo || ''
+    ).toLowerCase();
+    return unitText.includes('kg') || unitText.includes('kilogram');
+  };
+
+  const getQuantityStep = (targetProduct) =>
+    isWeightBasedProduct(targetProduct) ? 0.5 : 1;
+
+  const formatQuantity = (value) => {
+    const numeric = Number(value || 0);
+    if (Number.isInteger(numeric)) {
+      return String(numeric);
+    }
+    return numeric.toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
+  };
+
+  const getDefaultQuantity = (targetProduct) => {
+    const step = getQuantityStep(targetProduct);
+    const stock = Number(targetProduct?.stock || 0);
+    if (stock <= 0) {
+      return step;
+    }
+    return Math.min(step, Math.round(stock * 100) / 100);
+  };
+
   // Fetch product detail
   useEffect(() => {
     const fetchProductDetail = async () => {
@@ -46,6 +71,7 @@ const ProductDetailPage = () => {
         
         if (response.success) {
           setProduct(response.data);
+          setQuantity(getDefaultQuantity(response.data));
         }
       } catch (error) {
         console.error('Error fetching product detail:', error);
@@ -71,8 +97,9 @@ const ProductDetailPage = () => {
 
   // Handle quantity change
   const handleQuantityChange = (delta) => {
-    const newQuantity = quantity + delta;
-    if (newQuantity >= 1 && newQuantity <= product.stock) {
+    const step = getQuantityStep(product);
+    const newQuantity = Number((quantity + delta * step).toFixed(2));
+    if (newQuantity >= step && newQuantity <= Number(product.stock || 0) + 1e-9) {
       setQuantity(newQuantity);
     }
   };
@@ -88,7 +115,7 @@ const ProductDetailPage = () => {
     hookHandleAddToCart(product, quantity, false)(); // Call returned function
     
     // Reset quantity setelah berhasil (delay sedikit)
-    setTimeout(() => setQuantity(1), 500);
+    setTimeout(() => setQuantity(getDefaultQuantity(product)), 500);
   };
 
   // ✅ Handle buy now - Direct redirect, no toast
@@ -172,6 +199,9 @@ const ProductDetailPage = () => {
     originalPrice,      // ✅ Harga asli
     savingsAmount       // ✅ Jumlah hemat (Rp)
   } = calculateDiscount(product);
+
+  const unitLabel = product.unit || product.quantityInfo || 'kg';
+  const quantityStep = getQuantityStep(product);
 
   return (
     <>
@@ -318,7 +348,7 @@ const ProductDetailPage = () => {
                 <div className="mb-4 sm:mb-6">
                   <span className="text-caption sm:text-sm text-gray-700">
                     Stok: <span className={`font-semibold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {product.stock > 0 ? `${product.stock}` : 'Habis'}
+                      {product.stock > 0 ? `${formatQuantity(product.stock)} ${unitLabel}` : 'Habis'}
                     </span>
                   </span>
                 </div>
@@ -327,30 +357,30 @@ const ProductDetailPage = () => {
                 {product.stock > 0 && (
                   <div className="mb-4 sm:mb-6">
                     <label className="block text-caption sm:text-sm font-medium text-gray-700 mb-2">
-                      Jumlah
+                      Jumlah ({unitLabel})
                     </label>
                     <div className="flex items-center gap-3">
                       <button
                         data-cy="quantity-decrease"
                         onClick={() => handleQuantityChange(-1)}
-                        disabled={quantity <= 1}
+                        disabled={quantity <= quantityStep}
                         className="btn-touch w-10 h-10 sm:w-12 sm:h-12 rounded-lg border border-gray-300 flex items-center justify-center text-lg font-semibold hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         -
                       </button>
                       <span data-cy="quantity-input" className="w-12 sm:w-16 text-center text-base sm:text-lg font-semibold">
-                        {quantity}
+                        {formatQuantity(quantity)}
                       </span>
                       <button
                         data-cy="quantity-increase"
                         onClick={() => handleQuantityChange(1)}
-                        disabled={quantity >= product.stock}
+                        disabled={quantity + quantityStep > Number(product.stock || 0) + 1e-9}
                         className="btn-touch w-10 h-10 sm:w-12 sm:h-12 rounded-lg border border-gray-300 flex items-center justify-center text-lg font-semibold hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         +
                       </button>
                       <span className="text-xs sm:text-sm text-gray-500 ml-2">
-                        Maks. {product.stock} 
+                        Maks. {formatQuantity(product.stock)} {unitLabel}
                       </span>
                     </div>
                   </div>

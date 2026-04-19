@@ -239,7 +239,7 @@ exports.getAllProducts = async (req, res) => {
         price: parseFloat(productData.selling_price),
         finalPrice: finalPrice, // ✅ Added for frontend
         stock: productData.total_stock,
-        unit: productData.quantity_info || "unit", // ✅ Added for frontend
+        unit: productData.quantity_info || "kg", // Default kg jika quantity_info belum diisi
         quantityInfo: productData.quantity_info, // ✅ Added for frontend
         shelfLifeDays: productData.shelf_life_days,
         category: productData.category
@@ -473,7 +473,7 @@ exports.getProductDetail = async (req, res) => {
       price: parseFloat(productData.selling_price),
       finalPrice: finalPrice, // ✅ Added for frontend
       stock: productData.total_stock,
-      unit: productData.quantity_info || "unit", // ✅ Added for frontend
+      unit: productData.quantity_info || "kg", // Default kg jika quantity_info belum diisi
       quantityInfo: productData.quantity_info, // ✅ Added for frontend
       shelfLifeDays: productData.shelf_life_days,
       category: productData.category
@@ -659,7 +659,7 @@ exports.getFeaturedProducts = async (req, res) => {
         price: parseFloat(productData.selling_price),
         finalPrice: finalPrice, // ✅ Added for consistency
         stock: productData.total_stock,
-        unit: productData.quantity_info || "unit", // ✅ Added for consistency
+        unit: productData.quantity_info || "kg", // Default kg jika quantity_info belum diisi
         quantityInfo: productData.quantity_info, // ✅ Added for consistency
         category: productData.category?.category_name,
         image: primaryImage?.image_url || "/placeholder-product.jpg",
@@ -803,7 +803,7 @@ exports.getProductById = async (req, res) => {
       price: product.selling_price,
       finalPrice: finalPrice, // ✅ Added for consistency
       stock: product.total_stock,
-      unit: product.quantity_info || "unit", // ✅ Added for consistency
+      unit: product.quantity_info || "kg", // Default kg jika quantity_info belum diisi
       quantityInfo: product.quantity_info, // ✅ Added for consistency
       weight: product.weight,
       category: {

@@ -21,6 +21,7 @@ function shouldIgnoreMigrationError(error) {
 
   // Allow rerun on partially migrated databases.
   const ignorableErrnos = new Set([
+    1050, // Table already exists
     1060, // Duplicate column name
     1061, // Duplicate key name
     1091, // Can't DROP ... check that column/key exists
@@ -31,6 +32,7 @@ function shouldIgnoreMigrationError(error) {
   }
 
   if (
+    message.includes("already exists") ||
     message.includes("duplicate column") ||
     message.includes("duplicate key") ||
     message.includes("check that column/key exists")

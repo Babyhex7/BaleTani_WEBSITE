@@ -167,7 +167,7 @@ exports.getCustomerOrders = async (req, res) => {
             {
               model: Product,
               as: "product",
-              attributes: ["id", "name", "selling_price", "total_stock"],
+              attributes: ["id", "name", "selling_price", "total_stock", "quantity_info"],
               include: [
                 {
                   model: ProductImage,
@@ -222,7 +222,7 @@ exports.getCustomerOrders = async (req, res) => {
             product_name: item.product_name,
             product_image: item.product?.images?.[0]?.image_url || null,
             quantity: parseFloat(item.quantity || 0),
-            unit: "pcs",
+            unit: item.product?.quantity_info || "kg",
             price: parseFloat(item.final_price ?? item.original_price ?? 0),
             subtotal: parseFloat(item.subtotal || 0),
           })),
@@ -282,7 +282,7 @@ exports.getOrderDetail = async (req, res) => {
             {
               model: Product,
               as: "product",
-              attributes: ["id", "name", "selling_price", "total_stock"],
+              attributes: ["id", "name", "selling_price", "total_stock", "quantity_info"],
               include: [
                 {
                   model: ProductImage,
@@ -346,7 +346,7 @@ exports.getOrderDetail = async (req, res) => {
           product_name: item.product_name,
           product_image: item.product?.images?.[0]?.image_url || null,
           quantity: parseFloat(item.quantity),
-          unit: "pcs", // Default unit (TODO: Nanti bisa tambah kolom unit di table products)
+          unit: item.product?.quantity_info || "kg",
           price: parseFloat(item.final_price ?? item.original_price ?? 0),
           subtotal: parseFloat(item.subtotal),
           product_stock: item.product?.total_stock || 0,
@@ -452,9 +452,12 @@ exports.reorderItems = async (req, res) => {
         continue;
       }
 
-      if ((product.total_stock ?? 0) < item.quantity) {
+      const currentStock = parseFloat(product.total_stock || 0);
+      const requestedQty = parseFloat(item.quantity || 0);
+
+      if (currentStock < requestedQty) {
         outOfStockItems.push(
-          `${item.product_name} (stok: ${product.total_stock ?? 0})`
+          `${item.product_name} (stok: ${currentStock})`
         );
         continue;
       }
@@ -469,15 +472,17 @@ exports.reorderItems = async (req, res) => {
 
       if (existingCartItem) {
         // Update quantity
+        const currentCartQty = parseFloat(existingCartItem.quantity || 0);
+        const addQty = parseFloat(item.quantity || 0);
         await existingCartItem.update({
-          quantity: existingCartItem.quantity + item.quantity,
+          quantity: currentCartQty + addQty,
         });
       } else {
         // Add new cart item
         await Cart.create({
           customer_id: customerId,
           product_id: product.id,
-          quantity: item.quantity,
+          quantity: parseFloat(item.quantity || 0),
         });
       }
 
@@ -707,9 +712,11 @@ exports.triggerManualCancel = async (req, res) => {
       });
 
       if (product) {
+        const currentStock = parseFloat(product.total_stock || 0);
+        const restoreQty = parseFloat(item.quantity || 0);
         await product.update(
           {
-            total_stock: product.total_stock + item.quantity,
+            total_stock: currentStock + restoreQty,
             updated_at: now,
           },
           { transaction }
