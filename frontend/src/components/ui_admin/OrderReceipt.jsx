@@ -299,7 +299,8 @@ Tipe     : ${order.order_type === "online" ? "Online" : "Offline"}
 
 Nama  : ${order.customer_name}
 Phone : ${order.customer_phone}
---------------------------------`}
+--------------------------------
+`}
           {order.orderItems && order.orderItems.length > 0
             ? order.orderItems
                 .map((item) => {
@@ -310,7 +311,7 @@ Phone : ${order.customer_phone}
                     1,
                     32 - qty.length - subtotal.length
                   );
-                  return `${productName}\n${qty}${" ".repeat(spacing)}${subtotal}`;
+                  return `${productName}\n${formatLine(qty, subtotal)}`;
                 })
                 .join("\n")
             : "No items"}
