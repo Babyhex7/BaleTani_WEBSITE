@@ -330,8 +330,13 @@ const createProcurement = async (req, res) => {
           product_id: item.product_id,
           change_type: "procurement",
           quantity_change,
+          previous_qty: stock_before,
+          new_qty: stock_after,
+          actor_id: req.user.id,
           reason: `Procurement ${procurement.procurement_number} created`,
           reference_id: procurement.id,
+          reference_type: "procurement",
+          idempotency_key: `${procurement.id}:${item.product_id}:procurement_create`,
         },
         { transaction }
       );
@@ -447,8 +452,13 @@ const updateProcurement = async (req, res) => {
           product_id: oldItem.product_id,
           change_type: "procurement",
           quantity_change,
+          previous_qty: stock_before,
+          new_qty: stock_after,
+          actor_id: req.user.id,
           reason: `Procurement ${procurement.procurement_number} updated (rollback old item)`,
           reference_id: procurement.id,
+          reference_type: "procurement",
+          idempotency_key: `${procurement.id}:${oldItem.product_id}:procurement_rollback_${oldItem.id}`,
         },
         { transaction }
       );
@@ -530,8 +540,13 @@ const updateProcurement = async (req, res) => {
           product_id: item.product_id,
           change_type: "procurement",
           quantity_change,
+          previous_qty: stock_before,
+          new_qty: stock_after,
+          actor_id: req.user.id,
           reason: `Procurement ${procurement.procurement_number} updated`,
           reference_id: procurement.id,
+          reference_type: "procurement",
+          idempotency_key: `${procurement.id}:${item.product_id}:procurement_update`,
         },
         { transaction }
       );
@@ -633,13 +648,18 @@ const approveProcurement = async (req, res) => {
         total_stock: newStock,
       }, { transaction });
 
-      // Log stock history
+      // Log stock history (approval)
       await StockHistory.create({
         product_id: product.id,
         change_type: "procurement",
         quantity_change: quantity_change,
+        previous_qty: parseFloat(product.total_stock || 0),
+        new_qty: newStock,
+        actor_id: req.user.id,
         reason: `Procurement ${procurement.procurement_number} approved`,
         reference_id: procurement.id,
+        reference_type: "procurement",
+        idempotency_key: `${procurement.id}:${product.id}:procurement_approve`,
       }, { transaction });
 
       // Also log in StockMovement for backward compatibility
@@ -749,8 +769,13 @@ const rejectProcurement = async (req, res) => {
           product_id: item.product_id,
           change_type: "procurement",
           quantity_change,
+          previous_qty: stock_before,
+          new_qty: stock_after,
+          actor_id: req.user.id,
           reason: `Procurement ${procurement.procurement_number} rejected`,
           reference_id: procurement.id,
+          reference_type: "procurement",
+          idempotency_key: `${procurement.id}:${item.product_id}:procurement_reject`,
         },
         { transaction }
       );

@@ -30,12 +30,23 @@ const ProductDetailModal = ({
   const [activeTab, setActiveTab] = useState('details');
   const [stockHistory, setStockHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [pagination, setPagination] = useState(null);
 
+  // Reset page when product or tab changes
+  useEffect(() => {
+    if (isOpen && product && activeTab === 'history') {
+      setPage(1);
+    }
+  }, [isOpen, product, activeTab]);
+
+  // Fetch history when tab/page/limit changes
   useEffect(() => {
     if (isOpen && product && activeTab === 'history') {
       fetchStockHistory();
     }
-  }, [isOpen, product, activeTab]);
+  }, [isOpen, product, activeTab, page, limit]);
 
   const fetchStockHistory = async () => {
     const productId = product?.id || product?.product_id;
@@ -71,8 +82,9 @@ const ProductDetailModal = ({
                 ? 'procurement_in'
                 : 'adjustment',
               quantity_change: quantityChange,
-              stock_before: null,
-              stock_after: null,
+              // New DB fields: previous_qty / new_qty (fallback to old stock_before/stock_after if present)
+              stock_before: item.previous_qty ?? item.stock_before ?? null,
+              stock_after: item.new_qty ?? item.stock_after ?? null,
               reference_id: item.reference_id || null,
               reference_type: isProcurement ? 'procurement' : 'order',
               reason: item.reason || null,
@@ -82,10 +94,13 @@ const ProductDetailModal = ({
 
       let movementEntries = [];
       try {
-        const response = await adminApiClient.get(`/admin/products/${productId}/stock-history?limit=100`);
+        const response = await adminApiClient.get(
+          `/admin/products/${productId}/stock-history?limit=${limit}&page=${page}`,
+        );
         if (response?.status === 200) {
           const data = response.data;
           movementEntries = toRelevantMovements(data?.data?.movements || []);
+          setPagination(data?.data?.pagination || null);
         }
       } catch (movementError) {
         console.error('Failed to fetch stock movements endpoint:', movementError);
@@ -557,17 +572,49 @@ const ProductDetailModal = ({
                                 <p className={`text-sm font-medium ${historyConfig.valueClass}`}>
                                   {quantityValue > 0 ? '+' : ''}{formatQuantity(quantityValue)}
                                 </p>
-                                <p className="text-xs text-gray-500">
-                                  {item.stock_before !== null && item.stock_after !== null
-                                    ? `Stok: ${formatQuantity(item.stock_before)} -> ${formatQuantity(item.stock_after)}`
-                                    : 'Stok: -'}
-                                </p>
+                                <div className="text-xs text-gray-500">
+                                  {item.stock_before !== null && item.stock_after !== null ? (
+                                    <div className="flex items-center gap-2 justify-end">
+                                      <span className="inline-flex items-center gap-2 px-2 py-0.5 bg-gray-100 rounded text-xs">
+                                        <strong className="text-gray-700">Sebelum:</strong>
+                                        <span className="font-medium text-gray-900">{formatQuantity(item.stock_before)}</span>
+                                      </span>
+                                      <span className="inline-flex items-center gap-2 px-2 py-0.5 bg-gray-100 rounded text-xs">
+                                        <strong className="text-gray-700">Sesudah:</strong>
+                                        <span className="font-medium text-gray-900">{formatQuantity(item.stock_after)}</span>
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span>Stok: -</span>
+                                  )}
+                                </div>
                               </div>
                             </>
                           );
                         })()}
                       </div>
                     ))}
+                    {/* Pagination controls */}
+                    <div className="mt-4 flex items-center justify-between">
+                      <div className="text-sm text-gray-600">Menampilkan {stockHistory.length} entri</div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setPage(Math.max(1, page - 1))}
+                          disabled={page <= 1}
+                          className="px-3 py-1 bg-white border rounded disabled:opacity-50"
+                        >
+                          Sebelumnya
+                        </button>
+                        <span className="text-sm text-gray-700">Halaman {pagination?.current_page || page} / {pagination?.total_pages || '-'}</span>
+                        <button
+                          onClick={() => setPage(page + 1)}
+                          disabled={pagination ? page >= pagination.total_pages : false}
+                          className="px-3 py-1 bg-white border rounded disabled:opacity-50"
+                        >
+                          Berikutnya
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

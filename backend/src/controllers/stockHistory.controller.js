@@ -86,29 +86,49 @@ const createManual = async (req, res) => {
       });
     }
 
-    // Create history entry
-    const history = await StockHistory.create({
-      product_id,
-      change_type: "manual",
-      quantity_change: parseFloat(quantity_change),
-      reason: reason || "Manual adjustment",
-      created_at: new Date(),
-      updated_at: new Date(),
-    });
+    // Use transaction: update product stock and create history atomically
+    const transaction = await Product.sequelize.transaction();
+    try {
+      const currentStock = parseFloat(product.total_stock || 0);
+      const qtyChange = parseFloat(quantity_change);
+      const newStock = Math.max(0, currentStock + qtyChange);
 
-    // Update product stock
-    const currentStock = parseFloat(product.total_stock || 0);
-    const newStock = currentStock + parseFloat(quantity_change);
-    await product.update({
-      total_stock: Math.max(0, newStock), // Prevent negative stock
-      updated_at: new Date(),
-    });
+      await product.update(
+        {
+          total_stock: newStock,
+          updated_at: new Date(),
+        },
+        { transaction }
+      );
 
-    res.status(201).json({
-      success: true,
-      message: "History stok berhasil dibuat",
-      data: history,
-    });
+      const history = await StockHistory.create(
+        {
+          product_id,
+          change_type: "manual",
+          quantity_change: qtyChange,
+          previous_qty: currentStock,
+          new_qty: newStock,
+          actor_id: req.user?.id || null,
+          reason: reason || "Manual adjustment",
+          reference_type: "manual",
+          idempotency_key: `manual:${product_id}:${Date.now()}`,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        { transaction }
+      );
+
+      await transaction.commit();
+
+      res.status(201).json({
+        success: true,
+        message: "History stok berhasil dibuat",
+        data: history,
+      });
+    } catch (txError) {
+      await transaction.rollback();
+      throw txError;
+    }
   } catch (error) {
     console.error("Create manual stock history error:", error);
     res.status(500).json({

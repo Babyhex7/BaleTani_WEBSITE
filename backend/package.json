@@ -9,6 +9,7 @@
     "migrate": "node run-migration.js",
     "migrate:all": "node run-migration.js",
     "migrate:expiry": "node scripts/runMigrationExpiryDate.js",
+    "backfill:stock-history": "node scripts/backfill_stock_history.js",
     "seed": "node seeders/index.js",
     "seed:all": "node seeders/fullDataSeeder.js",
     "seed:comprehensive": "node seeders/comprehensiveDataSeeder.js",

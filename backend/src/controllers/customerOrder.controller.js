@@ -470,8 +470,13 @@ const createOrder = async (req, res) => {
             product_id: movement.product_id,
             change_type: "order",
             quantity_change: -movement.quantity,
+            previous_qty: movement.stock_before,
+            new_qty: movement.stock_after,
+            actor_id: stockActorId || null,
             reason: `Order ${order.order_number}`,
             reference_id: order.id,
+            reference_type: "order",
+            idempotency_key: `${order.id}:${movement.product_id}:order_create`,
           });
           console.log(
             `[ORDER ${order.order_number}] StockHistory logged for product ${movement.product_id}: -${movement.quantity}`
