@@ -478,7 +478,9 @@ async function seedComprehensiveData() {
           payment_status:
             Math.random() > 0.3 ? "confirmed" : "pending",
           payment_method: ["transfer", "cash", "qris"][Math.floor(Math.random() * 3)],
-          delivery_method: ["delivery", "self_pickup"][Math.floor(Math.random() * 2)],
+          delivery_method: ["delivery", "self_pickup", "in_store_transaction"][
+            Math.floor(Math.random() * 3)
+          ],
           delivery_address: customer.address || "Jakarta",
           item_subtotal: 0,
           delivery_fee: 10000,

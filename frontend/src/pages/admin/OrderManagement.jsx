@@ -388,6 +388,19 @@ const OrderManagement = () => {
                     <option value="cancelled">Cancelled</option>
                   </select>
                 </div>
+
+                <div>
+                  <select
+                    value={filters.delivery_method}
+                    onChange={(e) => handleFilterChange("delivery_method", e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Semua Metode Pengiriman</option>
+                    <option value="delivery">Delivery</option>
+                    <option value="self_pickup">Ambil di Toko</option>
+                    <option value="in_store_transaction">Transaksi di Toko</option>
+                  </select>
+                </div>
               </div>
             </div>
 

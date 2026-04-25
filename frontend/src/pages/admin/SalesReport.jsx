@@ -97,6 +97,7 @@ const SalesReport = () => {
     const labels = {
       self_pickup: "Pickup",
       delivery: "Delivery",
+      in_store_transaction: "In Store",
     };
     return labels[method] || method;
   };

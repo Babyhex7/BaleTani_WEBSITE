@@ -500,13 +500,14 @@ const AddOfflineOrderModal = ({ isOpen, onClose, onSuccess }) => {
                     onChange={(e) => {
                       setDeliveryMethod(e.target.value);
                       // Auto set delivery fee
-                      setDeliveryFee(e.target.value === "self_pickup" ? 0 : 10000);
+                      setDeliveryFee(e.target.value === "delivery" ? 10000 : 0);
                     }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
                   >
                     <option value="self_pickup">Ambil di Toko</option>
                     <option value="delivery">Delivery</option>
+                    <option value="in_store_transaction">Transaksi di Toko</option>
                   </select>
                 </div>
 
