@@ -151,8 +151,8 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
         toast.error(`Produk pada item ${i + 1} harus dipilih`);
         return false;
       }
-      if (!item.quantity || item.quantity <= 0) {
-        toast.error(`Jumlah pada item ${i + 1} harus lebih dari 0`);
+      if (!item.quantity || item.quantity == 0) {
+        toast.error(`Jumlah pada item ${i + 1} tidak boleh 0`);
         return false;
       }
       if (!item.unit_price || item.unit_price <= 0) {
@@ -388,7 +388,6 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
                           onChange={(e) =>
                             handleItemChange(index, "quantity", e.target.value)
                           }
-                          min="1"
                           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                           required
                         />
@@ -496,7 +495,6 @@ const ProcurementFormModal = ({ procurement, onClose, onSuccess }) => {
                           onChange={(e) =>
                             handleItemChange(index, "quantity", e.target.value)
                           }
-                          min="1"
                           className="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                           required
                         />

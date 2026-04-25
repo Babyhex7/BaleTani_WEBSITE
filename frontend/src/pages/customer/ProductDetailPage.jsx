@@ -5,31 +5,20 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MessageCircle, ArrowLeft, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
-import LoginModal from '../../components/ui/LoginModal';
 import Button from '../../components/ui/Button';
-import useAuthStore from '../../store/store_customer/useAuthStore';
-import useAddToCart from '../../hooks/hook_customer/useAddToCart'; // ✅ Import hook
 import productService from '../../services/services_customer/productService';
 import { getImageUrl as getImageUrlUtil } from '../../utils/imageUtils';
 import { calculateDiscount } from '../../utils/productUtils';
+import { getWhatsAppURL } from '../../utils/contactConfig';
 
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthStore();
   
-  // ✅ Use hook untuk consistent validation
-  const { 
-    handleAddToCart: hookHandleAddToCart, 
-    showLoginModal, 
-    setShowLoginModal,
-    isProcessing 
-  } = useAddToCart();
-
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -104,24 +93,14 @@ const ProductDetailPage = () => {
     }
   };
 
-  // ✅ Handle add to cart - Use hook dengan semua validasi
-  const handleAddToCart = () => {
-    // Call hook handler yang sudah ada validasi lengkap:
-    // - Debounce (300ms)
-    // - isProcessing check
-    // - Stock availability
-    // - Cart quantity check
-    // - Store stock validation
-    hookHandleAddToCart(product, quantity, false)(); // Call returned function
-    
-    // Reset quantity setelah berhasil (delay sedikit)
-    setTimeout(() => setQuantity(getDefaultQuantity(product)), 500);
-  };
-
-  // ✅ Handle buy now - Direct redirect, no toast
-  const handleBuyNow = async () => {
-    if (!isAuthenticated) {
-      setShowLoginModal(true);
+  // ========================================
+  // WHATSAPP ORDER HANDLER
+  // Langsung redirect ke WhatsApp tanpa perlu login
+  // Format pesan umum tanpa detail produk spesifik
+  // ========================================
+  const handleWhatsAppOrder = () => {
+    if (!product) {
+      toast.error('Produk tidak valid');
       return;
     }
 
@@ -129,18 +108,12 @@ const ProductDetailPage = () => {
       toast.error('Produk habis');
       return;
     }
-
-    try {
-      // Add to cart silently (no toast)
-      // Parameters: (product, quantity, stopPropagation, silent)
-      await hookHandleAddToCart(product, quantity, false, true)(); // silent = true
-      
-      // Redirect immediately to cart
-      navigate('/cart');
-    } catch (error) {
-      console.error('Error buy now:', error);
-      toast.error('Gagal menambahkan ke keranjang');
-    }
+    
+    // Format pesan WhatsApp umum tanpa nama produk atau detail
+    const message = `Halo BaleTani, saya tertarik dengan produk di BaleTani. Mohon info ketersediaan, harga, dan cara pemesanannya. Terima kasih!`;
+    
+    const whatsappUrl = getWhatsAppURL(message);
+    window.open(whatsappUrl, '_blank');
   };
 
   if (loading) {
@@ -386,36 +359,24 @@ const ProductDetailPage = () => {
                   </div>
                 )}
 
-                {/* Action Buttons */}
+                {/* Action Buttons - WhatsApp Direct Order */}
                 <div className="flex flex-col sm:flex-row gap-3 mt-auto pt-4 border-t border-gray-100">
                   <button
-                    data-cy="add-to-cart-btn"
-                    onClick={handleAddToCart}
-                    disabled={product.stock === 0 || isProcessing}
+                    data-cy="whatsapp-order-btn"
+                    onClick={handleWhatsAppOrder}
+                    disabled={product.stock === 0}
                     className="btn-touch flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-lg bg-green-600 text-white text-sm sm:text-base font-semibold hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    {isProcessing ? (
-                      <>
-                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                        </svg>
-                        <span>Menambahkan...</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingCart size={16} className="sm:w-5 sm:h-5" />
-                        <span className="hidden sm:inline">Tambah ke Keranjang</span>
-                        <span className="sm:hidden">+ Keranjang</span>
-                      </>
-                    )}
+                    <MessageCircle size={16} className="sm:w-5 sm:h-5" />
+                    <span className="hidden sm:inline">Pesan via WhatsApp</span>
+                    <span className="sm:hidden">Pesan WA</span>
                   </button>
                   <button
-                    onClick={handleBuyNow}
-                    disabled={product.stock === 0 || isProcessing}
+                    onClick={handleWhatsAppOrder}
+                    disabled={product.stock === 0}
                     className="btn-touch flex-1 flex items-center justify-center px-4 sm:px-6 py-3 rounded-lg bg-white border-2 border-green-600 text-green-600 text-sm sm:text-base font-semibold hover:bg-green-50 active:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    {isProcessing ? 'Memproses...' : 'Beli Sekarang'}
+                    <span>Konsultasi Produk</span>
                   </button>
                 </div>
               </div>
@@ -423,12 +384,6 @@ const ProductDetailPage = () => {
           </div>
         </div>
       </div>
-
-      {/* Login Modal */}
-      <LoginModal 
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-      />
 
       <Footer />
     </>

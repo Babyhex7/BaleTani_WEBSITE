@@ -233,13 +233,8 @@ const createProcurement = async (req, res) => {
   const transaction = await sequelize.transaction();
 
   try {
-    const {
-      procurement_date,
-      procurement_type,
-      supplier_name,
-      items,
-      notes,
-    } = req.body;
+    const { procurement_date, procurement_type, supplier_name, items, notes } =
+      req.body;
 
     // Validate required fields
     if (!procurement_date || !items || items.length === 0) {
@@ -253,10 +248,11 @@ const createProcurement = async (req, res) => {
     // Generate procurement number
     const procurement_number = await generateProcurementNumber();
 
-    // Calculate total amount
+    // Calculate total amount (gunakan absolute value untuk quantity)
     const total_amount = items.reduce(
-      (sum, item) => sum + parseFloat(item.quantity) * parseFloat(item.unit_price),
-      0
+      (sum, item) =>
+        sum + Math.abs(parseFloat(item.quantity)) * parseFloat(item.unit_price),
+      0,
     );
 
     // Create procurement
@@ -271,12 +267,13 @@ const createProcurement = async (req, res) => {
         notes,
         created_by: req.user.id,
       },
-      { transaction }
+      { transaction },
     );
 
-    // Create procurement items and update stock
+    // Create procurement items (hanya simpan record, belum ubah stok)
+    // Stok akan berubah saat procurement di-APPROVE
     for (const item of items) {
-      // Get product
+      // Get product untuk validasi saja
       const product = await Product.findByPk(item.product_id);
       if (!product) {
         await transaction.rollback();
@@ -286,59 +283,50 @@ const createProcurement = async (req, res) => {
         });
       }
 
-      // Create procurement item
+      // Parse quantity
+      const quantity = parseFloat(item.quantity);
+
+      // Validate quantity is not zero
+      if (quantity === 0) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: `Quantity untuk produk ${product.name} tidak boleh nol`,
+        });
+      }
+
+      // Jika quantity negatif (pengurangan stok), validasi stok cukup
+      // Tapi stok belum dikurangi sekarang, nanti saat approve
+      const currentStock = parseFloat(product.total_stock);
+      if (quantity < 0 && currentStock < Math.abs(quantity)) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: `Stok tidak cukup untuk pengurangan. Stok saat ini: ${currentStock}, pengurangan: ${Math.abs(quantity)}`,
+        });
+      }
+
+      // Handle expiry_date
+      let expiryDate = null;
+      if (
+        item.expiry_date &&
+        item.expiry_date !== "" &&
+        item.expiry_date !== "null"
+      ) {
+        expiryDate = item.expiry_date;
+      }
+
+      // Create procurement item (simpan saja, belum proses stok)
       await ProcurementItem.create(
         {
           procurement_id: procurement.id,
           product_id: item.product_id,
-          quantity: item.quantity,
+          quantity: quantity,
           purchase_price_per_unit: item.unit_price,
-          subtotal: parseFloat(item.quantity) * parseFloat(item.unit_price),
-          expiry_date: item.expiry_date || null,
+          subtotal: Math.abs(quantity) * parseFloat(item.unit_price),
+          expiry_date: expiryDate,
         },
-        { transaction }
-      );
-
-      // Update product stock
-      const stock_before = parseFloat(product.total_stock);
-      const quantity_change = parseFloat(item.quantity);
-      const stock_after = stock_before + quantity_change;
-
-      await product.update(
-        { total_stock: stock_after },
-        { transaction }
-      );
-
-      // Record stock movement
-      await StockMovement.create(
-        {
-          product_id: item.product_id,
-          movement_type: "procurement_in",
-          quantity_change,
-          stock_before,
-          stock_after,
-          reference_type: "procurement",
-          reference_id: procurement.id,
-          created_by: req.user.id,
-        },
-        { transaction }
-      );
-
-      // Record stock history (procurement add)
-      await StockHistory.create(
-        {
-          product_id: item.product_id,
-          change_type: "procurement",
-          quantity_change,
-          previous_qty: stock_before,
-          new_qty: stock_after,
-          actor_id: req.user.id,
-          reason: `Procurement ${procurement.procurement_number} created`,
-          reference_id: procurement.id,
-          reference_type: "procurement",
-          idempotency_key: `${procurement.id}:${item.product_id}:procurement_create`,
-        },
-        { transaction }
+        { transaction },
       );
     }
 
@@ -385,13 +373,8 @@ const updateProcurement = async (req, res) => {
 
   try {
     const { id } = req.params;
-    const {
-      procurement_date,
-      procurement_type,
-      supplier_name,
-      items,
-      notes,
-    } = req.body;
+    const { procurement_date, procurement_type, supplier_name, items, notes } =
+      req.body;
 
     // Get procurement
     const procurement = await Procurement.findByPk(id, {
@@ -420,60 +403,17 @@ const updateProcurement = async (req, res) => {
       });
     }
 
-    // Rollback old stock movements
-    for (const oldItem of procurement.items) {
-      const product = await Product.findByPk(oldItem.product_id);
-      const stock_before = parseFloat(product.total_stock);
-      const quantity_change = -parseFloat(oldItem.quantity);
-      const stock_after = stock_before + quantity_change;
-
-      await product.update(
-        { total_stock: stock_after },
-        { transaction }
-      );
-
-      await StockMovement.create(
-        {
-          product_id: oldItem.product_id,
-          movement_type: "adjustment",
-          quantity_change,
-          stock_before,
-          stock_after,
-          reference_type: "procurement",
-          reference_id: procurement.id,
-          created_by: req.user.id,
-        },
-        { transaction }
-      );
-
-      // Record stock history (procurement reduce due update rollback)
-      await StockHistory.create(
-        {
-          product_id: oldItem.product_id,
-          change_type: "procurement",
-          quantity_change,
-          previous_qty: stock_before,
-          new_qty: stock_after,
-          actor_id: req.user.id,
-          reason: `Procurement ${procurement.procurement_number} updated (rollback old item)`,
-          reference_id: procurement.id,
-          reference_type: "procurement",
-          idempotency_key: `${procurement.id}:${oldItem.product_id}:procurement_rollback_${oldItem.id}`,
-        },
-        { transaction }
-      );
-    }
-
-    // Delete old items
+    // Hapus old items (tidak perlu rollback stok karena stok belum berubah saat pending)
     await ProcurementItem.destroy({
       where: { procurement_id: id },
       transaction,
     });
 
-    // Calculate new total amount
+    // Calculate new total amount (gunakan absolute value)
     const total_amount = items.reduce(
-      (sum, item) => sum + parseFloat(item.quantity) * parseFloat(item.unit_price),
-      0
+      (sum, item) =>
+        sum + Math.abs(parseFloat(item.quantity)) * parseFloat(item.unit_price),
+      0,
     );
 
     // Update procurement
@@ -485,10 +425,11 @@ const updateProcurement = async (req, res) => {
         total_amount,
         notes,
       },
-      { transaction }
+      { transaction },
     );
 
-    // Create new items and update stock
+    // Create new items (hanya simpan record, tidak ubah stok)
+    // Stok akan berubah saat procurement di-APPROVE
     for (const item of items) {
       const product = await Product.findByPk(item.product_id);
       if (!product) {
@@ -499,56 +440,49 @@ const updateProcurement = async (req, res) => {
         });
       }
 
+      // Parse quantity
+      const quantity = parseFloat(item.quantity);
+
+      // Validate quantity is not zero
+      if (quantity === 0) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: `Quantity untuk produk ${product.name} tidak boleh nol`,
+        });
+      }
+
+      // Jika quantity negatif, validasi stok cukup (tapi belum dikurangi sekarang)
+      const currentStock = parseFloat(product.total_stock);
+      if (quantity < 0 && currentStock < Math.abs(quantity)) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: `Stok tidak cukup untuk pengurangan. Stok saat ini: ${currentStock}, pengurangan: ${Math.abs(quantity)}`,
+        });
+      }
+
+      // Handle expiry_date
+      let expiryDate = null;
+      if (
+        item.expiry_date &&
+        item.expiry_date !== "" &&
+        item.expiry_date !== "null"
+      ) {
+        expiryDate = item.expiry_date;
+      }
+
+      // Create procurement item (simpan saja, belum proses stok)
       await ProcurementItem.create(
         {
           procurement_id: procurement.id,
           product_id: item.product_id,
-          quantity: item.quantity,
+          quantity: quantity,
           purchase_price_per_unit: item.unit_price,
-          subtotal: parseFloat(item.quantity) * parseFloat(item.unit_price),
-          expiry_date: item.expiry_date || null,
+          subtotal: Math.abs(quantity) * parseFloat(item.unit_price),
+          expiry_date: expiryDate,
         },
-        { transaction }
-      );
-
-      const stock_before = parseFloat(product.total_stock);
-      const quantity_change = parseFloat(item.quantity);
-      const stock_after = stock_before + quantity_change;
-
-      await product.update(
-        { total_stock: stock_after },
-        { transaction }
-      );
-
-      await StockMovement.create(
-        {
-          product_id: item.product_id,
-          movement_type: "procurement_in",
-          quantity_change,
-          stock_before,
-          stock_after,
-          reference_type: "procurement",
-          reference_id: procurement.id,
-          created_by: req.user.id,
-        },
-        { transaction }
-      );
-
-      // Record stock history (procurement add after update)
-      await StockHistory.create(
-        {
-          product_id: item.product_id,
-          change_type: "procurement",
-          quantity_change,
-          previous_qty: stock_before,
-          new_qty: stock_after,
-          actor_id: req.user.id,
-          reason: `Procurement ${procurement.procurement_number} updated`,
-          reference_id: procurement.id,
-          reference_type: "procurement",
-          idempotency_key: `${procurement.id}:${item.product_id}:procurement_update`,
-        },
-        { transaction }
+        { transaction },
       );
     }
 
@@ -630,49 +564,91 @@ const approveProcurement = async (req, res) => {
     }
 
     // Update procurement status
-    await procurement.update({
-      status: "approved",
-      approved_by: req.user.id,
-      approved_at: new Date(),
-      notes: notes || procurement.notes,
-    }, { transaction });
+    await procurement.update(
+      {
+        status: "approved",
+        approved_by: req.user.id,
+        approved_at: new Date(),
+        notes: notes || procurement.notes,
+      },
+      { transaction },
+    );
 
     // Update stock for each item and log history
     for (const item of procurement.items) {
       const product = item.product;
+
+      // Check if product exists
+      if (!product) {
+        console.error(`❌ Product not found for item:`, item);
+        await transaction.rollback();
+        return res.status(404).json({
+          success: false,
+          message: `Produk dengan ID ${item.product_id} tidak ditemukan`,
+        });
+      }
+
       const quantity_change = parseFloat(item.quantity);
 
+      // Get current stock BEFORE update
+      const stock_before = parseFloat(product.total_stock || 0);
+
+      console.log(`📦 Updating stock for product ${product.id}:`);
+      console.log(`   Quantity change: ${quantity_change}`);
+      console.log(`   Stock before: ${stock_before}`);
+
       // Update product stock
-      const newStock = parseFloat(product.total_stock || 0) + quantity_change;
-      await product.update({
-        total_stock: newStock,
-      }, { transaction });
+      const stock_after = stock_before + quantity_change;
+
+      console.log(`   Stock after: ${stock_after}`);
+
+      await product.update(
+        {
+          total_stock: stock_after,
+        },
+        { transaction },
+      );
+
+      // Tentukan movement type dan change type berdasarkan quantity
+      const movementType =
+        quantity_change >= 0 ? "procurement_in" : "procurement_out";
+      const changeType = quantity_change >= 0 ? "procurement" : "return";
+      const reasonText =
+        quantity_change >= 0
+          ? `Procurement ${procurement.procurement_number} approved (tambah stok: +${quantity_change})`
+          : `Procurement ${procurement.procurement_number} approved (kurangi stok: ${quantity_change})`;
 
       // Log stock history (approval)
-      await StockHistory.create({
-        product_id: product.id,
-        change_type: "procurement",
-        quantity_change: quantity_change,
-        previous_qty: parseFloat(product.total_stock || 0),
-        new_qty: newStock,
-        actor_id: req.user.id,
-        reason: `Procurement ${procurement.procurement_number} approved`,
-        reference_id: procurement.id,
-        reference_type: "procurement",
-        idempotency_key: `${procurement.id}:${product.id}:procurement_approve`,
-      }, { transaction });
+      await StockHistory.create(
+        {
+          product_id: product.id,
+          change_type: changeType,
+          quantity_change: quantity_change,
+          previous_qty: stock_before,
+          new_qty: stock_after,
+          actor_id: req.user.id,
+          reason: reasonText,
+          reference_id: procurement.id,
+          reference_type: "procurement",
+          idempotency_key: `${procurement.id}:${product.id}:procurement_approve_${Date.now()}`,
+        },
+        { transaction },
+      );
 
-      // Also log in StockMovement for backward compatibility
-      await StockMovement.create({
-        product_id: product.id,
-        movement_type: "procurement_in",
-        quantity_change: quantity_change,
-        stock_before: parseFloat(product.total_stock || 0),
-        stock_after: newStock,
-        reference_type: "procurement",
-        reference_id: procurement.id,
-        created_by: req.user.id,
-      }, { transaction });
+      // Also log in StockMovement
+      await StockMovement.create(
+        {
+          product_id: product.id,
+          movement_type: movementType,
+          quantity_change: quantity_change,
+          stock_before: stock_before,
+          stock_after: stock_after,
+          reference_type: "procurement",
+          reference_id: procurement.id,
+          created_by: req.user.id,
+        },
+        { transaction },
+      );
     }
 
     await transaction.commit();
@@ -695,7 +671,7 @@ const approveProcurement = async (req, res) => {
 
 /**
  * PUT /api/admin/procurements/:id/reject
- * Reject procurement and rollback stock
+ * Reject procurement - stok TIDAK berubah karena procurement pending
  */
 const rejectProcurement = async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -712,14 +688,7 @@ const rejectProcurement = async (req, res) => {
       });
     }
 
-    const procurement = await Procurement.findByPk(id, {
-      include: [
-        {
-          model: ProcurementItem,
-          as: "items",
-        },
-      ],
-    });
+    const procurement = await Procurement.findByPk(id);
 
     if (!procurement) {
       await transaction.rollback();
@@ -737,51 +706,7 @@ const rejectProcurement = async (req, res) => {
       });
     }
 
-    // Rollback stock
-    for (const item of procurement.items) {
-      const product = await Product.findByPk(item.product_id);
-      const stock_before = parseFloat(product.total_stock);
-      const quantity_change = -parseFloat(item.quantity);
-      const stock_after = stock_before + quantity_change;
-
-      await product.update(
-        { total_stock: stock_after },
-        { transaction }
-      );
-
-      await StockMovement.create(
-        {
-          product_id: item.product_id,
-          movement_type: "adjustment",
-          quantity_change,
-          stock_before,
-          stock_after,
-          reference_type: "procurement",
-          reference_id: procurement.id,
-          created_by: req.user.id,
-        },
-        { transaction }
-      );
-
-      // Record stock history (procurement reduce due rejection)
-      await StockHistory.create(
-        {
-          product_id: item.product_id,
-          change_type: "procurement",
-          quantity_change,
-          previous_qty: stock_before,
-          new_qty: stock_after,
-          actor_id: req.user.id,
-          reason: `Procurement ${procurement.procurement_number} rejected`,
-          reference_id: procurement.id,
-          reference_type: "procurement",
-          idempotency_key: `${procurement.id}:${item.product_id}:procurement_reject`,
-        },
-        { transaction }
-      );
-    }
-
-    // Update procurement status
+    // Update procurement status - stok TIDAK berubah
     await procurement.update(
       {
         status: "rejected",
@@ -789,7 +714,7 @@ const rejectProcurement = async (req, res) => {
         rejected_at: new Date(),
         rejection_reason,
       },
-      { transaction }
+      { transaction },
     );
 
     await transaction.commit();
@@ -859,7 +784,7 @@ const softDeleteProcurement = async (req, res) => {
         deleted_reason: deleted_reason || null,
         deleted_at: new Date(),
       },
-      { transaction }
+      { transaction },
     );
 
     await transaction.commit();
@@ -923,7 +848,7 @@ const restoreProcurement = async (req, res) => {
           record_id: id,
         },
         transaction,
-      }
+      },
     );
 
     await transaction.commit();

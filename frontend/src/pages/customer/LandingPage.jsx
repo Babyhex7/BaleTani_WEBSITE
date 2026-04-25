@@ -5,10 +5,9 @@ import {
   Salad, Apple, Beef, Fish, Soup, Milk, ShoppingBag, Carrot 
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
-import useAuthStore from '../../store/store_customer/useAuthStore';
 import Button from '../../components/ui/Button';
+import { getWhatsAppURL } from '../../utils/contactConfig';
 import ProductCard from '../../components/ui/ProductCard';
 import ProductCardSkeleton from '../../components/ui/ProductCardSkeleton';
 import ErrorBoundary from '../../components/ErrorBoundary';
@@ -23,7 +22,6 @@ import categoryService from '../../services/services_customer/categoryService';
  */
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthStore();
   const { scrollYProgress } = useScroll();
   
   // State untuk data dari API
@@ -202,37 +200,17 @@ const LandingPage = () => {
 
   /**
    * Fungsi untuk menangani pemesanan via WhatsApp
-   * Mengecek status login sebelum mengizinkan pemesanan
-   * @param {string} productName - Nama produk
-   * @param {number} price - Harga produk
-   * @param {string} unit - Unit produk (kg, pcs, dll)
+   * Langsung redirect ke WhatsApp tanpa perlu login
+   * Format pesan umum tanpa detail produk spesifik
    */
-  const handleWhatsAppOrder = (productName, price, unit) => {
-    if (!isAuthenticated) {
-      toast.error('Silakan login terlebih dahulu untuk memesan produk');
-      navigate('/login');
-      return;
-    }
-
-    const message = `Halo, saya tertarik dengan ${productName} seharga ${formatPrice(price)}/${unit}. Mohon info ketersediaan dan cara pemesanannya. Terima kasih!`;
-    const whatsappUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
+  const handleWhatsAppOrder = () => {
+    const message = `Halo BaleTani, saya tertarik dengan produk di BaleTani. Mohon info ketersediaan, harga, dan cara pemesanannya. Terima kasih!`;
+    const whatsappUrl = getWhatsAppURL(message);
     window.open(whatsappUrl, '_blank');
   };
 
-  /**
-   * Fungsi untuk menangani penambahan ke keranjang
-   * Mengecek status login sebelum mengizinkan penambahan ke keranjang
-   * @param {object} product - Data produk
-   */
-  const handleAddToCart = (product) => {
-    if (!isAuthenticated) {
-      toast.error('Silakan login terlebih dahulu untuk menambah ke keranjang');
-      navigate('/login');
-      return;
-    }
-
-    // TODO: Implementasi add to cart
-    toast.success(`${product.name} berhasil ditambahkan ke keranjang`);
+  const handleAddToCart = () => {
+    handleWhatsAppOrder();
   };
 
   return (
@@ -323,7 +301,7 @@ const LandingPage = () => {
                   <Button 
                     size="lg" 
                     className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white border border-white/30 w-full sm:w-auto"
-                    onClick={() => handleWhatsAppOrder('Konsultasi Produk', 0, 'gratis')}
+                    onClick={handleWhatsAppOrder}
                   >
                     <MessageCircle className="mr-2" size={20} />
                     Chat WhatsApp

@@ -37,6 +37,7 @@
  * @requires components/ui/AddToCartButton
  * @requires hooks/hook_customer/useAddToCart
  * @requires utils/productUtils
+ * @requires utils/contactConfig
  * 
  * @author BaleTani Development Team
  * @created 2025-11-12
@@ -44,12 +45,11 @@
 
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast'; // ✅ ADDED: For error notifications
-import LoginModal from './LoginModal';
 import ProductImage from './ProductImage';
 import ProductPrice from './ProductPrice';
-import AddToCartButton from './AddToCartButton';
-import useAddToCart from '../../hooks/hook_customer/useAddToCart';
+import WhatsAppOrderButton from './WhatsAppOrderButton';
 import { calculateDiscount, getCategoryName } from '../../utils/productUtils';
+import { getWhatsAppURL } from '../../utils/contactConfig';
 
 /**
  * ProductCard Component
@@ -106,15 +106,6 @@ const ProductCard = ({
   // React Router navigation
   const navigate = useNavigate();
   
-  // Custom hook untuk add to cart logic
-  // Returns: handleAddToCart, showLoginModal, setShowLoginModal, isProcessing
-  const { 
-    handleAddToCart, 
-    showLoginModal, 
-    setShowLoginModal,
-    isProcessing 
-  } = useAddToCart();
-
   // ========================================
   // COMPUTED VALUES - DISKON REAL DARI DATABASE
   // Menggunakan utility functions dari productUtils.js
@@ -197,6 +188,22 @@ const ProductCard = ({
   };
   
   // ========================================
+  // WHATSAPP ORDER HANDLER
+  // Langsung redirect ke WhatsApp tanpa perlu login
+  // Format pesan umum tanpa detail produk spesifik
+  // ========================================
+  const handleWhatsAppOrder = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    
+    // Format pesan WhatsApp umum tanpa nama produk atau detail
+    const message = `Halo BaleTani, saya tertarik dengan produk di BaleTani. Mohon info ketersediaan, harga, dan cara pemesanannya. Terima kasih!`;
+    
+    const whatsappUrl = getWhatsAppURL(message);
+    window.open(whatsappUrl, '_blank');
+  };
+
+  // ========================================
   // RENDER COMPONENT
   // ========================================
   return (
@@ -219,7 +226,6 @@ const ProductCard = ({
         border-gray-200 
         hover:border-green-500 
         cursor-pointer
-        ${isProcessing ? 'pointer-events-none opacity-75' : ''}
         ${className}
       `}
       role="button"
@@ -325,45 +331,19 @@ const ProductCard = ({
         </div>
 
         {/* ========================================
-            ADD TO CART BUTTON
-            Menggunakan AddToCartButton component (reusable)
-            Props:
-            - onClick: Handler dari useAddToCart hook
-            - stock: Jumlah stok tersedia
-            - loading: State processing dari hook
-            - size: 'xs' untuk mobile grid 2 kolom, 'sm' tablet, 'md' desktop
-            - variant: 'primary' (green)
-            - fullWidth: true untuk full width
-            
-            ✅ CRITICAL: stopPropagation untuk prevent bubble ke card onClick
+            WHATSAPP ORDER BUTTON
+            Ganti Add to Cart dengan WhatsApp Order langsung
+            Tanpa perlu login - langsung redirect ke WhatsApp
             ======================================== */}
-        <AddToCartButton 
-          data-cy="add-to-cart-btn"
-          onClick={(e) => {
-            // ✅ CRITICAL: Stop propagation agar tidak trigger handleCardClick
-            if (e) {
-              e.stopPropagation();
-            }
-            // handleAddToCart sudah return function, langsung call
-            handleAddToCart(product, 1)(e);
-          }}
+        <WhatsAppOrderButton 
+          data-cy="whatsapp-order-btn"
+          onClick={handleWhatsAppOrder}
           stock={product.stock}
-          loading={isProcessing}
           size="xs"
-          variant="primary"
           fullWidth={true}
+          label="Pesan"
         />
       </div>
-
-      {/* ========================================
-          LOGIN MODAL
-          Muncul saat user belum login dan klik add to cart
-          State dihandle oleh useAddToCart hook
-          ======================================== */}
-      <LoginModal 
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-      />
     </div>
   );
 };
