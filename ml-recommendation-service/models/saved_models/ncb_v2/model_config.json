@@ -1,6 +1,0 @@
-{
-  "embedding_dim": 64,
-  "tfidf_max_features": 150,
-  "model_version": "ncb_v2",
-  "training_date": "2025-11-29T11:13:51.469519"
-}

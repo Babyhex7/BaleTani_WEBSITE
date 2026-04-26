@@ -1,3 +1,0 @@
-"""
-Hybrid models (future implementation)
-"""
