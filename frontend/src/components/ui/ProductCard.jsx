@@ -350,10 +350,17 @@ Mohon info ketersediaan dan cara pemesanannya. Terima kasih!`;
         </div>
 
         {/* ========================================
-            ACTION BUTTONS
-            If logged in: Show Add to Cart
-            If not logged in: Show WhatsApp Order
+            ACTION BUTTONS - FORCED WHATSAPP (LOGIN HIDDEN)
             ======================================== */}
+        <WhatsAppOrderButton 
+          data-cy="whatsapp-order-btn"
+          onClick={handleWhatsAppOrder}
+          stock={product.stock}
+          size="xs"
+          fullWidth={true}
+          label="Pesan"
+        />
+        {/* Add to cart hidden until login feature re-enabled
         {isAuthenticated ? (
           <AddToCartButton 
             data-cy="add-to-cart-btn"
@@ -373,6 +380,7 @@ Mohon info ketersediaan dan cara pemesanannya. Terima kasih!`;
             label="Pesan"
           />
         )}
+        */}
       </div>
 
       {/* Login Modal for unauthenticated users (if triggered by hook) */}

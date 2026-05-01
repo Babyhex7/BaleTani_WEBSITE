@@ -379,8 +379,19 @@ Mohon info ketersediaan dan cara pemesanannya. Terima kasih!`;
                   </div>
                 )}
 
-                {/* Action Buttons - Add to Cart if Logged In, otherwise WhatsApp */}
+                {/* Action Buttons - FORCED WHATSAPP (LOGIN HIDDEN) */}
                 <div className="flex flex-col sm:flex-row gap-3 mt-auto pt-4 border-t border-gray-100">
+                  <button
+                    data-cy="whatsapp-order-btn"
+                    onClick={handleWhatsAppOrder}
+                    disabled={product.stock === 0}
+                    className="btn-touch flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-lg bg-green-600 text-white text-sm sm:text-base font-semibold hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <MessageCircle size={16} className="sm:w-5 sm:h-5" />
+                    <span className="hidden sm:inline">Pesan via WhatsApp</span>
+                    <span className="sm:hidden">Pesan WA</span>
+                  </button>
+                  {/* Add to cart hidden until login feature re-enabled
                   {isAuthenticated ? (
                     <AddToCartButton 
                       data-cy="add-to-cart-btn"
@@ -402,6 +413,7 @@ Mohon info ketersediaan dan cara pemesanannya. Terima kasih!`;
                       <span className="sm:hidden">Pesan WA</span>
                     </button>
                   )}
+                  */}
                   <button
                     onClick={handleWhatsAppOrder}
                     disabled={product.stock === 0}

@@ -45,7 +45,7 @@ const ProtectedRoute = ({
   children, 
   requiredRole = null, 
   requireAuth = true,
-  redirectTo = '/login' 
+  redirectTo = '/landing' 
 }) => {
   const customerAuth = useAuthStore();
   const adminAuth = useAdminStore();
@@ -218,7 +218,7 @@ export const RoleBasedRedirect = () => {
 
   // Check customer auth
   if (customerAuth.isAuthenticated && customerAuth.user) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/landing" replace />;
   }
 
   // Not authenticated, redirect to landing

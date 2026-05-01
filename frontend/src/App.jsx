@@ -113,6 +113,7 @@ function App() {
         </ProtectedRoute>
       } />
       
+      {/* 
       <Route path="/login" element={
         <ProtectedRoute requireAuth={false}>
           <CustomerLayout>
@@ -128,13 +129,16 @@ function App() {
           </CustomerLayout>
         </ProtectedRoute>
       } />
+      */}
 
       {/* Customer routes (hanya untuk customer) */}
+      {/* 
       <Route path="/home" element={
         <ProtectedRoute requiredRole="customer">
           <Home />
         </ProtectedRoute>
       } />
+      */}
 
       <Route path="/products" element={<ProductPage />} />
 
@@ -142,6 +146,7 @@ function App() {
 
       <Route path="/promo" element={<PromoPage />} />
 
+      {/* 
       <Route path="/cart" element={
         <ProtectedRoute requiredRole="customer">
           <CartPage />
@@ -160,19 +165,18 @@ function App() {
         </ProtectedRoute>
       } />
 
-      {/* Profile Page - Halaman profile customer */}
       <Route path="/profile" element={
         <ProtectedRoute requiredRole="customer">
           <ProfilePage />
         </ProtectedRoute>
       } />
 
-      {/* Purchase History - Riwayat Pembelian Customer */}
       <Route path="/purchase-history" element={
         <ProtectedRoute requiredRole="customer">
           <PurchaseHistory />
         </ProtectedRoute>
       } />
+      */}
 
       {/* Categories - Daftar semua kategori */}
       <Route path="/categories" element={<CategoryPage />} />
@@ -183,6 +187,7 @@ function App() {
       {/* Contact Page - Halaman kontak customer */}
       <Route path="/contact" element={<ContactPage />} />
 
+      {/* 
       <Route path="/about" element={
         <ProtectedRoute requiredRole="customer">
           <CustomerLayout>
@@ -222,6 +227,7 @@ function App() {
           </CustomerLayout>
         </ProtectedRoute>
       } />
+      */}
 
       {/* Admin routes (untuk admin dan staff) */}
       

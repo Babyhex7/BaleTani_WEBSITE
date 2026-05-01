@@ -84,7 +84,7 @@ const Navbar = () => {
 
           {/* Desktop Auth & Cart */}
           <div className="hidden md:flex items-center gap-3 lg:gap-4">
-            {/* Cart - Only show if authenticated */}
+            {/* Cart - Only show if authenticated
             {isAuthenticated && (
               <Link 
                 data-cy="cart-icon"
@@ -99,8 +99,9 @@ const Navbar = () => {
                 )}
               </Link>
             )}
+            */}
 
-            {/* User Menu */}
+            {/* 
             {isAuthenticated ? (
               <div className="relative">
                 <button
@@ -111,7 +112,6 @@ const Navbar = () => {
                   <span className="text-sm font-medium truncate max-w-[100px] lg:max-w-[140px]">{user?.full_name || user?.email}</span>
                 </button>
 
-                {/* User Dropdown */}
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-dropdown">
                     <Link
@@ -160,11 +160,12 @@ const Navbar = () => {
                 </Link>
               </div>
             )}
+            */}
           </div>
 
           {/* Mobile Actions: Cart + Menu */}
           <div className="md:hidden flex items-center gap-2">
-            {/* Mobile Cart Icon */}
+            {/* Mobile Cart Icon
             {isAuthenticated && (
               <Link 
                 data-cy="cart-icon"
@@ -179,6 +180,7 @@ const Navbar = () => {
                 )}
               </Link>
             )}
+            */}
             
             {/* Mobile Menu Button */}
             <button
@@ -208,6 +210,7 @@ const Navbar = () => {
 
               {/* Mobile Auth */}
               <div className="border-t border-gray-100 mt-2 pt-3">
+                {/* 
                 {isAuthenticated ? (
                   <div className="space-y-1">
                     <div className="px-4 py-2 text-xs font-medium text-gray-500">
@@ -249,6 +252,7 @@ const Navbar = () => {
                     </Link>
                   </div>
                 )}
+                */}
               </div>
             </div>
           </div>
