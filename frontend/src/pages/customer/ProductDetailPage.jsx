@@ -14,6 +14,10 @@ import productService from '../../services/services_customer/productService';
 import { getImageUrl as getImageUrlUtil } from '../../utils/imageUtils';
 import { calculateDiscount } from '../../utils/productUtils';
 import { getWhatsAppURL } from '../../utils/contactConfig';
+import AddToCartButton from '../../components/ui/AddToCartButton';
+import LoginModal from '../../components/ui/LoginModal';
+import useAuthStore from '../../store/store_customer/useAuthStore';
+import useAddToCart from '../../hooks/hook_customer/useAddToCart';
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -23,6 +27,17 @@ const ProductDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+
+  // Auth store state
+  const { isAuthenticated } = useAuthStore();
+  
+  // Add to cart hook
+  const { 
+    handleAddToCart, 
+    isProcessing,
+    showLoginModal,
+    setShowLoginModal
+  } = useAddToCart();
 
   const isWeightBasedProduct = (targetProduct) => {
     const unitText = String(
@@ -364,18 +379,29 @@ Mohon info ketersediaan dan cara pemesanannya. Terima kasih!`;
                   </div>
                 )}
 
-                {/* Action Buttons - WhatsApp Direct Order */}
+                {/* Action Buttons - Add to Cart if Logged In, otherwise WhatsApp */}
                 <div className="flex flex-col sm:flex-row gap-3 mt-auto pt-4 border-t border-gray-100">
-                  <button
-                    data-cy="whatsapp-order-btn"
-                    onClick={handleWhatsAppOrder}
-                    disabled={product.stock === 0}
-                    className="btn-touch flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-lg bg-green-600 text-white text-sm sm:text-base font-semibold hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <MessageCircle size={16} className="sm:w-5 sm:h-5" />
-                    <span className="hidden sm:inline">Pesan via WhatsApp</span>
-                    <span className="sm:hidden">Pesan WA</span>
-                  </button>
+                  {isAuthenticated ? (
+                    <AddToCartButton 
+                      data-cy="add-to-cart-btn"
+                      onClick={handleAddToCart(product, quantity)}
+                      stock={product.stock}
+                      loading={isProcessing}
+                      size="lg"
+                      fullWidth={true}
+                    />
+                  ) : (
+                    <button
+                      data-cy="whatsapp-order-btn"
+                      onClick={handleWhatsAppOrder}
+                      disabled={product.stock === 0}
+                      className="btn-touch flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-lg bg-green-600 text-white text-sm sm:text-base font-semibold hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <MessageCircle size={16} className="sm:w-5 sm:h-5" />
+                      <span className="hidden sm:inline">Pesan via WhatsApp</span>
+                      <span className="sm:hidden">Pesan WA</span>
+                    </button>
+                  )}
                   <button
                     onClick={handleWhatsAppOrder}
                     disabled={product.stock === 0}
@@ -389,6 +415,12 @@ Mohon info ketersediaan dan cara pemesanannya. Terima kasih!`;
           </div>
         </div>
       </div>
+
+      {/* Login Modal */}
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)} 
+      />
 
       <Footer />
     </>

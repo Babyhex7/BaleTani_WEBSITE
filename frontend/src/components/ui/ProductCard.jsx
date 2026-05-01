@@ -44,10 +44,14 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast'; // ✅ ADDED: For error notifications
+import toast from 'react-hot-toast'; 
 import ProductImage from './ProductImage';
 import ProductPrice from './ProductPrice';
+import AddToCartButton from './AddToCartButton';
 import WhatsAppOrderButton from './WhatsAppOrderButton';
+import LoginModal from './LoginModal';
+import useAuthStore from '../../store/store_customer/useAuthStore';
+import useAddToCart from '../../hooks/hook_customer/useAddToCart';
 import { calculateDiscount, getCategoryName } from '../../utils/productUtils';
 import { getWhatsAppURL } from '../../utils/contactConfig';
 
@@ -105,6 +109,17 @@ const ProductCard = ({
   
   // React Router navigation
   const navigate = useNavigate();
+  
+  // Auth store state
+  const { isAuthenticated } = useAuthStore();
+  
+  // Add to cart hook
+  const { 
+    handleAddToCart, 
+    isProcessing,
+    showLoginModal,
+    setShowLoginModal
+  } = useAddToCart();
   
   // ========================================
   // COMPUTED VALUES - DISKON REAL DARI DATABASE
@@ -335,19 +350,36 @@ Mohon info ketersediaan dan cara pemesanannya. Terima kasih!`;
         </div>
 
         {/* ========================================
-            WHATSAPP ORDER BUTTON
-            Ganti Add to Cart dengan WhatsApp Order langsung
-            Tanpa perlu login - langsung redirect ke WhatsApp
+            ACTION BUTTONS
+            If logged in: Show Add to Cart
+            If not logged in: Show WhatsApp Order
             ======================================== */}
-        <WhatsAppOrderButton 
-          data-cy="whatsapp-order-btn"
-          onClick={handleWhatsAppOrder}
-          stock={product.stock}
-          size="xs"
-          fullWidth={true}
-          label="Pesan"
-        />
+        {isAuthenticated ? (
+          <AddToCartButton 
+            data-cy="add-to-cart-btn"
+            onClick={handleAddToCart(product, 1)}
+            stock={product.stock}
+            loading={isProcessing}
+            size="xs"
+            fullWidth={true}
+          />
+        ) : (
+          <WhatsAppOrderButton 
+            data-cy="whatsapp-order-btn"
+            onClick={handleWhatsAppOrder}
+            stock={product.stock}
+            size="xs"
+            fullWidth={true}
+            label="Pesan"
+          />
+        )}
       </div>
+
+      {/* Login Modal for unauthenticated users (if triggered by hook) */}
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)} 
+      />
     </div>
   );
 };
