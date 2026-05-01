@@ -196,8 +196,12 @@ const ProductCard = ({
     e.stopPropagation();
     e.preventDefault();
     
-    // Format pesan WhatsApp umum tanpa nama produk atau detail
-    const message = `Halo BaleTani, saya tertarik dengan produk di BaleTani. Mohon info ketersediaan, harga, dan cara pemesanannya. Terima kasih!`;
+    // Format pesan WhatsApp dengan detail produk spesifik
+    const message = `Halo BaleTani, saya tertarik dengan produk ini:
+*Nama Produk:* ${product.name}
+*Harga:* ${formatPrice(finalPrice)}
+
+Mohon info ketersediaan dan cara pemesanannya. Terima kasih!`;
     
     const whatsappUrl = getWhatsAppURL(message);
     window.open(whatsappUrl, '_blank');
